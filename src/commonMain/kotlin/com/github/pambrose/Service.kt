@@ -27,7 +27,7 @@ interface IRegisterProfileService {
 
 @KVService
 interface IContentService {
-  suspend fun lastSlide(title: String): SlideData
+  suspend fun currentSlide(title: String): SlideData
 }
 
 @KVService

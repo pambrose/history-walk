@@ -170,15 +170,18 @@ actual class ContentService : IContentService {
   @Inject
   lateinit var call: ApplicationCall
 
-
-  override suspend fun lastSlide(title: String): SlideData {
+  override suspend fun currentSlide(title: String): SlideData {
 
     println("name= ${call.sessions.get<Profile>()}")
-    println("session= ${call.sessions.get<BrowserSession>()}")
+    println("session= ${call.browserSession}")
 
-    val titleVal = findSlide(title).title
+    val sessionId = call.browserSession?.id ?: error("Missing browser session")
 
-    val escaped = findSlide(title).content
+    val slide = findSlide(title)
+
+    val titleVal = slide.title
+
+    val escaped = slide.content
       .replace("<", ltEscape)
       .replace(">", gtEscape)
 
@@ -187,14 +190,14 @@ actual class ContentService : IContentService {
         .replace(ltEscape, "<")
         .replace(gtEscape, ">")
 
-    val choices = findSlide(title).choices.map { (choice, destination) -> ChoiceTitle(choice, destination) }
+    val choices = slide.choices.map { (choice, destination) -> ChoiceTitle(choice, destination) }
 
-    val orientation = findSlide(title).choiceOrientation
+    val orientation = slide.choiceOrientation
 
     val parentTitles =
       mutableListOf<String>()
         .also { parentTitles ->
-          var currSlide = findSlide(title).parentSlide
+          var currSlide = slide.parentSlide
           while (currSlide != null) {
             parentTitles += currSlide.title
             currSlide = currSlide.parentSlide
@@ -202,19 +205,17 @@ actual class ContentService : IContentService {
         }
         .reversed()
 
-    return SlideData(
-      titleVal,
-      content,
-      choices,
-      orientation,
-      parentTitles,
-      5
-    )
+    val slides = sessionChoices.computeIfAbsent(sessionId) { mutableSetOf() }
+    slides += titleVal
+
+    return SlideData(titleVal, content, choices, orientation, parentTitles, slides.size)
   }
 
   companion object {
     const val ltEscape = "---LT---"
     const val gtEscape = "---GT---"
+
+    val sessionChoices = mutableMapOf<String, MutableSet<String>>()
   }
 }
 

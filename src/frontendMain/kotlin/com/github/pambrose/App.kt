@@ -67,12 +67,9 @@ class App : Application() {
     }
   }
 
-  suspend fun Container.refreshPanel(title: String) {
+  suspend fun Container.refreshPanel(slideTitle: String) {
 
-    val slideData =
-      Security.withAuth {
-        Model.lastSlide(title)
-      }
+    val currentSlide = Security.withAuth { Model.currentSlide(slideTitle) }
 
     removeAll()
 
@@ -84,33 +81,33 @@ class App : Application() {
         paddingTop = 5.px
         paddingBottom = 5.px
         textAlign = TextAlign.LEFT
-        +"Total moves: ${slideData.currentScore}"
+        +"Total moves: ${currentSlide.currentScore}"
       }
 
       h1 {
         background = Background(Color.rgb(53, 121, 246))
         color = Color.name(Col.WHITE)
         textAlign = TextAlign.CENTER
-        +slideData.title
+        +currentSlide.title
       }
 
       div {
         border = Border(2.px, BorderStyle.SOLID, Color.name(Col.GRAY))
         padding = 25.px
-        add(P(slideData.contents, true))
+        add(P(currentSlide.contents, true))
       }
 
       div {
         marginTop = 10.px
         val spacing = 4
-        val init: Container.() -> Unit = { addButtons(obsTitle.value, slideData.choices, this@refreshPanel) }
-        if (slideData.orientation == ChoiceOrientation.VERTICAL)
+        val init: Container.() -> Unit = { addButtons(obsTitle.value, currentSlide.choices, this@refreshPanel) }
+        if (currentSlide.orientation == ChoiceOrientation.VERTICAL)
           vPanel(spacing = spacing, init = init)
         else
           hPanel(spacing = spacing, init = init)
       }
 
-      if (slideData.parentTitles.isNotEmpty()) {
+      if (currentSlide.parentTitles.isNotEmpty()) {
         div {
           marginTop = 10.px
 
@@ -120,15 +117,15 @@ class App : Application() {
                 val dialog =
                   Dialog<String>("Go back to...") {
                     vPanel(spacing = 4) {
-                      slideData.parentTitles.forEach { title ->
-                        button(title, style = ButtonStyle.PRIMARY) { onClick { setResult(title) } }
+                      currentSlide.parentTitles.forEach { slideTitle ->
+                        button(slideTitle, style = ButtonStyle.PRIMARY) { onClick { setResult(slideTitle) } }
                       }
                     }
                   }
 
                 AppScope.launch {
-                  dialog.getResult()?.also { title ->
-                    if (title.isNotBlank()) this@refreshPanel.refreshPanel(title)
+                  dialog.getResult()?.also { slideTitle ->
+                    if (slideTitle.isNotBlank()) this@refreshPanel.refreshPanel(slideTitle)
                   }
                 }
               }
@@ -139,7 +136,7 @@ class App : Application() {
     }
   }
 
-  fun Container.addButtons(title: String, choices: List<ChoiceTitle>, mainPanel: Container) {
+  private fun Container.addButtons(title: String, choices: List<ChoiceTitle>, mainPanel: Container) {
     choices.forEach { ct ->
       button(ct.choice, style = ButtonStyle.PRIMARY) {
         onClick {

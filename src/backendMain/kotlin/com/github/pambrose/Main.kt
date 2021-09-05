@@ -65,7 +65,7 @@ fun Application.main() {
   Db.init(environment.config)
 
   install(Authentication) {
-    form {
+    form("UserId") {
       userParamName = "username"
       passwordParamName = "password"
 
@@ -86,7 +86,7 @@ fun Application.main() {
   routing {
     applyRoutes(RegisterProfileServiceManager)
 
-    authenticate {
+    authenticate("UserId") {
       post("login") {
         val principal = call.principal<UserIdPrincipal>()
         val result =

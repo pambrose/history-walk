@@ -87,7 +87,7 @@ object Model {
     }
   }
 
-  suspend fun lastSlide(title: String) = contentService.lastSlide(title)
+  suspend fun currentSlide(title: String) = contentService.currentSlide(title)
 
   suspend fun choose(user: String, fromTitle: String, toTitle: String, choice: String, reason: String) =
     userService.choose(user, fromTitle, toTitle, choice, reason)
