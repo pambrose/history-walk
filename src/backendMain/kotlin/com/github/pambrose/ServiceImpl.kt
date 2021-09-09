@@ -211,22 +211,13 @@ actual class ContentService : IContentService {
     return SlideData(titleVal, content, choices, orientation, parentTitles, slides.size)
   }
 
-  companion object {
-    const val ltEscape = "---LT---"
-    const val gtEscape = "---GT---"
-
-    val sessionChoices = mutableMapOf<String, MutableSet<String>>()
-  }
-}
-
-actual class UserService : IUserService {
   override suspend fun choose(
-    user: String,
     fromTitle: String,
     toTitle: String,
     choice: String,
     reason: String
   ): String {
+    val user = call.sessions.get<Profile>()?.name ?: error("Missing profile")
     //println("User: '$user' from: '$fromTitle' to: '$toTitle' choice: '$choice' reason: '$reason'")
     users.computeIfAbsent(user) { mutableListOf() }.add(Choice(fromTitle, toTitle, reason))
     println(users[user])
@@ -234,7 +225,11 @@ actual class UserService : IUserService {
   }
 
   companion object {
+    const val ltEscape = "---LT---"
+    const val gtEscape = "---GT---"
+
     val users = mutableMapOf<String, MutableList<Choice>>()
+    val sessionChoices = mutableMapOf<String, MutableSet<String>>()
   }
 }
 

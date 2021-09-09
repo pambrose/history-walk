@@ -136,38 +136,40 @@ class App : Application() {
     }
   }
 
+  private fun promptForReason(title: String, ct: ChoiceTitle, mainPanel: Container) {
+    val submit = Button("OK", disabled = true)
+    val reasonDialog =
+      Dialog<String>("Reasoning") {
+        val input =
+          Text(label = "Reason for your decision:") {
+            placeholder = """I chose "${ct.choice}" because..."""
+            setEventListener<Text> {
+              keyup = { e ->
+                submit.disabled = value.isNullOrBlank()
+              }
+            }
+          }
+        add(input)
+        addButton(Button("Cancel", style = OUTLINESECONDARY).also { it.onClick { setResult("") } })
+        addButton(submit.also { it.onClick { setResult(input.value) } })
+      }
+
+    AppScope.launch {
+      reasonDialog.getResult()?.also { response ->
+        if (response.isNotBlank()) {
+          Model.choose(title, ct.title, ct.choice, response)
+          mainPanel.refreshPanel(ct.title)
+        }
+      }
+    }
+  }
+
   private fun Container.addButtons(title: String, choices: List<ChoiceTitle>, mainPanel: Container) {
     choices.forEach { ct ->
       button(ct.choice, style = ButtonStyle.PRIMARY) {
         onClick {
-          val submit = Button("OK", disabled = true)
-          val dialog =
-            Dialog<String>("Reasoning") {
-              val input =
-                Text(label = "Reason for your decision:") {
-                  placeholder = """I chose "${ct.choice}" because..."""
-                  setEventListener<Text> {
-                    keyup = { e ->
-                      submit.disabled = value.isNullOrBlank()
-                    }
-                  }
-                }
-              add(input)
-              addButton(Button("Cancel", style = OUTLINESECONDARY).also { it.onClick { setResult("") } })
-              addButton(submit.also {
-                it.onClick {
-                  setResult(input.value)
-                }
-              })
-            }
-
           AppScope.launch {
-            dialog.getResult()?.also { response ->
-              if (response.isNotBlank()) {
-                Model.choose("user1", title, ct.title, ct.choice, response)
-                mainPanel.refreshPanel(ct.title)
-              }
-            }
+            promptForReason(title, ct, mainPanel)
           }
         }
       }

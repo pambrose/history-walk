@@ -116,7 +116,6 @@ fun Application.main() {
       applyRoutes(ProfileServiceManager)
 
       applyRoutes(ContentServiceManager)
-      applyRoutes(UserServiceManager)
     }
   }
 

@@ -28,11 +28,7 @@ interface IRegisterProfileService {
 @KVService
 interface IContentService {
   suspend fun currentSlide(title: String): SlideData
-}
-
-@KVService
-interface IUserService {
-  suspend fun choose(user: String, fromTitle: String, toTitle: String, choice: String, reason: String): String
+  suspend fun choose(fromTitle: String, toTitle: String, choice: String, reason: String): String
 }
 
 @Serializable

@@ -12,7 +12,6 @@ object Model {
   private val profileService = ProfileService()
   private val registerProfileService = RegisterProfileService()
   private val contentService = ContentService()
-  private val userService = UserService()
 
   val addresses: ObservableList<Address> = observableListOf()
   val profile: ObservableList<Profile> = observableListOf(Profile())
@@ -89,6 +88,6 @@ object Model {
 
   suspend fun currentSlide(title: String) = contentService.currentSlide(title)
 
-  suspend fun choose(user: String, fromTitle: String, toTitle: String, choice: String, reason: String) =
-    userService.choose(user, fromTitle, toTitle, choice, reason)
+  suspend fun choose(fromTitle: String, toTitle: String, choice: String, reason: String) =
+    contentService.choose(fromTitle, toTitle, choice, reason)
 }
