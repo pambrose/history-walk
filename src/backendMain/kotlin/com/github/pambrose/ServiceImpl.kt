@@ -215,7 +215,6 @@ actual class ContentService : IContentService {
 
   override suspend fun choose(fromTitle: String, choice: String, choiceTitle: String): ChoiceReason {
     val user = call.sessions.get<Profile>()?.name ?: error("Missing profile")
-    //println("User: '$user' from: '$fromTitle' to: '$toTitle' choice: '$choice' reason: '$reason'")
     val userMoves = users.computeIfAbsent(user) { mutableListOf() }
     val userChoice = userMoves.firstOrNull { it.fromTitle == fromTitle && it.choice == choice }
 

@@ -2,6 +2,7 @@ package com.github.pambrose
 
 import org.jetbrains.exposed.sql.ReferenceOption
 import org.jetbrains.exposed.sql.Table
+import org.jetbrains.exposed.sql.jodatime.datetime
 
 object AddressDao : Table("address") {
   val id = integer("id").primaryKey().autoIncrement()

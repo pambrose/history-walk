@@ -48,15 +48,15 @@ object Db {
     parameters: Map<String, Any?>,
     transform: (ResultSet) -> T
   ): List<T> {
-    val statement = NamedParameterPreparedStatement.createNamedParameterPreparedStatement(connection, query)
-    statement.setParameters(parameters)
+//    val statement = NamedParameterPreparedStatement.createNamedParameterPreparedStatement(connection, query)
+//    statement.setParameters(parameters)
     val result = arrayListOf<T>()
-    val resultSet = statement.executeQuery()
-    resultSet.use {
-      while (resultSet.next()) {
-        result += transform(resultSet)
-      }
-    }
+//    val resultSet = statement.executeQuery()
+//    resultSet.use {
+//      while (resultSet.next()) {
+//        result += transform(resultSet)
+//      }
+//    }
     return result
   }
 
@@ -65,14 +65,14 @@ object Db {
     parameters: Map<String, Any?>,
     transform: (ResultSet) -> T
   ): T? {
-    val statement = NamedParameterPreparedStatement.createNamedParameterPreparedStatement(connection, query)
-    statement.setParameters(parameters)
-    val resultSet = statement.executeQuery()
-    resultSet.use {
-      if (resultSet.next()) {
-        return transform(resultSet)
-      }
-    }
+//    val statement = NamedParameterPreparedStatement.createNamedParameterPreparedStatement(connection, query)
+//    statement.setParameters(parameters)
+//    val resultSet = statement.executeQuery()
+//    resultSet.use {
+//      if (resultSet.next()) {
+//        return transform(resultSet)
+//      }
+//    }
     return null
   }
 
