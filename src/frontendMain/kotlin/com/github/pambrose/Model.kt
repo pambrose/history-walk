@@ -88,6 +88,9 @@ object Model {
 
   suspend fun currentSlide(title: String) = contentService.currentSlide(title)
 
-  suspend fun choose(fromTitle: String, toTitle: String, choice: String, reason: String) =
-    contentService.choose(fromTitle, toTitle, choice, reason)
+  suspend fun choose(fromTitle: String, choiceTitle: String, choice: String) =
+    contentService.choose(fromTitle, choice, choiceTitle)
+
+  suspend fun reason(choiceId: String, reason: String) =
+    contentService.reason(choiceId, reason)
 }

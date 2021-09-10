@@ -4,6 +4,8 @@ import com.github.andrewoma.kwery.core.builder.query
 import com.github.pambrose.Db.dbQuery
 import com.github.pambrose.Db.queryList
 import com.github.pambrose.Slide.Companion.findSlide
+import com.github.pambrose.common.util.isNull
+import com.github.pambrose.common.util.randomId
 import com.google.inject.Inject
 import io.ktor.application.*
 import io.ktor.sessions.*
@@ -211,16 +213,30 @@ actual class ContentService : IContentService {
     return SlideData(titleVal, content, choices, orientation, parentTitles, slides.size)
   }
 
-  override suspend fun choose(
-    fromTitle: String,
-    toTitle: String,
-    choice: String,
-    reason: String
-  ): String {
+  override suspend fun choose(fromTitle: String, choice: String, choiceTitle: String): ChoiceReason {
     val user = call.sessions.get<Profile>()?.name ?: error("Missing profile")
     //println("User: '$user' from: '$fromTitle' to: '$toTitle' choice: '$choice' reason: '$reason'")
-    users.computeIfAbsent(user) { mutableListOf() }.add(Choice(fromTitle, toTitle, reason))
-    println(users[user])
+    val userMoves = users.computeIfAbsent(user) { mutableListOf() }
+    val userChoice = userMoves.firstOrNull { it.fromTitle == fromTitle && it.choice == choice }
+
+    return if (userChoice.isNull()) {
+      Choice(fromTitle, choice, choiceTitle).let { newChoice ->
+        userMoves.add(newChoice)
+        ChoiceReason(newChoice.choiceId, newChoice.reason)
+      }
+    } else {
+      ChoiceReason(userChoice.choiceId, userChoice.reason)
+    }.also {
+      println(users[user])
+    }
+  }
+
+  override suspend fun reason(choiceId: String, reason: String): String {
+    val user = call.sessions.get<Profile>()?.name ?: error("Missing profile")
+    val userMoves = users[user] ?: error("Missing user: $user")
+    val userChoice = userMoves.firstOrNull { it.choiceId == choiceId } ?: error("Missing choiceId: $choiceId")
+    println("Assigning $userChoice the reason: $reason")
+    userChoice.reason = reason
     return ""
   }
 
@@ -233,4 +249,6 @@ actual class ContentService : IContentService {
   }
 }
 
-data class Choice(val fromTitle: String, val toTitle: String, val reason: String)
+data class Choice(val fromTitle: String, val choice: String, val choiceTitle: String, var reason: String = "") {
+  val choiceId = randomId(10)
+}

@@ -136,7 +136,7 @@ class App : Application() {
     }
   }
 
-  private fun promptForReason(title: String, ct: ChoiceTitle, mainPanel: Container) {
+  private fun promptForReason(ct: ChoiceTitle, choiceId: String, mainPanel: Container) {
     val submit = Button("OK", disabled = true)
     val reasonDialog =
       Dialog<String>("Reasoning") {
@@ -157,7 +157,7 @@ class App : Application() {
     AppScope.launch {
       reasonDialog.getResult()?.also { response ->
         if (response.isNotBlank()) {
-          Model.choose(title, ct.title, ct.choice, response)
+          Model.reason(choiceId, response)
           mainPanel.refreshPanel(ct.title)
         }
       }
@@ -169,7 +169,12 @@ class App : Application() {
       button(ct.choice, style = ButtonStyle.PRIMARY) {
         onClick {
           AppScope.launch {
-            promptForReason(title, ct, mainPanel)
+            val choiceReason = Model.choose(title, ct.title, ct.choice)
+            println("I got back $choiceReason")
+            if (choiceReason.reason.isEmpty())
+              promptForReason(ct, choiceReason.choiceId, mainPanel)
+            else
+              mainPanel.refreshPanel(ct.title)
           }
         }
       }

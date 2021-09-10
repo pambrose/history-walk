@@ -1,7 +1,6 @@
 package com.github.pambrose
 
 import io.kvision.annotations.KVService
-import kotlinx.serialization.Serializable
 
 enum class Sort {
   FN, LN, E, F
@@ -28,11 +27,6 @@ interface IRegisterProfileService {
 @KVService
 interface IContentService {
   suspend fun currentSlide(title: String): SlideData
-  suspend fun choose(fromTitle: String, toTitle: String, choice: String, reason: String): String
+  suspend fun choose(fromTitle: String, choice: String, choiceTitle: String): ChoiceReason
+  suspend fun reason(choiceId: String, reason: String): String
 }
-
-@Serializable
-class ChoiceTitle(val choice: String, val title: String)
-
-@Serializable
-enum class ChoiceOrientation { VERTICAL, HORIZONTAL }
