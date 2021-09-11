@@ -5,15 +5,20 @@ import com.github.pambrose.Db.dbQuery
 import com.github.pambrose.Db.queryList
 import com.github.pambrose.Slide.Companion.findSlide
 import com.github.pambrose.common.util.isNull
+import com.github.pambrose.common.util.newStringSalt
 import com.github.pambrose.common.util.randomId
+import com.github.pambrose.common.util.sha256
+import com.github.pambrose.dbms.UsersTable
 import com.google.inject.Inject
 import io.ktor.application.*
 import io.ktor.sessions.*
 import org.apache.commons.codec.digest.DigestUtils
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.transactions.transaction
 import org.joda.time.DateTime
 import java.sql.ResultSet
 import java.time.ZoneId
+import java.util.*
 
 suspend fun <RESP> ApplicationCall.withProfile(block: suspend (Profile) -> RESP): RESP {
   val profile = this.sessions.get<Profile>()
@@ -154,6 +159,35 @@ actual class RegisterProfileService : IRegisterProfileService {
 
   override suspend fun registerProfile(profile: Profile, password: String): Boolean {
     try {
+      User(randomId(25), false)
+        .also { user ->
+          transaction {
+            val salt = newStringSalt()
+            val digest = password.sha256(salt)
+            val userDbmsId =
+              UsersTable
+                .insertAndGetId { row ->
+                  row[uuidCol] = UUID.randomUUID()
+                  row[userId] = user.userId
+                  row[fullName] = profile.name ?: ""
+                  row[UsersTable.email] = profile.id.toString()
+                  row[UsersTable.salt] = salt
+                  row[UsersTable.digest] = digest
+                }.value
+
+//            val browserId =
+//              browserSession?.sessionDbmsId() ?: error("Missing browser session")
+//
+//            UserSessionsTable
+//              .insert { row ->
+//                row[sessionRef] = browserId
+//                row[userRef] = userDbmsId
+//                row[activeClassCode] = DISABLED_CLASS_CODE.classCode
+//                row[previousTeacherClassCode] = DISABLED_CLASS_CODE.classCode
+//              }
+          }
+        }
+
       dbQuery {
         UserDao.insert {
           it[this.name] = profile.name!!

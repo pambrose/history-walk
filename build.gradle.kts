@@ -110,6 +110,7 @@ kotlin {
         implementation("io.ktor:ktor-auth:$ktorVersion")
         implementation("ch.qos.logback:logback-classic:$logbackVersion")
         implementation("com.h2database:h2:$h2Version")
+        implementation("com.github.pambrose.common-utils:exposed-utils:$utilsVersion")
         implementation("org.postgresql:postgresql:$pgsqlVersion")
         implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
         implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")

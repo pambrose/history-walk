@@ -2,6 +2,7 @@ package com.github.pambrose
 
 import com.github.pambrose.BrowserSessions.assignBrowserSession
 import com.github.pambrose.Db.dbQuery
+import com.github.pambrose.common.util.isNotNull
 import com.github.pambrose.common.util.isNull
 import com.github.pambrose.common.util.randomId
 import io.ktor.application.*
@@ -79,7 +80,7 @@ fun Application.main() {
         }
       }
 
-      skipWhen { call -> call.sessions.get<Profile>() != null }
+      skipWhen { call -> call.sessions.get<Profile>().isNotNull() }
     }
   }
 

@@ -12,9 +12,38 @@ import org.jetbrains.exposed.sql.Transaction
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.math.BigDecimal
 import java.sql.*
+import kotlin.time.Duration.Companion.minutes
 
 
 object Db {
+
+  internal val dbms by lazy {
+    Database.connect(
+      HikariDataSource(
+        HikariConfig()
+          .apply {
+            driverClassName = EnvVar.DBMS_DRIVER_CLASSNAME.getEnv(Property.DBMS_DRIVER_CLASSNAME.getRequiredProperty())
+            jdbcUrl = EnvVar.DBMS_URL.getEnv(Property.DBMS_URL.getRequiredProperty())
+            username = EnvVar.DBMS_USERNAME.getEnv(Property.DBMS_USERNAME.getRequiredProperty())
+            password = EnvVar.DBMS_PASSWORD.getEnv(Property.DBMS_PASSWORD.getRequiredProperty())
+
+            EnvVar.CLOUD_SQL_CONNECTION_NAME.getEnv("")
+              .also {
+                if (it.isNotBlank()) {
+                  addDataSourceProperty("cloudSqlInstance", it)
+                  addDataSourceProperty("socketFactory", "com.google.cloud.sql.postgres.SocketFactory")
+                }
+              }
+
+            maximumPoolSize = Property.DBMS_MAX_POOL_SIZE.getRequiredProperty().toInt()
+            isAutoCommit = false
+            transactionIsolation = "TRANSACTION_REPEATABLE_READ"
+            maxLifetime =
+              minutes(Property.DBMS_MAX_LIFETIME_MINS.getRequiredProperty().toInt()).inWholeMilliseconds
+            validate()
+          })
+    )
+  }
 
   fun init(config: ApplicationConfig) {
     Database.connect(hikari(config))
