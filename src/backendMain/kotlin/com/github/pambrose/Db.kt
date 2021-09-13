@@ -7,7 +7,6 @@ import io.ktor.config.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.SchemaUtils.create
 import org.jetbrains.exposed.sql.Transaction
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.math.BigDecimal
@@ -16,8 +15,7 @@ import kotlin.time.Duration.Companion.minutes
 
 
 object Db {
-
-  internal val dbms by lazy {
+  val dbms by lazy {
     Database.connect(
       HikariDataSource(
         HikariConfig()
@@ -46,11 +44,12 @@ object Db {
   }
 
   fun init(config: ApplicationConfig) {
-    Database.connect(hikari(config))
-    transaction {
-      create(UserDao)
-      create(AddressDao)
-    }
+    dbms
+//    Database.connect(hikari(config))
+//    transaction {
+//      create(UserDao)
+//      create(AddressDao)
+//    }
   }
 
   private fun hikari(config: ApplicationConfig): HikariDataSource {

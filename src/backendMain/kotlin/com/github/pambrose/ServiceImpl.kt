@@ -12,7 +12,6 @@ import com.github.pambrose.dbms.UsersTable
 import com.google.inject.Inject
 import io.ktor.application.*
 import io.ktor.sessions.*
-import org.apache.commons.codec.digest.DigestUtils
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.joda.time.DateTime
@@ -39,7 +38,7 @@ actual class AddressService : IAddressService {
           select("SELECT * FROM address")
           whereGroup {
             where("user_id = :user_id")
-            parameter("user_id", profile.id)
+            //parameter("user_id", profile.id)
             search?.let {
               where(
                 """(lower(first_name) like :search
@@ -77,7 +76,7 @@ actual class AddressService : IAddressService {
         it[postalAddress] = address.postalAddress
         it[favourite] = address.favourite ?: false
         it[createdAt] = DateTime()
-        it[userId] = profile.id!!
+        //it[userId] = profile.id!!
 
       } get AddressDao.id)
     }
@@ -97,7 +96,7 @@ actual class AddressService : IAddressService {
             it[favourite] = address.favourite ?: false
             it[createdAt] = oldAddress.createdAt
               ?.let { DateTime(java.util.Date.from(it.atZone(ZoneId.systemDefault()).toInstant())) }
-            it[userId] = profile.id!!
+            //it[userId] = profile.id
           }
         }
       }
@@ -107,7 +106,7 @@ actual class AddressService : IAddressService {
 
   override suspend fun deleteAddress(id: Int): Boolean = call.withProfile { profile ->
     dbQuery {
-      AddressDao.deleteWhere { (AddressDao.userId eq profile.id!!) and (AddressDao.id eq id) } > 0
+      AddressDao.deleteWhere { (AddressDao.userId eq 99/*profile.id*/) and (AddressDao.id eq id) } > 0
     }
   }
 
@@ -167,10 +166,10 @@ actual class RegisterProfileService : IRegisterProfileService {
             val userDbmsId =
               UsersTable
                 .insertAndGetId { row ->
-                  row[uuidCol] = UUID.randomUUID()
-                  row[userId] = user.userId
-                  row[fullName] = profile.name ?: ""
-                  row[UsersTable.email] = profile.id.toString()
+                  row[UsersTable.uuidCol] = UUID.randomUUID()
+                  row[UsersTable.userId] = user.userId
+                  row[UsersTable.fullName] = profile.name
+                  row[UsersTable.email] = profile.email
                   row[UsersTable.salt] = salt
                   row[UsersTable.digest] = digest
                 }.value
@@ -188,14 +187,15 @@ actual class RegisterProfileService : IRegisterProfileService {
           }
         }
 
-      dbQuery {
-        UserDao.insert {
-          it[this.name] = profile.name!!
-          it[this.username] = profile.username!!
-          it[this.password] = DigestUtils.sha256Hex(password)
-        }
-      }
+//      dbQuery {
+//        UserDao.insert {
+//          it[this.name] = profile.name
+//          it[this.username] = profile.email
+//          it[this.password] = DigestUtils.sha256Hex(password)
+//        }
+//      }
     } catch (e: Exception) {
+      e.printStackTrace()
       throw Exception("Register operation failed!")
     }
     return true

@@ -2,6 +2,7 @@ package com.github.pambrose
 
 import com.github.pambrose.BrowserSessions.assignBrowserSession
 import com.github.pambrose.Db.dbQuery
+import com.github.pambrose.Property.Companion.assignProperties
 import com.github.pambrose.common.util.isNotNull
 import com.github.pambrose.common.util.isNull
 import com.github.pambrose.common.util.randomId
@@ -25,6 +26,9 @@ import kotlin.time.Duration
 const val AUTH_COOKIE = "auth"
 
 fun Application.main() {
+
+  assignProperties()
+
   Content.initContent()
   Slide.verifySlides()
 
@@ -94,9 +98,8 @@ fun Application.main() {
           if (principal != null) {
             dbQuery {
               UserDao.select { UserDao.username eq principal.name }.firstOrNull()?.let {
-                val profile =
-                  Profile(it[UserDao.id], it[UserDao.name], it[UserDao.username].toString(), null, null)
-                call.sessions.set(profile)
+//                val profile = Profile(it[UserDao.id], it[UserDao.name], it[UserDao.username].toString(), "", "")
+//                call.sessions.set(profile)
                 HttpStatusCode.OK
               } ?: HttpStatusCode.Unauthorized
             }

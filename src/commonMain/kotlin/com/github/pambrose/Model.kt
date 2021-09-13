@@ -8,11 +8,11 @@ import kotlinx.serialization.UseContextualSerialization
 
 @Serializable
 data class Profile(
-  val id: Int? = null,
-  val name: String? = null,
-  val username: String? = null,
-  val password: String? = null,
-  val password2: String? = null
+  //val id: Int,
+  val name: String,
+  val email: String,
+  val password: String,
+  val password2: String
 )
 
 @Serializable

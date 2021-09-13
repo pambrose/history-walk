@@ -51,7 +51,7 @@ object EditPanel : StackPanel() {
         }
       }
     }
-    add(MainPanel)
+    add(OldMainPanel)
   }
 
   fun add() {
@@ -97,6 +97,6 @@ object EditPanel : StackPanel() {
 
   private fun close() {
     editingId = null
-    activeChild = MainPanel
+    activeChild = OldMainPanel
   }
 }

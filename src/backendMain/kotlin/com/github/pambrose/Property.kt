@@ -168,9 +168,9 @@ enum class Property(
       PYTHON_EVALUATORS_POOL_SIZE.setPropertyFromConfig(this, "5")
 
       DBMS_DRIVER_CLASSNAME.setPropertyFromConfig(this, "com.impossibl.postgres.jdbc.PGDriver")
-      DBMS_URL.setPropertyFromConfig(this, "jdbc:pgsql://localhost:5432/readingbat")
+      DBMS_URL.setPropertyFromConfig(this, "jdbc:pgsql://localhost:5432/history-walk")
       DBMS_USERNAME.setPropertyFromConfig(this, "postgres")
-      DBMS_PASSWORD.setPropertyFromConfig(this, "")
+      DBMS_PASSWORD.setPropertyFromConfig(this, "docker")
       DBMS_MAX_POOL_SIZE.setPropertyFromConfig(this, "10")
       DBMS_MAX_LIFETIME_MINS.setPropertyFromConfig(this, "30")
 

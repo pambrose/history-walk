@@ -1,7 +1,6 @@
 package com.github.pambrose
 
 import io.kvision.state.ObservableList
-import io.kvision.state.ObservableValue
 import io.kvision.state.observableListOf
 import io.kvision.utils.syncWithList
 import kotlinx.coroutines.launch
@@ -14,11 +13,7 @@ object Model {
   private val contentService = ContentService()
 
   val addresses: ObservableList<Address> = observableListOf()
-  val profile: ObservableList<Profile> = observableListOf(Profile())
-
-  val obsTitle = ObservableValue("")
-  val obsContent = ObservableValue("")
-  val obsChoices: ObservableList<ChoiceTitle> = observableListOf()
+  val profile: ObservableList<Profile> = observableListOf()
 
   var search: String? = null
     set(value) {
@@ -86,11 +81,18 @@ object Model {
     }
   }
 
-  suspend fun currentSlide(title: String) = contentService.currentSlide(title)
+  suspend fun currentSlide(title: String) =
+    Security.withAuth {
+      contentService.currentSlide(title)
+    }
 
   suspend fun choose(fromTitle: String, choiceTitle: String, choice: String) =
-    contentService.choose(fromTitle, choice, choiceTitle)
+    Security.withAuth {
+      contentService.choose(fromTitle, choice, choiceTitle)
+    }
 
   suspend fun reason(choiceId: String, reason: String) =
-    contentService.reason(choiceId, reason)
+    Security.withAuth {
+      contentService.reason(choiceId, reason)
+    }
 }
