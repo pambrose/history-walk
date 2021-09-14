@@ -82,7 +82,7 @@ class LoginWindow : Dialog<Credentials>(closeButton = false, escape = false, ani
       this@LoginWindow.processRegister()
     }
 
-    loginButton = Button(tr("Email"), "fas fa-check", ButtonStyle.PRIMARY).onClick {
+    loginButton = Button(tr("Login"), "fas fa-check", ButtonStyle.PRIMARY).onClick {
       this@LoginWindow.processCredentials()
     }
 

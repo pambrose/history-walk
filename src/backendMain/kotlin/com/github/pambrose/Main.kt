@@ -3,9 +3,11 @@ package com.github.pambrose
 import com.github.pambrose.BrowserSessions.assignBrowserSession
 import com.github.pambrose.Db.dbQuery
 import com.github.pambrose.Property.Companion.assignProperties
+import com.github.pambrose.User.Companion.queryUserByEmail
 import com.github.pambrose.common.util.isNotNull
 import com.github.pambrose.common.util.isNull
 import com.github.pambrose.common.util.randomId
+import com.github.pambrose.common.util.sha256
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.features.*
@@ -17,8 +19,6 @@ import io.ktor.util.pipeline.*
 import io.kvision.remote.applyRoutes
 import io.kvision.remote.kvisionInit
 import mu.KLogging
-import org.apache.commons.codec.digest.DigestUtils
-import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.select
 import kotlin.collections.set
 import kotlin.time.Duration
@@ -74,17 +74,36 @@ fun Application.main() {
       userParamName = "username"
       passwordParamName = "password"
 
-      validate { credentials ->
-        dbQuery {
-          UserDao.select {
-            (UserDao.username eq credentials.name) and (UserDao.password eq DigestUtils.sha256Hex(credentials.password))
-          }.firstOrNull()?.let {
-            UserIdPrincipal(credentials.name)
+      validate { cred: UserPasswordCredential ->
+
+        var principal: UserPrincipal? = null
+        val user = queryUserByEmail(Email(cred.name))
+        if (user.isNotNull()) {
+          val salt = user.salt
+          val digest = user.digest
+          if (salt.isNotBlank() && digest.isNotBlank() && digest == cred.password.sha256(salt)) {
+            //logger.debug { "Found user ${cred.name} ${user.userId}" }
+            principal = UserPrincipal(user.uuid)
           }
         }
+
+        //logger.info { "Login ${if (principal.isNull()) "failure" else "success for $user ${user?.email ?: UNKNOWN}"}" }
+
+        //if (principal.isNull())
+        //  failedLoginLimiter.acquire() // may block
+
+        principal
+
+//        dbQuery {
+//          UserDao.select {
+//            (UserDao.username eq credentials.name) and (UserDao.password eq DigestUtils.sha256Hex(credentials.password))
+//          }.firstOrNull()?.let {
+//            UserIdPrincipal(credentials.name)
+//          }
+//        }
       }
 
-      skipWhen { call -> call.sessions.get<Profile>().isNotNull() }
+      //skipWhen { call -> call.sessions.get<Profile>().isNotNull() }
     }
   }
 
@@ -97,6 +116,8 @@ fun Application.main() {
         val result =
           if (principal != null) {
             dbQuery {
+
+
               UserDao.select { UserDao.username eq principal.name }.firstOrNull()?.let {
 //                val profile = Profile(it[UserDao.id], it[UserDao.name], it[UserDao.username].toString(), "", "")
 //                call.sessions.set(profile)
@@ -106,6 +127,7 @@ fun Application.main() {
           } else {
             HttpStatusCode.Unauthorized
           }
+
         assignBrowserSession()
 
         call.respond(result)

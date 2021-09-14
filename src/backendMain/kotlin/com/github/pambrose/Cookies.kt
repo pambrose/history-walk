@@ -4,6 +4,7 @@ import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.sessions.*
 import java.time.Instant
+import java.util.*
 
 data class BrowserSession(val id: String, val created: Long = Instant.now().toEpochMilli()) {
 
@@ -66,7 +67,7 @@ data class BrowserSession(val id: String, val created: Long = Instant.now().toEp
 //  }
 }
 
-internal data class UserPrincipal(val userId: String, val created: Long = Instant.now().toEpochMilli()) : Principal
+internal data class UserPrincipal(val uuid: UUID, val created: Long = Instant.now().toEpochMilli()) : Principal
 
 internal val ApplicationCall.browserSession get() = sessions.get<BrowserSession>()
 

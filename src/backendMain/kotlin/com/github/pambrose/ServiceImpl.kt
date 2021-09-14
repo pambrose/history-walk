@@ -158,7 +158,7 @@ actual class RegisterProfileService : IRegisterProfileService {
 
   override suspend fun registerProfile(profile: Profile, password: String): Boolean {
     try {
-      User(randomId(25), false)
+      User(UUID.randomUUID(), false)
         .also { user ->
           transaction {
             val salt = newStringSalt()
@@ -166,8 +166,7 @@ actual class RegisterProfileService : IRegisterProfileService {
             val userDbmsId =
               UsersTable
                 .insertAndGetId { row ->
-                  row[UsersTable.uuidCol] = UUID.randomUUID()
-                  row[UsersTable.userId] = user.userId
+                  row[UsersTable.uuidCol] = user.uuid
                   row[UsersTable.fullName] = profile.name
                   row[UsersTable.email] = profile.email
                   row[UsersTable.salt] = salt

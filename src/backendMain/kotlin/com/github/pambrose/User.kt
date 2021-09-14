@@ -12,42 +12,43 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.measureTime
 
 class User {
 
   constructor(
-    userId: String,
+    uuid: UUID,
     //browserSession: BrowserSession?,
     initFields: Boolean
   ) {
-    this.userId = userId
+    this.uuid = uuid
     //this.browserSession = browserSession
 
     if (initFields) {
       measureTime {
         transaction {
           UsersTable
-            .select { UsersTable.userId eq this@User.userId }
+            .select { UsersTable.uuidCol eq this@User.uuid }
             .map { assignRowVals(it) }
-            .firstOrNull() ?: error("UserId not found: ${this@User.userId}")
+            .firstOrNull() ?: error("UserId not found: ${this@User.uuid}")
         }
       }.also { logger.debug { "Selected user info in $it" } }
     }
   }
 
   private constructor(
-    userId: String,
+    uuid: UUID,
     browserSession: BrowserSession?,
     row: ResultRow
   ) {
-    this.userId = userId
+    this.uuid = uuid
     //this.browserSession = browserSession
     assignRowVals(row)
   }
 
-  val userId: String
+  val uuid: UUID
 
   //val browserSession: BrowserSession?
   var userDbmsId: Long = -1
@@ -92,59 +93,59 @@ class User {
     }
 
   fun deleteUser() {
-    logger.info { "Deleting User: $userId $fullName" }
+    logger.info { "Deleting User: $uuid $fullName" }
     logger.info { "User Email: $email" }
-    logger.info { "UserId: $userId" }
+    logger.info { "uuid: $uuid" }
 
     transaction {
       UsersTable.deleteWhere { UsersTable.id eq userDbmsId }
     }
   }
 
-  override fun toString() = "User(userId='$userId', name='$fullName')"
+  override fun toString() = "User(uuid='$uuid', name='$fullName')"
 
   companion object : KLogging() {
 
-    val userIdCache = ConcurrentHashMap<String, Long>()
-    val emailCache = ConcurrentHashMap<String, Email>()
+    val userIdCache = ConcurrentHashMap<UUID, Long>()
+    val emailCache = ConcurrentHashMap<UUID, Email>()
 
-    fun String.toUser(browserSession: BrowserSession? = null) = User(this, true)
+    fun UUID.toUser(browserSession: BrowserSession? = null) = User(this, true)
 
-    fun String.toUser(row: ResultRow) = User(this, null, row)
+    fun UUID.toUser(row: ResultRow) = User(this, null, row)
 
-    fun userExists(userId: String) =
+    fun userExists(uuid: UUID) =
       transaction {
         UsersTable
           .slice(Count(UsersTable.id))
-          .select { UsersTable.userId eq userId }
+          .select { UsersTable.uuidCol eq uuid }
           .map { it[0] as Long }
           .first() > 0
       }
 
-    fun fetchUserDbmsIdFromCache(userId: String) =
-      userIdCache.computeIfAbsent(userId) {
-        queryUserDbmsId(userId).also { logger.debug { "Looked up userDbmsId for $userId: $it" } }
+    fun fetchUserDbmsIdFromCache(uuid: UUID) =
+      userIdCache.computeIfAbsent(uuid) {
+        queryUserDbmsId(uuid).also { logger.debug { "Looked up userDbmsId for $uuid: $it" } }
       }
 
-    fun fetchEmailFromCache(userId: String) =
-      emailCache.computeIfAbsent(userId) {
-        queryUserEmail(userId).also { logger.debug { "Looked up email for $userId: $it" } }
+    fun fetchEmailFromCache(uuid: UUID) =
+      emailCache.computeIfAbsent(uuid) {
+        queryUserEmail(uuid).also { logger.debug { "Looked up email for $uuid: $it" } }
       }
 
-    private fun queryUserDbmsId(userId: String, defaultIfMissing: Long = -1) =
+    private fun queryUserDbmsId(uuid: UUID, defaultIfMissing: Long = -1) =
       transaction {
         UsersTable
           .slice(UsersTable.id)
-          .select { UsersTable.userId eq userId }
+          .select { UsersTable.uuidCol eq uuid }
           .map { it[UsersTable.id].value }
           .firstOrNull() ?: defaultIfMissing
       }
 
-    private fun queryUserEmail(userId: String, defaultIfMissing: Email = UNKNOWN_EMAIL) =
+    private fun queryUserEmail(uuid: UUID, defaultIfMissing: Email = UNKNOWN_EMAIL) =
       transaction {
         UsersTable
           .slice(UsersTable.email)
-          .select { UsersTable.userId eq userId }
+          .select { UsersTable.uuidCol eq uuid }
           .map { Email(it[0] as String) }
           .firstOrNull() ?: defaultIfMissing
       }
@@ -155,7 +156,7 @@ class User {
       password: Password,
       browserSession: BrowserSession?
     ): User =
-      User(randomId(25), false)
+      User(UUID.randomUUID(), false)
         .also { user ->
           transaction {
             val salt = newStringSalt()
@@ -163,14 +164,14 @@ class User {
             val userDbmsId =
               UsersTable
                 .insertAndGetId { row ->
-                  row[userId] = user.userId
+                  row[uuidCol] = user.uuid
                   row[fullName] = name.value.maxLength(128)
                   row[UsersTable.email] = email.value.maxLength(128)
                   row[UsersTable.salt] = salt
                   row[UsersTable.digest] = digest
                 }.value
           }
-          logger.info { "Created user $email ${user.userId}" }
+          logger.info { "Created user $email ${user.uuid}" }
         }
 
     private fun isRegisteredEmail(email: Email) = queryUserByEmail(email).isNotNull()
@@ -180,11 +181,11 @@ class User {
     fun queryUserByEmail(email: Email): User? =
       transaction {
         UsersTable
-          .slice(UsersTable.userId)
+          .slice(UsersTable.uuidCol)
           .select { UsersTable.email eq email.value }
-          .map { (it[0] as String).toUser() }
+          .map { (it[0] as UUID).toUser() }
           .firstOrNull()
-          .also { logger.info { "lookupUserByEmail() returned: ${it?.email ?: " ${email.value} not found"}" } }
+          .also { logger.info { "queryUserByEmail() returned: ${it?.email ?: " ${email.value} not found"}" } }
       }
   }
 }
