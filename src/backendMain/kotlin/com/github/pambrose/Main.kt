@@ -95,7 +95,8 @@ fun Application.main() {
   }
 
   routing {
-    applyRoutes(RegisterProfileServiceManager)
+
+  applyRoutes(RegisterProfileServiceManager)
 
     authenticate("UserId") {
       applyRoutes(ContentServiceManager)
