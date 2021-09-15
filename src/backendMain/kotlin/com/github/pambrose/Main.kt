@@ -69,7 +69,7 @@ fun Application.main() {
   Db.init(environment.config)
 
   install(Authentication) {
-    form /*("UserId") */{
+    form("UserId") {
       userParamName = "username"
       passwordParamName = "password"
 
@@ -87,9 +87,6 @@ fun Application.main() {
 
         //logger.info { "Login ${if (principal.isNull()) "failure" else "success for $user ${user?.email ?: UNKNOWN}"}" }
 
-        //if (principal.isNull())
-        //  failedLoginLimiter.acquire() // may block
-
         principal
       }
 
@@ -100,7 +97,7 @@ fun Application.main() {
   routing {
     applyRoutes(RegisterProfileServiceManager)
 
-    authenticate /*("UserId")*/ {
+    authenticate("UserId") {
       applyRoutes(ContentServiceManager)
 
       post("login") {

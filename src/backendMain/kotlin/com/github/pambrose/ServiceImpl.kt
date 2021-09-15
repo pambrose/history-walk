@@ -207,9 +207,9 @@ actual class ContentService : IContentService {
 
   override suspend fun currentSlide(title: String): SlideData {
 
-    println("In currentSlide()")
-    //println("name= ${call.sessions.get<Profile>()}")
-    println("session= ${call.browserSession}")
+    println("In currentSlide() at ${System.currentTimeMillis()}")
+    println("name=${call.sessions.get<Profile>()}")
+    println("session=${call.browserSession}")
 
     val sessionId = call.browserSession?.id ?: error("Missing browser session")
 
