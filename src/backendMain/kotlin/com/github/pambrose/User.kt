@@ -18,13 +18,8 @@ import kotlin.time.measureTime
 
 class User {
 
-  constructor(
-    uuid: UUID,
-    //browserSession: BrowserSession?,
-    initFields: Boolean
-  ) {
+  constructor(uuid: UUID, initFields: Boolean) {
     this.uuid = uuid
-    //this.browserSession = browserSession
 
     if (initFields) {
       measureTime {
@@ -186,6 +181,16 @@ class User {
           .map { (it[0] as UUID).toUser() }
           .firstOrNull()
           .also { logger.info { "queryUserByEmail() returned: ${it?.email ?: " ${email.value} not found"}" } }
+      }
+
+    fun queryUserByUuid(uuid: UUID): User? =
+      transaction {
+        UsersTable
+          .slice(UsersTable.uuidCol)
+          .select { UsersTable.uuidCol eq uuid }
+          .map { (it[0] as UUID).toUser() }
+          .firstOrNull()
+          .also { logger.info { "queryUserByUuid() returned: ${it?.email ?: " $uuid not found"}" } }
       }
   }
 }

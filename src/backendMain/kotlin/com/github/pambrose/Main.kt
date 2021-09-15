@@ -1,9 +1,9 @@
 package com.github.pambrose
 
 import com.github.pambrose.BrowserSessions.assignBrowserSession
-import com.github.pambrose.Db.dbQuery
 import com.github.pambrose.Property.Companion.assignProperties
 import com.github.pambrose.User.Companion.queryUserByEmail
+import com.github.pambrose.User.Companion.queryUserByUuid
 import com.github.pambrose.common.util.isNotNull
 import com.github.pambrose.common.util.isNull
 import com.github.pambrose.common.util.randomId
@@ -19,7 +19,6 @@ import io.ktor.util.pipeline.*
 import io.kvision.remote.applyRoutes
 import io.kvision.remote.kvisionInit
 import mu.KLogging
-import org.jetbrains.exposed.sql.select
 import kotlin.collections.set
 import kotlin.time.Duration
 
@@ -70,12 +69,11 @@ fun Application.main() {
   Db.init(environment.config)
 
   install(Authentication) {
-    form("UserId") {
+    form /*("UserId") */{
       userParamName = "username"
       passwordParamName = "password"
 
-      validate { cred: UserPasswordCredential ->
-
+      validate { cred ->
         var principal: UserPrincipal? = null
         val user = queryUserByEmail(Email(cred.name))
         if (user.isNotNull()) {
@@ -93,36 +91,32 @@ fun Application.main() {
         //  failedLoginLimiter.acquire() // may block
 
         principal
-
-//        dbQuery {
-//          UserDao.select {
-//            (UserDao.username eq credentials.name) and (UserDao.password eq DigestUtils.sha256Hex(credentials.password))
-//          }.firstOrNull()?.let {
-//            UserIdPrincipal(credentials.name)
-//          }
-//        }
       }
 
-      //skipWhen { call -> call.sessions.get<Profile>().isNotNull() }
+      skipWhen { call -> call.sessions.get<Profile>().isNotNull() }
     }
   }
 
   routing {
     applyRoutes(RegisterProfileServiceManager)
 
-    authenticate("UserId") {
+    authenticate /*("UserId")*/ {
+      applyRoutes(AddressServiceManager)
+      applyRoutes(ProfileServiceManager)
+
+      applyRoutes(ContentServiceManager)
+
       post("login") {
-        val principal = call.principal<UserIdPrincipal>()
+        val principal = call.principal<UserPrincipal>()
         val result =
           if (principal != null) {
-            dbQuery {
-
-
-              UserDao.select { UserDao.username eq principal.name }.firstOrNull()?.let {
-//                val profile = Profile(it[UserDao.id], it[UserDao.name], it[UserDao.username].toString(), "", "")
-//                call.sessions.set(profile)
-                HttpStatusCode.OK
-              } ?: HttpStatusCode.Unauthorized
+            val user = queryUserByUuid(principal.uuid)
+            if (user.isNotNull()) {
+              val profile = Profile(user.uuid.toString(), user.fullName.value, user.email.value, "", "")
+              call.sessions.set(profile)
+              HttpStatusCode.OK
+            } else {
+              HttpStatusCode.Unauthorized
             }
           } else {
             HttpStatusCode.Unauthorized
@@ -137,17 +131,11 @@ fun Application.main() {
         call.sessions.clear<Profile>()
         call.respondRedirect("/")
       }
-
-      applyRoutes(AddressServiceManager)
-      applyRoutes(ProfileServiceManager)
-
-      applyRoutes(ContentServiceManager)
     }
   }
 
   kvisionInit()
 }
-
 
 typealias PipelineCall = PipelineContext<Unit, ApplicationCall>
 

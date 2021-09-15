@@ -36,18 +36,19 @@ class LoginWindow : Dialog<Credentials>(closeButton = false, escape = false, ani
   private val cancelButton: Button
 
   init {
-    loginPanel = formPanel {
-      add(Credentials::username, Text(label = "${tr("Email")}:"), required = true)
-      add(Credentials::password, Password(label = "${tr("Password")}:"), required = true)
+    loginPanel =
+      formPanel {
+        add(Credentials::username, Text(label = "${tr("Email")}:"), required = true)
+        add(Credentials::password, Password(label = "${tr("Password")}:"), required = true)
 
-      onEvent {
-        keydown = {
-          if (it.keyCode == ENTER_KEY) {
-            this@LoginWindow.processCredentials()
+        onEvent {
+          keydown = {
+            if (it.keyCode == ENTER_KEY) {
+              this@LoginWindow.processCredentials()
+            }
           }
         }
       }
-    }
 
     registerPanel =
       formPanel {

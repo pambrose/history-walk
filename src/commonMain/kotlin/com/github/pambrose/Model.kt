@@ -8,7 +8,7 @@ import kotlinx.serialization.UseContextualSerialization
 
 @Serializable
 data class Profile(
-  //val id: Int,
+  val uuid: String,
   val name: String,
   val email: String,
   val password: String,

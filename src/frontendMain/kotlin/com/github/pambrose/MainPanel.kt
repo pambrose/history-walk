@@ -20,7 +20,7 @@ object MainPanel : SimplePanel() {
 
 suspend fun Container.refreshPanel(slideTitle: String) {
 
-  val currentSlide = Security.withAuth { Model.currentSlide(slideTitle) }
+  val currentSlide = Model.currentSlide(slideTitle)
 
   removeAll()
 
