@@ -101,9 +101,6 @@ fun Application.main() {
     applyRoutes(RegisterProfileServiceManager)
 
     authenticate /*("UserId")*/ {
-      applyRoutes(AddressServiceManager)
-      applyRoutes(ProfileServiceManager)
-
       applyRoutes(ContentServiceManager)
 
       post("login") {

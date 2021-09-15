@@ -1,19 +1,13 @@
 package com.github.pambrose
 
-import io.kvision.core.onEvent
 import io.kvision.form.FormPanel
 import io.kvision.form.check.CheckBox
 import io.kvision.form.formPanel
 import io.kvision.form.text.Text
 import io.kvision.form.text.TextInputType
-import io.kvision.html.ButtonStyle
-import io.kvision.html.button
 import io.kvision.i18n.I18n.tr
-import io.kvision.panel.HPanel
 import io.kvision.panel.StackPanel
-import io.kvision.utils.ENTER_KEY
 import io.kvision.utils.px
-import kotlinx.coroutines.launch
 
 object EditPanel : StackPanel() {
 
@@ -34,22 +28,6 @@ object EditPanel : StackPanel() {
       add(Address::phone, Text(label = "${tr("Phone number")}:").apply { maxlength = 255 })
       add(Address::postalAddress, Text(label = "${tr("Postal address")}:").apply { maxlength = 255 })
       add(Address::favourite, CheckBox(label = tr("Mark as favourite")))
-
-      add(HPanel(spacing = 10) {
-        button(tr("Save"), "fas fa-check", ButtonStyle.PRIMARY).onClick {
-          this@EditPanel.save()
-        }
-        button(tr("Cancel"), "fas fa-times", ButtonStyle.SECONDARY).onClick {
-          this@EditPanel.close()
-        }
-      })
-      onEvent {
-        keydown = {
-          if (it.keyCode == ENTER_KEY) {
-            this@EditPanel.save()
-          }
-        }
-      }
     }
     add(OldMainPanel)
   }
@@ -59,34 +37,6 @@ object EditPanel : StackPanel() {
     open(null)
   }
 
-  fun edit(index: Int) {
-    val address = Model.addresses[index]
-    formPanel.setData(address)
-    open(address.id)
-  }
-
-  private fun save() {
-    AppScope.launch {
-      if (formPanel.validate()) {
-        val address = formPanel.getData()
-        if (editingId != null) {
-          Model.updateAddress(address.copy(id = editingId))
-        } else {
-          Model.addAddress(address)
-        }
-        close()
-      }
-    }
-  }
-
-  fun delete(index: Int) {
-    AppScope.launch {
-      close()
-      Model.addresses[index].id?.let {
-        Model.deleteAddress(it)
-      }
-    }
-  }
 
   private fun open(editingId: Int?) {
     this.editingId = editingId
