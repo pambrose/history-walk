@@ -26,14 +26,32 @@ object Model {
     }
   }
 
-  suspend fun currentSlide(title: String) =
+  suspend fun hello() {
     Security.withAuth {
-      contentService.currentSlide(title)
+      console.log("Before hello()")
+      val answer = contentService.hello()
+      console.log("After hello() = $answer")
     }
+  }
+
+  suspend fun currentSlide(title: String) {
+    Security.withAuth {
+      console.log("Before currentSlide()")
+      val currentSlide = contentService.currentSlide(title)
+      console.log("After currentSlide() = ${currentSlide.title}")
+
+      MainPanel.panel.displaySlide(currentSlide)
+    }
+  }
 
   suspend fun choose(fromTitle: String, choiceTitle: String, choice: String) =
     Security.withAuth {
-      contentService.choose(fromTitle, choice, choiceTitle)
+      try {
+        contentService.choose(fromTitle, choice, choiceTitle)
+      } catch (e: Exception) {
+        console.log(e)
+        throw e
+      }
     }
 
   suspend fun reason(choiceId: String, reason: String) =

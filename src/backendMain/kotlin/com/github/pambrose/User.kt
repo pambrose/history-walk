@@ -35,7 +35,6 @@ class User {
 
   private constructor(
     uuid: UUID,
-    browserSession: BrowserSession?,
     row: ResultRow
   ) {
     this.uuid = uuid
@@ -106,7 +105,7 @@ class User {
 
     fun UUID.toUser(browserSession: BrowserSession? = null) = User(this, true)
 
-    fun UUID.toUser(row: ResultRow) = User(this, null, row)
+    fun UUID.toUser(row: ResultRow) = User(this, row)
 
     fun userExists(uuid: UUID) =
       transaction {
@@ -149,7 +148,6 @@ class User {
       name: FullName,
       email: Email,
       password: Password,
-      browserSession: BrowserSession?
     ): User =
       User(UUID.randomUUID(), false)
         .also { user ->

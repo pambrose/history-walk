@@ -3,8 +3,43 @@ package com.github.pambrose
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.sessions.*
+import mu.KLogging
 import java.time.Instant
 import java.util.*
+import kotlin.time.Duration
+
+object Cookies : KLogging() {
+  fun Sessions.Configuration.assignCookies() {
+    cookie<Profile>("KTSESSION") {
+      cookie.path = "/"
+      cookie.extensions["SameSite"] = "strict"
+      cookie.maxAgeInSeconds = Duration.days(14).inWholeSeconds
+    }
+
+    cookie<BrowserSession>("history_session_id") {
+      cookie.path = "/"
+      cookie.httpOnly = true
+
+      // CSRF protection in modern browsers. Make sure your important side-effect-y operations, like ordering,
+      // uploads, and changing settings, use "unsafe" HTTP verbs like POST and PUT, not GET or HEAD.
+      // https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#SameSite_cookies
+      cookie.extensions["SameSite"] = "lax"
+    }
+
+    cookie<UserPrincipal>(AUTH_COOKIE) {
+      cookie.path = "/" //CHALLENGE_ROOT + "/"
+      cookie.httpOnly = true
+      //if (production)
+      //  cookie.secure = true
+      cookie.maxAgeInSeconds = Duration.days(14).inWholeSeconds
+
+      // CSRF protection in modern browsers. Make sure your important side-effect-y operations, like ordering,
+      // uploads, and changing settings, use "unsafe" HTTP verbs like POST and PUT, not GET or HEAD.
+      // https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#SameSite_cookies
+      cookie.extensions["SameSite"] = "lax"
+    }
+  }
+}
 
 data class BrowserSession(val id: String, val created: Long = Instant.now().toEpochMilli()) {
 
@@ -69,6 +104,7 @@ data class BrowserSession(val id: String, val created: Long = Instant.now().toEp
 
 internal data class UserPrincipal(val uuid: UUID, val created: Long = Instant.now().toEpochMilli()) : Principal
 
+internal val ApplicationCall.profile get() = sessions.get<Profile>()
 internal val ApplicationCall.browserSession get() = sessions.get<BrowserSession>()
 
 internal val ApplicationCall.userPrincipal get() = sessions.get<UserPrincipal>()

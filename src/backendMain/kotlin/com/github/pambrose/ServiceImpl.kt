@@ -9,6 +9,7 @@ import com.github.pambrose.dbms.UsersTable
 import com.google.inject.Inject
 import io.ktor.application.*
 import io.ktor.sessions.*
+import mu.KLogging
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
@@ -64,14 +65,18 @@ actual class ContentService : IContentService {
   @Inject
   lateinit var call: ApplicationCall
 
+  override suspend fun hello(): String {
+    return "world"
+  }
+
   override suspend fun currentSlide(title: String): SlideData {
 
-    println("In currentSlide() at ${System.currentTimeMillis()}")
-    println("name=${call.sessions.get<Profile>()}")
-    println("session=${call.browserSession}")
+    logger("In currentSlide() at ${System.currentTimeMillis()}")
+    logger.info { "provile=${call.sessions.get<Profile>()}" }
 
-    val sessionId = call.browserSession?.id ?: error("Missing browser session")
+    val uuid = call.profile?.uuid ?: error("Missing profile")
 
+    logger.info { "title=$title" }
     val slide = findSlide(title)
 
     val titleVal = slide.title
@@ -100,10 +105,11 @@ actual class ContentService : IContentService {
         }
         .reversed()
 
-    val slides = sessionChoices.computeIfAbsent(sessionId) { mutableSetOf() }
+    val slides = sessionChoices.computeIfAbsent(uuid) { mutableSetOf() }
     slides += titleVal
 
     return SlideData(titleVal, content, choices, orientation, parentTitles, slides.size)
+      .also { logger.info { "Returning: $it \n" } }
   }
 
   override suspend fun choose(fromTitle: String, choice: String, choiceTitle: String): ChoiceReason {
@@ -127,12 +133,12 @@ actual class ContentService : IContentService {
     val user = call.sessions.get<Profile>()?.name ?: error("Missing profile")
     val userMoves = users[user] ?: error("Missing user: $user")
     val userChoice = userMoves.firstOrNull { it.choiceId == choiceId } ?: error("Missing choiceId: $choiceId")
-    println("Assigning $userChoice the reason: $reason")
+    logger.info { "Assigning $userChoice the reason: $reason" }
     userChoice.reason = reason
     return ""
   }
 
-  companion object {
+  companion object : KLogging() {
     const val ltEscape = "---LT---"
     const val gtEscape = "---GT---"
 

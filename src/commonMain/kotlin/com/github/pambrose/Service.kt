@@ -14,6 +14,7 @@ interface IRegisterProfileService {
 
 @KVService
 interface IContentService {
+  suspend fun hello(): String
   suspend fun currentSlide(title: String): SlideData
   suspend fun choose(fromTitle: String, choice: String, choiceTitle: String): ChoiceReason
   suspend fun reason(choiceId: String, reason: String): String

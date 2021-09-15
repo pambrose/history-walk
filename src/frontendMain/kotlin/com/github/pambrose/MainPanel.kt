@@ -18,10 +18,7 @@ object MainPanel : SimplePanel() {
   }
 }
 
-suspend fun Container.refreshPanel(slideTitle: String) {
-
-  val currentSlide = Model.currentSlide(slideTitle)
-
+fun Container.displaySlide(currentSlide: SlideData) {
   removeAll()
 
   div {
@@ -51,7 +48,7 @@ suspend fun Container.refreshPanel(slideTitle: String) {
     div {
       marginTop = 10.px
       val spacing = 4
-      val init: Container.() -> Unit = { addButtons(currentSlide.title, currentSlide.choices, this@refreshPanel) }
+      val init: Container.() -> Unit = { addButtons(currentSlide.title, currentSlide.choices, this@displaySlide) }
       if (currentSlide.orientation == ChoiceOrientation.VERTICAL)
         vPanel(spacing = spacing, init = init)
       else
@@ -76,7 +73,7 @@ suspend fun Container.refreshPanel(slideTitle: String) {
 
               AppScope.launch {
                 dialog.getResult()?.also { slideTitle ->
-                  if (slideTitle.isNotBlank()) this@refreshPanel.refreshPanel(slideTitle)
+                  if (slideTitle.isNotBlank()) this@displaySlide.refreshPanel(slideTitle)
                 }
               }
             }
@@ -85,6 +82,21 @@ suspend fun Container.refreshPanel(slideTitle: String) {
       }
     }
   }
+}
+
+fun Container.refreshPanel(slideTitle: String) {
+
+  AppScope.launch {
+    console.log("Before hello()")
+    val answer = Model.hello()
+    console.log("After hello() = $answer")
+
+//    console.log("Before currentSlide()")
+//    val currentSlide = Model.currentSlide(slideTitle)
+//    console.log("After currentSlide() = ${currentSlide.title}")
+
+  }
+
 }
 
 private fun promptForReason(ct: ChoiceTitle, choiceId: String, mainPanel: Container) {
