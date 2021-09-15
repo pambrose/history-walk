@@ -108,6 +108,7 @@ fun Application.main() {
             if (user.isNotNull()) {
               val profile = Profile(user.uuid.toString(), user.fullName.value, user.email.value, "", "")
               call.sessions.set(profile)
+              assignBrowserSession()
               HttpStatusCode.OK
             } else {
               HttpStatusCode.Unauthorized
@@ -115,8 +116,6 @@ fun Application.main() {
           } else {
             HttpStatusCode.Unauthorized
           }
-
-        assignBrowserSession()
 
         call.respond(result)
       }

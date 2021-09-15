@@ -25,7 +25,7 @@ class User {
       measureTime {
         transaction {
           UsersTable
-            .select { UsersTable.uuidCol eq this@User.uuid }
+            .select { UsersTable.uuidCol eq uuid }
             .map { assignRowVals(it) }
             .firstOrNull() ?: error("UserId not found: ${this@User.uuid}")
         }
@@ -159,8 +159,8 @@ class User {
             val userDbmsId =
               UsersTable
                 .insertAndGetId { row ->
-                  row[uuidCol] = user.uuid
-                  row[fullName] = name.value.maxLength(128)
+                  row[UsersTable.uuidCol] = user.uuid
+                  row[UsersTable.fullName] = name.value.maxLength(128)
                   row[UsersTable.email] = email.value.maxLength(128)
                   row[UsersTable.salt] = salt
                   row[UsersTable.digest] = digest
