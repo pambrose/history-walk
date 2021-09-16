@@ -27,7 +27,7 @@ object Routes : KLogging() {
           if (principal != null) {
             val user = User.queryUserByUuid(principal.uuid)
             if (user.isNotNull()) {
-              val profile = Profile(user.uuid.toString(), user.fullName.value, user.email.value)
+              val profile = Profile(user.uuid.toString())
               call.sessions.set(profile)
               HttpStatusCode.OK
             } else {

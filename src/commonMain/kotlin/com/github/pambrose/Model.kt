@@ -8,7 +8,7 @@ import kotlinx.serialization.UseContextualSerialization
 
 @Serializable
 data class RegisterData(
-  val name: String,
+  val fullName: String,
   val email: String,
   val password: String,
   val password2: String,
@@ -16,9 +16,7 @@ data class RegisterData(
 
 @Serializable
 data class Profile(
-  val uuid: String? = null,
-  val name: String,
-  val email: String,
+  val uuid: String,
 )
 
 @Serializable

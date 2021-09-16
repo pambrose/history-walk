@@ -16,7 +16,7 @@ actual class RegisterUserService : IRegisterUserService {
 
   override suspend fun registerUser(registerData: RegisterData): Boolean {
     try {
-      User.createUser(FullName(registerData.name), Email(registerData.email), Password(registerData.password))
+      User.createUser(FullName(registerData.fullName), Email(registerData.email), Password(registerData.password))
     } catch (e: Exception) {
       logger.error(e) { "Failed to register user" }
       return false
