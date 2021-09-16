@@ -16,9 +16,11 @@ object MainPanel : SimplePanel() {
   init {
     add(panel)
   }
+
 }
 
 fun Container.displaySlide(currentSlide: SlideData) {
+
   removeAll()
 
   div {
@@ -48,7 +50,7 @@ fun Container.displaySlide(currentSlide: SlideData) {
     div {
       marginTop = 10.px
       val spacing = 4
-      val init: Container.() -> Unit = { addButtons(currentSlide.title, currentSlide.choices, this@displaySlide) }
+      val init: Container.() -> Unit = { addButtons(currentSlide) }
       if (currentSlide.orientation == ChoiceOrientation.VERTICAL)
         vPanel(spacing = spacing, init = init)
       else
@@ -73,7 +75,8 @@ fun Container.displaySlide(currentSlide: SlideData) {
 
               AppScope.launch {
                 dialog.getResult()?.also { slideTitle ->
-                  if (slideTitle.isNotBlank()) this@displaySlide.refreshPanel(slideTitle)
+                  if (slideTitle.isNotBlank())
+                    Model.refreshPanel(slideTitle)
                 }
               }
             }
@@ -84,22 +87,23 @@ fun Container.displaySlide(currentSlide: SlideData) {
   }
 }
 
-fun Container.refreshPanel(slideTitle: String) {
-
-  AppScope.launch {
-    console.log("Before hello()")
-    val answer = Model.hello()
-    console.log("After hello() = $answer")
-
-//    console.log("Before currentSlide()")
-//    val currentSlide = Model.currentSlide(slideTitle)
-//    console.log("After currentSlide() = ${currentSlide.title}")
-
+private fun Container.addButtons(currentSlide: SlideData) {
+  currentSlide.choices.forEach { ct ->
+    button(ct.choice, style = ButtonStyle.PRIMARY) {
+      onClick {
+        AppScope.launch {
+          val choiceReason = Model.choose(currentSlide.title, ct.title, ct.choice)
+          if (choiceReason.reason.isEmpty())
+            promptForReason(ct, choiceReason.choiceId)
+          else
+            Model.refreshPanel(ct.title)
+        }
+      }
+    }
   }
-
 }
 
-private fun promptForReason(ct: ChoiceTitle, choiceId: String, mainPanel: Container) {
+private fun promptForReason(ct: ChoiceTitle, choiceId: String) {
   val submit = Button("OK", disabled = true)
   val reasonDialog =
     Dialog<String>("Reasoning") {
@@ -107,7 +111,7 @@ private fun promptForReason(ct: ChoiceTitle, choiceId: String, mainPanel: Contai
         Text(label = "Reason for your decision:") {
           placeholder = """I chose "${ct.choice}" because..."""
           setEventListener<Text> {
-            keyup = { e ->
+            keyup = { _ ->
               submit.disabled = value.isNullOrBlank()
             }
           }
@@ -121,24 +125,7 @@ private fun promptForReason(ct: ChoiceTitle, choiceId: String, mainPanel: Contai
     reasonDialog.getResult()?.also { response ->
       if (response.isNotBlank()) {
         Model.reason(choiceId, response)
-        mainPanel.refreshPanel(ct.title)
-      }
-    }
-  }
-}
-
-private fun Container.addButtons(title: String, choices: List<ChoiceTitle>, mainPanel: Container) {
-  choices.forEach { ct ->
-    button(ct.choice, style = ButtonStyle.PRIMARY) {
-      onClick {
-        AppScope.launch {
-          val choiceReason = Model.choose(title, ct.title, ct.choice)
-          println("I got back $choiceReason")
-          if (choiceReason.reason.isEmpty())
-            promptForReason(ct, choiceReason.choiceId, mainPanel)
-          else
-            mainPanel.refreshPanel(ct.title)
-        }
+        Model.refreshPanel(ct.title)
       }
     }
   }

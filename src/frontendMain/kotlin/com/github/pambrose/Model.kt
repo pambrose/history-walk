@@ -26,21 +26,15 @@ object Model {
     }
   }
 
-  suspend fun hello() {
+  suspend fun refreshPanel(title: String) {
     Security.withAuth {
-      console.log("Before hello()")
-      val answer = contentService.hello()
-      console.log("After hello() = $answer")
-    }
-  }
-
-  suspend fun currentSlide(title: String) {
-    Security.withAuth {
-      console.log("Before currentSlide()")
-      val currentSlide = contentService.currentSlide(title)
-      console.log("After currentSlide() = ${currentSlide.title}")
-
-      MainPanel.panel.displaySlide(currentSlide)
+      try {
+        val currentSlide = contentService.currentSlide(title)
+        MainPanel.panel.displaySlide(currentSlide)
+      } catch (e: Exception) {
+        console.log(e)
+        throw e
+      }
     }
   }
 
@@ -56,6 +50,11 @@ object Model {
 
   suspend fun reason(choiceId: String, reason: String) =
     Security.withAuth {
-      contentService.reason(choiceId, reason)
+      try {
+        contentService.reason(choiceId, reason)
+      } catch (e: Exception) {
+        console.log(e)
+        throw e
+      }
     }
 }

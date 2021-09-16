@@ -31,10 +31,8 @@ class App : Application() {
       add(MainPanel)
     }
 
-    // MainPanel.panel.refreshPanel("/")
     AppScope.launch {
-      // Model.hello()
-      Model.currentSlide("/")
+      Model.refreshPanel("/")
     }
   }
 }

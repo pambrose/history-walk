@@ -65,18 +65,14 @@ actual class ContentService : IContentService {
   @Inject
   lateinit var call: ApplicationCall
 
-  override suspend fun hello(): String {
-    return "world"
-  }
-
   override suspend fun currentSlide(title: String): SlideData {
 
     logger("In currentSlide() at ${System.currentTimeMillis()}")
-    logger.info { "provile=${call.sessions.get<Profile>()}" }
+    logger.info { "profile=${call.sessions.get<Profile>()}" }
+    logger.info { "title=$title" }
 
     val uuid = call.profile?.uuid ?: error("Missing profile")
 
-    logger.info { "title=$title" }
     val slide = findSlide(title)
 
     val titleVal = slide.title

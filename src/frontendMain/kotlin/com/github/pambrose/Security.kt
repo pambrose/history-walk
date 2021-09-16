@@ -23,7 +23,13 @@ object Security : SecurityMgr() {
 
   override suspend fun login() = loginService.login(loginWindow.getResult())
 
-  override suspend fun afterLogin() = Model.readProfile()
+  override suspend fun afterLogin() {
+    console.log("Finished login")
+  }
+
+  override suspend fun afterError() {
+    console.log("Error on login")
+  }
 }
 
 class LoginWindow : Dialog<Credentials>(closeButton = false, escape = false, animation = true) {
@@ -128,8 +134,7 @@ class LoginWindow : Dialog<Credentials>(closeButton = false, escape = false, ani
     if (registerPanel.validate()) {
       val userData = registerPanel.getData()
       AppScope.launch {
-        if (Model.registerProfile(userData, userData.password)
-        ) {
+        if (Model.registerProfile(userData, userData.password)) {
           Alert.show(text = tr("User registered. You can now log in.")) {
             hideRegisterForm()
           }
