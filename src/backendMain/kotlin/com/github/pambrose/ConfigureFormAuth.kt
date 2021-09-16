@@ -9,7 +9,7 @@ import mu.KLogging
 
 object ConfigureFormAuth : KLogging() {
   fun Authentication.Configuration.configureFormAuth() {
-    form /*("UserId")*/ {
+    form {
       userParamName = "username"
       passwordParamName = "password"
 

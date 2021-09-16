@@ -17,7 +17,7 @@ object Routes : KLogging() {
   fun Route.assignRoutes() {
     applyRoutes(RegisterUserServiceManager)
 
-    authenticate /*("UserId")*/ {
+    authenticate {
       applyRoutes(ContentServiceManager)
 
       post(LOGIN) {
