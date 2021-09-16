@@ -33,10 +33,9 @@ object ConfigureFormAuth : KLogging() {
       }
 
       skipWhen { call ->
-        (call.sessions.get<UserId>()?.uuid?.let { uuid ->
+        call.sessions.get<UserId>()?.uuid?.let { uuid ->
           isValidUuid(uuid)
-        } ?: false)
-          .also { logger.info { "skipWhen called = $it" } }
+        } ?: false
       }
     }
   }

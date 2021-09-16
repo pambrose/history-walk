@@ -31,7 +31,7 @@ actual class ContentService : IContentService {
   lateinit var call: ApplicationCall
 
   override suspend fun currentSlide(): SlideData {
-    logger.info { "profile=${call.userId}" }
+    logger.debug { "userId=${call.userId}" }
     val uuid = call.userId.uuid
     val slide = findSlide(uuid)
     return slideData(uuid, slide)

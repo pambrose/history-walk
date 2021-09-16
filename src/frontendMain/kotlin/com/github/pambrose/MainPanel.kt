@@ -30,7 +30,7 @@ fun Container.displaySlide(currentSlide: SlideData) {
       paddingTop = 5.px
       paddingBottom = 5.px
       textAlign = TextAlign.LEFT
-      +"Decisions: ${currentSlide.decisionCount}"
+      +"Decision count: ${currentSlide.decisionCount}"
     }
 
     h1 {
@@ -63,19 +63,28 @@ fun Container.displaySlide(currentSlide: SlideData) {
         vPanel {
           button("Go Back In Time", style = ButtonStyle.SUCCESS) {
             onClick {
-              val dialog =
-                Dialog<String>("Go back to...") {
-                  vPanel(spacing = 4) {
-                    currentSlide.parentTitles.forEach { slideTitle ->
-                      button(slideTitle, style = ButtonStyle.PRIMARY) { onClick { setResult(slideTitle) } }
+              if (currentSlide.parentTitles.size == 1) {
+                currentSlide.parentTitles[0].also { parentTitle ->
+                  if (parentTitle.isNotBlank())
+                    AppScope.launch {
+                      Model.goBack(parentTitle)
+                    }
+                }
+              } else {
+                val dialog =
+                  Dialog<String>("Go back to...") {
+                    vPanel(spacing = 4) {
+                      currentSlide.parentTitles.forEach { parentTitle ->
+                        button(parentTitle, style = ButtonStyle.PRIMARY) { onClick { setResult(parentTitle) } }
+                      }
                     }
                   }
-                }
 
-              AppScope.launch {
-                dialog.getResult()?.also { slideTitle ->
-                  if (slideTitle.isNotBlank())
-                    Model.goBack(slideTitle)
+                AppScope.launch {
+                  dialog.getResult()?.also { parentTitle ->
+                    if (parentTitle.isNotBlank())
+                      Model.goBack(parentTitle)
+                  }
                 }
               }
             }
