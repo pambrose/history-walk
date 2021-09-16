@@ -7,12 +7,18 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseContextualSerialization
 
 @Serializable
-data class Profile(
-  val uuid: String,
+data class RegisterData(
   val name: String,
   val email: String,
   val password: String,
-  val password2: String
+  val password2: String,
+)
+
+@Serializable
+data class Profile(
+  val uuid: String? = null,
+  val name: String,
+  val email: String,
 )
 
 @Serializable

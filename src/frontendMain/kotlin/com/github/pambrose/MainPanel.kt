@@ -16,7 +16,6 @@ object MainPanel : SimplePanel() {
   init {
     add(panel)
   }
-
 }
 
 fun Container.displaySlide(currentSlide: SlideData) {
@@ -76,7 +75,7 @@ fun Container.displaySlide(currentSlide: SlideData) {
               AppScope.launch {
                 dialog.getResult()?.also { slideTitle ->
                   if (slideTitle.isNotBlank())
-                    Model.refreshPanel(slideTitle)
+                    Model.refreshPanel()
                 }
               }
             }
@@ -96,7 +95,7 @@ private fun Container.addButtons(currentSlide: SlideData) {
           if (choiceReason.reason.isEmpty())
             promptForReason(currentSlide.title, ct)
           else
-            Model.refreshPanel(ct.title)
+            Model.refreshPanel()
         }
       }
     }
@@ -125,7 +124,7 @@ private fun promptForReason(fromTitle: String, ct: ChoiceTitle) {
     reasonDialog.getResult()?.also { response ->
       if (response.isNotBlank()) {
         Model.reason(fromTitle, ct.abbrev, ct.title, response)
-        Model.refreshPanel(ct.title)
+        Model.refreshPanel()
       }
     }
   }

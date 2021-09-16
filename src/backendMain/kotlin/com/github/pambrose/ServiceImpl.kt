@@ -1,8 +1,6 @@
 package com.github.pambrose
 
 import com.github.pambrose.Slide.Companion.findSlide
-import com.github.pambrose.common.util.newStringSalt
-import com.github.pambrose.common.util.sha256
 import com.github.pambrose.dbms.UserChoiceTable
 import com.github.pambrose.dbms.UsersTable
 import com.google.inject.Inject
@@ -16,42 +14,28 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 import java.util.*
 
-actual class RegisterProfileService : IRegisterProfileService {
+actual class RegisterUserService : IRegisterUserService {
 
-  override suspend fun registerProfile(profile: Profile, password: String): Boolean {
+  override suspend fun registerUser(registerData: RegisterData): Boolean {
     try {
-      User(UUID.randomUUID(), false)
-        .also { user ->
-          transaction {
-            val salt = newStringSalt()
-            val digest = password.sha256(salt)
-            val userDbmsId =
-              UsersTable
-                .insertAndGetId { row ->
-                  row[UsersTable.uuidCol] = user.uuid
-                  row[UsersTable.fullName] = profile.name
-                  row[UsersTable.email] = profile.email
-                  row[UsersTable.salt] = salt
-                  row[UsersTable.digest] = digest
-                }.value
-          }
-        }
+      User.createUser(FullName(registerData.name), Email(registerData.email), Password(registerData.password))
     } catch (e: Exception) {
-      e.printStackTrace()
-      throw Exception("Register operation failed!")
+      logger.error(e) { "Failed to register user" }
+      return false
     }
     return true
   }
+
+  companion object : KLogging()
 }
 
 actual class ContentService : IContentService {
   @Inject
   lateinit var call: ApplicationCall
 
-  override suspend fun currentSlide(title: String): SlideData {
+  override suspend fun currentSlide(): SlideData {
 
     logger.info { "profile=${call.sessions.get<Profile>()}" }
-    logger.info { "title=$title" }
 
     val uuid = call.profile?.uuid ?: error("Missing profile")
 

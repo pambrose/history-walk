@@ -37,7 +37,7 @@ class LoginWindow : Dialog<Credentials>(closeButton = false, escape = false, ani
   private val loginPanel: FormPanel<Credentials>
   private val loginButton: Button
   private val userButton: Button
-  private val registerPanel: FormPanel<Profile>
+  private val registerPanel: FormPanel<RegisterData>
   private val registerButton: Button
   private val cancelButton: Button
 
@@ -58,22 +58,22 @@ class LoginWindow : Dialog<Credentials>(closeButton = false, escape = false, ani
 
     registerPanel =
       formPanel {
-        add(Profile::name, Text(label = "${tr("Your name")}:"), required = true)
-        add(Profile::email, Text(label = "Email:"), required = true)
+        add(RegisterData::name, Text(label = "${tr("Your name")}:"), required = true)
+        add(RegisterData::email, Text(label = "Email:"), required = true)
         add(
-          Profile::password, Password(label = "${tr("Password")}:"), required = true,
+          RegisterData::password, Password(label = "${tr("Password")}:"), required = true,
           validatorMessage = { "Password too short" }) {
           (it.getValue()?.length ?: 0) >= 8
         }
-        add(Profile::password2, Password(label = "${tr("Confirm password")}:"), required = true,
+        add(RegisterData::password2, Password(label = "${tr("Confirm password")}:"), required = true,
           validatorMessage = { tr("Password too short") }) {
           (it.getValue()?.length ?: 0) >= 8
         }
         validator = {
-          val result = it[Profile::password] == it[Profile::password2]
+          val result = it[RegisterData::password] == it[RegisterData::password2]
           if (!result) {
-            it.getControl(Profile::password)?.validatorError = tr("Passwords are not the same")
-            it.getControl(Profile::password2)?.validatorError = tr("Passwords are not the same")
+            it.getControl(RegisterData::password)?.validatorError = tr("Passwords are not the same")
+            it.getControl(RegisterData::password2)?.validatorError = tr("Passwords are not the same")
           }
           result
         }
@@ -132,9 +132,9 @@ class LoginWindow : Dialog<Credentials>(closeButton = false, escape = false, ani
 
   private fun processRegister() {
     if (registerPanel.validate()) {
-      val userData = registerPanel.getData()
+      val registerData = registerPanel.getData()
       AppScope.launch {
-        if (Model.registerProfile(userData, userData.password)) {
+        if (Model.registerUser(registerData)) {
           Alert.show(text = tr("User registered. You can now log in.")) {
             hideRegisterForm()
           }

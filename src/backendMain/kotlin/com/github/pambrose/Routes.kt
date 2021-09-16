@@ -13,7 +13,7 @@ import mu.KLogging
 object Routes : KLogging() {
 
   fun Route.assignRoutes() {
-    applyRoutes(RegisterProfileServiceManager)
+    applyRoutes(RegisterUserServiceManager)
 
     authenticate /*("UserId")*/ {
       applyRoutes(ContentServiceManager)
@@ -25,7 +25,7 @@ object Routes : KLogging() {
           if (principal != null) {
             val user = User.queryUserByUuid(principal.uuid)
             if (user.isNotNull()) {
-              val profile = Profile(user.uuid.toString(), user.fullName.value, user.email.value, "", "")
+              val profile = Profile(user.uuid.toString(), user.fullName.value, user.email.value)
               call.sessions.set(profile)
               // assignBrowserSession()
               HttpStatusCode.OK

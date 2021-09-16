@@ -2,22 +2,21 @@ package com.github.pambrose
 
 object Model {
 
-  private val registerProfileService = RegisterProfileService()
+  private val registerUserService = RegisterUserService()
   private val contentService = ContentService()
 
-  suspend fun registerProfile(profile: Profile, password: String): Boolean {
-    return try {
-      registerProfileService.registerProfile(profile, password)
+  suspend fun registerUser(registerData: RegisterData) =
+    try {
+      registerUserService.registerUser(registerData)
     } catch (e: Exception) {
       console.log(e)
       false
     }
-  }
 
-  suspend fun refreshPanel(title: String) {
+  suspend fun refreshPanel() {
     Security.withAuth {
       try {
-        val currentSlide = contentService.currentSlide(title)
+        val currentSlide = contentService.currentSlide()
         MainPanel.panel.displaySlide(currentSlide)
       } catch (e: Exception) {
         console.log(e)
