@@ -27,8 +27,8 @@ object Routes : KLogging() {
           if (principal != null) {
             val user = User.queryUserByUuid(principal.uuid)
             if (user.isNotNull()) {
-              val profile = Profile(user.uuid.toString())
-              call.sessions.set(profile)
+              val userId = UserId(user.uuid.toString())
+              call.sessions.set(userId)
               HttpStatusCode.OK
             } else {
               HttpStatusCode.Unauthorized
@@ -41,7 +41,7 @@ object Routes : KLogging() {
       }
 
       get(LOGOUT) {
-        call.sessions.clear<Profile>()
+        call.sessions.clear<UserId>()
         call.respondRedirect("/")
       }
     }

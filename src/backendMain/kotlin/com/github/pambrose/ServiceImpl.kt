@@ -6,7 +6,6 @@ import com.github.pambrose.dbms.UsersTable
 import com.google.inject.Inject
 import com.pambrose.common.exposed.get
 import io.ktor.application.*
-import io.ktor.sessions.*
 import mu.KLogging
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -32,8 +31,8 @@ actual class ContentService : IContentService {
   lateinit var call: ApplicationCall
 
   override suspend fun currentSlide(): SlideData {
-    logger.info { "profile=${call.sessions.get<Profile>()}" }
-    val uuid = call.profile?.uuid ?: error("Missing profile")
+    logger.info { "profile=${call.userId}" }
+    val uuid = call.userId.uuid
     val slide = findSlide(uuid)
     return slideData(uuid, slide)
   }
@@ -41,7 +40,7 @@ actual class ContentService : IContentService {
   override suspend fun choose(fromTitle: String, abbrev: String, title: String): UserChoice =
     transaction {
       // See if user has an entry for that transition
-      val uuid = call.sessions.get<Profile>()?.uuid ?: error("Missing profile")
+      val uuid = call.userId.uuid
       (UserChoiceTable
         .slice(UserChoiceTable.fromTitle, UserChoiceTable.abbrev, UserChoiceTable.title, UserChoiceTable.reason)
         .select { (UserChoiceTable.userUuid eq UUID.fromString(uuid)) and (UserChoiceTable.fromTitle eq fromTitle) and (UserChoiceTable.title eq title) }
@@ -63,7 +62,7 @@ actual class ContentService : IContentService {
 
   override suspend fun reason(fromTitle: String, abbrev: String, title: String, reason: String) =
     transaction {
-      val uuid = call.sessions.get<Profile>()?.uuid ?: error("Missing profile")
+      val uuid = call.userId.uuid
       UserChoiceTable
         .insertAndGetId { row ->
           row[UserChoiceTable.uuidCol] = UUID.randomUUID()
@@ -82,7 +81,7 @@ actual class ContentService : IContentService {
 
   override suspend fun goBack(title: String) =
     transaction {
-      val uuid = call.sessions.get<Profile>()?.uuid ?: error("Missing profile")
+      val uuid = call.userId.uuid
       updateLastTitle(uuid, title)
       val slide = findSlide(uuid)
       slideData(uuid, slide)
@@ -131,7 +130,6 @@ actual class ContentService : IContentService {
       val count = slideCount(uuid)
 
       return SlideData(slide.title, content, choices, orientation, parentTitles, count)
-        .also { logger.info { "Returning: $it \n" } }
     }
 
     private fun slideCount(uuid: String) =
@@ -141,7 +139,6 @@ actual class ContentService : IContentService {
           .select { UserChoiceTable.userUuid eq UUID.fromString(uuid) }
           .map { it.get(0) as Long }
           .first()
-          .toInt()
       }
   }
 }

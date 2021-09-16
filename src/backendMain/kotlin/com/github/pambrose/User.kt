@@ -12,7 +12,6 @@ import mu.KLogging
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
-import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.measureTime
 
 class User {
@@ -87,10 +86,7 @@ class User {
 
   companion object : KLogging() {
 
-    val userIdCache = ConcurrentHashMap<UUID, Long>()
-    val emailCache = ConcurrentHashMap<UUID, Email>()
-
-    fun UUID.toUser(browserSession: BrowserSession? = null) = User(this, true)
+    fun UUID.toUser() = User(this, true)
 
     fun UUID.toUser(row: ResultRow) = User(this, row)
 
@@ -101,16 +97,6 @@ class User {
           .select { UsersTable.uuidCol eq uuid }
           .map { it[0] as Long }
           .first() > 0
-      }
-
-    fun fetchUserDbmsIdFromCache(uuid: UUID) =
-      userIdCache.computeIfAbsent(uuid) {
-        queryUserDbmsId(uuid).also { logger.debug { "Looked up userDbmsId for $uuid: $it" } }
-      }
-
-    fun fetchEmailFromCache(uuid: UUID) =
-      emailCache.computeIfAbsent(uuid) {
-        queryUserEmail(uuid).also { logger.debug { "Looked up email for $uuid: $it" } }
       }
 
     private fun queryUserDbmsId(uuid: UUID, defaultIfMissing: Long = -1) =
@@ -167,6 +153,15 @@ class User {
           .map { (it[0] as UUID).toUser() }
           .firstOrNull()
           .also { logger.info { "queryUserByEmail() returned: ${it?.email ?: " ${email.value} not found"}" } }
+      }
+
+    fun isValidUuid(uuid: String) =
+      transaction {
+        UsersTable
+          .slice(Count(UsersTable.id))
+          .select { UsersTable.uuidCol eq UUID.fromString(uuid) }
+          .map { it[0] as Long }
+          .first() > 0
       }
 
     fun queryUserByUuid(uuid: UUID): User? =

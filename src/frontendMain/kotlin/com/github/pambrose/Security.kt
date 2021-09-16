@@ -59,7 +59,7 @@ class LoginWindow : Dialog<Credentials>(closeButton = false, escape = false, ani
 
     registerPanel =
       formPanel {
-        add(RegisterData::fullName, Text(label = "${tr("Your name")}:"), required = true)
+        add(RegisterData::fullName, Text(label = "${tr("Full name")}:"), required = true)
         add(RegisterData::email, Text(label = "Email:"), required = true)
         add(
           RegisterData::password, Password(label = "${tr("Password")}:"), required = true,

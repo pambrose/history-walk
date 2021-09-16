@@ -1,5 +1,6 @@
 package com.github.pambrose
 
+import com.github.pambrose.User.Companion.isValidUuid
 import com.github.pambrose.common.util.isNotNull
 import com.github.pambrose.common.util.isNull
 import com.github.pambrose.common.util.sha256
@@ -32,7 +33,10 @@ object ConfigureFormAuth : KLogging() {
       }
 
       skipWhen { call ->
-        call.sessions.get<Profile>().isNotNull().also { logger.info { "skipWhen called = $it" } }
+        (call.sessions.get<UserId>()?.uuid?.let { uuid ->
+          isValidUuid(uuid)
+        } ?: false)
+          .also { logger.info { "skipWhen called = $it" } }
       }
     }
   }

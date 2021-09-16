@@ -15,7 +15,7 @@ data class RegisterData(
 )
 
 @Serializable
-data class Profile(
+data class UserId(
   val uuid: String,
 )
 
@@ -26,7 +26,7 @@ data class SlideData(
   val choices: List<ChoiceTitle>,
   val orientation: ChoiceOrientation,
   val parentTitles: List<String>,
-  val decisionCount: Int,
+  val decisionCount: Long,
 )
 
 @Serializable

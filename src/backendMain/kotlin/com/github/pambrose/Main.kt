@@ -12,8 +12,6 @@ import io.ktor.sessions.*
 import io.ktor.util.pipeline.*
 import io.kvision.remote.kvisionInit
 
-const val AUTH_COOKIE = "auth"
-
 fun Application.main() {
 
   assignProperties()
@@ -43,3 +41,5 @@ fun Application.main() {
 }
 
 typealias PipelineCall = PipelineContext<Unit, ApplicationCall>
+
+val ApplicationCall.userPrincipal get() = sessions.get<UserPrincipal>()
