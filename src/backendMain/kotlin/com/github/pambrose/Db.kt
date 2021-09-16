@@ -46,9 +46,10 @@ object Db {
     return HikariDataSource(hikariConfig)
   }
 
-  suspend fun <T> dbQuery(block: Transaction.() -> T): T = withContext(Dispatchers.IO) {
-    transaction {
-      block()
+  suspend fun <T> tx(block: Transaction.() -> T): T =
+    withContext(Dispatchers.IO) {
+      transaction {
+        block()
+      }
     }
-  }
 }

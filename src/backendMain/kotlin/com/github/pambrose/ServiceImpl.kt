@@ -61,7 +61,7 @@ actual class ContentService : IContentService {
         }
     }
 
-  override suspend fun reason(fromTitle: String, abbrev: String, title: String, reason: String): String {
+  override suspend fun reason(fromTitle: String, abbrev: String, title: String, reason: String) =
     transaction {
       val uuid = call.sessions.get<Profile>()?.uuid ?: error("Missing profile")
       UserChoiceTable
@@ -75,18 +75,18 @@ actual class ContentService : IContentService {
         }.value
 
       updateLastTitle(uuid, title)
-    }
-    return ""
-  }
 
-  override suspend fun goBack(title: String): SlideData {
-    val uuid = call.sessions.get<Profile>()?.uuid ?: error("Missing profile")
-    transaction {
-      updateLastTitle(uuid, title)
+      val slide = findSlide(uuid)
+      slideData(uuid, slide)
     }
-    val slide = findSlide(uuid)
-    return slideData(uuid, slide)
-  }
+
+  override suspend fun goBack(title: String) =
+    transaction {
+      val uuid = call.sessions.get<Profile>()?.uuid ?: error("Missing profile")
+      updateLastTitle(uuid, title)
+      val slide = findSlide(uuid)
+      slideData(uuid, slide)
+    }
 
   private fun updateLastTitle(uuid: String, title: String) {
     UsersTable
@@ -99,10 +99,11 @@ actual class ContentService : IContentService {
   }
 
   companion object : KLogging() {
-    const val ltEscape = "---LT---"
-    const val gtEscape = "---GT---"
 
     fun slideData(uuid: String, slide: Slide): SlideData {
+      val ltEscape = "---LT---"
+      val gtEscape = "---GT---"
+
       val escaped = slide.content
         .replace("<", ltEscape)
         .replace(">", gtEscape)
@@ -127,18 +128,20 @@ actual class ContentService : IContentService {
           }
           .reversed()
 
-      val count =
-        transaction {
-          UserChoiceTable
-            .slice(Count(UserChoiceTable.id))
-            .select { UserChoiceTable.userUuid eq UUID.fromString(uuid) }
-            .map { it.get(0) as Long }
-            .first()
-            .toInt()
-        }
+      val count = slideCount(uuid)
 
       return SlideData(slide.title, content, choices, orientation, parentTitles, count)
         .also { logger.info { "Returning: $it \n" } }
     }
+
+    private fun slideCount(uuid: String) =
+      transaction {
+        UserChoiceTable
+          .slice(Count(UserChoiceTable.id))
+          .select { UserChoiceTable.userUuid eq UUID.fromString(uuid) }
+          .map { it.get(0) as Long }
+          .first()
+          .toInt()
+      }
   }
 }

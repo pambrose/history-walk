@@ -38,7 +38,8 @@ object Model {
   suspend fun reason(fromTitle: String, abbrev: String, title: String, reason: String) =
     Security.withAuth {
       try {
-        contentService.reason(fromTitle, abbrev, title, reason)
+        val currentSlide = contentService.reason(fromTitle, abbrev, title, reason)
+        MainPanel.panel.displaySlide(currentSlide)
       } catch (e: Exception) {
         console.log(e)
         throw e

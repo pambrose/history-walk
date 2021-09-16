@@ -124,7 +124,6 @@ private fun promptForReason(fromTitle: String, ct: ChoiceTitle) {
     reasonDialog.getResult()?.also { response ->
       if (response.isNotBlank()) {
         Model.reason(fromTitle, ct.abbrev, ct.title, response)
-        Model.refreshPanel()
       }
     }
   }
