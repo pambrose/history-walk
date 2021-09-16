@@ -2,7 +2,7 @@ package com.github.pambrose
 
 import com.github.pambrose.Slide.Companion.slide
 
-object Content {
+object SlideContent {
   fun initContent() {
     slide("Season to Leave") {
       content =

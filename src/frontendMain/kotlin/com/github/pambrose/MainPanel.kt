@@ -1,28 +1,139 @@
 package com.github.pambrose
 
-import io.kvision.core.JustifyContent
-import io.kvision.data.dataContainer
-import io.kvision.html.Button
-import io.kvision.html.ButtonStyle
-import io.kvision.html.Span
-import io.kvision.html.button
-import io.kvision.i18n.I18n.tr
-import io.kvision.panel.HPanel
-import kotlinx.browser.document
+import io.kvision.core.*
+import io.kvision.form.text.Text
+import io.kvision.html.*
+import io.kvision.modal.Dialog
+import io.kvision.panel.SimplePanel
+import io.kvision.panel.hPanel
+import io.kvision.panel.vPanel
+import io.kvision.utils.px
+import kotlinx.coroutines.launch
 
-object MainPanel : HPanel(justify = JustifyContent.SPACEBETWEEN) {
+object MainPanel : SimplePanel() {
+  val panel = SimplePanel()
+
   init {
-    button(tr("Add new address"), "fas fa-plus", style = ButtonStyle.PRIMARY).onClick {
-      EditPanel.add()
+    add(panel)
+  }
+}
+
+fun Container.displaySlide(currentSlide: SlideData) {
+
+  removeAll()
+
+  div {
+    margin = 10.px
+
+    div {
+      border = Border(2.px, BorderStyle.SOLID, Color.name(Col.WHITE))
+      paddingTop = 5.px
+      paddingBottom = 5.px
+      textAlign = TextAlign.LEFT
+      +"Decision count: ${currentSlide.decisionCount}"
     }
-    dataContainer(Model.profile, { profile, _, _ ->
-      if (profile.name != null) {
-        Button("Logout: ${profile.name}", "fas fa-sign-out-alt", style = ButtonStyle.WARNING).onClick {
-          document.location?.href = "/logout"
+
+    h1 {
+      background = Background(Color.rgb(53, 121, 246))
+      color = Color.name(Col.WHITE)
+      textAlign = TextAlign.CENTER
+      +currentSlide.title
+    }
+
+    div {
+      border = Border(2.px, BorderStyle.SOLID, Color.name(Col.GRAY))
+      padding = 25.px
+      add(P(currentSlide.contents, true))
+    }
+
+    div {
+      marginTop = 10.px
+      val spacing = 4
+      val init: Container.() -> Unit = { addButtons(currentSlide) }
+      if (currentSlide.orientation == ChoiceOrientation.VERTICAL)
+        vPanel(spacing = spacing, init = init)
+      else
+        hPanel(spacing = spacing, init = init)
+    }
+
+    if (currentSlide.parentTitles.isNotEmpty()) {
+      div {
+        marginTop = 10.px
+
+        vPanel {
+          button("Go Back In Time", style = ButtonStyle.SUCCESS) {
+            onClick {
+              if (currentSlide.parentTitles.size == 1) {
+                currentSlide.parentTitles[0].also { parentTitle ->
+                  if (parentTitle.isNotBlank())
+                    AppScope.launch {
+                      Model.goBack(parentTitle)
+                    }
+                }
+              } else {
+                val dialog =
+                  Dialog<String>("Go back to...") {
+                    vPanel(spacing = 4) {
+                      currentSlide.parentTitles.forEach { parentTitle ->
+                        button(parentTitle, style = ButtonStyle.PRIMARY) { onClick { setResult(parentTitle) } }
+                      }
+                    }
+                  }
+
+                AppScope.launch {
+                  dialog.getResult()?.also { parentTitle ->
+                    if (parentTitle.isNotBlank())
+                      Model.goBack(parentTitle)
+                  }
+                }
+              }
+            }
+          }
         }
-      } else {
-        Span("")
       }
-    })
+    }
+  }
+}
+
+private fun Container.addButtons(currentSlide: SlideData) {
+  currentSlide.choices.forEach { ct ->
+    button(ct.abbrev, style = ButtonStyle.PRIMARY) {
+      onClick {
+        AppScope.launch {
+          val choiceReason = Model.choose(currentSlide.title, ct.abbrev, ct.title)
+          if (choiceReason.reason.isEmpty())
+            promptForReason(currentSlide.title, ct)
+          else
+            Model.refreshPanel()
+        }
+      }
+    }
+  }
+}
+
+private fun promptForReason(fromTitle: String, ct: ChoiceTitle) {
+  val submit = Button("OK", disabled = true)
+  val reasonDialog =
+    Dialog<String>("Reasoning") {
+      val input =
+        Text(label = "Reason for your decision:") {
+          placeholder = """I chose "${ct.abbrev}" because..."""
+          setEventListener<Text> {
+            keyup = { _ ->
+              submit.disabled = value.isNullOrBlank()
+            }
+          }
+        }
+      add(input)
+      addButton(Button("Cancel", style = ButtonStyle.OUTLINESECONDARY).also { it.onClick { setResult("") } })
+      addButton(submit.also { it.onClick { setResult(input.value) } })
+    }
+
+  AppScope.launch {
+    reasonDialog.getResult()?.also { response ->
+      if (response.isNotBlank()) {
+        Model.reason(fromTitle, ct.abbrev, ct.title, response)
+      }
+    }
   }
 }

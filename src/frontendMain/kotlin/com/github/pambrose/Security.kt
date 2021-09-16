@@ -1,5 +1,6 @@
 package com.github.pambrose
 
+import com.github.pambrose.EndPoints.LOGIN
 import io.kvision.core.onEvent
 import io.kvision.form.FormPanel
 import io.kvision.form.formPanel
@@ -16,63 +17,87 @@ import io.kvision.remote.SecurityMgr
 import io.kvision.utils.ENTER_KEY
 import kotlinx.coroutines.launch
 
-class LoginWindow : Dialog<Credentials>(closeButton = false, escape = false, animation = false) {
+object Security : SecurityMgr() {
+
+  private val loginService = LoginService("/$LOGIN")
+  private val loginWindow = LoginWindow()
+
+  override suspend fun login() = loginService.login(loginWindow.getResult())
+
+  override suspend fun afterLogin() {
+    console.log("Finished login")
+  }
+
+  override suspend fun afterError() {
+    console.log("Error on login")
+  }
+}
+
+class LoginWindow : Dialog<Credentials>(closeButton = false, escape = false, animation = true) {
 
   private val loginPanel: FormPanel<Credentials>
   private val loginButton: Button
   private val userButton: Button
-  private val registerPanel: FormPanel<Profile>
+  private val registerPanel: FormPanel<RegisterData>
   private val registerButton: Button
   private val cancelButton: Button
 
   init {
-    loginPanel = formPanel {
-      add(Credentials::username, Text(label = "${tr("Login")}:"), required = true)
-      add(Credentials::password, Password(label = "${tr("Password")}:"), required = true)
-      onEvent {
-        keydown = {
-          if (it.keyCode == ENTER_KEY) {
-            this@LoginWindow.processCredentials()
+    loginPanel =
+      formPanel {
+        add(Credentials::username, Text(label = "${tr("Email")}:"), required = true)
+        add(Credentials::password, Password(label = "${tr("Password")}:"), required = true)
+
+        onEvent {
+          keydown = {
+            if (it.keyCode == ENTER_KEY) {
+              this@LoginWindow.processCredentials()
+            }
           }
         }
       }
-    }
+
     registerPanel =
       formPanel {
-        add(Profile::name, Text(label = "${tr("Your name")}:"), required = true)
-        add(Profile::username, Text(label = "Login:"), required = true)
+        add(RegisterData::fullName, Text(label = "${tr("Full name")}:"), required = true)
+        add(RegisterData::email, Text(label = "Email:"), required = true)
         add(
-          Profile::password, Password(label = "${tr("Password")}:"), required = true,
+          RegisterData::password, Password(label = "${tr("Password")}:"), required = true,
           validatorMessage = { "Password too short" }) {
           (it.getValue()?.length ?: 0) >= 8
         }
-        add(Profile::password2, Password(label = "${tr("Confirm password")}:"), required = true,
+        add(RegisterData::password2, Password(label = "${tr("Confirm password")}:"), required = true,
           validatorMessage = { tr("Password too short") }) {
           (it.getValue()?.length ?: 0) >= 8
         }
         validator = {
-          val result = it[Profile::password] == it[Profile::password2]
+          val result = it[RegisterData::password] == it[RegisterData::password2]
           if (!result) {
-            it.getControl(Profile::password)?.validatorError = tr("Passwords are not the same")
-            it.getControl(Profile::password2)?.validatorError = tr("Passwords are not the same")
+            it.getControl(RegisterData::password)?.validatorError = tr("Passwords are not the same")
+            it.getControl(RegisterData::password2)?.validatorError = tr("Passwords are not the same")
           }
           result
         }
         validatorMessage = { tr("Passwords are not the same") }
 
       }
+
     cancelButton = Button(tr("Cancel"), "fas fa-times").onClick {
       this@LoginWindow.hideRegisterForm()
     }
+
     registerButton = Button(tr("Register"), "fas fa-check", ButtonStyle.PRIMARY).onClick {
       this@LoginWindow.processRegister()
     }
+
     loginButton = Button(tr("Login"), "fas fa-check", ButtonStyle.PRIMARY).onClick {
       this@LoginWindow.processCredentials()
     }
+
     userButton = Button(tr("Register user"), "fas fa-user").onClick {
       this@LoginWindow.showRegisterForm()
     }
+
     addButton(userButton)
     addButton(loginButton)
     addButton(cancelButton)
@@ -108,10 +133,9 @@ class LoginWindow : Dialog<Credentials>(closeButton = false, escape = false, ani
 
   private fun processRegister() {
     if (registerPanel.validate()) {
-      val userData = registerPanel.getData()
+      val registerData = registerPanel.getData()
       AppScope.launch {
-        if (Model.registerProfile(userData, userData.password!!)
-        ) {
+        if (Model.registerUser(registerData)) {
           Alert.show(text = tr("User registered. You can now log in.")) {
             hideRegisterForm()
           }
@@ -120,19 +144,5 @@ class LoginWindow : Dialog<Credentials>(closeButton = false, escape = false, ani
         }
       }
     }
-  }
-}
-
-object Security : SecurityMgr() {
-
-  private val loginService = LoginService("/login")
-  private val loginWindow = LoginWindow()
-
-  override suspend fun login(): Boolean {
-    return loginService.login(loginWindow.getResult())
-  }
-
-  override suspend fun afterLogin() {
-    Model.readProfile()
   }
 }

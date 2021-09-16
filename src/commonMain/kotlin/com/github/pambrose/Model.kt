@@ -7,25 +7,16 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseContextualSerialization
 
 @Serializable
-data class Profile(
-  val id: Int? = null,
-  val name: String? = null,
-  val username: String? = null,
-  val password: String? = null,
-  val password2: String? = null
+data class RegisterData(
+  val fullName: String,
+  val email: String,
+  val password: String,
+  val password2: String,
 )
 
 @Serializable
-data class Address(
-  val id: Int? = 0,
-  val firstName: String? = null,
-  val lastName: String? = null,
-  val email: String? = null,
-  val phone: String? = null,
-  val postalAddress: String? = null,
-  val favourite: Boolean? = false,
-  val createdAt: LocalDateTime? = null,
-  val userId: Int? = null
+data class UserId(
+  val uuid: String,
 )
 
 @Serializable
@@ -35,5 +26,19 @@ data class SlideData(
   val choices: List<ChoiceTitle>,
   val orientation: ChoiceOrientation,
   val parentTitles: List<String>,
-  val currentScore: Int,
+  val decisionCount: Long,
 )
+
+@Serializable
+data class ChoiceTitle(val abbrev: String, val title: String)
+
+@Serializable
+data class UserChoice(
+  val fromTitle: String,
+  val abbrev: String,
+  val title: String,
+  val reason: String,
+)
+
+@Serializable
+enum class ChoiceOrientation { VERTICAL, HORIZONTAL }

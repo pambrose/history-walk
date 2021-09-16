@@ -2,212 +2,243 @@ import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
-    val kotlinVersion: String by System.getProperties()
-    kotlin("plugin.serialization") version kotlinVersion
-    kotlin("multiplatform") version kotlinVersion
-    val versionsVersion: String by System.getProperties()
-    id("com.github.ben-manes.versions") version versionsVersion
-    val kvisionVersion: String by System.getProperties()
-    id("io.kvision") version kvisionVersion
+  val kotlinVersion: String by System.getProperties()
+  val kvisionVersion: String by System.getProperties()
+  val versionsVersion: String by System.getProperties()
+  val flywayVersion: String by System.getProperties()
+
+  kotlin("multiplatform") version kotlinVersion
+  kotlin("plugin.serialization") version kotlinVersion
+  id("io.kvision") version kvisionVersion
+  id("com.github.ben-manes.versions") version versionsVersion
+  id("org.flywaydb.flyway") version flywayVersion
 }
 
 version = "1.0.0-SNAPSHOT"
 group = "com.github.pambrose"
 
 repositories {
-    mavenCentral()
-    jcenter()
-    mavenLocal()
-    maven { url = uri("https://jitpack.io") }
+  mavenLocal()
+  maven { url = uri("https://kotlin.bintray.com/ktor") }
+  maven { url = uri("https://kotlin.bintray.com/kotlinx") }
+  maven { url = uri("https://maven-central.storage-download.googleapis.com/repos/central/data/") }
+  mavenCentral()
+  maven { url = uri("https://jitpack.io") }
 }
 
 // Versions
 val kotlinVersion: String by System.getProperties()
 val kvisionVersion: String by System.getProperties()
-val ktorVersion: String by project
+val commonsCodecVersion: String by project
 val exposedVersion: String by project
-val hikariVersion: String by project
+val flexmarkVersion: String by project
 val h2Version: String by project
-val pgsqlVersion: String by project
+val hikariVersion: String by project
 val kweryVersion: String by project
 val logbackVersion: String by project
-val commonsCodecVersion: String by project
-val jdbcNamedParametersVersion: String by project
-val flexmarkVersion: String by project
-val utilsVersion: String by project
 val loggingVersion: String by project
+val pgjdbcVersion: String by project
+val pgsqlVersion: String by project
+val jdbcNamedParametersVersion: String by project
+val ktorVersion: String by project
+val utilsVersion: String by project
 
 val webDir = file("src/frontendMain/web")
 val mainClassName = "io.ktor.server.netty.EngineMain"
 
 kotlin {
-    jvm("backend") {
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = "1.8"
-                freeCompilerArgs = listOf("-Xjsr305=strict")
-            }
+  jvm("backend") {
+    compilations.all {
+      kotlinOptions {
+        jvmTarget = "1.8"
+        freeCompilerArgs = listOf("-Xjsr305=strict")
+      }
+    }
+  }
+
+  js("frontend") {
+    browser {
+      runTask {
+        outputFileName = "main.bundle.js"
+        sourceMaps = false
+        devServer = KotlinWebpackConfig.DevServer(
+          open = false,
+          port = 3000,
+          proxy = mutableMapOf(
+            "/kv/*" to "http://localhost:8080",
+            "/login" to "http://localhost:8080",
+            "/logout" to "http://localhost:8080",
+            "/kvws/*" to mapOf("target" to "ws://localhost:8080", "ws" to true)
+          ),
+          static = mutableListOf("$buildDir/processedResources/frontend/main")
+        )
+      }
+      webpackTask {
+        outputFileName = "main.bundle.js"
+      }
+      testTask {
+        useKarma {
+          useChromeHeadless()
         }
+      }
+    }
+    binaries.executable()
+  }
+
+  sourceSets {
+    val commonMain by getting {
+      dependencies {
+        api("io.kvision:kvision-server-ktor:$kvisionVersion")
+      }
+      kotlin.srcDir("build/generated-src/common")
     }
 
-    js("frontend") {
-        browser {
-            runTask {
-                outputFileName = "main.bundle.js"
-                sourceMaps = false
-                devServer = KotlinWebpackConfig.DevServer(
-                    open = false,
-                    port = 3000,
-                    proxy = mutableMapOf(
-                        "/kv/*" to "http://localhost:8080",
-                        "/login" to "http://localhost:8080",
-                        "/logout" to "http://localhost:8080",
-                        "/kvws/*" to mapOf("target" to "ws://localhost:8080", "ws" to true)
-                    ),
-                    static = mutableListOf("$buildDir/processedResources/frontend/main")
-                )
-            }
-            webpackTask {
-                outputFileName = "main.bundle.js"
-            }
-            testTask {
-                useKarma {
-                    useChromeHeadless()
-                }
-            }
-        }
-        binaries.executable()
+    val commonTest by getting {
+      dependencies {
+        implementation(kotlin("test-common"))
+        implementation(kotlin("test-annotations-common"))
+      }
     }
 
-    sourceSets {
-        val commonMain by getting {
-            dependencies {
-                api("io.kvision:kvision-server-ktor:$kvisionVersion")
-            }
-            kotlin.srcDir("build/generated-src/common")
-        }
-        val commonTest by getting {
-            dependencies {
-                implementation(kotlin("test-common"))
-                implementation(kotlin("test-annotations-common"))
-            }
-        }
-        val backendMain by getting {
-            dependencies {
-                implementation(kotlin("stdlib-jdk8"))
-                implementation(kotlin("reflect"))
-                implementation("io.ktor:ktor-server-core:$ktorVersion")
-                implementation("io.ktor:ktor-server-netty:$ktorVersion")
-                implementation("io.ktor:ktor-server-sessions:$ktorVersion")
-                implementation("io.ktor:ktor-auth:$ktorVersion")
-                implementation("ch.qos.logback:logback-classic:$logbackVersion")
-                implementation("com.h2database:h2:$h2Version")
-                implementation("org.jetbrains.exposed:exposed:$exposedVersion")
-                implementation("org.postgresql:postgresql:$pgsqlVersion")
-                implementation("com.zaxxer:HikariCP:$hikariVersion")
-                implementation("commons-codec:commons-codec:$commonsCodecVersion")
-                implementation("com.axiomalaska:jdbc-named-parameters:$jdbcNamedParametersVersion")
-                implementation("com.github.andrewoma.kwery:core:$kweryVersion")
-                implementation("com.vladsch.flexmark:flexmark:$flexmarkVersion")
-                implementation("com.github.pambrose.common-utils:core-utils:$utilsVersion")
-                implementation("com.github.pambrose.common-utils:ktor-server-utils:$utilsVersion")
-                implementation("io.github.microutils:kotlin-logging:$loggingVersion")
-            }
-        }
-        val backendTest by getting {
-            dependencies {
-                implementation(kotlin("test"))
-                implementation(kotlin("test-junit"))
-            }
-        }
-        val frontendMain by getting {
-            resources.srcDir(webDir)
-            dependencies {
-                implementation("io.kvision:kvision:$kvisionVersion")
-                implementation("io.kvision:kvision-bootstrap:$kvisionVersion")
-                implementation("io.kvision:kvision-datacontainer:$kvisionVersion")
-                implementation("io.kvision:kvision-bootstrap-dialog:$kvisionVersion")
-                implementation("io.kvision:kvision-fontawesome:$kvisionVersion")
-                implementation("io.kvision:kvision-i18n:$kvisionVersion")
-            }
-            kotlin.srcDir("build/generated-src/frontend")
-        }
-        val frontendTest by getting {
-            dependencies {
-                implementation(kotlin("test-js"))
-                implementation("io.kvision:kvision-testutils:$kvisionVersion")
-            }
-        }
-        all {
-            languageSettings.optIn("kotlin.time.ExperimentalTime")
-        }
+    val backendMain by getting {
+      dependencies {
+        implementation(kotlin("stdlib-jdk8"))
+        implementation(kotlin("reflect"))
+        implementation("io.ktor:ktor-server-core:$ktorVersion")
+        implementation("io.ktor:ktor-server-netty:$ktorVersion")
+        implementation("io.ktor:ktor-server-sessions:$ktorVersion")
+        implementation("io.ktor:ktor-auth:$ktorVersion")
+        implementation("ch.qos.logback:logback-classic:$logbackVersion")
+        implementation("com.h2database:h2:$h2Version")
+        implementation("com.github.pambrose.common-utils:exposed-utils:$utilsVersion")
+        implementation("org.postgresql:postgresql:$pgsqlVersion")
+        implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
+        implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
+        implementation("org.jetbrains.exposed:exposed-jodatime:$exposedVersion")
+        implementation("com.impossibl.pgjdbc-ng:pgjdbc-ng-all:$pgjdbcVersion")
+        implementation("com.zaxxer:HikariCP:$hikariVersion")
+        implementation("commons-codec:commons-codec:$commonsCodecVersion")
+        implementation("com.axiomalaska:jdbc-named-parameters:$jdbcNamedParametersVersion")
+        implementation("com.github.andrewoma.kwery:core:$kweryVersion")
+        implementation("com.vladsch.flexmark:flexmark:$flexmarkVersion")
+        implementation("com.github.pambrose.common-utils:core-utils:$utilsVersion")
+        implementation("com.github.pambrose.common-utils:ktor-server-utils:$utilsVersion")
+        implementation("io.github.microutils:kotlin-logging:$loggingVersion")
+      }
     }
+
+    val backendTest by getting {
+      dependencies {
+        implementation(kotlin("test"))
+        implementation(kotlin("test-junit"))
+      }
+    }
+
+    val frontendMain by getting {
+      resources.srcDir(webDir)
+      dependencies {
+        implementation("io.kvision:kvision:$kvisionVersion")
+        implementation("io.kvision:kvision-bootstrap:$kvisionVersion")
+        implementation("io.kvision:kvision-datacontainer:$kvisionVersion")
+        implementation("io.kvision:kvision-bootstrap-dialog:$kvisionVersion")
+        implementation("io.kvision:kvision-fontawesome:$kvisionVersion")
+        implementation("io.kvision:kvision-i18n:$kvisionVersion")
+      }
+      kotlin.srcDir("build/generated-src/frontend")
+    }
+
+    val frontendTest by getting {
+      dependencies {
+        implementation(kotlin("test-js"))
+        implementation("io.kvision:kvision-testutils:$kvisionVersion")
+      }
+    }
+
+    all {
+      languageSettings.optIn("kotlin.time.ExperimentalTime")
+    }
+  }
 }
 
 afterEvaluate {
-    tasks {
-        create("frontendArchive", Jar::class).apply {
-            dependsOn("frontendBrowserProductionWebpack")
-            group = "package"
-            archiveAppendix.set("frontend")
-            val distribution =
-                project.tasks.getByName("frontendBrowserProductionWebpack", KotlinWebpack::class).destinationDirectory!!
-            from(distribution) {
-                include("*.*")
-            }
-            from(webDir)
-            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-            into("/assets")
-            inputs.files(distribution, webDir)
-            outputs.file(archiveFile)
-            manifest {
-                attributes(
-                    mapOf(
-                        "Implementation-Title" to rootProject.name,
-                        "Implementation-Group" to rootProject.group,
-                        "Implementation-Version" to rootProject.version,
-                        "Timestamp" to System.currentTimeMillis()
-                    )
-                )
-            }
-        }
-        getByName("backendProcessResources", Copy::class) {
-            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-        }
-        getByName("backendJar").group = "package"
-        create("jar", Jar::class).apply {
-            dependsOn("frontendArchive", "backendJar")
-            group = "package"
-            manifest {
-                attributes(
-                    mapOf(
-                        "Implementation-Title" to rootProject.name,
-                        "Implementation-Group" to rootProject.group,
-                        "Implementation-Version" to rootProject.version,
-                        "Timestamp" to System.currentTimeMillis(),
-                        "Main-Class" to mainClassName
-                    )
-                )
-            }
-            val dependencies = configurations["backendRuntimeClasspath"].filter { it.name.endsWith(".jar") } +
-                project.tasks["backendJar"].outputs.files +
-                project.tasks["frontendArchive"].outputs.files
-            dependencies.forEach {
-                if (it.isDirectory) from(it) else from(zipTree(it))
-            }
-            exclude("META-INF/*.RSA", "META-INF/*.SF", "META-INF/*.DSA")
-            inputs.files(dependencies)
-            outputs.file(archiveFile)
-            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-        }
-        create("backendRun", JavaExec::class) {
-            dependsOn("compileKotlinBackend")
-            group = "run"
-            main = mainClassName
-            classpath =
-                configurations["backendRuntimeClasspath"] + project.tasks["compileKotlinBackend"].outputs.files +
-                    project.tasks["backendProcessResources"].outputs.files
-            workingDir = buildDir
-        }
+  tasks {
+    create("frontendArchive", Jar::class).apply {
+      dependsOn("frontendBrowserProductionWebpack")
+      group = "package"
+      archiveAppendix.set("frontend")
+      val distribution =
+        project.tasks.getByName("frontendBrowserProductionWebpack", KotlinWebpack::class).destinationDirectory
+      from(distribution) {
+        include("*.*")
+      }
+      from(webDir)
+      duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+      into("/assets")
+      inputs.files(distribution, webDir)
+      outputs.file(archiveFile)
+      manifest {
+        attributes(
+          mapOf(
+            "Implementation-Title" to rootProject.name,
+            "Implementation-Group" to rootProject.group,
+            "Implementation-Version" to rootProject.version,
+            "Timestamp" to System.currentTimeMillis()
+          )
+        )
+      }
     }
+    getByName("backendProcessResources", Copy::class) {
+      duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
+    getByName("backendJar").group = "package"
+    create("jar", Jar::class).apply {
+      dependsOn("frontendArchive", "backendJar")
+      group = "package"
+      manifest {
+        attributes(
+          mapOf(
+            "Implementation-Title" to rootProject.name,
+            "Implementation-Group" to rootProject.group,
+            "Implementation-Version" to rootProject.version,
+            "Timestamp" to System.currentTimeMillis(),
+            "Main-Class" to mainClassName
+          )
+        )
+      }
+      val dependencies = configurations["backendRuntimeClasspath"].filter { it.name.endsWith(".jar") } +
+          project.tasks["backendJar"].outputs.files +
+          project.tasks["frontendArchive"].outputs.files
+      dependencies.forEach {
+        if (it.isDirectory) from(it) else from(zipTree(it))
+      }
+      exclude("META-INF/*.RSA", "META-INF/*.SF", "META-INF/*.DSA")
+      inputs.files(dependencies)
+      outputs.file(archiveFile)
+      duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
+    create("backendRun", JavaExec::class) {
+      dependsOn("compileKotlinBackend")
+      group = "run"
+      main = mainClassName
+      classpath =
+        configurations["backendRuntimeClasspath"] + project.tasks["compileKotlinBackend"].outputs.files +
+            project.tasks["backendProcessResources"].outputs.files
+      workingDir = buildDir
+    }
+  }
+}
+
+// This is for flyway
+buildscript {
+  dependencies {
+    classpath("org.postgresql:postgresql:42.2.2")
+  }
+}
+
+flyway {
+  driver = "org.postgresql.Driver"
+  url = "jdbc:postgresql://localhost:5432/history-walk"
+  user = "postgres"
+  password = "docker"
+  locations = arrayOf("filesystem:src/backendMain/resources/db/migration")
 }
