@@ -1,5 +1,6 @@
 package com.github.pambrose
 
+import com.github.pambrose.Content.ROOT
 import com.github.pambrose.dbms.UsersTable
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -36,7 +37,7 @@ class Slide(val title: String) {
           .map { it[UsersTable.lastTitle] }
           .firstOrNull() ?: error("Missing uuid: $uuid"))
           .let { title ->
-            (if (title == "/") rootSlide else allSlides[title]) ?: error("Invalid title: $title")
+            (if (title == ROOT) rootSlide else allSlides[title]) ?: error("Invalid title: $title")
           }
       }
 

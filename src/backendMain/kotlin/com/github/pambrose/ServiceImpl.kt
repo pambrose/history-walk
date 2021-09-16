@@ -99,10 +99,10 @@ actual class ContentService : IContentService {
   }
 
   companion object : KLogging() {
+    private const val ltEscape = "---LT---"
+    private const val gtEscape = "---GT---"
 
-    fun slideData(uuid: String, slide: Slide): SlideData {
-      val ltEscape = "---LT---"
-      val gtEscape = "---GT---"
+    private fun slideData(uuid: String, slide: Slide): SlideData {
 
       val escaped = slide.content
         .replace("<", ltEscape)

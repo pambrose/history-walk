@@ -26,7 +26,7 @@ data class SlideData(
   val choices: List<ChoiceTitle>,
   val orientation: ChoiceOrientation,
   val parentTitles: List<String>,
-  val currentScore: Int,
+  val decisionCount: Int,
 )
 
 @Serializable

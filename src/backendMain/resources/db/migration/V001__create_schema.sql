@@ -9,7 +9,7 @@ CREATE TABLE history.users
     updated    TIMESTAMPTZ DEFAULT NOW(),
     uuid       UUID NOT NULL UNIQUE,
     email      TEXT NOT NULL UNIQUE,
-    name       TEXT NOT NULL,
+    full_name  TEXT NOT NULL,
     salt       TEXT NOT NULL,
     digest     TEXT NOT NULL,
     last_title TEXT NOT NULL
@@ -25,5 +25,7 @@ CREATE TABLE history.userchoices
     from_title TEXT NOT NULL,
     abbrev     TEXT NOT NULL,
     title      TEXT NOT NULL,
-    reason     TEXT NOT NULL
+    reason     TEXT NOT NULL,
+
+    CONSTRAINT user_choices_unique unique (user_uuid, from_title, title)
 );

@@ -30,7 +30,7 @@ fun Container.displaySlide(currentSlide: SlideData) {
       paddingTop = 5.px
       paddingBottom = 5.px
       textAlign = TextAlign.LEFT
-      +"Total moves: ${currentSlide.currentScore}"
+      +"Decisions: ${currentSlide.decisionCount}"
     }
 
     h1 {

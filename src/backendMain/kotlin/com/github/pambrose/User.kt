@@ -1,5 +1,6 @@
 package com.github.pambrose
 
+import com.github.pambrose.Content.ROOT
 import com.github.pambrose.Email.Companion.EMPTY_EMAIL
 import com.github.pambrose.Email.Companion.UNKNOWN_EMAIL
 import com.github.pambrose.FullName.Companion.EMPTY_FULLNAME
@@ -148,7 +149,7 @@ class User {
                   row[UsersTable.email] = email.value.maxLength(128)
                   row[UsersTable.salt] = salt
                   row[UsersTable.digest] = digest
-                  row[UsersTable.lastTitle] = "/"
+                  row[UsersTable.lastTitle] = ROOT
                 }.value
           }
           logger.info { "Created user $email ${user.uuid}" }

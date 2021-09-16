@@ -8,7 +8,7 @@ object UsersTable : LongIdTable("history.users") {
   val updated = datetime("updated")
   val uuidCol = uuid("uuid")
   val email = text("email")
-  val fullName = text("name")
+  val fullName = text("full_name")
   val salt = text("salt")
   val digest = text("digest")
   val lastTitle = text("last_title")
