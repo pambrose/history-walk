@@ -75,7 +75,7 @@ fun Container.displaySlide(currentSlide: SlideData) {
               AppScope.launch {
                 dialog.getResult()?.also { slideTitle ->
                   if (slideTitle.isNotBlank())
-                    Model.refreshPanel()
+                    Model.goBack(slideTitle)
                 }
               }
             }

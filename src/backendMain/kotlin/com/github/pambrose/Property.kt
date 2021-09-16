@@ -14,6 +14,16 @@ import io.ktor.config.*
 import mu.KLogging
 import java.util.concurrent.atomic.AtomicBoolean
 
+object PropertyNames {
+  const val READINGBAT = "readingbat"
+  const val DBMS = "dbms"
+  const val SITE = "site"
+  const val AGENT = "agent"
+  const val CLASSES = "classes"
+  const val CONTENT = "content"
+  const val CHALLENGES = "challenges"
+}
+
 enum class Property(
   val propertyValue: String,
   val maskFunc: Property.() -> String = { getProperty(UNASSIGNED, false) }
@@ -130,7 +140,7 @@ enum class Property(
 
     private fun notInitialized(prop: Property) = "Property ${prop.name} not initialized"
 
-    internal fun Application.assignProperties() {
+    fun Application.assignProperties() {
 
       val agentEnabled =
         EnvVar.AGENT_ENABLED.getEnv(AGENT_ENABLED.configValue(this, default = "false").toBoolean())

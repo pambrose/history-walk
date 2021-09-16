@@ -1,5 +1,7 @@
 package com.github.pambrose
 
+import com.github.pambrose.EndPoints.LOGIN
+import com.github.pambrose.EndPoints.LOGOUT
 import com.github.pambrose.common.util.isNotNull
 import io.ktor.application.*
 import io.ktor.auth.*
@@ -18,7 +20,7 @@ object Routes : KLogging() {
     authenticate /*("UserId")*/ {
       applyRoutes(ContentServiceManager)
 
-      post("login") {
+      post(LOGIN) {
         logger.info { "/login called" }
         val principal = call.principal<UserPrincipal>()
         val result =
@@ -27,7 +29,6 @@ object Routes : KLogging() {
             if (user.isNotNull()) {
               val profile = Profile(user.uuid.toString(), user.fullName.value, user.email.value)
               call.sessions.set(profile)
-              // assignBrowserSession()
               HttpStatusCode.OK
             } else {
               HttpStatusCode.Unauthorized
@@ -39,7 +40,7 @@ object Routes : KLogging() {
         call.respond(result)
       }
 
-      get("logout") {
+      get(LOGOUT) {
         call.sessions.clear<Profile>()
         call.respondRedirect("/")
       }

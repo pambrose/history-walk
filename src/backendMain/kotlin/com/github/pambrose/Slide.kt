@@ -28,13 +28,13 @@ class Slide(val title: String) {
       Slide(title).block()
     }
 
-    fun findSlide(userUuid: UUID) =
+    fun findSlide(uuid: String) =
       transaction {
         (UsersTable
           .slice(UsersTable.lastTitle)
-          .select { UsersTable.uuidCol eq userUuid }
+          .select { UsersTable.uuidCol eq UUID.fromString(uuid) }
           .map { it[UsersTable.lastTitle] }
-          .firstOrNull() ?: error("Missing uuid: $userUuid"))
+          .firstOrNull() ?: error("Missing uuid: $uuid"))
           .let { title ->
             (if (title == "/") rootSlide else allSlides[title]) ?: error("Invalid title: $title")
           }

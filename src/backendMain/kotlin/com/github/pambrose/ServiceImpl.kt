@@ -4,14 +4,12 @@ import com.github.pambrose.Slide.Companion.findSlide
 import com.github.pambrose.dbms.UserChoiceTable
 import com.github.pambrose.dbms.UsersTable
 import com.google.inject.Inject
+import com.pambrose.common.exposed.get
 import io.ktor.application.*
 import io.ktor.sessions.*
 import mu.KLogging
-import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.insertAndGetId
-import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.jetbrains.exposed.sql.update
 import java.util.*
 
 actual class RegisterUserService : IRegisterUserService {
@@ -34,42 +32,10 @@ actual class ContentService : IContentService {
   lateinit var call: ApplicationCall
 
   override suspend fun currentSlide(): SlideData {
-
     logger.info { "profile=${call.sessions.get<Profile>()}" }
-
     val uuid = call.profile?.uuid ?: error("Missing profile")
-
-    val slide = findSlide(UUID.fromString(uuid))
-
-    val escaped = slide.content
-      .replace("<", ltEscape)
-      .replace(">", gtEscape)
-
-    val content =
-      MarkdownParser.toHtml(escaped)
-        .replace(ltEscape, "<")
-        .replace(gtEscape, ">")
-
-    val choices = slide.choices.map { (choice, destination) -> ChoiceTitle(choice, destination) }
-
-    val orientation = slide.choiceOrientation
-
-    val parentTitles =
-      mutableListOf<String>()
-        .also { parentTitles ->
-          var currSlide = slide.parentSlide
-          while (currSlide != null) {
-            parentTitles += currSlide.title
-            currSlide = currSlide.parentSlide
-          }
-        }
-        .reversed()
-
-    val slides = sessionChoices.computeIfAbsent(uuid) { mutableSetOf() }
-    slides += slide.title
-
-    return SlideData(slide.title, content, choices, orientation, parentTitles, slides.size)
-      .also { logger.info { "Returning: $it \n" } }
+    val slide = findSlide(uuid)
+    return slideData(uuid, slide)
   }
 
   override suspend fun choose(fromTitle: String, abbrev: String, title: String): UserChoice =
@@ -113,7 +79,16 @@ actual class ContentService : IContentService {
     return ""
   }
 
-  fun updateLastTitle(uuid: String, title: String) {
+  override suspend fun goBack(title: String): SlideData {
+    val uuid = call.sessions.get<Profile>()?.uuid ?: error("Missing profile")
+    transaction {
+      updateLastTitle(uuid, title)
+    }
+    val slide = findSlide(uuid)
+    return slideData(uuid, slide)
+  }
+
+  private fun updateLastTitle(uuid: String, title: String) {
     UsersTable
       .update({ UsersTable.uuidCol eq UUID.fromString(uuid) }) { row ->
         row[UsersTable.lastTitle] = title
@@ -127,6 +102,43 @@ actual class ContentService : IContentService {
     const val ltEscape = "---LT---"
     const val gtEscape = "---GT---"
 
-    val sessionChoices = mutableMapOf<String, MutableSet<String>>()
+    fun slideData(uuid: String, slide: Slide): SlideData {
+      val escaped = slide.content
+        .replace("<", ltEscape)
+        .replace(">", gtEscape)
+
+      val content =
+        MarkdownParser.toHtml(escaped)
+          .replace(ltEscape, "<")
+          .replace(gtEscape, ">")
+
+      val choices = slide.choices.map { (choice, destination) -> ChoiceTitle(choice, destination) }
+
+      val orientation = slide.choiceOrientation
+
+      val parentTitles =
+        mutableListOf<String>()
+          .also { parentTitles ->
+            var currSlide = slide.parentSlide
+            while (currSlide != null) {
+              parentTitles += currSlide.title
+              currSlide = currSlide.parentSlide
+            }
+          }
+          .reversed()
+
+      val count =
+        transaction {
+          UserChoiceTable
+            .slice(Count(UserChoiceTable.id))
+            .select { UserChoiceTable.userUuid eq UUID.fromString(uuid) }
+            .map { it.get(0) as Long }
+            .first()
+            .toInt()
+        }
+
+      return SlideData(slide.title, content, choices, orientation, parentTitles, count)
+        .also { logger.info { "Returning: $it \n" } }
+    }
   }
 }

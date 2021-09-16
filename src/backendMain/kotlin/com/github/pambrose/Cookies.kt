@@ -102,9 +102,9 @@ data class BrowserSession(val id: String, val created: Long = Instant.now().toEp
 //  }
 }
 
-internal data class UserPrincipal(val uuid: UUID, val created: Long = Instant.now().toEpochMilli()) : Principal
+data class UserPrincipal(val uuid: UUID, val created: Long = Instant.now().toEpochMilli()) : Principal
 
-internal val ApplicationCall.profile get() = sessions.get<Profile>()
-internal val ApplicationCall.browserSession get() = sessions.get<BrowserSession>()
+val ApplicationCall.profile get() = sessions.get<Profile>()
+val ApplicationCall.browserSession get() = sessions.get<BrowserSession>()
 
-internal val ApplicationCall.userPrincipal get() = sessions.get<UserPrincipal>()
+val ApplicationCall.userPrincipal get() = sessions.get<UserPrincipal>()

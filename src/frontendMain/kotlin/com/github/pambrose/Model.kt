@@ -44,4 +44,15 @@ object Model {
         throw e
       }
     }
+
+  suspend fun goBack(title: String) =
+    Security.withAuth {
+      try {
+        val currentSlide = contentService.goBack(title)
+        MainPanel.panel.displaySlide(currentSlide)
+      } catch (e: Exception) {
+        console.log(e)
+        throw e
+      }
+    }
 }

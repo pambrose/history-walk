@@ -1,5 +1,6 @@
 package com.github.pambrose
 
+import com.github.pambrose.EndPoints.LOGIN
 import io.kvision.core.onEvent
 import io.kvision.form.FormPanel
 import io.kvision.form.formPanel
@@ -18,7 +19,7 @@ import kotlinx.coroutines.launch
 
 object Security : SecurityMgr() {
 
-  private val loginService = LoginService("/login")
+  private val loginService = LoginService("/$LOGIN")
   private val loginWindow = LoginWindow()
 
   override suspend fun login() = loginService.login(loginWindow.getResult())
