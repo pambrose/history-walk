@@ -44,6 +44,5 @@ object Routes : KLogging() {
         call.respondRedirect("/")
       }
     }
-
   }
 }

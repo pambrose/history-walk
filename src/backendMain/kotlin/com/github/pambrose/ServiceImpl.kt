@@ -1,33 +1,19 @@
 package com.github.pambrose
 
 import com.github.pambrose.Slide.Companion.findSlide
-import com.github.pambrose.common.util.isNull
 import com.github.pambrose.common.util.newStringSalt
-import com.github.pambrose.common.util.randomId
 import com.github.pambrose.common.util.sha256
+import com.github.pambrose.dbms.UserChoiceTable
 import com.github.pambrose.dbms.UsersTable
 import com.google.inject.Inject
 import io.ktor.application.*
 import io.ktor.sessions.*
 import mu.KLogging
+import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.insertAndGetId
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
-
-suspend fun <RESP> ApplicationCall.withProfile(block: suspend (Profile) -> RESP): RESP {
-  val profile = this.sessions.get<Profile>()
-  return profile?.let {
-    block(profile)
-  } ?: throw IllegalStateException("Profile not set!")
-}
-
-actual class ProfileService : IProfileService {
-
-  @Inject
-  lateinit var call: ApplicationCall
-
-  override suspend fun getProfile() = call.withProfile { it }
-}
 
 actual class RegisterProfileService : IRegisterProfileService {
 
@@ -47,10 +33,6 @@ actual class RegisterProfileService : IRegisterProfileService {
                   row[UsersTable.salt] = salt
                   row[UsersTable.digest] = digest
                 }.value
-
-//            val browserId =
-//              browserSession?.sessionDbmsId() ?: error("Missing browser session")
-//
           }
         }
     } catch (e: Exception) {
@@ -67,15 +49,12 @@ actual class ContentService : IContentService {
 
   override suspend fun currentSlide(title: String): SlideData {
 
-    logger("In currentSlide() at ${System.currentTimeMillis()}")
     logger.info { "profile=${call.sessions.get<Profile>()}" }
     logger.info { "title=$title" }
 
     val uuid = call.profile?.uuid ?: error("Missing profile")
 
     val slide = findSlide(title)
-
-    val titleVal = slide.title
 
     val escaped = slide.content
       .replace("<", ltEscape)
@@ -102,35 +81,41 @@ actual class ContentService : IContentService {
         .reversed()
 
     val slides = sessionChoices.computeIfAbsent(uuid) { mutableSetOf() }
-    slides += titleVal
+    slides += slide.title
 
-    return SlideData(titleVal, content, choices, orientation, parentTitles, slides.size)
+    return SlideData(slide.title, content, choices, orientation, parentTitles, slides.size)
       .also { logger.info { "Returning: $it \n" } }
   }
 
-  override suspend fun choose(fromTitle: String, choice: String, choiceTitle: String): ChoiceReason {
-    val user = call.sessions.get<Profile>()?.name ?: error("Missing profile")
-    val userMoves = users.computeIfAbsent(user) { mutableListOf() }
-    val userChoice = userMoves.firstOrNull { it.fromTitle == fromTitle && it.choice == choice }
-
-    return if (userChoice.isNull()) {
-      Choice(fromTitle, choice, choiceTitle).let { newChoice ->
-        userMoves.add(newChoice)
-        ChoiceReason(newChoice.choiceId, newChoice.reason)
-      }
-    } else {
-      ChoiceReason(userChoice.choiceId, userChoice.reason)
-    }.also {
-      println(users[user])
+  override suspend fun choose(fromTitle: String, abbrev: String, title: String): ChoiceReason =
+    transaction {
+      // See if user has an entry for that transition
+      val uuid = call.sessions.get<Profile>()?.uuid ?: error("Missing profile")
+      UserChoiceTable
+        .slice(UserChoiceTable.fromTitle, UserChoiceTable.title, UserChoiceTable.abbrev, UserChoiceTable.reason)
+        .select { (UserChoiceTable.userUuid eq UUID.fromString(uuid)) and (UserChoiceTable.fromTitle eq fromTitle) and (UserChoiceTable.title eq title) }
+        .map { row ->
+          ChoiceReason(
+            row[UserChoiceTable.fromTitle],
+            row[UserChoiceTable.abbrev],
+            row[UserChoiceTable.title],
+            row[UserChoiceTable.reason],
+          )
+        }
+        .firstOrNull() ?: ChoiceReason(fromTitle, title, abbrev, "")
     }
-  }
 
-  override suspend fun reason(choiceId: String, reason: String): String {
-    val user = call.sessions.get<Profile>()?.name ?: error("Missing profile")
-    val userMoves = users[user] ?: error("Missing user: $user")
-    val userChoice = userMoves.firstOrNull { it.choiceId == choiceId } ?: error("Missing choiceId: $choiceId")
-    logger.info { "Assigning $userChoice the reason: $reason" }
-    userChoice.reason = reason
+  override suspend fun reason(fromTitle: String, abbrev: String, title: String, reason: String): String {
+    val uuid = call.sessions.get<Profile>()?.uuid ?: error("Missing profile")
+    UserChoiceTable
+      .insertAndGetId { row ->
+        row[UserChoiceTable.uuidCol] = UUID.randomUUID()
+        row[UserChoiceTable.userUuid] = UUID.fromString(uuid)
+        row[UserChoiceTable.fromTitle] = fromTitle
+        row[UserChoiceTable.abbrev] = abbrev
+        row[UserChoiceTable.title] = title
+        row[UserChoiceTable.reason] = reason
+      }.value
     return ""
   }
 
@@ -138,11 +123,6 @@ actual class ContentService : IContentService {
     const val ltEscape = "---LT---"
     const val gtEscape = "---GT---"
 
-    val users = mutableMapOf<String, MutableList<Choice>>()
     val sessionChoices = mutableMapOf<String, MutableSet<String>>()
   }
-}
-
-data class Choice(val fromTitle: String, val choice: String, val choiceTitle: String, var reason: String = "") {
-  val choiceId = randomId(10)
 }

@@ -26,10 +26,15 @@ data class SlideData(
 )
 
 @Serializable
-data class ChoiceTitle(val choice: String, val title: String)
+data class ChoiceTitle(val abbrev: String, val title: String)
 
 @Serializable
-data class ChoiceReason(val choiceId: String, val reason: String)
+data class ChoiceReason(
+  val fromTitle: String,
+  val abbrev: String,
+  val title: String,
+  val reason: String,
+)
 
 @Serializable
 enum class ChoiceOrientation { VERTICAL, HORIZONTAL }

@@ -10,8 +10,6 @@ import io.ktor.http.*
 import mu.KLogging
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.joda.time.DateTime
-import org.joda.time.DateTimeZone
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.measureTime
@@ -70,20 +68,8 @@ class User {
       UsersTable
         .slice(Count(id))
         .select { id eq userDbmsId }
-        .map { it.get(0) as Long }
+        .map { it[0] as Long }
         .first() > 0
-    }
-
-  fun assignDigest(newDigest: String) =
-    transaction {
-      //PasswordResetsTable.deleteWhere { PasswordResetsTable.userRef eq userDbmsId }
-
-      UsersTable
-        .update({ UsersTable.id eq userDbmsId }) { row ->
-          row[updated] = DateTime.now(DateTimeZone.UTC)
-          row[digest] = newDigest
-          digestBacking = newDigest
-        }
     }
 
   fun deleteUser() {
