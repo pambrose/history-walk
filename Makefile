@@ -7,6 +7,9 @@ client:
 clean:
 	./gradlew clean
 
+jar: clean
+	./gradlew jar
+
 versioncheck:
 	./gradlew dependencyUpdates
 
