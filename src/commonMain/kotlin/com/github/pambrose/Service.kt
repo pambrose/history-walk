@@ -10,6 +10,6 @@ interface IRegisterProfileService {
 @KVService
 interface IContentService {
   suspend fun currentSlide(title: String): SlideData
-  suspend fun choose(fromTitle: String, abbrev: String, title: String): ChoiceReason
+  suspend fun choose(fromTitle: String, abbrev: String, title: String): UserChoice
   suspend fun reason(fromTitle: String, abbrev: String, title: String, reason: String): String
 }

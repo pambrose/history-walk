@@ -4,14 +4,15 @@ create schema history;
 
 CREATE TABLE history.users
 (
-    id      BIGSERIAL UNIQUE PRIMARY KEY,
-    created TIMESTAMPTZ DEFAULT NOW(),
-    updated TIMESTAMPTZ DEFAULT NOW(),
-    uuid    UUID NOT NULL UNIQUE,
-    email   TEXT NOT NULL UNIQUE,
-    name    TEXT NOT NULL,
-    salt    TEXT NOT NULL,
-    digest  TEXT NOT NULL
+    id         BIGSERIAL UNIQUE PRIMARY KEY,
+    created    TIMESTAMPTZ DEFAULT NOW(),
+    updated    TIMESTAMPTZ DEFAULT NOW(),
+    uuid       UUID NOT NULL UNIQUE,
+    email      TEXT NOT NULL UNIQUE,
+    name       TEXT NOT NULL,
+    salt       TEXT NOT NULL,
+    digest     TEXT NOT NULL,
+    last_title TEXT NOT NULL
 );
 
 CREATE TABLE history.userchoices

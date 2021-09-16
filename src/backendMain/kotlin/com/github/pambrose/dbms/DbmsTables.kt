@@ -11,6 +11,7 @@ object UsersTable : LongIdTable("history.users") {
   val fullName = text("name")
   val salt = text("salt")
   val digest = text("digest")
+  val lastTitle = text("last_title")
 }
 
 object UserChoiceTable : LongIdTable("history.userchoices") {

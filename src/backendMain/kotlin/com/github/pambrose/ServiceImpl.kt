@@ -13,6 +13,7 @@ import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
 import java.util.*
 
 actual class RegisterProfileService : IRegisterProfileService {
@@ -54,7 +55,7 @@ actual class ContentService : IContentService {
 
     val uuid = call.profile?.uuid ?: error("Missing profile")
 
-    val slide = findSlide(title)
+    val slide = findSlide(UUID.fromString(uuid))
 
     val escaped = slide.content
       .replace("<", ltEscape)
@@ -87,36 +88,55 @@ actual class ContentService : IContentService {
       .also { logger.info { "Returning: $it \n" } }
   }
 
-  override suspend fun choose(fromTitle: String, abbrev: String, title: String): ChoiceReason =
+  override suspend fun choose(fromTitle: String, abbrev: String, title: String): UserChoice =
     transaction {
       // See if user has an entry for that transition
       val uuid = call.sessions.get<Profile>()?.uuid ?: error("Missing profile")
-      UserChoiceTable
-        .slice(UserChoiceTable.fromTitle, UserChoiceTable.title, UserChoiceTable.abbrev, UserChoiceTable.reason)
+      (UserChoiceTable
+        .slice(UserChoiceTable.fromTitle, UserChoiceTable.abbrev, UserChoiceTable.title, UserChoiceTable.reason)
         .select { (UserChoiceTable.userUuid eq UUID.fromString(uuid)) and (UserChoiceTable.fromTitle eq fromTitle) and (UserChoiceTable.title eq title) }
         .map { row ->
-          ChoiceReason(
+          UserChoice(
             row[UserChoiceTable.fromTitle],
             row[UserChoiceTable.abbrev],
             row[UserChoiceTable.title],
             row[UserChoiceTable.reason],
           )
         }
-        .firstOrNull() ?: ChoiceReason(fromTitle, title, abbrev, "")
+        .firstOrNull() ?: UserChoice(fromTitle, title, abbrev, ""))
+        .also { userChoice ->
+          if (userChoice.reason.isNotBlank()) {
+            updateLastTitle(uuid, title)
+          }
+        }
     }
 
   override suspend fun reason(fromTitle: String, abbrev: String, title: String, reason: String): String {
-    val uuid = call.sessions.get<Profile>()?.uuid ?: error("Missing profile")
-    UserChoiceTable
-      .insertAndGetId { row ->
-        row[UserChoiceTable.uuidCol] = UUID.randomUUID()
-        row[UserChoiceTable.userUuid] = UUID.fromString(uuid)
-        row[UserChoiceTable.fromTitle] = fromTitle
-        row[UserChoiceTable.abbrev] = abbrev
-        row[UserChoiceTable.title] = title
-        row[UserChoiceTable.reason] = reason
-      }.value
+    transaction {
+      val uuid = call.sessions.get<Profile>()?.uuid ?: error("Missing profile")
+      UserChoiceTable
+        .insertAndGetId { row ->
+          row[UserChoiceTable.uuidCol] = UUID.randomUUID()
+          row[UserChoiceTable.userUuid] = UUID.fromString(uuid)
+          row[UserChoiceTable.fromTitle] = fromTitle
+          row[UserChoiceTable.abbrev] = abbrev
+          row[UserChoiceTable.title] = title
+          row[UserChoiceTable.reason] = reason
+        }.value
+
+      updateLastTitle(uuid, title)
+    }
     return ""
+  }
+
+  fun updateLastTitle(uuid: String, title: String) {
+    UsersTable
+      .update({ UsersTable.uuidCol eq UUID.fromString(uuid) }) { row ->
+        row[UsersTable.lastTitle] = title
+      }.also { count ->
+        if (count != 1)
+          error("Missing uuid: $uuid")
+      }
   }
 
   companion object : KLogging() {

@@ -29,7 +29,7 @@ data class SlideData(
 data class ChoiceTitle(val abbrev: String, val title: String)
 
 @Serializable
-data class ChoiceReason(
+data class UserChoice(
   val fromTitle: String,
   val abbrev: String,
   val title: String,

@@ -1,5 +1,10 @@
 package com.github.pambrose
 
+import com.github.pambrose.dbms.UsersTable
+import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.transactions.transaction
+import java.util.*
+
 class Slide(val title: String) {
   var parentSlide: Slide? = null
   val choices = mutableMapOf<String, String>()
@@ -23,16 +28,24 @@ class Slide(val title: String) {
       Slide(title).block()
     }
 
-    fun findSlide(title: String) =
-      (if (title == "/") rootSlide else allSlides[title]) ?: error("Invalid title: $title")
+    fun findSlide(userUuid: UUID) =
+      transaction {
+        (UsersTable
+          .slice(UsersTable.lastTitle)
+          .select { UsersTable.uuidCol eq userUuid }
+          .map { it[UsersTable.lastTitle] }
+          .firstOrNull() ?: error("Missing uuid: $userUuid"))
+          .let { title ->
+            (if (title == "/") rootSlide else allSlides[title]) ?: error("Invalid title: $title")
+          }
+      }
 
     fun verifySlides() {
       allSlides.forEach { (title, slide) ->
-        slide.choices.forEach { (choice, destination) ->
-          val destSlide =
-            allSlides[destination] ?: throw IllegalArgumentException("Missing slide with title: $destination")
+        slide.choices.forEach { (choice, dest) ->
+          val destSlide = allSlides[dest] ?: throw IllegalArgumentException("Missing slide with title: $dest")
           if (destSlide.parentSlide != null)
-            throw IllegalArgumentException("Parent slide already assigned to : $destination")
+            throw IllegalArgumentException("Parent slide already assigned to : $dest")
           destSlide.parentSlide = slide
         }
       }

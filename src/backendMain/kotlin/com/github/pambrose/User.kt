@@ -148,6 +148,7 @@ class User {
                   row[UsersTable.email] = email.value.maxLength(128)
                   row[UsersTable.salt] = salt
                   row[UsersTable.digest] = digest
+                  row[UsersTable.lastTitle] = "/"
                 }.value
           }
           logger.info { "Created user $email ${user.uuid}" }
