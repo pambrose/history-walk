@@ -1,5 +1,6 @@
 package com.github.pambrose
 
+import com.github.pambrose.MainPanel.displaySlide
 import io.kvision.*
 import io.kvision.core.Display
 import io.kvision.i18n.DefaultI18nManager
@@ -32,7 +33,8 @@ class App : Application() {
     }
 
     AppScope.launch {
-      RpcWrapper.refreshPanel()
+      val newSlide = Rpc.refreshPanel()
+      displaySlide(newSlide)
     }
   }
 }

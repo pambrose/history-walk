@@ -25,14 +25,14 @@ object Security : SecurityMgr() {
   override suspend fun login() = loginService.login(loginWindow.getResult())
 
   override suspend fun afterLogin() {
-    console.log("Finished login")
+    console.log("Successful login")
   }
 
   override suspend fun afterError() {
     console.log("Error on login")
   }
 
-  suspend fun <T> withAuthAndTry(block: suspend () -> T) =
+  suspend fun <T> withTryAuth(block: suspend () -> T) =
     Security.withAuth {
       try {
         block()
@@ -146,7 +146,7 @@ class LoginWindow : Dialog<Credentials>(closeButton = false, escape = false, ani
     if (registerPanel.validate()) {
       val registerData = registerPanel.getData()
       AppScope.launch {
-        if (RpcWrapper.registerUser(registerData)) {
+        if (Rpc.registerUser(registerData)) {
           Alert.show(text = tr("User registered. You can now log in.")) {
             hideRegisterForm()
           }

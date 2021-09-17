@@ -30,14 +30,14 @@ actual class ContentService : IContentService {
   @Inject
   lateinit var call: ApplicationCall
 
-  override suspend fun currentSlide(): SlideData {
+  override suspend fun getCurrentSlide(): SlideData {
     logger.debug { "userId=${call.userId}" }
     val uuid = call.userId.uuid
     val slide = findSlide(uuid)
     return slideData(uuid, slide)
   }
 
-  override suspend fun choose(fromTitle: String, abbrev: String, title: String): UserChoice =
+  override suspend fun makeChoice(fromTitle: String, abbrev: String, title: String): UserChoice =
     transaction {
       // See if user has an entry for that transition
       val uuid = call.userId.uuid
@@ -60,7 +60,7 @@ actual class ContentService : IContentService {
         }
     }
 
-  override suspend fun reason(fromTitle: String, abbrev: String, title: String, reason: String) =
+  override suspend fun provideReason(fromTitle: String, abbrev: String, title: String, reason: String) =
     transaction {
       val uuid = call.userId.uuid
       UserChoiceTable
@@ -79,7 +79,7 @@ actual class ContentService : IContentService {
       slideData(uuid, slide)
     }
 
-  override suspend fun goBack(title: String) =
+  override suspend fun goBackInTime(title: String) =
     transaction {
       val uuid = call.userId.uuid
       updateLastTitle(uuid, title)

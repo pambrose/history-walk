@@ -9,8 +9,8 @@ interface IRegisterUserService {
 
 @KVService
 interface IContentService {
-  suspend fun currentSlide(): SlideData
-  suspend fun choose(fromTitle: String, abbrev: String, title: String): UserChoice
-  suspend fun reason(fromTitle: String, abbrev: String, title: String, reason: String): SlideData
-  suspend fun goBack(title: String): SlideData
+  suspend fun getCurrentSlide(): SlideData
+  suspend fun makeChoice(fromTitle: String, abbrev: String, title: String): UserChoice
+  suspend fun provideReason(fromTitle: String, abbrev: String, title: String, reason: String): SlideData
+  suspend fun goBackInTime(title: String): SlideData
 }
