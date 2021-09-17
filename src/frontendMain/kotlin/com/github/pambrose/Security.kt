@@ -8,7 +8,8 @@ import io.kvision.form.formPanel
 import io.kvision.form.text.Password
 import io.kvision.form.text.Text
 import io.kvision.html.Button
-import io.kvision.html.ButtonStyle
+import io.kvision.html.ButtonStyle.PRIMARY
+import io.kvision.html.ButtonStyle.SECONDARY
 import io.kvision.i18n.I18n.tr
 import io.kvision.modal.Alert
 import io.kvision.modal.Dialog
@@ -59,7 +60,6 @@ class LoginWindow : Dialog<Credentials>(closeButton = false, escape = false, ani
       formPanel {
         add(Credentials::username, Text(label = "${tr("Email")}:"), required = true)
         add(Credentials::password, Password(label = "${tr("Password")}:"), required = true)
-
         onEvent {
           keydown = {
             if (it.keyCode == ENTER_KEY) {
@@ -95,23 +95,32 @@ class LoginWindow : Dialog<Credentials>(closeButton = false, escape = false, ani
       }
 
     cancelButton =
-      Button(tr("Cancel"), "fas fa-times").apply {
+      Button(tr("Cancel"), "fas fa-times", SECONDARY).apply {
         textTransform = TextTransform.NONE
         onClick {
           this@LoginWindow.hideRegisterForm()
         }
       }
 
-    registerButton = Button(tr("Register"), "fas fa-check", ButtonStyle.PRIMARY).onClick {
-      this@LoginWindow.processRegister()
+    registerButton = Button(tr("Register"), "fas fa-check", PRIMARY).apply {
+      textTransform = TextTransform.NONE
+      onClick {
+        this@LoginWindow.processRegister()
+      }
     }
 
-    loginButton = Button(tr("Login"), "fas fa-check", ButtonStyle.PRIMARY).onClick {
-      this@LoginWindow.processCredentials()
+    loginButton = Button(tr("Login"), "fas fa-check", PRIMARY).apply {
+      textTransform = TextTransform.NONE
+      onClick {
+        this@LoginWindow.processCredentials()
+      }
     }
 
-    userButton = Button(tr("Register user"), "fas fa-user").onClick {
-      this@LoginWindow.showRegisterForm()
+    userButton = Button(tr("Sign Up"), "fas fa-user").apply {
+      textTransform = TextTransform.NONE
+      onClick {
+        this@LoginWindow.showRegisterForm()
+      }
     }
 
     addButton(userButton)

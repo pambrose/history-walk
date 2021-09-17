@@ -1,6 +1,7 @@
 package com.github.pambrose
 
 import com.github.pambrose.EndPoints.LOGOUT
+import com.github.pambrose.MainPanel.buttonPadding
 import com.github.pambrose.MainPanel.refresh
 import io.kvision.core.AlignItems
 import io.kvision.core.Background
@@ -14,9 +15,13 @@ import io.kvision.core.FlexWrap
 import io.kvision.core.JustifyContent
 import io.kvision.core.TextAlign
 import io.kvision.core.TextTransform
+import io.kvision.core.onEvent
 import io.kvision.form.text.Text
 import io.kvision.html.Button
 import io.kvision.html.ButtonStyle
+import io.kvision.html.ButtonStyle.OUTLINESECONDARY
+import io.kvision.html.ButtonStyle.PRIMARY
+import io.kvision.html.ButtonStyle.SUCCESS
 import io.kvision.html.P
 import io.kvision.html.button
 import io.kvision.html.h1
@@ -26,11 +31,14 @@ import io.kvision.panel.flexPanel
 import io.kvision.panel.hPanel
 import io.kvision.panel.simplePanel
 import io.kvision.panel.vPanel
+import io.kvision.utils.ENTER_KEY
 import io.kvision.utils.px
 import kotlinx.browser.document
 import kotlinx.coroutines.launch
 
 object MainPanel : SimplePanel() {
+  val buttonPadding = 5.px
+
   val panel = SimplePanel()
 
   init {
@@ -97,7 +105,7 @@ private fun Container.displaySlide(slide: SlideData) {
         marginTop = 10.px
 
         vPanel {
-          button("Go Back In Time", icon = "fas fa-arrow-alt-circle-up", style = ButtonStyle.SUCCESS) {
+          button("Go Back In Time", icon = "fas fa-arrow-alt-circle-up", style = SUCCESS) {
             textTransform = TextTransform.NONE
             onClick {
               if (slide.parentTitles.size == 1) {
@@ -113,7 +121,7 @@ private fun Container.displaySlide(slide: SlideData) {
                   Dialog<String>("Go back to...") {
                     vPanel(spacing = 4) {
                       slide.parentTitles.forEach { parentTitle ->
-                        button(parentTitle, style = ButtonStyle.PRIMARY) {
+                        button(parentTitle, style = PRIMARY) {
                           textTransform = TextTransform.NONE
                           onClick { setResult(parentTitle) }
                         }
@@ -140,7 +148,7 @@ private fun Container.displaySlide(slide: SlideData) {
 
 private fun Container.addChoiceButtons(currentSlide: SlideData) {
   currentSlide.choices.forEach { ct ->
-    button(ct.abbrev, icon = "fas fa-caret-right", style = ButtonStyle.PRIMARY) {
+    button(ct.abbrev, icon = "fas fa-angle-double-right", style = PRIMARY) {
       textTransform = TextTransform.NONE
       onClick {
         AppScope.launch {
@@ -158,16 +166,15 @@ private fun Container.addChoiceButtons(currentSlide: SlideData) {
 }
 
 private fun promptForReason(fromTitle: String, ct: ChoiceTitle) {
-  val padding = 5.px
   val submit = Button("OK", disabled = true).apply {
     textTransform = TextTransform.NONE
-    paddingTop = padding
-    paddingBottom = padding
+    paddingTop = buttonPadding
+    paddingBottom = buttonPadding
   }
   val reasonDialog =
     Dialog<String>("Reasoning") {
       val input =
-        Text(label = "Reason for your decision:") {
+        Text(label = """Reason for your "${ct.abbrev}" decision:""") {
           placeholder = """I chose "${ct.abbrev}" because..."""
           setEventListener<Text> {
             keyup = { _ ->
@@ -176,13 +183,20 @@ private fun promptForReason(fromTitle: String, ct: ChoiceTitle) {
           }
         }
       add(input)
-      addButton(Button("Cancel", style = ButtonStyle.OUTLINESECONDARY).apply {
+      addButton(Button("Cancel", style = OUTLINESECONDARY).apply {
         textTransform = TextTransform.NONE
-        paddingTop = padding
-        paddingBottom = padding
+        paddingTop = buttonPadding
+        paddingBottom = buttonPadding
         onClick { setResult("") }
       })
       addButton(submit.also { it.onClick { setResult(input.value) } })
+      onEvent {
+        keydown = {
+          if (it.keyCode == ENTER_KEY && input.value?.isNotEmpty() ?: false) {
+            setResult(input.value)
+          }
+        }
+      }
     }
 
   AppScope.launch {
