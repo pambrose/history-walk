@@ -1,6 +1,7 @@
 package com.github.pambrose
 
 import com.github.pambrose.EndPoints.LOGIN
+import io.kvision.core.TextTransform
 import io.kvision.core.onEvent
 import io.kvision.form.FormPanel
 import io.kvision.form.formPanel
@@ -93,9 +94,13 @@ class LoginWindow : Dialog<Credentials>(closeButton = false, escape = false, ani
 
       }
 
-    cancelButton = Button(tr("Cancel"), "fas fa-times").onClick {
-      this@LoginWindow.hideRegisterForm()
-    }
+    cancelButton =
+      Button(tr("Cancel"), "fas fa-times").apply {
+        textTransform = TextTransform.NONE
+        onClick {
+          this@LoginWindow.hideRegisterForm()
+        }
+      }
 
     registerButton = Button(tr("Register"), "fas fa-check", ButtonStyle.PRIMARY).onClick {
       this@LoginWindow.processRegister()

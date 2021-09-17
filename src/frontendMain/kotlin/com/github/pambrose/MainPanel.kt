@@ -1,7 +1,7 @@
 package com.github.pambrose
 
 import com.github.pambrose.EndPoints.LOGOUT
-import com.github.pambrose.MainPanel.displaySlide
+import com.github.pambrose.MainPanel.refresh
 import io.kvision.core.AlignItems
 import io.kvision.core.Background
 import io.kvision.core.Border
@@ -13,13 +13,13 @@ import io.kvision.core.FlexDirection
 import io.kvision.core.FlexWrap
 import io.kvision.core.JustifyContent
 import io.kvision.core.TextAlign
+import io.kvision.core.TextTransform
 import io.kvision.form.text.Text
 import io.kvision.html.Button
 import io.kvision.html.ButtonStyle
 import io.kvision.html.P
 import io.kvision.html.button
 import io.kvision.html.h1
-import io.kvision.i18n.tr
 import io.kvision.modal.Dialog
 import io.kvision.panel.SimplePanel
 import io.kvision.panel.flexPanel
@@ -37,7 +37,7 @@ object MainPanel : SimplePanel() {
     add(panel)
   }
 
-  fun displaySlide(slide: SlideData) = panel.displaySlide(slide)
+  fun refresh(slide: SlideData) = panel.displaySlide(slide)
 }
 
 private fun Container.displaySlide(slide: SlideData) {
@@ -60,8 +60,11 @@ private fun Container.displaySlide(slide: SlideData) {
         paddingBottom = 10.px
 
         +"Decision count: ${slide.decisionCount}"
-        button(tr("Logout"), "fas fa-sign-out-alt", style = ButtonStyle.LINK).onClick {
-          document.location?.href = "/$LOGOUT"
+        button("Logout", "fas fa-sign-out-alt", style = ButtonStyle.LINK) {
+          textTransform = TextTransform.NONE
+          onClick {
+            document.location?.href = "/$LOGOUT"
+          }
         }
       }
     }
@@ -94,14 +97,15 @@ private fun Container.displaySlide(slide: SlideData) {
         marginTop = 10.px
 
         vPanel {
-          button(tr("Go Back In Time"), style = ButtonStyle.SUCCESS) {
+          button("Go Back In Time", icon = "fas fa-arrow-alt-circle-up", style = ButtonStyle.SUCCESS) {
+            textTransform = TextTransform.NONE
             onClick {
               if (slide.parentTitles.size == 1) {
                 slide.parentTitles[0].also { parentTitle ->
                   if (parentTitle.isNotBlank())
                     AppScope.launch {
                       val newSlide = Rpc.goBackInTime(parentTitle)
-                      displaySlide(newSlide)
+                      refresh(newSlide)
                     }
                 }
               } else {
@@ -109,7 +113,10 @@ private fun Container.displaySlide(slide: SlideData) {
                   Dialog<String>("Go back to...") {
                     vPanel(spacing = 4) {
                       slide.parentTitles.forEach { parentTitle ->
-                        button(tr(parentTitle), style = ButtonStyle.PRIMARY) { onClick { setResult(parentTitle) } }
+                        button(parentTitle, style = ButtonStyle.PRIMARY) {
+                          textTransform = TextTransform.NONE
+                          onClick { setResult(parentTitle) }
+                        }
                       }
                     }
                   }
@@ -118,7 +125,7 @@ private fun Container.displaySlide(slide: SlideData) {
                   dialog.getResult()?.also { parentTitle ->
                     if (parentTitle.isNotBlank()) {
                       val newSlide = Rpc.goBackInTime(parentTitle)
-                      displaySlide(newSlide)
+                      refresh(newSlide)
                     }
                   }
                 }
@@ -133,7 +140,8 @@ private fun Container.displaySlide(slide: SlideData) {
 
 private fun Container.addChoiceButtons(currentSlide: SlideData) {
   currentSlide.choices.forEach { ct ->
-    button(tr(ct.abbrev), style = ButtonStyle.PRIMARY) {
+    button(ct.abbrev, style = ButtonStyle.PRIMARY) {
+      textTransform = TextTransform.NONE
       onClick {
         AppScope.launch {
           val choiceReason = Rpc.makeChoice(currentSlide.title, ct.abbrev, ct.title)
@@ -141,7 +149,7 @@ private fun Container.addChoiceButtons(currentSlide: SlideData) {
             promptForReason(currentSlide.title, ct)
           else {
             val newSlide = Rpc.refreshPanel()
-            displaySlide(newSlide)
+            refresh(newSlide)
           }
         }
       }
@@ -150,7 +158,12 @@ private fun Container.addChoiceButtons(currentSlide: SlideData) {
 }
 
 private fun promptForReason(fromTitle: String, ct: ChoiceTitle) {
-  val submit = Button("OK", disabled = true)
+  val padding = 5.px
+  val submit = Button("OK", disabled = true).apply {
+    textTransform = TextTransform.NONE
+    paddingTop = padding
+    paddingBottom = padding
+  }
   val reasonDialog =
     Dialog<String>("Reasoning") {
       val input =
@@ -163,7 +176,12 @@ private fun promptForReason(fromTitle: String, ct: ChoiceTitle) {
           }
         }
       add(input)
-      addButton(Button("Cancel", style = ButtonStyle.OUTLINESECONDARY).also { it.onClick { setResult("") } })
+      addButton(Button("Cancel", style = ButtonStyle.OUTLINESECONDARY).apply {
+        textTransform = TextTransform.NONE
+        paddingTop = padding
+        paddingBottom = padding
+        onClick { setResult("") }
+      })
       addButton(submit.also { it.onClick { setResult(input.value) } })
     }
 
@@ -171,7 +189,7 @@ private fun promptForReason(fromTitle: String, ct: ChoiceTitle) {
     reasonDialog.getResult()?.also { response ->
       if (response.isNotBlank()) {
         val newSlide = Rpc.provideReason(fromTitle, ct.abbrev, ct.title, response)
-        displaySlide(newSlide)
+        refresh(newSlide)
       }
     }
   }
