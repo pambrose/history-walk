@@ -2,11 +2,30 @@ package com.github.pambrose
 
 import com.github.pambrose.EndPoints.LOGOUT
 import com.github.pambrose.MainPanel.displaySlide
-import io.kvision.core.*
+import io.kvision.core.AlignItems
+import io.kvision.core.Background
+import io.kvision.core.Border
+import io.kvision.core.BorderStyle
+import io.kvision.core.Col
+import io.kvision.core.Color
+import io.kvision.core.Container
+import io.kvision.core.FlexDirection
+import io.kvision.core.FlexWrap
+import io.kvision.core.JustifyContent
+import io.kvision.core.TextAlign
 import io.kvision.form.text.Text
-import io.kvision.html.*
+import io.kvision.html.Button
+import io.kvision.html.ButtonStyle
+import io.kvision.html.P
+import io.kvision.html.button
+import io.kvision.html.h1
+import io.kvision.i18n.tr
 import io.kvision.modal.Dialog
-import io.kvision.panel.*
+import io.kvision.panel.SimplePanel
+import io.kvision.panel.flexPanel
+import io.kvision.panel.hPanel
+import io.kvision.panel.simplePanel
+import io.kvision.panel.vPanel
 import io.kvision.utils.px
 import kotlinx.browser.document
 import kotlinx.coroutines.launch
@@ -19,16 +38,6 @@ object MainPanel : SimplePanel() {
   }
 
   fun displaySlide(slide: SlideData) = panel.displaySlide(slide)
-}
-
-private fun Container.customDiv(value: String, size: Int): Tag {
-  return div(value).apply {
-    paddingTop = ((size / 2) - 10).px
-    align = Align.CENTER
-    background = Background(Color.name(Col.GREEN))
-    width = size.px
-    height = size.px
-  }
 }
 
 private fun Container.displaySlide(slide: SlideData) {
@@ -51,7 +60,7 @@ private fun Container.displaySlide(slide: SlideData) {
         paddingBottom = 10.px
 
         +"Decision count: ${slide.decisionCount}"
-        button("Logout", "fas fa-sign-out-alt", style = ButtonStyle.LINK).onClick {
+        button(tr("Logout"), "fas fa-sign-out-alt", style = ButtonStyle.LINK).onClick {
           document.location?.href = "/$LOGOUT"
         }
       }
@@ -85,7 +94,7 @@ private fun Container.displaySlide(slide: SlideData) {
         marginTop = 10.px
 
         vPanel {
-          button("Go Back In Time", style = ButtonStyle.SUCCESS) {
+          button(tr("Go Back In Time"), style = ButtonStyle.SUCCESS) {
             onClick {
               if (slide.parentTitles.size == 1) {
                 slide.parentTitles[0].also { parentTitle ->
@@ -100,7 +109,7 @@ private fun Container.displaySlide(slide: SlideData) {
                   Dialog<String>("Go back to...") {
                     vPanel(spacing = 4) {
                       slide.parentTitles.forEach { parentTitle ->
-                        button(parentTitle, style = ButtonStyle.PRIMARY) { onClick { setResult(parentTitle) } }
+                        button(tr(parentTitle), style = ButtonStyle.PRIMARY) { onClick { setResult(parentTitle) } }
                       }
                     }
                   }
@@ -124,7 +133,7 @@ private fun Container.displaySlide(slide: SlideData) {
 
 private fun Container.addChoiceButtons(currentSlide: SlideData) {
   currentSlide.choices.forEach { ct ->
-    button(ct.abbrev, style = ButtonStyle.PRIMARY) {
+    button(tr(ct.abbrev), style = ButtonStyle.PRIMARY) {
       onClick {
         AppScope.launch {
           val choiceReason = Rpc.makeChoice(currentSlide.title, ct.abbrev, ct.title)
