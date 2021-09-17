@@ -105,5 +105,5 @@ data class BrowserSession(val id: String, val created: Long = Instant.now().toEp
 
 data class UserPrincipal(val uuid: UUID, val created: Long = Instant.now().toEpochMilli()) : Principal
 
-val ApplicationCall.userId get() = sessions.get<UserId>() ?: error("Missing userId")
+val ApplicationCall.userId get() = sessions.get<UserId>() ?: error("Missing UserId")
 //val ApplicationCall.browserSession get() = sessions.get<BrowserSession>()

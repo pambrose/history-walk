@@ -7,8 +7,13 @@ import com.google.inject.Inject
 import com.pambrose.common.exposed.get
 import io.ktor.application.*
 import mu.KLogging
-import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.Count
+import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.deleteWhere
+import org.jetbrains.exposed.sql.insertAndGetId
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
 import java.util.*
 
 actual class RegisterUserService : IRegisterUserService {
@@ -87,19 +92,26 @@ actual class ContentService : IContentService {
       slideData(uuid, slide)
     }
 
-  private fun updateLastTitle(uuid: String, title: String) {
-    UsersTable
-      .update({ UsersTable.uuidCol eq UUID.fromString(uuid) }) { row ->
-        row[UsersTable.lastTitle] = title
-      }.also { count ->
-        if (count != 1)
-          error("Missing uuid: $uuid")
-      }
-  }
-
   companion object : KLogging() {
     private const val ltEscape = "---LT---"
     private const val gtEscape = "---GT---"
+
+    fun updateLastTitle(uuid: String, title: String) {
+      UsersTable
+        .update({ UsersTable.uuidCol eq UUID.fromString(uuid) }) { row ->
+          row[UsersTable.lastTitle] = title
+        }.also { count ->
+          if (count != 1)
+            error("Missing uuid: $uuid")
+        }
+    }
+
+    fun deleteChoices(uuid: String) {
+      UserChoiceTable
+        .deleteWhere { UserChoiceTable.userUuid eq UUID.fromString(uuid) }.also { count ->
+          logger.info("Deleted $count records for uuid: $uuid")
+        }
+    }
 
     private fun slideData(uuid: String, slide: Slide): SlideData {
 

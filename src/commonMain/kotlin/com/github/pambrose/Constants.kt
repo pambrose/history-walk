@@ -5,7 +5,7 @@ object Content {
 }
 
 object Auth {
-  const val AUTH_COOKIE = "auth"
+  const val AUTH_COOKIE = "HistoryWalkAuth"
 }
 
 object EndPoints {

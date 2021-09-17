@@ -1,5 +1,8 @@
 package com.github.pambrose
 
+import com.github.pambrose.Content.ROOT
+import com.github.pambrose.ContentService.Companion.deleteChoices
+import com.github.pambrose.ContentService.Companion.updateLastTitle
 import com.github.pambrose.EndPoints.LOGIN
 import com.github.pambrose.EndPoints.LOGOUT
 import com.github.pambrose.common.util.isNotNull
@@ -11,6 +14,7 @@ import io.ktor.routing.*
 import io.ktor.sessions.*
 import io.kvision.remote.applyRoutes
 import mu.KLogging
+import org.jetbrains.exposed.sql.transactions.transaction
 
 object Routes : KLogging() {
 
@@ -41,9 +45,21 @@ object Routes : KLogging() {
       }
 
       get(LOGOUT) {
+        logger.info { "/logout called" }
         call.sessions.clear<UserId>()
         call.respondRedirect("/")
       }
+
+    }
+
+    get("reset") {
+      logger.info { "/reset called" }
+      transaction {
+        val uuid = call.userId.uuid
+        deleteChoices(uuid)
+        updateLastTitle(uuid, ROOT)
+      }
+      call.respondRedirect("/")
     }
   }
 }
