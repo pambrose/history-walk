@@ -140,7 +140,7 @@ private fun Container.displaySlide(slide: SlideData) {
 
 private fun Container.addChoiceButtons(currentSlide: SlideData) {
   currentSlide.choices.forEach { ct ->
-    button(ct.abbrev, style = ButtonStyle.PRIMARY) {
+    button(ct.abbrev, icon = "fas fa-caret-right", style = ButtonStyle.PRIMARY) {
       textTransform = TextTransform.NONE
       onClick {
         AppScope.launch {
