@@ -32,7 +32,7 @@ class App : Application() {
     }
 
     AppScope.launch {
-      Model.refreshPanel()
+      RpcWrapper.refreshPanel()
     }
   }
 }

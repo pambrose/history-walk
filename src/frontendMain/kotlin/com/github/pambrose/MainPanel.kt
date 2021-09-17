@@ -67,7 +67,7 @@ fun Container.displaySlide(currentSlide: SlideData) {
                 currentSlide.parentTitles[0].also { parentTitle ->
                   if (parentTitle.isNotBlank())
                     AppScope.launch {
-                      Model.goBack(parentTitle)
+                      RpcWrapper.goBack(parentTitle)
                     }
                 }
               } else {
@@ -83,7 +83,7 @@ fun Container.displaySlide(currentSlide: SlideData) {
                 AppScope.launch {
                   dialog.getResult()?.also { parentTitle ->
                     if (parentTitle.isNotBlank())
-                      Model.goBack(parentTitle)
+                      RpcWrapper.goBack(parentTitle)
                   }
                 }
               }
@@ -100,11 +100,11 @@ private fun Container.addButtons(currentSlide: SlideData) {
     button(ct.abbrev, style = ButtonStyle.PRIMARY) {
       onClick {
         AppScope.launch {
-          val choiceReason = Model.choose(currentSlide.title, ct.abbrev, ct.title)
+          val choiceReason = RpcWrapper.choose(currentSlide.title, ct.abbrev, ct.title)
           if (choiceReason.reason.isEmpty())
             promptForReason(currentSlide.title, ct)
           else
-            Model.refreshPanel()
+            RpcWrapper.refreshPanel()
         }
       }
     }
@@ -132,7 +132,7 @@ private fun promptForReason(fromTitle: String, ct: ChoiceTitle) {
   AppScope.launch {
     reasonDialog.getResult()?.also { response ->
       if (response.isNotBlank()) {
-        Model.reason(fromTitle, ct.abbrev, ct.title, response)
+        RpcWrapper.reason(fromTitle, ct.abbrev, ct.title, response)
       }
     }
   }

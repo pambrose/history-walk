@@ -8,6 +8,7 @@ import io.kvision.form.text.Password
 import io.kvision.form.text.Text
 import io.kvision.html.Button
 import io.kvision.html.ButtonStyle
+import io.kvision.i18n.I18n
 import io.kvision.i18n.I18n.tr
 import io.kvision.modal.Alert
 import io.kvision.modal.Dialog
@@ -31,6 +32,17 @@ object Security : SecurityMgr() {
   override suspend fun afterError() {
     console.log("Error on login")
   }
+
+  suspend fun <T> withAuthAndTry(block: suspend () -> T) =
+    Security.withAuth {
+      try {
+        block()
+      } catch (e: Exception) {
+        //console.log(e)
+        Alert.show(text = I18n.tr(e.toString()))
+        throw e
+      }
+    }
 }
 
 class LoginWindow : Dialog<Credentials>(closeButton = false, escape = false, animation = true) {
@@ -135,7 +147,7 @@ class LoginWindow : Dialog<Credentials>(closeButton = false, escape = false, ani
     if (registerPanel.validate()) {
       val registerData = registerPanel.getData()
       AppScope.launch {
-        if (Model.registerUser(registerData)) {
+        if (RpcWrapper.registerUser(registerData)) {
           Alert.show(text = tr("User registered. You can now log in.")) {
             hideRegisterForm()
           }

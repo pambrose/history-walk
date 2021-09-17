@@ -21,3 +21,9 @@
 * backendJar - Packages a backend jar with compiled source files into `build/libs/*.jar`
 * jar - Packages a "fat" jar with all backend sources and dependencies while also embedding frontend resources
   into `build/libs/*.jar`
+
+### Heroku Deployment
+
+* Add a Procfile
+* Add config var `GRADLE_TASK = -Pprod=true jar`
+* Add build pack `heroku/gradle`

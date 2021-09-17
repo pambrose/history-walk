@@ -23,7 +23,7 @@ class Slide(val title: String) {
 
   companion object {
     val allSlides = mutableMapOf<String, Slide>()
-    lateinit var rootSlide: Slide
+    private lateinit var rootSlide: Slide
 
     fun slide(title: String, block: Slide.() -> Unit = { }) {
       Slide(title).block()

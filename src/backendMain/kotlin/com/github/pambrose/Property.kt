@@ -1,8 +1,6 @@
 package com.github.pambrose
 
 import com.github.pambrose.PropertyNames.AGENT
-import com.github.pambrose.PropertyNames.CHALLENGES
-import com.github.pambrose.PropertyNames.CLASSES
 import com.github.pambrose.PropertyNames.CONTENT
 import com.github.pambrose.PropertyNames.DBMS
 import com.github.pambrose.PropertyNames.READINGBAT
@@ -25,7 +23,7 @@ object PropertyNames {
 }
 
 enum class Property(
-  val propertyValue: String,
+  private val propertyValue: String,
   val maskFunc: Property.() -> String = { getProperty(UNASSIGNED, false) }
 ) {
   KOTLIN_SCRIPT_CLASSPATH("kotlin.script.classpath"),
@@ -51,8 +49,6 @@ enum class Property(
 
   // These are assigned to ReadingBatContent vals
   ANALYTICS_ID("$READINGBAT.$SITE.googleAnalyticsId", { getPropertyOrNull(false) ?: UNASSIGNED }),
-  MAX_HISTORY_LENGTH("$READINGBAT.$CHALLENGES.maxHistoryLength"),
-  MAX_CLASS_COUNT("$READINGBAT.$CLASSES.maxCount"),
   KTOR_PORT("ktor.deployment.port"),
   KTOR_WATCH("ktor.deployment.watch"),
 
@@ -60,25 +56,11 @@ enum class Property(
   IS_PRODUCTION("$READINGBAT.$SITE.production"),
   IS_TESTING("$READINGBAT.$SITE.testing"),
   DBMS_ENABLED("$READINGBAT.$SITE.dbmsEnabled"),
-  REDIS_ENABLED("$READINGBAT.$SITE.redisEnabled"),
   SAVE_REQUESTS_ENABLED("$READINGBAT.$SITE.saveRequestsEnabled"),
-  MULTI_SERVER_ENABLED("$READINGBAT.$SITE.multiServerEnabled"),
-  CONTENT_CACHING_ENABLED("$READINGBAT.$SITE.contentCachingEnabled"),
-  AGENT_ENABLED("$AGENT.enabled"),
 
   PINGDOM_BANNER_ID("$READINGBAT.$SITE.pingdomBannerId", { getPropertyOrNull(false) ?: UNASSIGNED }),
   PINGDOM_URL("$READINGBAT.$SITE.pingdomUrl", { getPropertyOrNull(false) ?: UNASSIGNED }),
   STATUS_PAGE_URL("$READINGBAT.$SITE.statusPageUrl", { getPropertyOrNull(false) ?: UNASSIGNED }),
-
-  PROMETHEUS_URL("$READINGBAT.prometheus.url"),
-  GRAFANA_URL("$READINGBAT.grafana.url"),
-
-  JAVA_SCRIPTS_POOL_SIZE("$READINGBAT.scripts.javaPoolSize"),
-  KOTLIN_SCRIPTS_POOL_SIZE("$READINGBAT.scripts.kotlinPoolSize"),
-  PYTHON_SCRIPTS_POOL_SIZE("$READINGBAT.scripts.pythonPoolSize"),
-
-  KOTLIN_EVALUATORS_POOL_SIZE("$READINGBAT.evaluators.kotlinPoolSize"),
-  PYTHON_EVALUATORS_POOL_SIZE("$READINGBAT.evaluators.pythonPoolSize"),
 
   DBMS_DRIVER_CLASSNAME("$DBMS.driverClassName"),
   DBMS_URL("$DBMS.jdbcUrl"),
@@ -86,7 +68,6 @@ enum class Property(
   DBMS_PASSWORD("$DBMS.password", { getPropertyOrNull(false)?.obfuscate(1) ?: UNASSIGNED }),
   DBMS_MAX_POOL_SIZE("$DBMS.maxPoolSize"),
   DBMS_MAX_LIFETIME_MINS("$DBMS.maxLifetimeMins"),
-
   ;
 
   private fun Application.configProperty(name: String, default: String = "", warn: Boolean = false) =
@@ -142,21 +123,13 @@ enum class Property(
 
     fun Application.assignProperties() {
 
-      val agentEnabled =
-        EnvVar.AGENT_ENABLED.getEnv(AGENT_ENABLED.configValue(this, default = "false").toBoolean())
-      AGENT_ENABLED.setProperty(agentEnabled.toString())
       PROXY_HOSTNAME.setPropertyFromConfig(this, "")
 
       IS_PRODUCTION.also { it.setProperty(it.configValue(this, "false").toBoolean().toString()) }
 
       DBMS_ENABLED.also { it.setProperty(it.configValue(this, "false").toBoolean().toString()) }
-      REDIS_ENABLED.also { it.setProperty(it.configValue(this, "false").toBoolean().toString()) }
 
       SAVE_REQUESTS_ENABLED.also { it.setProperty(it.configValue(this, "true").toBoolean().toString()) }
-
-      MULTI_SERVER_ENABLED.also { it.setProperty(it.configValue(this, "false").toBoolean().toString()) }
-
-      CONTENT_CACHING_ENABLED.also { it.setProperty(it.configValue(this, "false").toBoolean().toString()) }
 
       DSL_FILE_NAME.setPropertyFromConfig(this, "src/Content.kt")
       DSL_VARIABLE_NAME.setPropertyFromConfig(this, "content")
@@ -166,16 +139,6 @@ enum class Property(
       PINGDOM_BANNER_ID.setPropertyFromConfig(this, "")
       PINGDOM_URL.setPropertyFromConfig(this, "")
       STATUS_PAGE_URL.setPropertyFromConfig(this, "")
-
-      PROMETHEUS_URL.setPropertyFromConfig(this, "")
-      GRAFANA_URL.setPropertyFromConfig(this, "")
-
-      JAVA_SCRIPTS_POOL_SIZE.setPropertyFromConfig(this, "5")
-      KOTLIN_SCRIPTS_POOL_SIZE.setPropertyFromConfig(this, "5")
-      PYTHON_SCRIPTS_POOL_SIZE.setPropertyFromConfig(this, "5")
-
-      KOTLIN_EVALUATORS_POOL_SIZE.setPropertyFromConfig(this, "5")
-      PYTHON_EVALUATORS_POOL_SIZE.setPropertyFromConfig(this, "5")
 
       DBMS_DRIVER_CLASSNAME.setPropertyFromConfig(this, "com.impossibl.postgres.jdbc.PGDriver")
       DBMS_URL.setPropertyFromConfig(this, "jdbc:pgsql://localhost:5432/history-walk")

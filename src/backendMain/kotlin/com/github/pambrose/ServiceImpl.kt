@@ -137,7 +137,7 @@ actual class ContentService : IContentService {
         UserChoiceTable
           .slice(Count(UserChoiceTable.id))
           .select { UserChoiceTable.userUuid eq UUID.fromString(uuid) }
-          .map { it.get(0) as Long }
+          .map { it[0] as Long }
           .first()
       }
   }

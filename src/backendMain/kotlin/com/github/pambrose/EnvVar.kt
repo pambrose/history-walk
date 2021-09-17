@@ -7,21 +7,13 @@ enum class EnvVar(val maskFunc: EnvVar.() -> String = { getEnv(UNASSIGNED) }) {
 
   AGENT_ENABLED,
   AGENT_CONFIG,
-  GITHUB_OAUTH({ getEnvOrNull()?.obfuscate(4) ?: UNASSIGNED }),
   PAPERTRAIL_PORT,
-  IPGEOLOCATION_KEY({ getEnvOrNull()?.obfuscate(4) ?: UNASSIGNED }),
   SCRIPT_CLASSPATH,
-  SENDGRID_API_KEY({ getEnvOrNull()?.obfuscate(4) ?: UNASSIGNED }),
-  SENDGRID_PREFIX,
   FILTER_LOG,
-  REDIRECT_HOSTNAME,
   DBMS_DRIVER_CLASSNAME,
   DBMS_URL({ getEnvOrNull()?.obfuscate(4) ?: UNASSIGNED }),
   DBMS_USERNAME,
   DBMS_PASSWORD({ getEnvOrNull()?.obfuscate(1) ?: UNASSIGNED }),
-  CLOUD_SQL_CONNECTION_NAME,
-  FORWARDED_ENABLED,
-  XFORWARDED_ENABLED,
   JAVA_TOOL_OPTIONS;
 
   fun isDefined(): Boolean = getEnvOrNull().isNotNull()
