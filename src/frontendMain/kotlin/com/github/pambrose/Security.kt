@@ -8,7 +8,6 @@ import io.kvision.form.text.Password
 import io.kvision.form.text.Text
 import io.kvision.html.Button
 import io.kvision.html.ButtonStyle
-import io.kvision.i18n.I18n
 import io.kvision.i18n.I18n.tr
 import io.kvision.modal.Alert
 import io.kvision.modal.Dialog
@@ -38,8 +37,8 @@ object Security : SecurityMgr() {
       try {
         block()
       } catch (e: Exception) {
-        //console.log(e)
-        Alert.show(text = I18n.tr(e.toString()))
+        console.log(e)
+        //Alert.show(text = I18n.tr(e.toString()))
         throw e
       }
     }

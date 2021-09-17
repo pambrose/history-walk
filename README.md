@@ -26,4 +26,7 @@
 
 * Add a Procfile
 * Add config var `GRADLE_TASK = -Pprod=true jar`
-* Add build pack `heroku/gradle`
+* Add buildpack `heroku/gradle`
+
+For more info see [this post](https://github.com/rjaros/kvision/issues/48).
+(Ignore suggestion of adding `heroku/nodejs` buildpack.)

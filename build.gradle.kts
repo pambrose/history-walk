@@ -44,7 +44,7 @@ val ktorVersion: String by project
 val utilsVersion: String by project
 
 val webDir = file("src/frontendMain/web")
-val mainClassName = "io.ktor.server.netty.EngineMain"
+val mainClassName = "io.ktor.server.cio.EngineMain"
 
 kotlin {
   jvm("backend") {
@@ -104,26 +104,29 @@ kotlin {
       dependencies {
         implementation(kotlin("stdlib-jdk8"))
         implementation(kotlin("reflect"))
+
         implementation("io.ktor:ktor-server-core:$ktorVersion")
-        implementation("io.ktor:ktor-server-netty:$ktorVersion")
+        implementation("io.ktor:ktor-server-cio:$ktorVersion")
         implementation("io.ktor:ktor-server-sessions:$ktorVersion")
         implementation("io.ktor:ktor-auth:$ktorVersion")
-        implementation("ch.qos.logback:logback-classic:$logbackVersion")
-        implementation("com.h2database:h2:$h2Version")
-        implementation("com.github.pambrose.common-utils:exposed-utils:$utilsVersion")
+        implementation("com.github.pambrose.common-utils:ktor-server-utils:$utilsVersion")
+
         implementation("org.postgresql:postgresql:$pgsqlVersion")
+        implementation("com.impossibl.pgjdbc-ng:pgjdbc-ng-all:$pgjdbcVersion")
+        implementation("com.zaxxer:HikariCP:$hikariVersion")
         implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
         implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
         implementation("org.jetbrains.exposed:exposed-jodatime:$exposedVersion")
-        implementation("com.impossibl.pgjdbc-ng:pgjdbc-ng-all:$pgjdbcVersion")
-        implementation("com.zaxxer:HikariCP:$hikariVersion")
-        implementation("commons-codec:commons-codec:$commonsCodecVersion")
-        implementation("com.axiomalaska:jdbc-named-parameters:$jdbcNamedParametersVersion")
-        implementation("com.github.andrewoma.kwery:core:$kweryVersion")
+        implementation("com.github.pambrose.common-utils:exposed-utils:$utilsVersion")
+
+        //implementation("commons-codec:commons-codec:$commonsCodecVersion")
+        //implementation("com.axiomalaska:jdbc-named-parameters:$jdbcNamedParametersVersion")
+        //implementation("com.github.andrewoma.kwery:core:$kweryVersion")
         implementation("com.vladsch.flexmark:flexmark:$flexmarkVersion")
         implementation("com.github.pambrose.common-utils:core-utils:$utilsVersion")
-        implementation("com.github.pambrose.common-utils:ktor-server-utils:$utilsVersion")
+
         implementation("io.github.microutils:kotlin-logging:$loggingVersion")
+        implementation("ch.qos.logback:logback-classic:$logbackVersion")
       }
     }
 

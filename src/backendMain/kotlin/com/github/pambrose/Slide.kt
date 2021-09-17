@@ -2,6 +2,7 @@ package com.github.pambrose
 
 import com.github.pambrose.Content.ROOT
 import com.github.pambrose.dbms.UsersTable
+import mu.KLogging
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
@@ -21,7 +22,7 @@ class Slide(val title: String) {
     choices[choice] = destination
   }
 
-  companion object {
+  companion object : KLogging() {
     val allSlides = mutableMapOf<String, Slide>()
     private lateinit var rootSlide: Slide
 
