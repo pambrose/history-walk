@@ -8,6 +8,7 @@ import io.kvision.form.text.Password
 import io.kvision.form.text.Text
 import io.kvision.html.Button
 import io.kvision.html.ButtonStyle
+import io.kvision.html.ButtonStyle.PRIMARY
 import io.kvision.i18n.tr
 import io.kvision.modal.Alert
 import io.kvision.modal.Dialog
@@ -27,7 +28,7 @@ class LoginWindow : Dialog<Credentials>(closeButton = false, escape = false, ani
   init {
     loginPanel =
       formPanel {
-        add(Credentials::username, Text(label = "${tr("Email")}:"), required = true)
+        add(Credentials::username, Text(label = "${tr("Email")}:"), required = true).apply { focus() }
         add(Credentials::password, Password(label = "${tr("Password")}:"), required = true)
         onEvent {
           keydown = {
@@ -72,14 +73,14 @@ class LoginWindow : Dialog<Credentials>(closeButton = false, escape = false, ani
         }
       }
 
-    registerButton = Button(tr("Register"), "fas fa-check", ButtonStyle.PRIMARY).apply {
+    registerButton = Button(tr("Register"), "fas fa-check", PRIMARY).apply {
       lowercase()
       onClick {
         this@LoginWindow.processRegister()
       }
     }
 
-    loginButton = Button(tr("Login"), "fas fa-check", ButtonStyle.PRIMARY).apply {
+    loginButton = Button(tr("Login"), "fas fa-check", PRIMARY).apply {
       lowercase()
       onClick {
         this@LoginWindow.processCredentials()
@@ -102,7 +103,7 @@ class LoginWindow : Dialog<Credentials>(closeButton = false, escape = false, ani
 
   private fun showRegisterForm() {
     loginPanel.hide()
-    registerPanel.show()
+    registerPanel.show().focus()
     registerPanel.clearData()
     loginButton.hide()
     userButton.hide()
@@ -111,7 +112,7 @@ class LoginWindow : Dialog<Credentials>(closeButton = false, escape = false, ani
   }
 
   private fun hideRegisterForm() {
-    loginPanel.show()
+    loginPanel.show().focus()
     registerPanel.hide()
     loginButton.show()
     userButton.show()
@@ -130,13 +131,12 @@ class LoginWindow : Dialog<Credentials>(closeButton = false, escape = false, ani
     if (registerPanel.validate()) {
       val registerData = registerPanel.getData()
       AppScope.launch {
-        if (Rpc.registerUser(registerData)) {
+        if (Rpc.registerUser(registerData))
           Alert.show(text = tr("User registered. You can now log in.")) {
             hideRegisterForm()
           }
-        } else {
-          Alert.show(text = tr("This login is not available. Please try again."))
-        }
+        else
+          Alert.show(text = tr("Unsuccessful login. Please try again."))
       }
     }
   }
