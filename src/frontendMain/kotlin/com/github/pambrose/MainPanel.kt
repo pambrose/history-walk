@@ -176,7 +176,6 @@ private fun promptForReason(fromTitle: String, ct: ChoiceTitle) {
         TextArea(rows = 3, label = """Reason for your "${ct.abbrev}" decision:""") {
           placeholder = """I chose "${ct.abbrev}" because..."""
           autofocus = true
-          //border = Border(2.px, BorderStyle.SOLID, Color.name(Col.BLACK))
           setEventListener<Text> {
             keyup = { _ ->
               submit.disabled = value.isNullOrBlank()
