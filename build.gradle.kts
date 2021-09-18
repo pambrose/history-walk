@@ -11,10 +11,10 @@ plugins {
   kotlin("multiplatform") version kotlinVersion
   kotlin("plugin.serialization") version kotlinVersion
   // This is required by BuildConfig
-  id("idea")
+  // id("idea")
   id("io.kvision") version kvisionVersion
   id("com.github.ben-manes.versions") version versionsVersion
-  id("com.github.gmazzo.buildconfig") version configVersion
+  // id("com.github.gmazzo.buildconfig") version configVersion
   id("org.flywaydb.flyway") version flywayVersion
 }
 
@@ -30,13 +30,13 @@ repositories {
   maven { url = uri("https://jitpack.io") }
 }
 
-buildConfig {
-  packageName("com.github.pambrose")
-  buildConfigField("String", "CORE_NAME", "\"${project.name}\"")
-  buildConfigField("String", "CORE_VERSION", provider { "\"${project.version}\"" })
-  buildConfigField("String", "CORE_RELEASE_DATE", "\"9/17/21\"")
-  buildConfigField("long", "BUILD_TIME", "${System.currentTimeMillis()}L")
-}
+//buildConfig {
+//  packageName("com.github.pambrose")
+//  buildConfigField("String", "CORE_NAME", "\"${project.name}\"")
+//  buildConfigField("String", "CORE_VERSION", provider { "\"${project.version}\"" })
+//  buildConfigField("String", "CORE_RELEASE_DATE", "\"9/17/21\"")
+//  buildConfigField("long", "BUILD_TIME", "${System.currentTimeMillis()}L")
+//}
 
 // Versions
 val kotlinVersion: String by System.getProperties()
