@@ -1,6 +1,6 @@
 package com.github.pambrose
 
-import com.github.pambrose.Security.withTryAuth
+import com.github.pambrose.ClientUtils.withAuth
 
 object Rpc {
 
@@ -16,22 +16,22 @@ object Rpc {
     }
 
   suspend fun refreshPanel() =
-    withTryAuth {
+    withAuth {
       contentService.getCurrentSlide()
     }
 
   suspend fun makeChoice(fromTitle: String, abbrev: String, title: String) =
-    withTryAuth {
+    withAuth {
       contentService.makeChoice(fromTitle, abbrev, title)
     }
 
   suspend fun provideReason(fromTitle: String, abbrev: String, title: String, reason: String) =
-    withTryAuth {
+    withAuth {
       contentService.provideReason(fromTitle, abbrev, title, reason)
     }
 
   suspend fun goBackInTime(title: String) =
-    withTryAuth {
+    withAuth {
       contentService.goBackInTime(title)
     }
 }

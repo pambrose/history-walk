@@ -1,5 +1,7 @@
 package com.github.pambrose
 
+import com.github.pambrose.ClientUtils.lowercase
+import com.github.pambrose.ClientUtils.verticalPadding
 import com.github.pambrose.EndPoints.LOGOUT
 import com.github.pambrose.MainPanel.buttonPadding
 import com.github.pambrose.MainPanel.refresh
@@ -14,7 +16,6 @@ import io.kvision.core.FlexDirection
 import io.kvision.core.FlexWrap
 import io.kvision.core.JustifyContent
 import io.kvision.core.TextAlign
-import io.kvision.core.TextTransform
 import io.kvision.core.onEvent
 import io.kvision.form.text.Text
 import io.kvision.html.Button
@@ -69,7 +70,7 @@ private fun Container.displaySlide(slide: SlideData) {
 
         +"Decision count: ${slide.decisionCount}"
         button("Logout", "fas fa-sign-out-alt", style = ButtonStyle.LINK) {
-          textTransform = TextTransform.NONE
+          lowercase()
           onClick {
             document.location?.href = "/$LOGOUT"
           }
@@ -106,7 +107,7 @@ private fun Container.displaySlide(slide: SlideData) {
 
         vPanel {
           button("Go Back In Time", icon = "fas fa-arrow-alt-circle-up", style = SUCCESS) {
-            textTransform = TextTransform.NONE
+            lowercase()
             onClick {
               if (slide.parentTitles.size == 1) {
                 slide.parentTitles[0].also { parentTitle ->
@@ -122,7 +123,7 @@ private fun Container.displaySlide(slide: SlideData) {
                     vPanel(spacing = 4) {
                       slide.parentTitles.forEach { parentTitle ->
                         button(parentTitle, style = PRIMARY) {
-                          textTransform = TextTransform.NONE
+                          lowercase()
                           onClick { setResult(parentTitle) }
                         }
                       }
@@ -149,7 +150,7 @@ private fun Container.displaySlide(slide: SlideData) {
 private fun Container.addChoiceButtons(currentSlide: SlideData) {
   currentSlide.choices.forEach { ct ->
     button(ct.abbrev, icon = "fas fa-angle-double-right", style = PRIMARY) {
-      textTransform = TextTransform.NONE
+      lowercase()
       onClick {
         AppScope.launch {
           val choiceReason = Rpc.makeChoice(currentSlide.title, ct.abbrev, ct.title)
@@ -167,9 +168,8 @@ private fun Container.addChoiceButtons(currentSlide: SlideData) {
 
 private fun promptForReason(fromTitle: String, ct: ChoiceTitle) {
   val submit = Button("OK", disabled = true).apply {
-    textTransform = TextTransform.NONE
-    paddingTop = buttonPadding
-    paddingBottom = buttonPadding
+    lowercase()
+    verticalPadding(buttonPadding)
   }
   val reasonDialog =
     Dialog<String>("Reasoning") {
@@ -184,9 +184,8 @@ private fun promptForReason(fromTitle: String, ct: ChoiceTitle) {
         }
       add(input)
       addButton(Button("Cancel", style = OUTLINESECONDARY).apply {
-        textTransform = TextTransform.NONE
-        paddingTop = buttonPadding
-        paddingBottom = buttonPadding
+        lowercase()
+        verticalPadding(buttonPadding)
         onClick { setResult("") }
       })
       addButton(submit.also { it.onClick { setResult(input.value) } })
