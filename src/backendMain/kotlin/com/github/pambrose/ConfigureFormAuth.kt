@@ -4,8 +4,10 @@ import com.github.pambrose.User.Companion.isValidUuid
 import com.github.pambrose.common.util.isNotNull
 import com.github.pambrose.common.util.isNull
 import com.github.pambrose.common.util.sha256
-import io.ktor.auth.*
-import io.ktor.sessions.*
+import io.ktor.auth.Authentication
+import io.ktor.auth.form
+import io.ktor.sessions.get
+import io.ktor.sessions.sessions
 import mu.KLogging
 
 object ConfigureFormAuth : KLogging() {

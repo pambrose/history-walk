@@ -1,66 +1,28 @@
 package com.github.pambrose
 
-import com.github.pambrose.PropertyNames.AGENT
-import com.github.pambrose.PropertyNames.CONTENT
 import com.github.pambrose.PropertyNames.DBMS
-import com.github.pambrose.PropertyNames.READINGBAT
+import com.github.pambrose.PropertyNames.HISTORYWALK
 import com.github.pambrose.PropertyNames.SITE
 import com.github.pambrose.common.util.isNotNull
 import com.github.pambrose.common.util.obfuscate
-import io.ktor.application.*
-import io.ktor.config.*
+import io.ktor.application.Application
+import io.ktor.config.ApplicationConfigurationException
 import mu.KLogging
 import java.util.concurrent.atomic.AtomicBoolean
 
 object PropertyNames {
-  const val READINGBAT = "readingbat"
+  const val HISTORYWALK = "historywalk"
   const val DBMS = "dbms"
   const val SITE = "site"
-  const val AGENT = "agent"
-  const val CLASSES = "classes"
-  const val CONTENT = "content"
-  const val CHALLENGES = "challenges"
 }
 
 enum class Property(
   private val propertyValue: String,
   val maskFunc: Property.() -> String = { getProperty(UNASSIGNED, false) }
 ) {
-  KOTLIN_SCRIPT_CLASSPATH("kotlin.script.classpath"),
-
-  CONFIG_FILENAME("$READINGBAT.configFilename"),
-  ADMIN_USERS("$READINGBAT.adminUsers"),
-  LOGBACK_CONFIG_FILE("logback.configurationFile"),
-  AGENT_LAUNCH_ID("$AGENT.launchId"),
-
-  AGENT_CONFIG("agent.config"),
-
-  // These are used in module()
-  DSL_FILE_NAME("$READINGBAT.$CONTENT.fileName"),
-  DSL_VARIABLE_NAME("$READINGBAT.$CONTENT.variableName"),
-  PROXY_HOSTNAME("$AGENT.proxy.hostname"),
-  STARTUP_DELAY_SECS("$READINGBAT.$SITE.startupMaxDelaySecs"),
-
-  // These are defaults for env var values
-  REDIRECT_HOSTNAME("$READINGBAT.$SITE.redirectHostname"),
-  SENDGRID_PREFIX("$READINGBAT.$SITE.sendGridPrefix"),
-  FORWARDED_ENABLED("$READINGBAT.$SITE.forwardedHeaderSupportEnabled"),
-  XFORWARDED_ENABLED("$READINGBAT.$SITE.xforwardedHeaderSupportEnabled"),
-
-  // These are assigned to ReadingBatContent vals
-  ANALYTICS_ID("$READINGBAT.$SITE.googleAnalyticsId", { getPropertyOrNull(false) ?: UNASSIGNED }),
+  ANALYTICS_ID("$HISTORYWALK.$SITE.googleAnalyticsId", { getPropertyOrNull(false) ?: UNASSIGNED }),
   KTOR_PORT("ktor.deployment.port"),
   KTOR_WATCH("ktor.deployment.watch"),
-
-  // These are assigned in ReadingBatServer
-  IS_PRODUCTION("$READINGBAT.$SITE.production"),
-  IS_TESTING("$READINGBAT.$SITE.testing"),
-  DBMS_ENABLED("$READINGBAT.$SITE.dbmsEnabled"),
-  SAVE_REQUESTS_ENABLED("$READINGBAT.$SITE.saveRequestsEnabled"),
-
-  PINGDOM_BANNER_ID("$READINGBAT.$SITE.pingdomBannerId", { getPropertyOrNull(false) ?: UNASSIGNED }),
-  PINGDOM_URL("$READINGBAT.$SITE.pingdomUrl", { getPropertyOrNull(false) ?: UNASSIGNED }),
-  STATUS_PAGE_URL("$READINGBAT.$SITE.statusPageUrl", { getPropertyOrNull(false) ?: UNASSIGNED }),
 
   DBMS_DRIVER_CLASSNAME("$DBMS.driverClassName"),
   DBMS_URL("$DBMS.jdbcUrl"),
@@ -123,22 +85,7 @@ enum class Property(
 
     fun Application.assignProperties() {
 
-      PROXY_HOSTNAME.setPropertyFromConfig(this, "")
-
-      IS_PRODUCTION.also { it.setProperty(it.configValue(this, "false").toBoolean().toString()) }
-
-      DBMS_ENABLED.also { it.setProperty(it.configValue(this, "false").toBoolean().toString()) }
-
-      SAVE_REQUESTS_ENABLED.also { it.setProperty(it.configValue(this, "true").toBoolean().toString()) }
-
-      DSL_FILE_NAME.setPropertyFromConfig(this, "src/Content.kt")
-      DSL_VARIABLE_NAME.setPropertyFromConfig(this, "content")
-
       ANALYTICS_ID.setPropertyFromConfig(this, "")
-
-      PINGDOM_BANNER_ID.setPropertyFromConfig(this, "")
-      PINGDOM_URL.setPropertyFromConfig(this, "")
-      STATUS_PAGE_URL.setPropertyFromConfig(this, "")
 
       DBMS_DRIVER_CLASSNAME.setPropertyFromConfig(this, "com.impossibl.postgres.jdbc.PGDriver")
       DBMS_URL.setPropertyFromConfig(this, "jdbc:pgsql://localhost:5432/history-walk")

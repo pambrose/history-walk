@@ -1,12 +1,16 @@
 package com.github.pambrose
 
 import com.github.pambrose.Auth.AUTH_COOKIE
-import io.ktor.application.*
-import io.ktor.auth.*
-import io.ktor.sessions.*
+import io.ktor.application.ApplicationCall
+import io.ktor.auth.Principal
+import io.ktor.sessions.Sessions
+import io.ktor.sessions.cookie
+import io.ktor.sessions.get
+import io.ktor.sessions.sessions
 import mu.KLogging
 import java.time.Instant
 import java.util.*
+import kotlin.collections.set
 import kotlin.time.Duration
 
 object Cookies : KLogging() {

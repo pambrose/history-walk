@@ -5,16 +5,20 @@ plugins {
   val kotlinVersion: String by System.getProperties()
   val kvisionVersion: String by System.getProperties()
   val versionsVersion: String by System.getProperties()
+  val configVersion: String by System.getProperties()
   val flywayVersion: String by System.getProperties()
 
   kotlin("multiplatform") version kotlinVersion
   kotlin("plugin.serialization") version kotlinVersion
+  // This is required by BuildConfig
+  id("idea")
   id("io.kvision") version kvisionVersion
   id("com.github.ben-manes.versions") version versionsVersion
+  id("com.github.gmazzo.buildconfig") version configVersion
   id("org.flywaydb.flyway") version flywayVersion
 }
 
-version = "1.0.0-SNAPSHOT"
+version = "1.0.0"
 group = "com.github.pambrose"
 
 repositories {
@@ -24,6 +28,14 @@ repositories {
   maven { url = uri("https://maven-central.storage-download.googleapis.com/repos/central/data/") }
   mavenCentral()
   maven { url = uri("https://jitpack.io") }
+}
+
+buildConfig {
+  packageName("com.github.pambrose")
+  buildConfigField("String", "CORE_NAME", "\"${project.name}\"")
+  buildConfigField("String", "CORE_VERSION", provider { "\"${project.version}\"" })
+  buildConfigField("String", "CORE_RELEASE_DATE", "\"9/17/21\"")
+  buildConfigField("long", "BUILD_TIME", "${System.currentTimeMillis()}L")
 }
 
 // Versions
@@ -109,6 +121,7 @@ kotlin {
         implementation("io.ktor:ktor-server-cio:$ktorVersion")
         implementation("io.ktor:ktor-server-sessions:$ktorVersion")
         implementation("io.ktor:ktor-auth:$ktorVersion")
+        implementation("io.ktor:ktor-metrics:$ktorVersion")
         implementation("com.github.pambrose.common-utils:ktor-server-utils:$utilsVersion")
 
         implementation("org.postgresql:postgresql:$pgsqlVersion")

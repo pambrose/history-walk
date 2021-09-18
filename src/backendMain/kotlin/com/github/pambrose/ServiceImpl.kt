@@ -5,7 +5,7 @@ import com.github.pambrose.dbms.UserChoiceTable
 import com.github.pambrose.dbms.UsersTable
 import com.google.inject.Inject
 import com.pambrose.common.exposed.get
-import io.ktor.application.*
+import io.ktor.application.ApplicationCall
 import mu.KLogging
 import org.jetbrains.exposed.sql.Count
 import org.jetbrains.exposed.sql.and
