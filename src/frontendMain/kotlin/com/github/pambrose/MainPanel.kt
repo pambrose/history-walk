@@ -16,8 +16,8 @@ import io.kvision.core.FlexDirection
 import io.kvision.core.FlexWrap
 import io.kvision.core.JustifyContent
 import io.kvision.core.TextAlign
-import io.kvision.core.onEvent
 import io.kvision.form.text.Text
+import io.kvision.form.text.TextArea
 import io.kvision.html.Button
 import io.kvision.html.ButtonStyle
 import io.kvision.html.ButtonStyle.OUTLINESECONDARY
@@ -32,7 +32,6 @@ import io.kvision.panel.flexPanel
 import io.kvision.panel.hPanel
 import io.kvision.panel.simplePanel
 import io.kvision.panel.vPanel
-import io.kvision.utils.ENTER_KEY
 import io.kvision.utils.px
 import kotlinx.browser.document
 import kotlinx.coroutines.launch
@@ -174,8 +173,10 @@ private fun promptForReason(fromTitle: String, ct: ChoiceTitle) {
   val reasonDialog =
     Dialog<String>("Reasoning") {
       val input =
-        Text(label = """Reason for your "${ct.abbrev}" decision:""") {
+        TextArea(rows = 3, label = """Reason for your "${ct.abbrev}" decision:""") {
           placeholder = """I chose "${ct.abbrev}" because..."""
+          autofocus = true
+          //border = Border(2.px, BorderStyle.SOLID, Color.name(Col.BLACK))
           setEventListener<Text> {
             keyup = { _ ->
               submit.disabled = value.isNullOrBlank()
@@ -188,14 +189,14 @@ private fun promptForReason(fromTitle: String, ct: ChoiceTitle) {
         verticalPadding(buttonPadding)
         onClick { setResult("") }
       })
-      addButton(submit.also { it.onClick { setResult(input.value) } })
-      onEvent {
-        keydown = {
-          if (it.keyCode == ENTER_KEY && input.value?.isNotEmpty() ?: false) {
-            setResult(input.value)
-          }
-        }
-      }
+      addButton(submit.apply { onClick { setResult(input.value) } })
+//      onEvent {
+//        keydown = {
+//          if (it.keyCode == ENTER_KEY && input.value?.isNotEmpty() ?: false) {
+//            setResult(input.value)
+//          }
+//        }
+//      }
     }
 
   AppScope.launch {

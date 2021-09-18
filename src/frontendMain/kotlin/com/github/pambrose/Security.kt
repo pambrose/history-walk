@@ -7,9 +7,9 @@ import io.kvision.remote.SecurityMgr
 object Security : SecurityMgr() {
 
   private val loginService = LoginService("/$LOGIN")
-  private val loginWindow = LoginWindow()
+  private val loginPanel = LoginPanel()
 
-  override suspend fun login() = loginService.login(loginWindow.getResult())
+  override suspend fun login() = loginService.login(loginPanel.getResult())
 
   override suspend fun afterLogin() {
     console.log("Successful login")

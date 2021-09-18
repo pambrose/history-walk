@@ -16,7 +16,7 @@ import io.kvision.remote.Credentials
 import io.kvision.utils.ENTER_KEY
 import kotlinx.coroutines.launch
 
-class LoginWindow : Dialog<Credentials>(closeButton = false, escape = false, animation = true) {
+class LoginPanel : Dialog<Credentials>(closeButton = false, escape = false, animation = true) {
 
   private val loginPanel: FormPanel<Credentials>
   private val loginButton: Button
@@ -28,12 +28,20 @@ class LoginWindow : Dialog<Credentials>(closeButton = false, escape = false, ani
   init {
     loginPanel =
       formPanel {
-        add(Credentials::username, Text(label = "${tr("Email")}:"), required = true).apply { focus() }
+        add(
+          Credentials::username,
+          Text(label = "${tr("Email")}:").apply {
+            autofocus = true
+            focus()
+          },
+          required = true
+        )
+
         add(Credentials::password, Password(label = "${tr("Password")}:"), required = true)
         onEvent {
           keydown = {
             if (it.keyCode == ENTER_KEY) {
-              this@LoginWindow.processCredentials()
+              this@LoginPanel.processCredentials()
             }
           }
         }
@@ -69,28 +77,28 @@ class LoginWindow : Dialog<Credentials>(closeButton = false, escape = false, ani
       Button(tr("Cancel"), "fas fa-times", ButtonStyle.SECONDARY).apply {
         lowercase()
         onClick {
-          this@LoginWindow.hideRegisterForm()
+          this@LoginPanel.hideRegisterForm()
         }
       }
 
     registerButton = Button(tr("Register"), "fas fa-check", PRIMARY).apply {
       lowercase()
       onClick {
-        this@LoginWindow.processRegister()
+        this@LoginPanel.processRegister()
       }
     }
 
     loginButton = Button(tr("Login"), "fas fa-check", PRIMARY).apply {
       lowercase()
       onClick {
-        this@LoginWindow.processCredentials()
+        this@LoginPanel.processCredentials()
       }
     }
 
     userButton = Button(tr("Sign Up"), "fas fa-user").apply {
       lowercase()
       onClick {
-        this@LoginWindow.showRegisterForm()
+        this@LoginPanel.showRegisterForm()
       }
     }
 
