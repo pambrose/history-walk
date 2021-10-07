@@ -1,3 +1,5 @@
+default: versioncheck
+
 server:
 	./gradlew backendRun
 
@@ -16,9 +18,6 @@ versioncheck:
 depends:
 	./gradlew dependencies
 
-upgrade-wrapper:
-	./gradlew wrapper --gradle-version=7.2 --distribution-type=bin
-
 dbinfo:
 	./gradlew flywayInfo
 
@@ -32,3 +31,6 @@ dbreset: dbclean dbmigrate
 
 dbvalidate:
 	./gradlew flywayValidate
+
+upgrade-wrapper:
+	./gradlew wrapper --gradle-version=7.2 --distribution-type=bin

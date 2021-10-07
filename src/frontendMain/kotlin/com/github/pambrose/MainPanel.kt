@@ -26,6 +26,7 @@ import io.kvision.html.ButtonStyle.SUCCESS
 import io.kvision.html.P
 import io.kvision.html.button
 import io.kvision.html.h1
+import io.kvision.html.icon
 import io.kvision.modal.Dialog
 import io.kvision.panel.SimplePanel
 import io.kvision.panel.flexPanel
@@ -38,7 +39,6 @@ import kotlinx.coroutines.launch
 
 object MainPanel : SimplePanel() {
   val buttonPadding = 5.px
-
   val panel = SimplePanel()
 
   init {
@@ -53,7 +53,8 @@ private fun Container.displaySlide(slide: SlideData) {
   removeAll()
 
   simplePanel {
-    margin = 10.px
+    margin = 20.px
+    width = 600.px
 
 //    simplePanel {
 //      border = Border(2.px, BorderStyle.SOLID, Color.name(Col.WHITE))
@@ -73,6 +74,30 @@ private fun Container.displaySlide(slide: SlideData) {
           onClick {
             document.location?.href = "/$LOGOUT"
           }
+        }
+      }
+    }
+
+    vPanel {
+      slide.parentTitles.forEach { parentTitle ->
+//        span {
+//          background = Background(Color.rgb(53, 121, 246))
+//          color = Color.name(Col.WHITE)
+//          textAlign = TextAlign.CENTER
+//          +parent
+//        }
+        button(parentTitle, style = SUCCESS) {
+          onClick {
+            AppScope.launch {
+              val newSlide = Rpc.goBackInTime(parentTitle)
+              refresh(newSlide)
+            }
+          }
+        }
+        hPanel(justify = JustifyContent.CENTER) {
+          paddingTop = 5.px
+          paddingBottom = 5.px
+          icon("fas fa-arrow-alt-circle-down")
         }
       }
     }
@@ -100,7 +125,7 @@ private fun Container.displaySlide(slide: SlideData) {
         hPanel(spacing = spacing, init = init)
     }
 
-    if (slide.parentTitles.isNotEmpty()) {
+    if (false && slide.parentTitles.isNotEmpty()) {
       simplePanel {
         marginTop = 10.px
 
