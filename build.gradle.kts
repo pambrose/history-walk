@@ -117,7 +117,7 @@ kotlin {
         implementation(kotlin("stdlib-jdk8"))
         implementation(kotlin("reflect"))
 
-        implementation("io.ktor:ktor-server-core:$ktorVersion")
+        //implementation("io.ktor:ktor-server-core:$ktorVersion")
         implementation("io.ktor:ktor-server-cio:$ktorVersion")
         implementation("io.ktor:ktor-server-sessions:$ktorVersion")
         implementation("io.ktor:ktor-auth:$ktorVersion")
@@ -249,7 +249,7 @@ afterEvaluate {
 // This is for flyway
 buildscript {
   dependencies {
-    classpath("org.postgresql:postgresql:42.2.24")
+    classpath("org.postgresql:postgresql:42.3.1")
   }
 }
 
