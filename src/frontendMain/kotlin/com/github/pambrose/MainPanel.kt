@@ -20,19 +20,13 @@ import io.kvision.form.text.Text
 import io.kvision.form.text.TextArea
 import io.kvision.html.Button
 import io.kvision.html.ButtonStyle
-import io.kvision.html.ButtonStyle.OUTLINESECONDARY
-import io.kvision.html.ButtonStyle.PRIMARY
-import io.kvision.html.ButtonStyle.SUCCESS
+import io.kvision.html.ButtonStyle.*
 import io.kvision.html.P
 import io.kvision.html.button
 import io.kvision.html.h1
 import io.kvision.html.icon
 import io.kvision.modal.Dialog
-import io.kvision.panel.SimplePanel
-import io.kvision.panel.flexPanel
-import io.kvision.panel.hPanel
-import io.kvision.panel.simplePanel
-import io.kvision.panel.vPanel
+import io.kvision.panel.*
 import io.kvision.utils.px
 import kotlinx.browser.document
 import kotlinx.coroutines.launch
@@ -199,11 +193,14 @@ private fun promptForReason(fromTitle: String, ct: ChoiceTitle) {
     Dialog<String>("Reasoning") {
       val input =
         TextArea(rows = 3, label = """Reason for your "${ct.abbrev}" decision:""") {
-          placeholder = """I chose "${ct.abbrev}" because..."""
+//          marginLeft = 25.px
+//          paddingLeft = 25.px
+          placeholder = """ I chose "${ct.abbrev}" because..."""
           autofocus = true
           setEventListener<Text> {
             keyup = { _ ->
-              submit.disabled = value.isNullOrBlank()
+              // Make sure the user has typed something.
+              submit.disabled = value?.trim()?.length ?: 0 < 10
             }
           }
         }

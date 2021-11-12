@@ -5,8 +5,8 @@ import com.github.pambrose.PropertyNames.HISTORYWALK
 import com.github.pambrose.PropertyNames.SITE
 import com.github.pambrose.common.util.isNotNull
 import com.github.pambrose.common.util.obfuscate
-import io.ktor.application.Application
-import io.ktor.config.ApplicationConfigurationException
+import io.ktor.application.*
+import io.ktor.config.*
 import mu.KLogging
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -88,7 +88,7 @@ enum class Property(
       ANALYTICS_ID.setPropertyFromConfig(this, "")
 
       DBMS_DRIVER_CLASSNAME.setPropertyFromConfig(this, "com.impossibl.postgres.jdbc.PGDriver")
-      DBMS_URL.setPropertyFromConfig(this, "jdbc:pgsql://localhost:5432/history-walk")
+      DBMS_URL.setPropertyFromConfig(this, "jdbc:pgsql://localhost:5432/historywalk")
       DBMS_USERNAME.setPropertyFromConfig(this, "postgres")
       DBMS_PASSWORD.setPropertyFromConfig(this, "docker")
       DBMS_MAX_POOL_SIZE.setPropertyFromConfig(this, "10")

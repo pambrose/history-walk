@@ -255,7 +255,7 @@ buildscript {
 
 flyway {
   driver = "org.postgresql.Driver"
-  url = "jdbc:postgresql://localhost:5432/history-walk"
+  url = "jdbc:postgresql://localhost:5432/historywalk"
   user = "postgres"
   password = "docker"
   locations = arrayOf("filesystem:src/backendMain/resources/db/migration")

@@ -144,7 +144,7 @@ class LoginPanel : Dialog<Credentials>(closeButton = false, escape = false, anim
             hideRegisterForm()
           }
         else
-          Alert.show(text = tr("Unsuccessful login. Please try again."))
+          Alert.show(text = tr("Unsuccessful registration. Please try again."))
       }
     }
   }

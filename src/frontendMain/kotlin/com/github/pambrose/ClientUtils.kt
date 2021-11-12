@@ -20,7 +20,7 @@ object ClientUtils {
       try {
         block()
       } catch (e: Exception) {
-        console.log(e)
+        console.log("This is the exception: $e ${e.message}")
         //Alert.show(text = I18n.tr(e.toString()))
         throw e
       }
