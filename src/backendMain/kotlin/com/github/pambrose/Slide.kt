@@ -9,8 +9,10 @@ import java.util.*
 
 class Slide(val title: String) {
   var parentSlide: Slide? = null
-  val choices = mutableMapOf<String, String>()
   var content: String = ""
+  var failure: String = ""
+  var success: String = ""
+  val choices = mutableMapOf<String, String>()
   var choiceOrientation: ChoiceOrientation = ChoiceOrientation.VERTICAL
 
   init {

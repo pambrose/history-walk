@@ -39,10 +39,18 @@ object SlideContent {
 
     slide("Summer Choice") {
       content = "Summer Slide"
+
+      failure = """
+        This is a dead end.
+      """
     }
 
     slide("Fall Choice") {
       content = "Fall Slide"
+
+      success = """
+        Congratulations, you have made it!!!
+      """
     }
 
     slide("Winter Choice") {

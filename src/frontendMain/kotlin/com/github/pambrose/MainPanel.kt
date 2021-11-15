@@ -5,26 +5,11 @@ import com.github.pambrose.ClientUtils.verticalPadding
 import com.github.pambrose.EndPoints.LOGOUT
 import com.github.pambrose.MainPanel.buttonPadding
 import com.github.pambrose.MainPanel.refresh
-import io.kvision.core.AlignItems
-import io.kvision.core.Background
-import io.kvision.core.Border
-import io.kvision.core.BorderStyle
-import io.kvision.core.Col
-import io.kvision.core.Color
-import io.kvision.core.Container
-import io.kvision.core.FlexDirection
-import io.kvision.core.FlexWrap
-import io.kvision.core.JustifyContent
-import io.kvision.core.TextAlign
+import io.kvision.core.*
 import io.kvision.form.text.Text
 import io.kvision.form.text.TextArea
-import io.kvision.html.Button
-import io.kvision.html.ButtonStyle
+import io.kvision.html.*
 import io.kvision.html.ButtonStyle.*
-import io.kvision.html.P
-import io.kvision.html.button
-import io.kvision.html.h1
-import io.kvision.html.icon
 import io.kvision.modal.Dialog
 import io.kvision.panel.*
 import io.kvision.utils.px
@@ -184,10 +169,15 @@ private fun Container.addChoiceButtons(currentSlide: SlideData) {
   }
 }
 
+private fun String?.wordCount(): Int = this?.split(" ")?.filter { it.isNotEmpty() }?.size ?: 0
+
 private fun promptForReason(fromTitle: String, ct: ChoiceTitle) {
   val submit = Button("OK", disabled = true).apply {
     lowercase()
     verticalPadding(buttonPadding)
+  }
+  val wordCount = Span(content = "0 words") {
+    float = PosFloat.RIGHT
   }
   val reasonDialog =
     Dialog<String>("Reasoning") {
@@ -200,11 +190,15 @@ private fun promptForReason(fromTitle: String, ct: ChoiceTitle) {
           setEventListener<Text> {
             keyup = { _ ->
               // Make sure the user has typed something.
-              submit.disabled = value?.trim()?.length ?: 0 < 10
+              value.wordCount().also { wc ->
+                submit.disabled = wc < 5
+                wordCount.content = "$wc words"
+              }
             }
           }
         }
       add(input)
+      add(wordCount)
       addButton(Button("Cancel", style = OUTLINESECONDARY).apply {
         lowercase()
         verticalPadding(buttonPadding)

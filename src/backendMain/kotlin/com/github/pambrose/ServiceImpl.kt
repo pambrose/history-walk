@@ -5,15 +5,10 @@ import com.github.pambrose.dbms.UserChoiceTable
 import com.github.pambrose.dbms.UsersTable
 import com.google.inject.Inject
 import com.pambrose.common.exposed.get
-import io.ktor.application.ApplicationCall
+import io.ktor.application.*
 import mu.KLogging
-import org.jetbrains.exposed.sql.Count
-import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.deleteWhere
-import org.jetbrains.exposed.sql.insertAndGetId
-import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.jetbrains.exposed.sql.update
 import java.util.*
 
 actual class RegisterUserService : IRegisterUserService {
@@ -113,16 +108,19 @@ actual class ContentService : IContentService {
         }
     }
 
-    private fun slideData(uuid: String, slide: Slide): SlideData {
-
-      val escaped = slide.content
+    private fun String.transformText(): String {
+      val escaped = this
         .replace("<", ltEscape)
         .replace(">", gtEscape)
 
-      val content =
-        MarkdownParser.toHtml(escaped)
-          .replace(ltEscape, "<")
-          .replace(gtEscape, ">")
+      return MarkdownParser.toHtml(escaped)
+        .replace(ltEscape, "<")
+        .replace(gtEscape, ">")
+    }
+
+    private fun slideData(uuid: String, slide: Slide): SlideData {
+
+      val content = slide.content.transformText()
 
       val choices = slide.choices.map { (choice, destination) -> ChoiceTitle(choice, destination) }
 
