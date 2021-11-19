@@ -23,11 +23,21 @@ data class UserId(
 data class SlideData(
   val title: String,
   val contents: String,
+  val success: Boolean,
   val choices: List<ChoiceTitle>,
   val orientation: ChoiceOrientation,
   val parentTitles: List<String>,
   val decisionCount: Long,
-)
+) {
+  val failure: Boolean
+    get() = !success && choices.isEmpty()
+
+  val hasParents: Boolean
+    get() = parentTitles.isNotEmpty()
+
+  val hasOneParent: Boolean
+    get() = parentTitles.size == 1
+}
 
 @Serializable
 data class ChoiceTitle(val abbrev: String, val title: String)

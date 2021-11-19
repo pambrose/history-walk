@@ -38,22 +38,19 @@ object SlideContent {
     }
 
     slide("Summer Choice") {
-      content = "Summer Slide"
-
-      failure = """
-        This is a dead end.
-      """
+      content = """
+        ## Summer Slide
+        * this is more
+        * this is also more
+        """
     }
 
     slide("Fall Choice") {
       content = "Fall Slide"
-
-      success = """
-        Congratulations, you have made it!!!
-      """
     }
 
     slide("Winter Choice") {
+      success = true
       content = "Winter Slide"
     }
 
@@ -65,7 +62,11 @@ object SlideContent {
     }
 
     slide("Red Jacket") {
-      content = "Description for Red Jacket"
+      success = true
+      content = """
+        ## Success!
+        Summer Slide
+        """
     }
 
     slide("Blue Jacket") {

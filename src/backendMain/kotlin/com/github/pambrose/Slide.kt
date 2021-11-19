@@ -10,10 +10,12 @@ import java.util.*
 class Slide(val title: String) {
   var parentSlide: Slide? = null
   var content: String = ""
-  var failure: String = ""
-  var success: String = ""
+  var success = false
   val choices = mutableMapOf<String, String>()
   var choiceOrientation: ChoiceOrientation = ChoiceOrientation.VERTICAL
+
+  val hasChoices: Boolean
+    get() = choices.isNotEmpty()
 
   init {
     require(title !in allSlides.keys) { "Slide titles must be unique: $title" }
@@ -46,13 +48,25 @@ class Slide(val title: String) {
 
     fun verifySlides() {
       allSlides.forEach { (title, slide) ->
-        slide.choices.forEach { (choice, dest) ->
+        slide.choices.forEach { (_, dest) ->
           val destSlide = allSlides[dest] ?: throw IllegalArgumentException("Missing slide with title: $dest")
           if (destSlide.parentSlide != null)
             throw IllegalArgumentException("Parent slide already assigned to : $dest")
           destSlide.parentSlide = slide
         }
+
+        if (slide.success && slide.hasChoices)
+          throw IllegalArgumentException("""Slide "$title" has both success and choices""")
       }
+
+      allSlides.filter { it.value.success }.count()
+        .also { successCount ->
+          if (successCount == 0)
+            throw IllegalArgumentException("No success slides found")
+
+          if (successCount > 1)
+            throw IllegalArgumentException("Multiple success slides found")
+        }
 
       rootSlide =
         allSlides.values.filter { it.parentSlide == null }.let { nullParents ->

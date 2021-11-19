@@ -139,7 +139,7 @@ actual class ContentService : IContentService {
 
       val count = slideCount(uuid)
 
-      return SlideData(slide.title, content, choices, orientation, parentTitles, count)
+      return SlideData(slide.title, content, slide.success, choices, orientation, parentTitles, count)
     }
 
     private fun slideCount(uuid: String) =
