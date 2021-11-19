@@ -50,7 +50,6 @@ object SlideContent {
     }
 
     slide("Winter Choice") {
-      success = true
       content = "Winter Slide"
     }
 
