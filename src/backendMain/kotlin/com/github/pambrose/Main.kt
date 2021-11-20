@@ -4,21 +4,19 @@ import com.github.pambrose.ConfigureFormAuth.configureFormAuth
 import com.github.pambrose.Cookies.assignCookies
 import com.github.pambrose.Property.Companion.assignProperties
 import com.github.pambrose.Routes.assignRoutes
+import com.github.pambrose.common.script.KotlinScript
+import com.github.pambrose.common.util.FileSystemSource
 import com.github.pambrose.common.util.Version.Companion.versionDesc
 import com.github.pambrose.common.util.getBanner
-import io.ktor.application.Application
-import io.ktor.application.ApplicationCall
-import io.ktor.application.install
-import io.ktor.auth.Authentication
-import io.ktor.features.CallLogging
-import io.ktor.features.Compression
-import io.ktor.features.DefaultHeaders
-import io.ktor.routing.routing
-import io.ktor.sessions.Sessions
-import io.ktor.sessions.get
-import io.ktor.sessions.sessions
-import io.ktor.util.pipeline.PipelineContext
+import com.github.pambrose.slides.SlideContent
+import io.ktor.application.*
+import io.ktor.auth.*
+import io.ktor.features.*
+import io.ktor.routing.*
+import io.ktor.sessions.*
+import io.ktor.util.pipeline.*
 import io.kvision.remote.kvisionInit
+import kotlinx.coroutines.runBlocking
 import mu.KLogging
 import mu.KotlinLogging
 import org.slf4j.event.Level
@@ -27,6 +25,8 @@ import org.slf4j.event.Level
 object HistoryWalkServer : KLogging() {
 
 }
+
+var masterSlides = SlideContent()
 
 fun Application.main() {
   val logger = KotlinLogging.logger {}
@@ -40,8 +40,23 @@ fun Application.main() {
 
   assignProperties()
 
-  SlideContent.initContent()
-  Slide.verifySlides()
+//  val path = Paths.get("").toAbsolutePath().toString()
+//  println("cwd = $path")
+
+  val fsSource = FileSystemSource("./")
+  val fs = fsSource.file("../src/backendMain/kotlin/Slides.kt")
+  val code = "${fs.content}\n\nslides"
+
+  val slides = runBlocking {
+    println(code)
+    val l = KotlinScript().use { it.eval(code) as SlideContent }
+    println(l)
+    l
+  }
+
+  masterSlides = slides
+
+  masterSlides.verifySlides()
 
   install(Compression)
   install(DefaultHeaders)

@@ -1,9 +1,8 @@
-package com.github.pambrose
+import com.github.pambrose.slides.slideContent
 
-import com.github.pambrose.Slide.Companion.slide
-
-object SlideContent {
-  fun initContent() {
+val slides =
+  slideContent {
+    println("Evaluating slides")
     slide("Season to Leave") {
       content =
         """
@@ -30,7 +29,8 @@ object SlideContent {
         
         Here are the choices of clothing:
       """
-      choiceOrientation = ChoiceOrientation.HORIZONTAL
+
+      horizontal()
 
       choice("Clothing Choice 1", "Warm Jacket1")
       choice("Clothing Choice 2", "Warm Jacket2")
@@ -80,4 +80,3 @@ object SlideContent {
       content = "Description for Warm Jacket3"
     }
   }
-}

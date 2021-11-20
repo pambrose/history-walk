@@ -37,7 +37,11 @@ class LoginPanel : Dialog<Credentials>(closeButton = false, escape = false, anim
           required = true
         )
 
-        add(Credentials::password, Password(label = "${tr("Password")}:"), required = true)
+        add(
+          Credentials::password,
+          Password(label = "${tr("Password")}:"),
+          required = true
+        )
         onEvent {
           keydown = {
             if (it.keyCode == ENTER_KEY) {
@@ -62,12 +66,12 @@ class LoginPanel : Dialog<Credentials>(closeButton = false, escape = false, anim
           (it.getValue()?.length ?: 0) >= 8
         }
         validator = {
-          val result = it[RegisterData::password] == it[RegisterData::password2]
-          if (!result) {
+          val pwsAreEqual = it[RegisterData::password] == it[RegisterData::password2]
+          if (!pwsAreEqual) {
             it.getControl(RegisterData::password)?.validatorError = tr("Passwords are not the same")
             it.getControl(RegisterData::password2)?.validatorError = tr("Passwords are not the same")
           }
-          result
+          pwsAreEqual
         }
         validatorMessage = { tr("Passwords are not the same") }
 
