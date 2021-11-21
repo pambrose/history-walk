@@ -49,8 +49,13 @@ object Routes : KLogging() {
       }
 
       get("/reset") {
-        masterSlides = SlideContent.loadSlides()
-        call.respondRedirect("/")
+        try {
+          masterSlides = SlideContent.loadSlides()
+          call.respondRedirect("/")
+        } catch (e: Exception) {
+          logger.error("Error resetting slides", e)
+          call.respondText(e.stackTraceToString(), ContentType.Text.Plain)
+        }
       }
 
       get(LOGOUT) {

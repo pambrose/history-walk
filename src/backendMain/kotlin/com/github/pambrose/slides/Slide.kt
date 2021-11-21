@@ -1,14 +1,13 @@
 package com.github.pambrose.slides
 
-import com.github.pambrose.ChoiceOrientation
 import mu.KLogging
 
 class Slide(val title: String, private val slideContent: SlideContent) {
   var parentSlide: Slide? = null
   var content: String = ""
   var success = false
+  var verticalChoices = true
   val choices = mutableMapOf<String, String>()
-  var choiceOrientation: ChoiceOrientation = ChoiceOrientation.VERTICAL
 
   val hasChoices: Boolean
     get() = choices.isNotEmpty()
@@ -19,11 +18,11 @@ class Slide(val title: String, private val slideContent: SlideContent) {
   }
 
   fun verticalChoices() {
-    choiceOrientation = ChoiceOrientation.VERTICAL
+    verticalChoices = true
   }
 
   fun horizontalChoices() {
-    choiceOrientation = ChoiceOrientation.HORIZONTAL
+    verticalChoices = false
   }
 
   fun choice(choice: String, destination: String) {

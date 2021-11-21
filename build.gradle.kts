@@ -254,17 +254,17 @@ afterEvaluate {
   }
 }
 
-publishing {
-  publications {
-    create<MavenPublication>("maven") {
-      groupId = "com.github.pambrose"
-      artifactId = "library"
-      version = "1.0.0"
-
-      from(components["java"])
-    }
-  }
-}
+//publishing {
+//  publications {
+//    create<MavenPublication>("maven") {
+//      groupId = "com.github.pambrose"
+//      artifactId = "library"
+//      version = "1.0.0"
+//
+//      from(components["java"])
+//    }
+//  }
+//}
 
 // This is for flyway
 buildscript {

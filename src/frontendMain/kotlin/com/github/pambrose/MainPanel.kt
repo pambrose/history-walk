@@ -118,7 +118,7 @@ private fun Container.displaySlide(slide: SlideData) {
         marginTop = 10.px
         val spacing = 4
         val init: Container.() -> Unit = { addChoiceButtons(slide) }
-        if (slide.orientation == ChoiceOrientation.VERTICAL)
+        if (slide.verticalChoices)
           vPanel(spacing = spacing, init = init)
         else
           hPanel(spacing = spacing, init = init)

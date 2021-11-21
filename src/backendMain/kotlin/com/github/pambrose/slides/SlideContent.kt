@@ -1,7 +1,6 @@
 package com.github.pambrose.slides
 
 import com.github.pambrose.Content
-import com.github.pambrose.ScriptPools.kotlinScriptPool
 import com.github.pambrose.common.script.KotlinScript
 import com.github.pambrose.common.util.FileSystemSource
 import com.github.pambrose.dbms.UsersTable
@@ -64,19 +63,10 @@ class SlideContent {
   }
 
   companion object : KLogging() {
-    private suspend fun evalDsl(code: String, sourceName: String) =
-      try {
-        kotlinScriptPool.eval { eval(code) as SlideContent }//.apply { validate() }
-      } catch (e: Throwable) {
-        logger.info { "Error in $sourceName:\n$code" }
-        throw e
-      }
-
     fun loadSlides() =
       runBlocking {
         val fs = FileSystemSource("./").file("../src/backendMain/kotlin/Slides.kt")
         val code = "${fs.content}\n\nslides"
-        //println(code)
         KotlinScript().use { it.eval(code) as SlideContent }.apply { validate() }
       }
   }

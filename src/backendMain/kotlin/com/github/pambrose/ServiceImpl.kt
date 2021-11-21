@@ -124,8 +124,6 @@ actual class ContentService : IContentService {
 
       val choices = slide.choices.map { (choice, destination) -> ChoiceTitle(choice, destination) }
 
-      val orientation = slide.choiceOrientation
-
       val parentTitles =
         mutableListOf<String>()
           .also { parentTitles ->
@@ -139,7 +137,7 @@ actual class ContentService : IContentService {
 
       val count = slideCount(uuid)
 
-      return SlideData(slide.title, content, slide.success, choices, orientation, parentTitles, count)
+      return SlideData(slide.title, content, slide.success, choices, slide.verticalChoices, parentTitles, count)
     }
 
     private fun slideCount(uuid: String) =

@@ -25,7 +25,7 @@ data class SlideData(
   val contents: String,
   val success: Boolean,
   val choices: List<ChoiceTitle>,
-  val orientation: ChoiceOrientation,
+  val verticalChoices: Boolean,
   val parentTitles: List<String>,
   val decisionCount: Long,
 ) {
@@ -49,6 +49,3 @@ data class UserChoice(
   val title: String,
   val reason: String,
 )
-
-@Serializable
-enum class ChoiceOrientation { VERTICAL, HORIZONTAL }
