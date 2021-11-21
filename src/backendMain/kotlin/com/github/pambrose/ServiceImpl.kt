@@ -1,5 +1,6 @@
 package com.github.pambrose
 
+import com.github.pambrose.User.Companion.findSlide
 import com.github.pambrose.dbms.UserChoiceTable
 import com.github.pambrose.dbms.UsersTable
 import com.github.pambrose.slides.Slide
@@ -33,7 +34,7 @@ actual class ContentService : IContentService {
   override suspend fun getCurrentSlide(): SlideData {
     logger.debug { "userId=${call.userId}" }
     val uuid = call.userId.uuid
-    val slide = masterSlides.findSlide(uuid)
+    val slide = findSlide(uuid, masterSlides.get())
     return slideData(uuid, slide)
   }
 
@@ -75,7 +76,7 @@ actual class ContentService : IContentService {
 
       updateLastTitle(uuid, title)
 
-      val slide = masterSlides.findSlide(uuid)
+      val slide = findSlide(uuid, masterSlides.get())
       slideData(uuid, slide)
     }
 
@@ -83,7 +84,7 @@ actual class ContentService : IContentService {
     transaction {
       val uuid = call.userId.uuid
       updateLastTitle(uuid, title)
-      val slide = masterSlides.findSlide(uuid)
+      val slide = findSlide(uuid, masterSlides.get())
       slideData(uuid, slide)
     }
 

@@ -1,4 +1,4 @@
-import com.github.pambrose.slides.slideContent
+import com.github.pambrose.slides.SlideContent.Companion.slideContent
 
 val slides =
   slideContent {

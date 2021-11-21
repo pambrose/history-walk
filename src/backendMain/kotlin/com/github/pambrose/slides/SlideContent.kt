@@ -1,34 +1,14 @@
 package com.github.pambrose.slides
 
-import com.github.pambrose.Content
-import com.github.pambrose.common.script.KotlinScript
-import com.github.pambrose.common.util.FileSystemSource
-import com.github.pambrose.dbms.UsersTable
-import kotlinx.coroutines.runBlocking
 import mu.KLogging
-import org.jetbrains.exposed.sql.select
-import org.jetbrains.exposed.sql.transactions.transaction
-import java.util.*
 
 class SlideContent {
   val allSlides = mutableMapOf<String, Slide>()
-  private lateinit var rootSlide: Slide
+  lateinit var rootSlide: Slide
 
   fun slide(title: String, block: Slide.() -> Unit = { }) {
     Slide(title, this).block()
   }
-
-  fun findSlide(uuid: String) =
-    transaction {
-      (UsersTable
-        .slice(UsersTable.lastTitle)
-        .select { UsersTable.uuidCol eq UUID.fromString(uuid) }
-        .map { it[UsersTable.lastTitle] }
-        .firstOrNull() ?: error("Missing uuid: $uuid"))
-        .let { title ->
-          (if (title == Content.ROOT) rootSlide else allSlides[title]) ?: error("Invalid title: $title")
-        }
-    }
 
   fun validate() {
     allSlides.forEach { (title, slide) ->
@@ -63,14 +43,8 @@ class SlideContent {
   }
 
   companion object : KLogging() {
-    fun loadSlides() =
-      runBlocking {
-        val fs = FileSystemSource("./").file("../src/backendMain/kotlin/Slides.kt")
-        val code = "${fs.content}\n\nslides"
-        KotlinScript().use { it.eval(code) as SlideContent }.apply { validate() }
-      }
+    fun slideContent(block: SlideContent.() -> Unit) =
+      SlideContent().apply(block).apply { }
   }
 }
 
-fun slideContent(block: SlideContent.() -> Unit) =
-  SlideContent().apply(block).apply { }

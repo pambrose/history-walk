@@ -5,16 +5,10 @@ import com.github.pambrose.common.util.obfuscate
 
 enum class EnvVar(val maskFunc: EnvVar.() -> String = { getEnv(UNASSIGNED) }) {
 
-  AGENT_ENABLED,
-  AGENT_CONFIG,
-  PAPERTRAIL_PORT,
-  SCRIPT_CLASSPATH,
-  FILTER_LOG,
   DBMS_DRIVER_CLASSNAME,
   DBMS_URL({ getEnvOrNull()?.obfuscate(4) ?: UNASSIGNED }),
   DBMS_USERNAME,
-  DBMS_PASSWORD({ getEnvOrNull()?.obfuscate(1) ?: UNASSIGNED }),
-  JAVA_TOOL_OPTIONS;
+  DBMS_PASSWORD({ getEnvOrNull()?.obfuscate(1) ?: UNASSIGNED });
 
   fun isDefined(): Boolean = getEnvOrNull().isNotNull()
 

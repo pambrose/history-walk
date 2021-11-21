@@ -8,10 +8,10 @@ import com.github.pambrose.EndPoints.LOGIN
 import com.github.pambrose.EndPoints.LOGOUT
 import com.github.pambrose.common.util.Version.Companion.versionDesc
 import com.github.pambrose.common.util.isNotNull
-import com.github.pambrose.slides.SlideContent
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.http.*
+import io.ktor.http.ContentType.Text.Plain
 import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.sessions.*
@@ -20,6 +20,7 @@ import mu.KLogging
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.io.ByteArrayOutputStream
 import java.lang.management.ManagementFactory
+import kotlin.text.Charsets.UTF_8
 
 object Routes : KLogging() {
 
@@ -50,11 +51,11 @@ object Routes : KLogging() {
 
       get("/reset") {
         try {
-          masterSlides = SlideContent.loadSlides()
+          masterSlides.set(loadSlides())
           call.respondRedirect("/")
         } catch (e: Exception) {
           logger.error("Error resetting slides", e)
-          call.respondText(e.stackTraceToString(), ContentType.Text.Plain)
+          call.respondText(e.stackTraceToString(), Plain)
         }
       }
 
@@ -74,11 +75,11 @@ object Routes : KLogging() {
     }
 
     get("ping") {
-      call.respondText("pong", ContentType.Text.Plain)
+      call.respondText("pong", Plain)
     }
 
     get("version") {
-      call.respondText(HistoryWalkServer::class.versionDesc(), ContentType.Text.Plain)
+      call.respondText(HistoryWalkServer::class.versionDesc(), Plain)
     }
 
     get("threaddump") {
@@ -87,12 +88,12 @@ object Routes : KLogging() {
           .apply {
             use { ThreadDumpInfo.threadDump.dump(true, true, it) }
           }.let { baos ->
-            String(baos.toByteArray(), Charsets.UTF_8)
+            String(baos.toByteArray(), UTF_8)
           }
       } catch (e: NoClassDefFoundError) {
         "Sorry, your runtime environment does not allow dump threads."
       }.also {
-        call.respondText(it, ContentType.Text.Plain)
+        call.respondText(it, Plain)
       }
     }
   }

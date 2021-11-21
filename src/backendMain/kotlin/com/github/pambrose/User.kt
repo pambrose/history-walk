@@ -4,20 +4,13 @@ import com.github.pambrose.Content.ROOT
 import com.github.pambrose.Email.Companion.EMPTY_EMAIL
 import com.github.pambrose.Email.Companion.UNKNOWN_EMAIL
 import com.github.pambrose.FullName.Companion.EMPTY_FULLNAME
-import com.github.pambrose.common.util.isNotNull
-import com.github.pambrose.common.util.isNotValidEmail
-import com.github.pambrose.common.util.maxLength
-import com.github.pambrose.common.util.newStringSalt
-import com.github.pambrose.common.util.sha256
+import com.github.pambrose.common.util.*
 import com.github.pambrose.dbms.UsersTable
+import com.github.pambrose.slides.SlideContent
 import com.pambrose.common.exposed.get
-import io.ktor.http.Parameters
+import io.ktor.http.*
 import mu.KLogging
-import org.jetbrains.exposed.sql.Count
-import org.jetbrains.exposed.sql.ResultRow
-import org.jetbrains.exposed.sql.deleteWhere
-import org.jetbrains.exposed.sql.insertAndGetId
-import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
 import kotlin.time.measureTime
@@ -180,6 +173,21 @@ class User {
           .map { (it[0] as UUID).toUser() }
           .firstOrNull()
           .also { logger.info { "queryUserByUuid() returned: ${it?.email ?: " $uuid not found"}" } }
+      }
+
+    fun findSlide(uuid: String, slideContent: SlideContent) =
+      transaction {
+        (UsersTable
+          .slice(UsersTable.lastTitle)
+          .select { UsersTable.uuidCol eq UUID.fromString(uuid) }
+          .map { it[UsersTable.lastTitle] }
+          .firstOrNull() ?: error("Missing uuid: $uuid"))
+          .let { title ->
+            (if (title == Content.ROOT)
+              slideContent.rootSlide
+            else
+              slideContent.allSlides[title]) ?: error("Invalid title: $title")
+          }
       }
   }
 }

@@ -1,7 +1,5 @@
 package com.github.pambrose.slides
 
-import mu.KLogging
-
 class Slide(val title: String, private val slideContent: SlideContent) {
   var parentSlide: Slide? = null
   var content: String = ""
@@ -28,6 +26,4 @@ class Slide(val title: String, private val slideContent: SlideContent) {
   fun choice(choice: String, destination: String) {
     choices[choice] = destination
   }
-
-  companion object : KLogging()
 }
