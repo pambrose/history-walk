@@ -8,20 +8,13 @@ import com.github.pambrose.EndPoints.LOGIN
 import com.github.pambrose.EndPoints.LOGOUT
 import com.github.pambrose.common.util.Version.Companion.versionDesc
 import com.github.pambrose.common.util.isNotNull
-import io.ktor.application.call
-import io.ktor.auth.authenticate
-import io.ktor.auth.principal
-import io.ktor.http.ContentType
-import io.ktor.http.HttpStatusCode
-import io.ktor.response.respond
-import io.ktor.response.respondRedirect
-import io.ktor.response.respondText
-import io.ktor.routing.Route
-import io.ktor.routing.get
-import io.ktor.routing.post
-import io.ktor.sessions.clear
-import io.ktor.sessions.sessions
-import io.ktor.sessions.set
+import com.github.pambrose.slides.SlideContent
+import io.ktor.application.*
+import io.ktor.auth.*
+import io.ktor.http.*
+import io.ktor.response.*
+import io.ktor.routing.*
+import io.ktor.sessions.*
 import io.kvision.remote.applyRoutes
 import mu.KLogging
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -53,6 +46,11 @@ object Routes : KLogging() {
           }
 
         call.respond(result)
+      }
+
+      get("/reset") {
+        masterSlides = SlideContent.loadSlides()
+        call.respondRedirect("/")
       }
 
       get(LOGOUT) {

@@ -2,7 +2,10 @@ package com.github.pambrose.slides
 
 import com.github.pambrose.Content
 import com.github.pambrose.ScriptPools.kotlinScriptPool
+import com.github.pambrose.common.script.KotlinScript
+import com.github.pambrose.common.util.FileSystemSource
 import com.github.pambrose.dbms.UsersTable
+import kotlinx.coroutines.runBlocking
 import mu.KLogging
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -28,7 +31,7 @@ class SlideContent {
         }
     }
 
-  fun verifySlides() {
+  fun validate() {
     allSlides.forEach { (title, slide) ->
       slide.choices.forEach { (_, dest) ->
         val destSlide = allSlides[dest] ?: error("Missing slide with title: $dest")
@@ -67,6 +70,14 @@ class SlideContent {
       } catch (e: Throwable) {
         logger.info { "Error in $sourceName:\n$code" }
         throw e
+      }
+
+    fun loadSlides() =
+      runBlocking {
+        val fs = FileSystemSource("./").file("../src/backendMain/kotlin/Slides.kt")
+        val code = "${fs.content}\n\nslides"
+        //println(code)
+        KotlinScript().use { it.eval(code) as SlideContent }.apply { validate() }
       }
   }
 }

@@ -2,7 +2,9 @@ import com.github.pambrose.slides.slideContent
 
 val slides =
   slideContent {
-    println("Evaluating slides")
+
+    println("Reading slides")
+
     slide("Season to Leave") {
       content =
         """
@@ -17,6 +19,8 @@ val slides =
             When will you choose to leave?
         """
 
+      verticalChoices()
+
       choice("Spring", "Spring Choice")
       choice("Summer", "Summer Choice")
       choice("Fall", "Fall Choice")
@@ -30,7 +34,7 @@ val slides =
         Here are the choices of clothing:
       """
 
-      horizontal()
+      horizontalChoices()
 
       choice("Clothing Choice 1", "Warm Jacket1")
       choice("Clothing Choice 2", "Warm Jacket2")

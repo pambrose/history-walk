@@ -18,11 +18,11 @@ class Slide(val title: String, private val slideContent: SlideContent) {
     slideContent.allSlides[title] = this
   }
 
-  fun vertical() {
+  fun verticalChoices() {
     choiceOrientation = ChoiceOrientation.VERTICAL
   }
 
-  fun horizontal() {
+  fun horizontalChoices() {
     choiceOrientation = ChoiceOrientation.HORIZONTAL
   }
 
