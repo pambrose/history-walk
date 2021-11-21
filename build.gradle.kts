@@ -8,6 +8,8 @@ plugins {
   val configVersion: String by System.getProperties()
   val flywayVersion: String by System.getProperties()
 
+  `maven-publish`
+
   kotlin("multiplatform") version kotlinVersion
   kotlin("plugin.serialization") version kotlinVersion
   // This is required by BuildConfig
@@ -248,6 +250,18 @@ afterEvaluate {
         configurations["backendRuntimeClasspath"] + project.tasks["compileKotlinBackend"].outputs.files +
             project.tasks["backendProcessResources"].outputs.files
       workingDir = buildDir
+    }
+  }
+}
+
+publishing {
+  publications {
+    create<MavenPublication>("maven") {
+      groupId = "com.github.pambrose"
+      artifactId = "library"
+      version = "1.0.0"
+
+      from(components["java"])
     }
   }
 }
