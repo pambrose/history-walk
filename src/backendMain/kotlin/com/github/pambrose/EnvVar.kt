@@ -5,12 +5,13 @@ import com.github.pambrose.common.util.obfuscate
 
 enum class EnvVar(val maskFunc: EnvVar.() -> String = { getEnv(UNASSIGNED) }) {
 
+  SLIDES_LOCAL_FILENAME,
   SLIDES_REPO_TYPE,
   SLIDES_REPO_OWNER,
   SLIDES_REPO_NAME,
-  SLIDES_BRANCH,
-  SLIDES_PATH,
-  SLIDES_FILENAME,
+  SLIDES_REPO_BRANCH,
+  SLIDES_REPO_PATH,
+  SLIDES_REPO_FILENAME,
   DBMS_DRIVER_CLASSNAME,
   DBMS_DRIVER_VARIABLE_NAME,
   DBMS_URL({ getEnvOrNull()?.obfuscate(4) ?: UNASSIGNED }),

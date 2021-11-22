@@ -183,7 +183,7 @@ class User {
           .map { it[UsersTable.lastTitle] }
           .firstOrNull() ?: error("Missing uuid: $uuid"))
           .let { title ->
-            (if (title == Content.ROOT)
+            (if (title == ROOT)
               slideContent.rootSlide
             else
               slideContent.allSlides[title]) ?: error("Invalid title: $title")

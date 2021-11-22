@@ -48,7 +48,7 @@ private fun Container.displaySlide(slide: SlideData) {
         paddingBottom = 10.px
 
         +"Decision count: ${slide.decisionCount}"
-        button("Logout", "fas fa-sign-out-alt", style = ButtonStyle.LINK) {
+        button("Logout", "fas fa-sign-out-alt", style = LINK) {
           lowercase()
           onClick {
             document.location?.href = "/$LOGOUT"
@@ -104,7 +104,7 @@ private fun Container.displaySlide(slide: SlideData) {
 
     if (slide.success) {
       flexPanel(FlexDirection.ROW, FlexWrap.WRAP, JustifyContent.FLEXEND, AlignItems.CENTER, spacing = 5) {
-        button("Go Home", "fas fa-arrow-alt-circle-up", style = ButtonStyle.LINK) {
+        button("Go Home", "fas fa-arrow-alt-circle-up", style = LINK) {
           lowercase()
           onClick {
             AppScope.launch {
