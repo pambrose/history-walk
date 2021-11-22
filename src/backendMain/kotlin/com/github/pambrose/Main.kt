@@ -49,10 +49,10 @@ fun loadSlides(): SlideContent {
                 GitHubRepo(
                   if (repoType.equals("User", ignoreCase = true)) OwnerType.User else OwnerType.Organization,
                   EnvVar.SLIDES_REPO_OWNER.getEnv("pambrose"),
-                  EnvVar.SLIDES_REPO_NAME.getEnv("history-walk")
+                  EnvVar.SLIDES_REPO_NAME.getEnv("history-walk-content")
                 ),
                 branchName = EnvVar.SLIDES_REPO_BRANCH.getEnv("master"),
-                srcPath = EnvVar.SLIDES_REPO_PATH.getEnv("src/backendMain/kotlin"),
+                srcPath = EnvVar.SLIDES_REPO_PATH.getEnv("src/main/kotlin"),
                 fileName = EnvVar.SLIDES_REPO_FILENAME.getEnv("Slides.kt")
               )
               logger.info { "Loading slides from GitHub: $gh" }

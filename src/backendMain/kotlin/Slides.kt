@@ -64,8 +64,7 @@ val slides =
       choice("Blue Jacket", "Blue Jacket")
     }
 
-    slide("Red Jacket") {
-      success = true
+    slide("Red Jacket", true) {
       content = """
         ## Success!
         Summer Slide

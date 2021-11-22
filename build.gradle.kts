@@ -55,6 +55,7 @@ val pgjdbcVersion: String by project
 val pgsqlVersion: String by project
 val jdbcNamedParametersVersion: String by project
 val ktorVersion: String by project
+val slidesVersion: String by project
 val utilsVersion: String by project
 
 val webDir = file("src/frontendMain/web")
@@ -126,6 +127,7 @@ kotlin {
         implementation("io.ktor:ktor-auth:$ktorVersion")
         implementation("io.ktor:ktor-metrics:$ktorVersion")
         implementation("com.github.pambrose.common-utils:ktor-server-utils:$utilsVersion")
+        implementation("com.github.pambrose:history-walk-slides:$slidesVersion")
 
         implementation("org.postgresql:postgresql:$pgsqlVersion")
         implementation("com.impossibl.pgjdbc-ng:pgjdbc-ng-all:$pgjdbcVersion")
