@@ -34,7 +34,7 @@ actual class ContentService : IContentService {
   override suspend fun getCurrentSlide(): SlideData {
     logger.debug { "userId=${call.userId}" }
     val uuid = call.userId.uuid
-    val slide = findSlide(uuid, masterSlides.get())
+    val slide = findSlide(uuid, HistoryWalkServer.masterSlides.get())
     return slideData(uuid, slide)
   }
 
@@ -76,7 +76,7 @@ actual class ContentService : IContentService {
 
       updateLastTitle(uuid, title)
 
-      val slide = findSlide(uuid, masterSlides.get())
+      val slide = findSlide(uuid, HistoryWalkServer.masterSlides.get())
       slideData(uuid, slide)
     }
 
@@ -84,7 +84,7 @@ actual class ContentService : IContentService {
     transaction {
       val uuid = call.userId.uuid
       updateLastTitle(uuid, title)
-      val slide = findSlide(uuid, masterSlides.get())
+      val slide = findSlide(uuid, HistoryWalkServer.masterSlides.get())
       slideData(uuid, slide)
     }
 
