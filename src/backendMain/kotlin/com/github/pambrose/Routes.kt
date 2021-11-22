@@ -51,7 +51,7 @@ object Routes : KLogging() {
 
       get("/reset") {
         try {
-          masterSlides.set(loadSlides())
+          HistoryWalkServer.masterSlides.set(loadSlides())
           call.respondRedirect("/")
         } catch (e: Exception) {
           logger.error("Error resetting slides", e)

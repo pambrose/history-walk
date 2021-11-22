@@ -5,8 +5,9 @@ import com.github.pambrose.Cookies.assignCookies
 import com.github.pambrose.Property.Companion.assignProperties
 import com.github.pambrose.Routes.assignRoutes
 import com.github.pambrose.common.script.KotlinScript
-import com.github.pambrose.common.util.FileSystemSource
-import com.github.pambrose.common.util.UrlSource
+import com.github.pambrose.common.util.GitHubFile
+import com.github.pambrose.common.util.GitHubRepo
+import com.github.pambrose.common.util.OwnerType
 import com.github.pambrose.common.util.Version.Companion.versionDesc
 import com.github.pambrose.common.util.getBanner
 import com.github.pambrose.slides.SlideContent
@@ -25,18 +26,38 @@ import java.util.concurrent.atomic.AtomicReference
 
 //@Version(version = BuildConfig.CORE_VERSION, date = BuildConfig.CORE_RELEASE_DATE)
 object HistoryWalkServer : KLogging() {
-
+  var masterSlides = AtomicReference(SlideContent())
 }
 
-fun loadSlides() =
-  runBlocking {
-    val remote = UrlSource("https://raw.githubusercontent.com/pambrose/slides/master/slides.json")
-    val fs = FileSystemSource("./").file("../src/backendMain/kotlin/Slides.kt")
-    val code = "${fs.content}\n\nslides"
-    KotlinScript().use { it.eval(code) as SlideContent }.apply { validate() }
-  }
+fun loadSlides(): SlideContent {
+  val logger = KotlinLogging.logger {}
+  try {
+    return runBlocking {
 
-var masterSlides = AtomicReference(SlideContent())
+      val repoType = EnvVar.SLIDES_REPO_TYPE.getEnv("User")
+      val gh = GitHubFile(
+        GitHubRepo(
+          if (repoType.equals("User", ignoreCase = true)) OwnerType.User else OwnerType.Organization,
+          EnvVar.SLIDES_REPO_OWNER.getEnv("pambrose"),
+          EnvVar.SLIDES_REPO_NAME.getEnv("history-walk")
+        ),
+        branchName = EnvVar.SLIDES_BRANCH.getEnv("master"),
+        srcPath = EnvVar.SLIDES_PATH.getEnv("src/backendMain/kotlin"),
+        fileName = EnvVar.SLIDES_FILENAME.getEnv("Slides.kt")
+      )
+
+//    val fs = FileSystemSource("./").file("../src/backendMain/kotlin/$fileName")
+
+      val varName = EnvVar.DBMS_DRIVER_VARIABLE_NAME.getEnv("slides")
+      val code = "${gh.content}\n\n$varName"
+
+      KotlinScript().use { it.eval(code) as SlideContent }.apply { validate() }
+    }
+  } catch (e: Throwable) {
+    logger.error(e) { "Failed to load slides" }
+    throw e
+  }
+}
 
 fun Application.main() {
   val logger = KotlinLogging.logger {}
@@ -50,7 +71,7 @@ fun Application.main() {
 
   assignProperties()
 
-  masterSlides.set(loadSlides())
+  HistoryWalkServer.masterSlides.set(loadSlides())
 
   install(Compression)
   install(DefaultHeaders)
