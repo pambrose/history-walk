@@ -2,6 +2,8 @@ package com.github.pambrose
 
 import com.github.pambrose.ClientUtils.lowercase
 import com.github.pambrose.ClientUtils.verticalPadding
+import com.github.pambrose.ElementType.IMAGE
+import com.github.pambrose.ElementType.TEXT
 import com.github.pambrose.EndPoints.LOGOUT
 import com.github.pambrose.MainPanel.buttonPadding
 import com.github.pambrose.MainPanel.refresh
@@ -24,10 +26,10 @@ object MainPanel : SimplePanel() {
     add(panel)
   }
 
-  fun refresh(slide: SlideData) = panel.displaySlide(slide)
+  fun refresh(slide: SlideDeckData) = panel.displaySlide(slide)
 }
 
-private fun Container.displaySlide(slide: SlideData) {
+private fun Container.displaySlide(slide: SlideDeckData) {
 
   removeAll()
 
@@ -98,8 +100,18 @@ private fun Container.displaySlide(slide: SlideData) {
 
       border = Border(2.px, BorderStyle.SOLID, Color.name(Col.GRAY))
       padding = 25.px
-      add(P(slide.contents, true) {
-      })
+
+      slide.elements.forEach { element ->
+        when (element.elementType) {
+          TEXT ->
+            add(P(element.content, true))
+          IMAGE ->
+            add(image(element.content) {
+              width = element.width.px
+              height = element.height.px
+            })
+        }
+      }
     }
 
     if (slide.success) {
@@ -113,7 +125,8 @@ private fun Container.displaySlide(slide: SlideData) {
           }
         }
       }
-    } else {
+    }
+    else {
       simplePanel {
         marginTop = 10.px
         val spacing = 4
@@ -141,7 +154,8 @@ private fun Container.displaySlide(slide: SlideData) {
                       Rpc.goBackInTime(parentTitle).also { refresh(it) }
                     }
                 }
-              } else {
+              }
+              else {
                 val dialog =
                   Dialog<String>("Go back to...") {
                     vPanel(spacing = 4) {
@@ -170,7 +184,7 @@ private fun Container.displaySlide(slide: SlideData) {
   }
 }
 
-private fun Container.addChoiceButtons(currentSlide: SlideData) {
+private fun Container.addChoiceButtons(currentSlide: SlideDeckData) {
   currentSlide.choices.forEach { ct ->
     button(ct.abbrev, icon = "fas fa-angle-double-right", style = PRIMARY) {
       lowercase()

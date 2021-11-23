@@ -6,7 +6,7 @@ import com.github.pambrose.Email.Companion.UNKNOWN_EMAIL
 import com.github.pambrose.FullName.Companion.EMPTY_FULLNAME
 import com.github.pambrose.common.util.*
 import com.github.pambrose.dbms.UsersTable
-import com.github.pambrose.slides.SlideContent
+import com.github.pambrose.slides.SlideDeck
 import com.pambrose.common.exposed.get
 import io.ktor.http.*
 import mu.KLogging
@@ -175,7 +175,7 @@ class User {
           .also { logger.info { "queryUserByUuid() returned: ${it?.email ?: " $uuid not found"}" } }
       }
 
-    fun findSlide(uuid: String, slideContent: SlideContent) =
+    fun findSlide(uuid: String, slideDeck: SlideDeck) =
       transaction {
         (UsersTable
           .slice(UsersTable.lastTitle)
@@ -184,9 +184,9 @@ class User {
           .firstOrNull() ?: error("Missing uuid: $uuid"))
           .let { title ->
             (if (title == ROOT)
-              slideContent.rootSlide
+              slideDeck.rootSlide
             else
-              slideContent.allSlides[title]) ?: error("Invalid title: $title")
+              slideDeck.allSlides[title]) ?: error("Invalid title: $title")
           }
       }
   }

@@ -20,9 +20,20 @@ data class UserId(
 )
 
 @Serializable
-data class SlideData(
+enum class ElementType { TEXT, IMAGE }
+
+@Serializable
+data class ElementData(
+  val elementType: ElementType,
+  val content: String,
+  val width: Int = 0,
+  val height: Int = 0
+)
+
+@Serializable
+data class SlideDeckData(
   val title: String,
-  val contents: String,
+  val elements: List<ElementData>,
   val success: Boolean,
   val choices: List<ChoiceTitle>,
   val verticalChoices: Boolean,

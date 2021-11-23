@@ -1,12 +1,12 @@
-import com.github.pambrose.slides.SlideContent.Companion.slideContent
+import com.github.pambrose.slides.SlideDeck.Companion.slideDeck
 
 val slides =
-  slideContent {
+  slideDeck {
 
     println("Reading slides")
 
     slide("Season to Leave") {
-      content =
+      addText(
         """
             <h1>Welcome to this lesson</h1>
             ## I am a header 
@@ -16,70 +16,98 @@ val slides =
             * Item 1 with *italics*
             * Item 2 with **bold**
             
-            When will you choose to leave?
+            When will you choose to leave?  
         """
+      )
+
+      addImage(
+        "https://www.nps.gov/articles/000/images/Runaway-Slave-Advertisement-1_Columbus-Democrat-Columbus-MS-_18-August-1838_2.jpg",
+        300,
+        300
+      )
+
+      addText(
+        """
+        <br>
+        This is more text
+        <br>
+        """
+      )
+
+      addImage(
+        "https://www.nps.gov/articles/000/images/Runaway-Slave-Advertisement-1_Columbus-Democrat-Columbus-MS-_18-August-1838_2.jpg",
+        400,
+        400
+      )
+
 
       verticalChoices()
 
-      choice("Spring", "Spring Choice")
-      choice("Summer", "Summer Choice")
-      choice("Fall", "Fall Choice")
-      choice("Winter", "Winter Choice")
+      addChoice("Spring", "Spring Choice")
+      addChoice("Summer", "Summer Choice")
+      addChoice("Fall", "Fall Choice")
+      addChoice("Winter", "Winter Choice")
     }
 
     slide("Spring Choice") {
-      content = """
+      addText(
+        """
         # This is the spring choice slide
         
         Here are the choices of clothing:
       """
+      )
 
       horizontalChoices()
 
-      choice("Clothing Choice 1", "Warm Jacket1")
-      choice("Clothing Choice 2", "Warm Jacket2")
-      choice("Clothing Choice 3", "Warm Jacket3")
+      addChoice("Clothing Choice 1", "Warm Jacket1")
+      addChoice("Clothing Choice 2", "Warm Jacket2")
+      addChoice("Clothing Choice 3", "Warm Jacket3")
     }
 
     slide("Summer Choice") {
-      content = """
+      addText(
+        """
         ## Summer Slide
         * this is more
         * this is also more
         """
+      )
     }
 
     slide("Fall Choice") {
-      content = "Fall Slide"
+      addText("Fall Slide")
     }
 
     slide("Winter Choice") {
-      content = "Winter Slide"
+      addText("Winter Slide")
     }
 
     slide("Warm Jacket1") {
-      content = "Description for Warm Jacket1"
+      addText("Description for Warm Jacket1")
 
-      choice("Red Jacket", "Red Jacket")
-      choice("Blue Jacket", "Blue Jacket")
+      addChoice("Red Jacket", "Red Jacket")
+      addChoice("Blue Jacket", "Blue Jacket")
     }
 
     slide("Red Jacket", true) {
-      content = """
+      addText(
+        """
         ## Success!
         Summer Slide
         """
+      )
     }
 
     slide("Blue Jacket") {
-      content = "Description for Blue Jacket"
+      addText("Description for Blue Jacket")
     }
 
     slide("Warm Jacket2") {
-      content = "Description for Warm Jacket2"
+      addText("Description for Warm Jacket2")
     }
 
     slide("Warm Jacket3") {
-      content = "Description for Warm Jacket3"
+      addText("Description for Warm Jacket3")
     }
   }

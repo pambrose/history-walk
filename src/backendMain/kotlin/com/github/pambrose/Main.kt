@@ -10,7 +10,7 @@ import com.github.pambrose.common.util.GitHubRepo
 import com.github.pambrose.common.util.OwnerType
 import com.github.pambrose.common.util.Version.Companion.versionDesc
 import com.github.pambrose.common.util.getBanner
-import com.github.pambrose.slides.SlideContent
+import com.github.pambrose.slides.SlideDeck
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.features.*
@@ -27,10 +27,10 @@ import java.util.concurrent.atomic.AtomicReference
 
 //@Version(version = BuildConfig.CORE_VERSION, date = BuildConfig.CORE_RELEASE_DATE)
 object HistoryWalkServer : KLogging() {
-  var masterSlides = AtomicReference(SlideContent())
+  var masterSlides = AtomicReference(SlideDeck())
 }
 
-fun loadSlides(): SlideContent {
+fun loadSlides(): SlideDeck {
   val logger = KotlinLogging.logger {}
   try {
     return runBlocking {
@@ -63,7 +63,7 @@ fun loadSlides(): SlideContent {
       val varName = EnvVar.DBMS_DRIVER_VARIABLE_NAME.getEnv("slides")
       val code = "$src\n\n$varName"
 
-      KotlinScript().use { it.eval(code) as SlideContent }.apply { validate() }
+      KotlinScript().use { it.eval(code) as SlideDeck }.apply { validate() }
     }
   } catch (e: Throwable) {
     logger.error(e) { "Failed to load slides" }
@@ -75,7 +75,7 @@ fun Application.main() {
   val logger = KotlinLogging.logger {}
 
   logger.apply {
-    info { getBanner("banners/historywalk.txt", this) }
+    info { getBanner("banners/history-walk.txt", this) }
     info { HistoryWalkServer::class.versionDesc() }
 //    callerVersion = callerVersion(args)
 //    info { "Caller Version: $callerVersion" }

@@ -3,7 +3,9 @@ package com.github.pambrose
 import com.github.pambrose.User.Companion.findSlide
 import com.github.pambrose.dbms.UserChoiceTable
 import com.github.pambrose.dbms.UsersTable
+import com.github.pambrose.slides.ImageElement
 import com.github.pambrose.slides.Slide
+import com.github.pambrose.slides.TextElement
 import com.google.inject.Inject
 import com.pambrose.common.exposed.get
 import io.ktor.application.*
@@ -31,7 +33,7 @@ actual class ContentService : IContentService {
   @Inject
   lateinit var call: ApplicationCall
 
-  override suspend fun getCurrentSlide(): SlideData {
+  override suspend fun getCurrentSlide(): SlideDeckData {
     logger.debug { "userId=${call.userId}" }
     val uuid = call.userId.uuid
     val slide = findSlide(uuid, HistoryWalkServer.masterSlides.get())
@@ -119,9 +121,16 @@ actual class ContentService : IContentService {
         .replace(gtEscape, ">")
     }
 
-    private fun slideData(uuid: String, slide: Slide): SlideData {
+    private fun slideData(uuid: String, slide: Slide): SlideDeckData {
 
-      val content = slide.content.transformText()
+      val content = mutableListOf<ElementData>()
+
+      slide.content.forEach { element ->
+        when (element) {
+          is TextElement -> content += ElementData(ElementType.TEXT, element.text.transformText())
+          is ImageElement -> content += ElementData(ElementType.IMAGE, element.src, element.width, element.height)
+        }
+      }
 
       val choices = slide.choices.map { (choice, destination) -> ChoiceTitle(choice, destination) }
 
@@ -138,7 +147,7 @@ actual class ContentService : IContentService {
 
       val count = slideCount(uuid)
 
-      return SlideData(slide.title, content, slide.success, choices, slide.verticalChoices, parentTitles, count)
+      return SlideDeckData(slide.title, content, slide.success, choices, slide.verticalChoices, parentTitles, count)
     }
 
     private fun slideCount(uuid: String) =
