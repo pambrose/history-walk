@@ -14,6 +14,7 @@ import com.github.pambrose.slides.SlideDeck
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.features.*
+import io.ktor.http.content.*
 import io.ktor.routing.*
 import io.ktor.sessions.*
 import io.ktor.util.pipeline.*
@@ -103,6 +104,11 @@ fun Application.main() {
 
   routing {
     assignRoutes()
+
+    // Allow for static content to be served from the /static/ directory
+    static("static") {
+      resources("static")
+    }
   }
 
   kvisionInit()

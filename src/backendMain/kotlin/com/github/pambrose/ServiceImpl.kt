@@ -93,6 +93,8 @@ actual class ContentService : IContentService {
   companion object : KLogging() {
     private const val ltEscape = "---LT---"
     private const val gtEscape = "---GT---"
+    private const val dquoteEscape = "---DQ---"
+    private const val squoteEscape = "---SQ---"
 
     fun updateLastTitle(uuid: String, title: String) {
       UsersTable
@@ -115,10 +117,17 @@ actual class ContentService : IContentService {
       val escaped = this
         .replace("<", ltEscape)
         .replace(">", gtEscape)
+        .replace("\"", dquoteEscape)
+        .replace("\"", squoteEscape)
 
       return MarkdownParser.toHtml(escaped)
         .replace(ltEscape, "<")
         .replace(gtEscape, ">")
+        .replace(dquoteEscape, "'")
+        .replace(squoteEscape, "\"")
+        .also {
+          println("Post conversion:\n$it")
+        }
     }
 
     private fun slideData(uuid: String, slide: Slide): SlideDeckData {
@@ -127,7 +136,7 @@ actual class ContentService : IContentService {
 
       slide.content.forEach { element ->
         when (element) {
-          is TextElement -> content += ElementData(ElementType.TEXT, element.text.transformText())
+          is TextElement -> content += ElementData(ElementType.TEXT, element.text.trimIndent().transformText())
           is ImageElement -> content += ElementData(ElementType.IMAGE, element.src, element.width, element.height)
         }
       }

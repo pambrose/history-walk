@@ -8,16 +8,18 @@ val slides =
     slide("Season to Leave") {
       addText(
         """
-            <h1>Welcome to this lesson</h1>
-            ## I am a header 
-            ### I am a smaller header 
-            
-            Here are some bullet points:
-            * Item 1 with *italics*
-            * Item 2 with **bold**
-            
-            When will you choose to leave?  
-        """
+      <h1>Welcome to this lesson</h1>
+      ## I am a header 
+      ### I am a smaller header 
+      
+      Here are some bullet points:
+      * Item 1 with *italics*
+      * Item 2 with **bold**
+      
+      When will you choose to leave?  
+   
+      <img src="https://www.nps.gov/articles/000/images/Runaway-Slave-Advertisement-1_Columbus-Democrat-Columbus-MS-_18-August-1838_2.jpg" alt="Pic" width="300" height="400" style="border:5px solid black"/>
+    """
       )
 
       addImage(
