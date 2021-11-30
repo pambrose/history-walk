@@ -1,5 +1,14 @@
 import com.github.pambrose.slides.SlideDeck.Companion.slideDeck
 
+val titlePage = """ 
+    ## UGRR Scenario
+    
+    Jarm Logue, later known as Reverend Jermain W. Longuen
+    
+    *Ted Webb* <br>
+    *Sven Miller*
+  """
+
 val majorDecision = """
       ## Major Decision
       
@@ -127,54 +136,110 @@ val paddyRollers = """
       THE END.
       """
 
+val winterDepartureAlone = """
+      ## Winter Departure Alone
+      
+      Will you try to steal an overcoat in order to survive the elements as you hopefully head… North?
+      """
+
+val stealOvercoat = """
+      ## Steal Overcoat
+      
+      That evening, you creep into the main household, enter the coat room, and grab 
+      your master’s finest winter coat.
+      
+	    Striding outside, toasty warm and with a sense of accomplishment, you begin your journey.
+
+      You decide to go…
+"""
+
 // <img src="https://www.nps.gov/articles/000/images/Runaway-Slave-Advertisement-1_Columbus-Democrat-Columbus-MS-_18-August-1838_2.jpg" alt="Pic" width="300" height="400" style="border:5px solid black"/>
 
 val slides =
   slideDeck {
 
-    slide("Major Decision", majorDecision) {
+    slide("UGRR Scenario", titlePage) {
       choice(
-        "Yes, tell your two best friends",
-        slide("Companion Decision", companionDecision) {
-          choice("Yes, take your chances and go meet with Ross then meet with Ben",
-            slide("Meet With Ross and Ben", rossEncounter) {
-              choice(
-                "Yes",
-                slide("Ross Advice")
-              )
-              choice(
-                "No",
-                slide("Old Ben Via Ross")
-              )
-            }
-          )
-
+        "Continue",
+        slide("Major Decision", majorDecision) {
           choice(
-            "Yes, take your chances, but skip talking to Ben and just go to meet with Ross",
-            slide("Meet With Just Ross", rossEncounter) {
-            }
-          )
-
-          choice(
-            "No, skip Ross and just go to Old Ben",
-            slide("Go To Old Ben", oldBenWhenToGo) {
-              choice(
-                "Leave in the summer, when the weather is warmest and you can easily sleep outdoors",
-                slide("Summer Departure", summerDeparture) {
+            "Yes, tell your two best friends",
+            slide("Companion Decision", companionDecision) {
+              choice("Yes, take your chances and go meet with Ross then meet with Ben",
+                slide("Meet With Ross and Ben", rossEncounter) {
                   choice(
-                    "Continue on the main road, with the risk of encountering patrol",
-                    slide("Main Road")
+                    "Yes",
+                    slide("Ross Advice")
                   )
                   choice(
-                    "Go off-track, cross-country, with the risk of getting lost",
-                    slide("Summer Cross-Country", summerCrossCountry) {
+                    "No",
+                    slide("Old Ben Via Ross")
+                  )
+                }
+              )
+
+              choice(
+                "Yes, take your chances, but skip talking to Ben and just go to meet with Ross",
+                slide("Meet With Just Ross", rossEncounter) {
+                }
+              )
+
+              choice(
+                "No, skip Ross and just go to Old Ben",
+                slide("Go To Old Ben", oldBenWhenToGo) {
+                  choice(
+                    "Leave in the summer, when the weather is warmest and you can easily sleep outdoors",
+                    slide("Summer Departure", summerDeparture) {
                       choice(
-                        "Into the deep forest",
-                        slide("Deep Forest", deepForest)
+                        "Continue on the main road, with the risk of encountering patrol",
+                        slide("Main Road")
                       )
                       choice(
-                        "Back to the main road",
-                        slide("Main Road2")
+                        "Go off-track, cross-country, with the risk of getting lost",
+                        slide("Summer Cross-Country", summerCrossCountry) {
+                          choice(
+                            "Into the deep forest",
+                            slide("Deep Forest", deepForest)
+                          )
+                          choice(
+                            "Back to the main road",
+                            slide("Main Road2")
+                          )
+                        }
+                      )
+                    }
+                  )
+
+                  choice(
+                    "Leave in the autumn, hoping to slip away in the business and hub-bub of harvest time",
+                    slide("Autumn Departure", autumDeparture) {
+                      choice(
+                        "Continue",
+                        slide("Paddy Rollers", paddyRollers),
+                      )
+                    }
+                  )
+                  choice(
+                    "Leave in the spring, when love is in the air",
+                    slide("Spring Departure")
+                  )
+                  choice(
+                    "Follow Old Ben’s advice and leave in the winter, right at Christmas, when it is coldest and darkest",
+                    slide("Winter Departure", winterDepartureAlone) {
+                      choice(
+                        "Yes",
+                        slide("Steal an Overcoat", stealOvercoat) {
+                          choice("on the Main Road", slide("Main Road4"))
+                          choice("Cross-Country", slide("Cross-Country2"))
+                        }
+                      )
+                      choice(
+                        "No, go on the main road",
+                        slide("Main Road3")
+                      )
+                      choice(
+                        "No, go cross-country",
+                        slide("Cross-Country")
                       )
                     }
                   )
@@ -182,36 +247,16 @@ val slides =
               )
 
               choice(
-                "Leave in the autumn, hoping to slip away in the business and hub-bub of harvest time",
-                slide("Autumn Departure", autumDeparture) {
-                  choice(
-                    "Continue",
-                    slide("Paddy Rollers", paddyRollers),
-                    advance = true
-                  )
-                }
+                "No, play it safe and seek escape without talking to Ross or Ben",
+                slide("Without Talking To Ross or Ben")
               )
-              choice(
-                "Leave in the spring, when love is in the air",
-                slide("Spring Departure")
-              )
-              choice(
-                "Follow Old Ben’s advice and leave in the winter, right at Christmas, when it is coldest and darkest",
-                slide("Winter Departure")
-              )
-
-            }
-          )
+            })
 
           choice(
-            "No, play it safe and seek escape without talking to Ross or Ben",
-            slide("Without Talking To Ross or Ben")
+            "No, do not tell your two best friends",
+            slide("Do Not Tell Best Friends", success = true)
           )
-        })
-
-      choice(
-        "No, do not tell your two best friends",
-        slide("Do Not Tell Best Friends", success = true)
+        },
       )
     }
   }

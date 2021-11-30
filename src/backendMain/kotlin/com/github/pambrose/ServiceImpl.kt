@@ -40,10 +40,6 @@ actual class ContentService : IContentService {
 
   override suspend fun makeChoice(fromTitle: String, abbrev: String, toTitle: String, advance: Boolean): UserChoice =
     transaction {
-//      if (advance)
-//        runBlocking {
-//          provideReason(fromTitle, abbrev, toTitle, "Advance")
-//        }
       // See if user has an entry for that transition
       val uuid = call.userId.uuid
       (UserChoiceTable
@@ -152,7 +148,7 @@ actual class ContentService : IContentService {
 
       val choices =
         slide.choices.map { (choice, destination) ->
-          SlideChoice(choice, destination.first, destination.second)
+          SlideChoice(choice, destination)
         }
 
       val parentTitles =

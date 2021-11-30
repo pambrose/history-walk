@@ -199,7 +199,7 @@ private fun Container.addChoiceButtons(slide: SlideData) {
       lowercase()
       onClick {
         AppScope.launch {
-          val choiceReason = Rpc.makeChoice(slide.title, ct.abbrev, ct.title, ct.advance)
+          val choiceReason = Rpc.makeChoice(slide.title, ct.abbrev, ct.title, slide.choices.size == 1)
           if (choiceReason.reason.isEmpty())
             promptForReason(slide.title, ct)
           else {

@@ -52,7 +52,7 @@ data class SlideData(
 }
 
 @Serializable
-data class SlideChoice(val abbrev: String, val title: String, val advance: Boolean)
+data class SlideChoice(val abbrev: String, val title: String)
 
 @Serializable
 data class UserChoice(
