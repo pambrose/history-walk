@@ -134,7 +134,13 @@ actual class ContentService : IContentService {
 
       slide.content.forEach { element ->
         when (element) {
-          is TextElement -> content += ElementData(ElementType.TEXT, element.text.trimIndent().transformText())
+          is TextElement -> {
+            val stripped = element.text
+              .splitToSequence("\n")
+              .map { line -> line.trimStart() }
+              .joinToString("\n")
+            content += ElementData(ElementType.TEXT, stripped.transformText())
+          }
           is ImageElement -> content += ElementData(ElementType.IMAGE, element.src, element.width, element.height)
         }
       }
