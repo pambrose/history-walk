@@ -15,14 +15,14 @@ object Rpc {
       false
     }
 
-  suspend fun refreshPanel() =
+  suspend fun getCurrentSlide() =
     withAuth {
       contentService.getCurrentSlide()
     }
 
-  suspend fun makeChoice(fromTitle: String, abbrev: String, title: String) =
+  suspend fun makeChoice(fromTitle: String, abbrev: String, toTitle: String, advance: Boolean) =
     withAuth {
-      contentService.makeChoice(fromTitle, abbrev, title)
+      contentService.makeChoice(fromTitle, abbrev, toTitle, advance)
     }
 
   suspend fun provideReason(fromTitle: String, abbrev: String, title: String, reason: String) =

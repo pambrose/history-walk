@@ -35,7 +35,7 @@ data class SlideData(
   val title: String,
   val elements: List<ElementData>,
   val success: Boolean,
-  val choices: List<ChoiceTitle>,
+  val choices: List<SlideChoice>,
   val verticalChoices: Boolean,
   val parentTitles: List<String>,
   val decisionCount: Long,
@@ -52,12 +52,12 @@ data class SlideData(
 }
 
 @Serializable
-data class ChoiceTitle(val abbrev: String, val title: String)
+data class SlideChoice(val abbrev: String, val title: String, val advance: Boolean)
 
 @Serializable
 data class UserChoice(
   val fromTitle: String,
   val abbrev: String,
-  val title: String,
+  val toTitle: String,
   val reason: String,
 )

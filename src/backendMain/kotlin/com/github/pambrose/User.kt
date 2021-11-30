@@ -174,7 +174,7 @@ class User {
           .also { logger.info { "queryUserByUuid() returned: ${it?.email ?: " $uuid not found"}" } }
       }
 
-    fun findSlide(uuid: String, slideDeck: SlideDeck) =
+    fun findSlideForUser(uuid: String, slideDeck: SlideDeck) =
       transaction {
         (UsersTable
           .slice(UsersTable.lastTitle)

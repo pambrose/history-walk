@@ -193,17 +193,17 @@ private fun Container.displaySlide(slide: SlideData) {
   }
 }
 
-private fun Container.addChoiceButtons(currentSlide: SlideData) {
-  currentSlide.choices.forEach { ct ->
+private fun Container.addChoiceButtons(slide: SlideData) {
+  slide.choices.forEach { ct ->
     button(ct.abbrev, icon = "fas fa-angle-double-right", style = PRIMARY) {
       lowercase()
       onClick {
         AppScope.launch {
-          val choiceReason = Rpc.makeChoice(currentSlide.title, ct.abbrev, ct.title)
+          val choiceReason = Rpc.makeChoice(slide.title, ct.abbrev, ct.title, ct.advance)
           if (choiceReason.reason.isEmpty())
-            promptForReason(currentSlide.title, ct)
+            promptForReason(slide.title, ct)
           else {
-            val newSlide = Rpc.refreshPanel()
+            val newSlide = Rpc.getCurrentSlide()
             refresh(newSlide)
           }
         }
@@ -214,7 +214,7 @@ private fun Container.addChoiceButtons(currentSlide: SlideData) {
 
 private fun String?.wordCount(): Int = this?.split(" ")?.filter { it.isNotEmpty() }?.size ?: 0
 
-private fun promptForReason(fromTitle: String, ct: ChoiceTitle) {
+private fun promptForReason(fromTitle: String, ct: SlideChoice) {
   val submit = Button("OK", disabled = true).apply {
     lowercase()
     verticalPadding(buttonPadding)
