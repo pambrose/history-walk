@@ -25,9 +25,9 @@ group = "com.github.pambrose"
 
 repositories {
   mavenLocal()
-  maven { url = uri("https://kotlin.bintray.com/ktor") }
-  maven { url = uri("https://kotlin.bintray.com/kotlinx") }
-  maven { url = uri("https://maven-central.storage-download.googleapis.com/repos/central/data/") }
+  //maven { url = uri("https://kotlin.bintray.com/ktor") }
+  //maven { url = uri("https://kotlin.bintray.com/kotlinx") }
+  //maven { url = uri("https://maven-central.storage-download.googleapis.com/repos/central/data/") }
   mavenCentral()
   maven { url = uri("https://jitpack.io") }
 }

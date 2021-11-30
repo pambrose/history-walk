@@ -152,9 +152,9 @@ actual class ContentService : IContentService {
           }
           .reversed()
 
-      val count = slideCount(uuid)
-      val showResetButon = EnvVar.SHOW_RESET_BUTTON.getEnv(false)
       return slide.run {
+        val count = slideCount(uuid)
+        val showResetButon = EnvVar.SHOW_RESET_BUTTON.getEnv(false)
         SlideData(title, content, success, choices, verticalChoices, parentTitles, count, showResetButon)
       }
     }

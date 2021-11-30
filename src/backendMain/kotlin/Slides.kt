@@ -1,35 +1,21 @@
 import com.github.pambrose.slides.SlideDeck.Companion.slideDeck
 
-val slides =
-  slideDeck {
-
-    println("Reading slides")
-
-    slide("Major Decision") {
-      addText(
-        """
+val majorDecision = """
 ## Major Decision
 
 You suffer a horrific and vicious beating, worse than others in 
 the past from your drunken, enraged owner that maims your face 
 (a mangled and broken jaw).  While you once thought of him as 
 family (your uncle) and that you were special, it is clear now 
-that that is not the case.  You conclude that to stay much 
-longer would mean death.  You are determined to escape sometime 
+that that is not the case. You conclude that to stay much 
+longer would mean death. You are determined to escape sometime 
 in the coming months.
 
 Do you tell your intentions to your two best friends, fellow 
 slaves on the neighboring plantation?         
-      """
-      )
-      //       <img src="https://www.nps.gov/articles/000/images/Runaway-Slave-Advertisement-1_Columbus-Democrat-Columbus-MS-_18-August-1838_2.jpg" alt="Pic" width="300" height="400" style="border:5px solid black"/>
-      addChoice("Yes, tell your two best friends", "Companion Decision")
-      addChoice("No, do not tell your two best friends", "Do Not Tell Best Friends")
-    }
+"""
 
-    slide("Companion Decision") {
-      addText(
-        """
+val companionDecision = """
 # Companion Decision
 
 Eager to join you, your friend John Farney asks around and says that 
@@ -42,26 +28,9 @@ very wise.
 
 Will you risk beating, torture, or worse by stealing the items that Ross 
 wants in exchange for what he offers?      
-        """
-      )
+"""
 
-      addChoice("Yes, take your chances and go meet with Ross then meet with Ben", "Meet With Ross and Ben")
-      addChoice("Yes, take your chances, but skip talking to Ben and just go to meet with Ross", "Meet With Just Ross")
-      addChoice("No, skip Ross and just go to Old Ben", "Go To Old Ben")
-      addChoice("No, play it safe and seek escape without talking to Ross or Ben", "Without Talking To Ross or Ben")
-    }
-
-    slide("Do Not Tell Best Friends", true) {
-      addText(
-        """
-## Summer Slide
-* this is more
-* this is also more
-        """
-      )
-    }
-
-    val ross = """
+val rossEncounter = """
 ## Ross Encounter
         
 Having risked severe punishment, you have managed to steal some bacon, 
@@ -79,18 +48,9 @@ have what he wants, and when you nod and hold up a sack with the goods,
 he steps up close and offers a linen bundle in exchange.  
 
 Do you complete the deal?
-        """
-    slide("Meet With Ross and Ben") {
-      addText(ross)
-    }
+"""
 
-    slide("Meet With Just Ross") {
-      addText(ross)
-    }
-
-    slide("Go To Old Ben") {
-      addText(
-        """
+val oldBenWhenToGo = """
 ## Old Ben: When to Go
 
 Old Ben, who has been on the plantation next door some time and is 
@@ -110,73 +70,91 @@ Sounds good, but then again, if he knew so much, why is he still here?
 
 When will you leave?
  """
-      )
-      addChoice(
-        "Leave in the summer, when the weather is warmest and you can easily sleep outdoors",
-        "Summer Departure"
-      )
-      addChoice(
-        "Leave in the autumn, hoping to slip away in the business and hub-bub of harvest time",
-        "Autumn Departure"
-      )
-      addChoice(
-        "Leave in the spring, when love is in the air",
-        "Spring Departure"
-      )
-      addChoice(
-        "Follow Old Ben’s advice and leave in the winter, right at Christmas, when it is coldest and darkest",
-        "Winter Departure"
-      )
 
-    }
+// <img src="https://www.nps.gov/articles/000/images/Runaway-Slave-Advertisement-1_Columbus-Democrat-Columbus-MS-_18-August-1838_2.jpg" alt="Pic" width="300" height="400" style="border:5px solid black"/>
 
-    slide("Without Talking To Ross or Ben") {
-      addText(
-        """
-        ## Summer Slide
-        * this is more
-        * this is also more
-        """
-      )
-    }
+val slides =
+  slideDeck {
 
-    slide("Summer Departure") {
-      addText(
-        """
-        ## Summer Departure
-        * this is more
-        * this is also more
-        """
-      )
-    }
+    slide("Major Decision") {
+      body(majorDecision)
 
-    slide("Autumn Departure") {
-      addText(
-        """
-        ## Autumn Departure
-        * this is more
-        * this is also more
-        """
-      )
-    }
+      choice("Yes, tell your two best friends",
+        slide("Companion Decision") {
+          body(companionDecision)
 
-    slide("Spring Departure") {
-      addText(
-        """
-        ## Spring Departure
-        * this is more
-        * this is also more
-        """
-      )
-    }
+          choice("Yes, take your chances and go meet with Ross then meet with Ben",
+            slide("Meet With Ross and Ben") {
+              body(rossEncounter)
+              choice("Yes",
+                slide("Ross Advice") {
+                  body(""" """)
+                })
+              choice("No",
+                slide("Old Ben Via Ross") {
+                  body(""" """)
+                })
+            }
+          )
 
-    slide("Winter Departure") {
-      addText(
-        """
-        ## Winter Departure
-        * this is more
-        * this is also more
-        """
-      )
+          choice(
+            "Yes, take your chances, but skip talking to Ben and just go to meet with Ross",
+            slide("Meet With Just Ross") {
+              body(rossEncounter)
+            }
+          )
+
+          choice(
+            "No, skip Ross and just go to Old Ben",
+            slide("Go To Old Ben") {
+              body(oldBenWhenToGo)
+
+              choice(
+                "Leave in the summer, when the weather is warmest and you can easily sleep outdoors",
+                slide("Summer Departure") {
+                  body(
+                    """ """
+                  )
+                }
+              )
+
+              choice(
+                "Leave in the autumn, hoping to slip away in the business and hub-bub of harvest time",
+                slide("Autumn Departure") {
+                  body(
+                    """ """
+                  )
+                }
+
+              )
+              choice(
+                "Leave in the spring, when love is in the air",
+                slide("Spring Departure") {
+                  body(""" """)
+                }
+
+              )
+              choice(
+                "Follow Old Ben’s advice and leave in the winter, right at Christmas, when it is coldest and darkest",
+                slide("Winter Departure") {
+                  body(""" """)
+                }
+              )
+
+            }
+          )
+
+          choice(
+            "No, play it safe and seek escape without talking to Ross or Ben",
+            slide("Without Talking To Ross or Ben") {
+              body(""" """)
+            }
+          )
+        })
+
+      choice("No, do not tell your two best friends",
+        slide("Do Not Tell Best Friends", true) {
+          body(""" """)
+        })
     }
   }

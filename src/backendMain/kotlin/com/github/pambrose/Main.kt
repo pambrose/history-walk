@@ -35,7 +35,6 @@ fun loadSlides(): SlideDeck {
   val logger = KotlinLogging.logger {}
   try {
     return runBlocking {
-
       val src =
         EnvVar.SLIDES_LOCAL_FILENAME.getEnv("")
           .let { localFilename ->
