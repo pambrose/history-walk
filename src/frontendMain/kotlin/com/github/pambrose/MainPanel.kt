@@ -5,6 +5,7 @@ import com.github.pambrose.ClientUtils.verticalPadding
 import com.github.pambrose.ElementType.IMAGE
 import com.github.pambrose.ElementType.TEXT
 import com.github.pambrose.EndPoints.LOGOUT
+import com.github.pambrose.EndPoints.RESET
 import com.github.pambrose.MainPanel.buttonPadding
 import com.github.pambrose.MainPanel.refresh
 import io.kvision.core.*
@@ -26,10 +27,10 @@ object MainPanel : SimplePanel() {
     add(panel)
   }
 
-  fun refresh(slide: SlideDeckData) = panel.displaySlide(slide)
+  fun refresh(slide: SlideData) = panel.displaySlide(slide)
 }
 
-private fun Container.displaySlide(slide: SlideDeckData) {
+private fun Container.displaySlide(slide: SlideData) {
 
   removeAll()
 
@@ -56,6 +57,14 @@ private fun Container.displaySlide(slide: SlideDeckData) {
             document.location?.href = "/$LOGOUT"
           }
         }
+
+        if (slide.showResetButton)
+          button("Reset", "fas fa-sync-alt", style = LINK) {
+            lowercase()
+            onClick {
+              document.location?.href = "/$RESET"
+            }
+          }
       }
     }
 
@@ -184,7 +193,7 @@ private fun Container.displaySlide(slide: SlideDeckData) {
   }
 }
 
-private fun Container.addChoiceButtons(currentSlide: SlideDeckData) {
+private fun Container.addChoiceButtons(currentSlide: SlideData) {
   currentSlide.choices.forEach { ct ->
     button(ct.abbrev, icon = "fas fa-angle-double-right", style = PRIMARY) {
       lowercase()

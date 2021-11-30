@@ -10,6 +10,7 @@ There are 3 repos involved in this project:
 
 ## Env Vars
 
+* SLIDES_LOCAL_FILENAME - The name of the local file to be used for the slides.
 * SLIDES_REPO_TYPE
 * SLIDES_REPO_OWNER
 * SLIDES_REPO_NAME

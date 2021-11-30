@@ -5,7 +5,6 @@ import com.github.pambrose.Email.Companion.EMPTY_EMAIL
 import com.github.pambrose.Email.Companion.UNKNOWN_EMAIL
 import com.github.pambrose.FullName.Companion.EMPTY_FULLNAME
 import com.github.pambrose.common.util.*
-import com.github.pambrose.dbms.UsersTable
 import com.github.pambrose.slides.SlideDeck
 import com.pambrose.common.exposed.get
 import io.ktor.http.*

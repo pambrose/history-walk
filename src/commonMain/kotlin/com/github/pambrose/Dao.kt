@@ -31,7 +31,7 @@ data class ElementData(
 )
 
 @Serializable
-data class SlideDeckData(
+data class SlideData(
   val title: String,
   val elements: List<ElementData>,
   val success: Boolean,
@@ -39,6 +39,7 @@ data class SlideDeckData(
   val verticalChoices: Boolean,
   val parentTitles: List<String>,
   val decisionCount: Long,
+  val showResetButton: Boolean,
 ) {
   val failure: Boolean
     get() = !success && choices.isEmpty()

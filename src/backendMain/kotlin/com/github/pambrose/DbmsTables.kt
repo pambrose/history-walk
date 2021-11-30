@@ -1,4 +1,4 @@
-package com.github.pambrose.dbms
+package com.github.pambrose
 
 import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.jodatime.datetime

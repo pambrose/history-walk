@@ -2,7 +2,7 @@ package com.github.pambrose
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import io.ktor.config.ApplicationConfig
+import io.ktor.config.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.sql.Database
@@ -29,7 +29,7 @@ object Db {
         isAutoCommit = false
         transactionIsolation = "TRANSACTION_REPEATABLE_READ"
         maxLifetime =
-          minutes(Property.DBMS_MAX_LIFETIME_MINS.getRequiredProperty().toInt()).inWholeMilliseconds
+          Property.DBMS_MAX_LIFETIME_MINS.getRequiredProperty().toInt().minutes.inWholeMilliseconds
         validate()
       }.let { HikariDataSource(it) }
 

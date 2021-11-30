@@ -11,4 +11,5 @@ object Auth {
 object EndPoints {
   const val LOGIN = "login"
   const val LOGOUT = "logout"
+  const val RESET = "reset"
 }

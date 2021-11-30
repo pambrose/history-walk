@@ -1,8 +1,6 @@
 package com.github.pambrose
 
 import com.github.pambrose.User.Companion.findSlide
-import com.github.pambrose.dbms.UserChoiceTable
-import com.github.pambrose.dbms.UsersTable
 import com.github.pambrose.slides.ImageElement
 import com.github.pambrose.slides.Slide
 import com.github.pambrose.slides.TextElement
@@ -33,7 +31,7 @@ actual class ContentService : IContentService {
   @Inject
   lateinit var call: ApplicationCall
 
-  override suspend fun getCurrentSlide(): SlideDeckData {
+  override suspend fun getCurrentSlide(): SlideData {
     logger.debug { "userId=${call.userId}" }
     val uuid = call.userId.uuid
     val slide = findSlide(uuid, HistoryWalkServer.masterSlides.get())
@@ -130,7 +128,7 @@ actual class ContentService : IContentService {
         }
     }
 
-    private fun slideData(uuid: String, slide: Slide): SlideDeckData {
+    private fun slideData(uuid: String, slide: Slide): SlideData {
 
       val content = mutableListOf<ElementData>()
 
@@ -155,8 +153,10 @@ actual class ContentService : IContentService {
           .reversed()
 
       val count = slideCount(uuid)
-
-      return SlideDeckData(slide.title, content, slide.success, choices, slide.verticalChoices, parentTitles, count)
+      val showResetButon = EnvVar.SHOW_RESET_BUTTON.getEnv(false)
+      return slide.run {
+        SlideData(title, content, success, choices, verticalChoices, parentTitles, count, showResetButon)
+      }
     }
 
     private fun slideCount(uuid: String) =

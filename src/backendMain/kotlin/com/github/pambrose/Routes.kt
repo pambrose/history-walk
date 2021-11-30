@@ -6,6 +6,7 @@ import com.github.pambrose.ContentService.Companion.deleteChoices
 import com.github.pambrose.ContentService.Companion.updateLastTitle
 import com.github.pambrose.EndPoints.LOGIN
 import com.github.pambrose.EndPoints.LOGOUT
+import com.github.pambrose.EndPoints.RESET
 import com.github.pambrose.common.util.Version.Companion.versionDesc
 import com.github.pambrose.common.util.isNotNull
 import io.ktor.application.*
@@ -49,7 +50,7 @@ object Routes : KLogging() {
         call.respond(result)
       }
 
-      get("/reset") {
+      get(RESET) {
         try {
           HistoryWalkServer.masterSlides.set(loadSlides())
           call.respondRedirect("/")
@@ -65,7 +66,7 @@ object Routes : KLogging() {
       }
     }
 
-    get("reset") {
+    get("resetUser") {
       transaction {
         val uuid = call.userId.uuid
         deleteChoices(uuid)
