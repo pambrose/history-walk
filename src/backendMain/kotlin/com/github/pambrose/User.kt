@@ -135,7 +135,7 @@ class User {
                   row[UsersTable.email] = email.value.maxLength(128)
                   row[UsersTable.salt] = salt
                   row[UsersTable.digest] = digest
-                  row[UsersTable.lastfqName] = ROOT
+                  row[UsersTable.lastPathName] = ROOT
                 }.value
           }
           logger.info { "Created user $email ${user.uuid}" }
@@ -177,19 +177,19 @@ class User {
     fun findSlideForUser(uuid: String, slideDeck: SlideDeck) =
       transaction {
         (UsersTable
-          .slice(UsersTable.lastfqName)
+          .slice(UsersTable.lastPathName)
           .select { UsersTable.uuidCol eq UUID.fromString(uuid) }
-          .map { it[UsersTable.lastfqName] }
+          .map { it[UsersTable.lastPathName] }
           .firstOrNull() ?: error("Missing uuid: $uuid"))
-          .let { fqName ->
+          .let { pathName ->
             val slide =
-              if (fqName == ROOT)
+              if (pathName == ROOT)
                 slideDeck.rootSlide
               else
-                slideDeck.findSlide(fqName)
+                slideDeck.findSlide(pathName)
 
             if (slide == null) {
-              logger.error("Invalid slide name: $fqName")
+              logger.error("Invalid slide name: $pathName")
               slideDeck.rootSlide
             }
             else

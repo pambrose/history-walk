@@ -20,14 +20,14 @@ object Rpc {
       contentService.getCurrentSlide()
     }
 
-  suspend fun makeChoice(fromfqName: String, fromTitle: String, slideChoice: SlideChoice, advance: Boolean) =
+  suspend fun makeChoice(fromPathName: String, fromTitle: String, slideChoice: SlideChoice, advance: Boolean) =
     withAuth {
-      contentService.makeChoice(fromfqName, fromTitle, slideChoice, advance)
+      contentService.makeChoice(fromPathName, fromTitle, slideChoice, advance)
     }
 
-  suspend fun provideReason(fromfqName: String, fromTitle: String, slideChoice: SlideChoice, reason: String) =
+  suspend fun provideReason(fromPathName: String, fromTitle: String, slideChoice: SlideChoice, reason: String) =
     withAuth {
-      contentService.provideReason(fromfqName, fromTitle, slideChoice, reason)
+      contentService.provideReason(fromPathName, fromTitle, slideChoice, reason)
     }
 
   suspend fun goBackInTime(parentTitle: ParentTitle) =

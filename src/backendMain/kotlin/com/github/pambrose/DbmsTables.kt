@@ -11,7 +11,7 @@ object UsersTable : LongIdTable("history.users") {
   val fullName = text("full_name")
   val salt = text("salt")
   val digest = text("digest")
-  val lastfqName = text("last_title")
+  val lastPathName = text("last_path_name")
 }
 
 object UserChoiceTable : LongIdTable("history.userchoices") {
@@ -19,9 +19,9 @@ object UserChoiceTable : LongIdTable("history.userchoices") {
   val updated = datetime("updated")
   val uuidCol = uuid("uuid")
   val userUuid = uuid("user_uuid")
-  val fromfqName = text("from_fqname")
+  val fromPathName = text("from_path_name")
   val fromTitle = text("from_title")
-  val tofqName = text("to_fqname")
+  val toPathName = text("to_path_name")
   val toTitle = text("to_title")
   val choiceText = text("choice_text")
   val reason = text("reason")

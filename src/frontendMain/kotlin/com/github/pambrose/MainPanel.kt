@@ -131,9 +131,10 @@ private fun Container.addChoiceButtons(slide: SlideData) {
       lowercase()
       onClick {
         AppScope.launch {
-          val choiceReason = Rpc.makeChoice(slide.fqName, slide.title, slideChoice, slide.choices.size == 1)
-          if (choiceReason.reason.isEmpty())
-            promptForReason(slide.fqName, slide.title, slideChoice)
+          val choiceReason = Rpc.makeChoice(slide.pathName, slide.title, slideChoice, slide.choices.size == 1)
+          if (choiceReason.reason.isEmpty()) {
+            promptUserForReason(slide.pathName, slide.title, slideChoice)
+          }
           else {
             val newSlide = Rpc.getCurrentSlide()
             refresh(newSlide)
@@ -144,9 +145,9 @@ private fun Container.addChoiceButtons(slide: SlideData) {
   }
 }
 
-private fun String?.wordCount(): Int = this?.split(" ")?.filter { it.isNotEmpty() }?.size ?: 0
+private fun String?.wordCount(): Int = this?.split(" ", "\n")?.filter { it.isNotEmpty() }?.size ?: 0
 
-private fun promptForReason(fromfqName: String, fromTitle: String, slideChoice: SlideChoice) {
+private fun promptUserForReason(fromPathName: String, fromTitle: String, slideChoice: SlideChoice) {
   val submit = Button("OK", disabled = true).apply {
     lowercase()
     verticalPadding(buttonPadding)
@@ -156,8 +157,6 @@ private fun promptForReason(fromfqName: String, fromTitle: String, slideChoice: 
     Dialog<String>("Reasoning") {
       val input =
         TextArea(rows = 3, label = """Reason for your "${slideChoice.choiceText}" decision:""") {
-//          marginLeft = 25.px
-//          paddingLeft = 25.px
           placeholder = """ I chose "${slideChoice.choiceText}" because..."""
           autofocus = true
           setEventListener<Text> {
@@ -190,7 +189,7 @@ private fun promptForReason(fromfqName: String, fromTitle: String, slideChoice: 
   AppScope.launch {
     reasonDialog.getResult()?.also { response ->
       if (response.isNotBlank()) {
-        val newSlide = Rpc.provideReason(fromfqName, fromTitle, slideChoice, response)
+        val newSlide = Rpc.provideReason(fromPathName, fromTitle, slideChoice, response)
         refresh(newSlide)
       }
     }

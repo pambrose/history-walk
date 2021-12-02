@@ -21,7 +21,7 @@ data class UserId(
 
 @Serializable
 data class SlideData(
-  val fqName: String,
+  val pathName: String,
   val title: String,
   val content: String,
   val success: Boolean,
@@ -42,14 +42,14 @@ data class SlideData(
 }
 
 @Serializable
-data class ParentTitle(val fqName: String, val title: String)
+data class ParentTitle(val pathName: String, val title: String)
 
 @Serializable
-data class SlideChoice(val choiceText: String, val fqName: String, val title: String)
+data class SlideChoice(val choiceText: String, val pathName: String, val title: String)
 
 @Serializable
 data class UserChoice(
-  val fromfqName: String,
+  val fromPathName: String,
   val fromTitle: String,
   val slideChoice: SlideChoice,
   val reason: String,
