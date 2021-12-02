@@ -17,15 +17,17 @@ CREATE TABLE history.users
 
 CREATE TABLE history.userchoices
 (
-    id         BIGSERIAL UNIQUE PRIMARY KEY,
-    created    TIMESTAMPTZ DEFAULT NOW(),
-    updated    TIMESTAMPTZ DEFAULT NOW(),
-    uuid       UUID NOT NULL UNIQUE,
-    user_uuid  UUID NOT NULL,
-    from_title TEXT NOT NULL,
-    abbrev     TEXT NOT NULL,
-    title      TEXT NOT NULL,
-    reason     TEXT NOT NULL,
+    id          BIGSERIAL UNIQUE PRIMARY KEY,
+    created     TIMESTAMPTZ DEFAULT NOW(),
+    updated     TIMESTAMPTZ DEFAULT NOW(),
+    uuid        UUID NOT NULL UNIQUE,
+    user_uuid   UUID NOT NULL,
+    from_fqname TEXT NOT NULL,
+    from_title  TEXT NOT NULL,
+    to_fqname   TEXT NOT NULL,
+    to_title    TEXT NOT NULL,
+    choice_text TEXT NOT NULL,
+    reason      TEXT NOT NULL,
 
-    CONSTRAINT user_choices_unique unique (user_uuid, from_title, title)
+    CONSTRAINT user_choices_unique unique (user_uuid, from_fqname, to_fqname)
 );

@@ -1,9 +1,7 @@
 package com.github.pambrose
 
 import com.github.pambrose.User.Companion.findSlideForUser
-import com.github.pambrose.slides.ImageElement
 import com.github.pambrose.slides.Slide
-import com.github.pambrose.slides.TextElement
 import com.google.inject.Inject
 import com.pambrose.common.exposed.get
 import io.ktor.application.*
@@ -38,53 +36,64 @@ actual class ContentService : IContentService {
     return slideData(uuid, slide)
   }
 
-  override suspend fun makeChoice(fromTitle: String, abbrev: String, toTitle: String, advance: Boolean): UserChoice =
+  override suspend fun makeChoice(
+    fromfqName: String,
+    fromTitle: String,
+    slideChoice: SlideChoice,
+    advance: Boolean
+  ): UserChoice =
     transaction {
       // See if user has an entry for that transition
       val uuid = call.userId.uuid
       (UserChoiceTable
-        .slice(UserChoiceTable.fromTitle, UserChoiceTable.abbrev, UserChoiceTable.title, UserChoiceTable.reason)
-        .select { (UserChoiceTable.userUuid eq UUID.fromString(uuid)) and (UserChoiceTable.fromTitle eq fromTitle) and (UserChoiceTable.title eq toTitle) }
+        .slice(UserChoiceTable.fromTitle, UserChoiceTable.choiceText, UserChoiceTable.toTitle, UserChoiceTable.reason)
+        .select { (UserChoiceTable.userUuid eq UUID.fromString(uuid)) and (UserChoiceTable.fromfqName eq fromfqName) and (UserChoiceTable.tofqName eq slideChoice.fqName) }
         .map { row ->
           UserChoice(
+            row[UserChoiceTable.fromfqName],
             row[UserChoiceTable.fromTitle],
-            row[UserChoiceTable.abbrev],
-            row[UserChoiceTable.title],
+            SlideChoice(
+              row[UserChoiceTable.choiceText],
+              row[UserChoiceTable.tofqName],
+              row[UserChoiceTable.toTitle]
+            ),
             row[UserChoiceTable.reason],
           )
         }
-        .firstOrNull() ?: UserChoice(fromTitle, abbrev, toTitle, if (advance) "Advance" else "")
+        .firstOrNull() ?: UserChoice(fromfqName, fromTitle, slideChoice, if (advance) "Advance" else "")
           )
         .also { userChoice ->
           if (userChoice.reason.isNotBlank()) {
-            updateLastTitle(uuid, toTitle)
+            updateLastSlide(uuid, slideChoice.fqName)
           }
         }
     }
 
-  override suspend fun provideReason(fromTitle: String, abbrev: String, toTitle: String, reason: String) =
+  override suspend fun provideReason(fromfqName: String, fromTitle: String, slideChoice: SlideChoice, reason: String) =
     transaction {
       val uuid = call.userId.uuid
       UserChoiceTable
         .insertAndGetId { row ->
           row[UserChoiceTable.uuidCol] = UUID.randomUUID()
           row[UserChoiceTable.userUuid] = UUID.fromString(uuid)
+          row[UserChoiceTable.fromfqName] = fromfqName
           row[UserChoiceTable.fromTitle] = fromTitle
-          row[UserChoiceTable.abbrev] = abbrev
-          row[UserChoiceTable.title] = toTitle
+          row[UserChoiceTable.tofqName] = slideChoice.fqName
+          row[UserChoiceTable.toTitle] = slideChoice.title
+          row[UserChoiceTable.choiceText] = slideChoice.choiceText
           row[UserChoiceTable.reason] = reason
         }.value
 
-      updateLastTitle(uuid, toTitle)
+      updateLastSlide(uuid, slideChoice.fqName)
 
       val slide = findSlideForUser(uuid, HistoryWalkServer.masterSlides.get())
       slideData(uuid, slide)
     }
 
-  override suspend fun goBackInTime(title: String) =
+  override suspend fun goBackInTime(parentTitle: ParentTitle) =
     transaction {
       val uuid = call.userId.uuid
-      updateLastTitle(uuid, title)
+      updateLastSlide(uuid, parentTitle.fqName)
       val slide = findSlideForUser(uuid, HistoryWalkServer.masterSlides.get())
       slideData(uuid, slide)
     }
@@ -95,10 +104,10 @@ actual class ContentService : IContentService {
     private const val dquoteEscape = "---DQ---"
     private const val squoteEscape = "---SQ---"
 
-    fun updateLastTitle(uuid: String, title: String) {
+    fun updateLastSlide(uuid: String, fqName: String) {
       UsersTable
         .update({ UsersTable.uuidCol eq UUID.fromString(uuid) }) { row ->
-          row[UsersTable.lastTitle] = title
+          row[UsersTable.lastfqName] = fqName
         }.also { count ->
           if (count != 1)
             error("Missing uuid: $uuid")
@@ -124,39 +133,28 @@ actual class ContentService : IContentService {
         .replace(gtEscape, ">")
         .replace(dquoteEscape, "'")
         .replace(squoteEscape, "\"")
-        .also {
-          // println("Post conversion:\n$it")
-        }
     }
 
     private fun slideData(uuid: String, slide: Slide): SlideData {
 
-      val content = mutableListOf<ElementData>()
-
-      slide.content.forEach { element ->
-        when (element) {
-          is TextElement -> {
-            val stripped = element.text
-              .splitToSequence("\n")
-              .map { line -> line.trim() }
-              .joinToString("\n")
-            content += ElementData(ElementType.TEXT, stripped.transformText())
-          }
-          is ImageElement -> content += ElementData(ElementType.IMAGE, element.src, element.width, element.height)
-        }
-      }
+      val content =
+        slide.content
+          .splitToSequence("\n")
+          .map { line -> line.trim() }  // Get rid of leading/trailing whitespace
+          .joinToString("\n")
+          .transformText()                     // Transform markdown to html
 
       val choices =
-        slide.choices.map { (choice, destination) ->
-          SlideChoice(choice, destination)
+        slide.choices.map { (choice, slide) ->
+          SlideChoice(choice, slide.fqName, slide.title)
         }
 
       val parentTitles =
-        mutableListOf<String>()
+        mutableListOf<ParentTitle>()
           .also { parentTitles ->
             var currSlide = slide.parentSlide
             while (currSlide != null) {
-              parentTitles += currSlide.title
+              parentTitles += ParentTitle(currSlide.fqName, currSlide.title)
               currSlide = currSlide.parentSlide
             }
           }
@@ -164,8 +162,8 @@ actual class ContentService : IContentService {
 
       return slide.run {
         val count = slideCount(uuid)
-        val showResetButon = EnvVar.SHOW_RESET_BUTTON.getEnv(false)
-        SlideData(title, content, success, choices, verticalChoices, parentTitles, count, showResetButon)
+        val showResetButton = EnvVar.SHOW_RESET_BUTTON.getEnv(false)
+        SlideData(fqName, title, content, success, choices, verticalChoices, parentTitles, count, showResetButton)
       }
     }
 

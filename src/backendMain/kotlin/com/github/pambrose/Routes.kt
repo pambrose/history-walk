@@ -3,7 +3,7 @@ package com.github.pambrose
 import com.codahale.metrics.jvm.ThreadDump
 import com.github.pambrose.Content.ROOT
 import com.github.pambrose.ContentService.Companion.deleteChoices
-import com.github.pambrose.ContentService.Companion.updateLastTitle
+import com.github.pambrose.ContentService.Companion.updateLastSlide
 import com.github.pambrose.EndPoints.LOGIN
 import com.github.pambrose.EndPoints.LOGOUT
 import com.github.pambrose.EndPoints.RESET
@@ -66,11 +66,11 @@ object Routes : KLogging() {
       }
     }
 
-    get("resetUser") {
+    get("userReset") {
       transaction {
         val uuid = call.userId.uuid
         deleteChoices(uuid)
-        updateLastTitle(uuid, ROOT)
+        updateLastSlide(uuid, ROOT)
       }
       call.respondRedirect("/")
     }

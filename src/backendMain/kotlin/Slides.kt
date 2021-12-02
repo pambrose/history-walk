@@ -113,34 +113,24 @@ val summerCrossCountry = """
       Where do you go?
       """
 
-val deepForest = """
-      ## Flee into the Deep Forest
-      
-      You dash into the deep forest, gasping for air, as the sound of hounds follow you.  
-      You begin to panic as the sounds get louder and closer.
-      
-	    Suddenly, they are upon you. The hounds grab you by the legs and then rip you 
-      into shreds. 
-      
-      THE END.
-      """
-
-val paddyRollers = """
-      ## Paddy Rollers
-      
-      You are surprised by the sudden appearance of four ‘paddy rollers,’ as slave-catchers 
-      were sometimes called, who were waiting to ambush you.  Speedily they seize you up, 
-      bind you, and, after torturing you for information, return you to your owner for a reward.  
-      He then cruelly punishes you for trying to escape.  
-      
-      THE END.
-      """
-
 val winterDepartureAlone = """
       ## Winter Departure Alone
       
       Will you try to steal an overcoat in order to survive the elements as you hopefully head… North?
       """
+
+val winterCrossCountry = """
+      ## Winter Cross-Country  
+      
+      The winter is harsh, and as the freezing wind blows your toes begin to go numb, 
+      but fear of the slave-catchers and their dogs drives you deeper into the wilderness.  
+      But soon the terrain gets rougher, the snow drifts get deeper, the brush blocks your sight, 
+      and an increasing number of trees start to affect your sense of direction.
+      
+	    You are lost. Suddenly, at the sound of the harsh braying of pursuing hounds, you flee blindly.
+      
+      Where do you go?
+"""
 
 val stealOvercoat = """
       ## Steal Overcoat
@@ -152,6 +142,52 @@ val stealOvercoat = """
 
       You decide to go…
 """
+
+val deepForestEnd = """
+      ## Flee into the Deep Forest
+      
+      You dash into the deep forest, gasping for air, as the sound of hounds follow you.  
+      You begin to panic as the sounds get louder and closer.
+      
+	    Suddenly, they are upon you. The hounds grab you by the legs and then rip you 
+      into shreds. 
+      
+      THE END.
+      """
+
+val paddyRollersEnd = """
+      ## Paddy Rollers
+      
+      You are surprised by the sudden appearance of four ‘paddy rollers,’ as slave-catchers 
+      were sometimes called, who were waiting to ambush you.  Speedily they seize you up, 
+      bind you, and, after torturing you for information, return you to your owner for a reward.  
+      He then cruelly punishes you for trying to escape.  
+      
+      THE END.
+      """
+
+val majorEncounterFleePatrolEnd = """
+      ## Major Encounter: Flee Patrol
+      
+      As you turn to run, you hear the loud blast of a pistol, following by an hot, stabbing 
+      pain in your thigh.  Stumbling and and falling, you fumble futilely for some weapon.  
+      The pain is overwhelming and the bleeding great.  As your vision begins to blur, you 
+      know that you will awaken either back at the plantation or in the hereafter… 
+      
+      THE END.
+"""
+
+val majorEncounterPatrol = """
+      ## Major Encounter: Patrol
+      
+	    Rounding the bend on the main road that you have been following, you come to a crossroads 
+      just as two men ride up from the side, one with a rifle slung across back.  They quickly 
+      pull along side, grab the reins of your horses, and begin to question you aggressively, 
+      demanding to see your passes, to know your origins and destination, and to learn your 
+      intentions.
+      
+      Do you...
+      """
 
 // <img src="https://www.nps.gov/articles/000/images/Runaway-Slave-Advertisement-1_Columbus-Democrat-Columbus-MS-_18-August-1838_2.jpg" alt="Pic" width="300" height="400" style="border:5px solid black"/>
 
@@ -167,14 +203,8 @@ val slides =
             slide("Companion Decision", companionDecision) {
               choice("Yes, take your chances and go meet with Ross then meet with Ben",
                 slide("Meet With Ross and Ben", rossEncounter) {
-                  choice(
-                    "Yes",
-                    slide("Ross Advice")
-                  )
-                  choice(
-                    "No",
-                    slide("Old Ben Via Ross")
-                  )
+                  choice("Yes", slide("Ross Advice"))
+                  choice("No", slide("Old Ben Via Ross"))
                 }
               )
 
@@ -199,11 +229,11 @@ val slides =
                         slide("Summer Cross-Country", summerCrossCountry) {
                           choice(
                             "Into the deep forest",
-                            slide("Deep Forest", deepForest)
+                            slide("Deep Forest", deepForestEnd)
                           )
                           choice(
                             "Back to the main road",
-                            slide("Main Road2")
+                            slide("Main Road")
                           )
                         }
                       )
@@ -215,13 +245,13 @@ val slides =
                     slide("Autumn Departure", autumDeparture) {
                       choice(
                         "Continue",
-                        slide("Paddy Rollers", paddyRollers),
+                        slide("Paddy Rollers", paddyRollersEnd),
                       )
                     }
                   )
                   choice(
                     "Leave in the spring, when love is in the air",
-                    slide("Spring Departure")
+                    slide("Spring Departure", paddyRollersEnd)
                   )
                   choice(
                     "Follow Old Ben’s advice and leave in the winter, right at Christmas, when it is coldest and darkest",
@@ -229,17 +259,37 @@ val slides =
                       choice(
                         "Yes",
                         slide("Steal an Overcoat", stealOvercoat) {
-                          choice("on the Main Road", slide("Main Road4"))
-                          choice("Cross-Country", slide("Cross-Country2"))
+                          choice(
+                            "on the Main Road",
+                            // 20
+                            slide("Major Encounter: Patrol", majorEncounterPatrol) {
+                              choice(
+                                "Flee",
+                                slide("Major EncounterL Flee Patrol", majorEncounterFleePatrolEnd)
+                              )
+                              choice("Fight", slide("Fight"))
+                              choice("Bluff (talk your way out of the situation)", slide("Bluff"))
+                            }
+                          )
+                          choice("Cross-Country", slide("Cross-Country"))
                         }
                       )
                       choice(
                         "No, go on the main road",
-                        slide("Main Road3")
+                        slide("Spring Main Road", paddyRollersEnd)
                       )
                       choice(
                         "No, go cross-country",
-                        slide("Cross-Country")
+                        slide("Winter Cross-Country", winterCrossCountry) {
+                          choice(
+                            "Into the deep forest",
+                            slide("Deep Forest2", deepForestEnd)
+                          )
+                          choice(
+                            "Back to the main road",
+                            slide("Main Road")
+                          )
+                        }
                       )
                     }
                   )

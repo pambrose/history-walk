@@ -63,7 +63,7 @@ fun loadSlides(): SlideDeck {
       val varName = EnvVar.DBMS_DRIVER_VARIABLE_NAME.getEnv("slides")
       val code = "$src\n\n$varName"
 
-      KotlinScript().use { it.eval(code) as SlideDeck }.apply { validate() }
+      KotlinScript().use { it.eval(code) as SlideDeck }
     }
   } catch (e: Throwable) {
     logger.error(e) { "Failed to load slides" }

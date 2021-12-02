@@ -20,24 +20,14 @@ data class UserId(
 )
 
 @Serializable
-enum class ElementType { TEXT, IMAGE }
-
-@Serializable
-data class ElementData(
-  val elementType: ElementType,
-  val content: String,
-  val width: Int = 0,
-  val height: Int = 0
-)
-
-@Serializable
 data class SlideData(
+  val fqName: String,
   val title: String,
-  val elements: List<ElementData>,
+  val content: String,
   val success: Boolean,
   val choices: List<SlideChoice>,
   val verticalChoices: Boolean,
-  val parentTitles: List<String>,
+  val parentTitles: List<ParentTitle>,
   val decisionCount: Long,
   val showResetButton: Boolean,
 ) {
@@ -52,12 +42,15 @@ data class SlideData(
 }
 
 @Serializable
-data class SlideChoice(val abbrev: String, val title: String)
+data class ParentTitle(val fqName: String, val title: String)
+
+@Serializable
+data class SlideChoice(val choiceText: String, val fqName: String, val title: String)
 
 @Serializable
 data class UserChoice(
+  val fromfqName: String,
   val fromTitle: String,
-  val abbrev: String,
-  val toTitle: String,
+  val slideChoice: SlideChoice,
   val reason: String,
 )

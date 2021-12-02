@@ -2,8 +2,6 @@ package com.github.pambrose
 
 import com.github.pambrose.ClientUtils.lowercase
 import com.github.pambrose.ClientUtils.verticalPadding
-import com.github.pambrose.ElementType.IMAGE
-import com.github.pambrose.ElementType.TEXT
 import com.github.pambrose.EndPoints.LOGOUT
 import com.github.pambrose.EndPoints.RESET
 import com.github.pambrose.MainPanel.buttonPadding
@@ -36,15 +34,7 @@ private fun Container.displaySlide(slide: SlideData) {
 
   simplePanel {
     margin = 20.px
-    width = 600.px
-
-//    simplePanel {
-//      border = Border(2.px, BorderStyle.SOLID, Color.name(Col.WHITE))
-//      paddingTop = 5.px
-//      paddingBottom = 5.px
-//      textAlign = TextAlign.LEFT
-//      +"Decision count: ${slide.decisionCount}"
-//    }
+    width = 700.px
 
     simplePanel {
       flexPanel(FlexDirection.ROW, FlexWrap.WRAP, JustifyContent.SPACEBETWEEN, AlignItems.CENTER, spacing = 5) {
@@ -71,13 +61,8 @@ private fun Container.displaySlide(slide: SlideData) {
     if (!slide.success) {
       vPanel {
         slide.parentTitles.forEach { parentTitle ->
-//        span {
-//          background = Background(Color.rgb(53, 121, 246))
-//          color = Color.name(Col.WHITE)
-//          textAlign = TextAlign.CENTER
-//          +parent
-//        }
-          button(parentTitle, style = SUCCESS) {
+
+          button(parentTitle.title, style = SUCCESS) {
             onClick {
               AppScope.launch {
                 Rpc.goBackInTime(parentTitle).also { refresh(it) }
@@ -110,17 +95,7 @@ private fun Container.displaySlide(slide: SlideData) {
       border = Border(2.px, BorderStyle.SOLID, Color.name(Col.GRAY))
       padding = 25.px
 
-      slide.elements.forEach { element ->
-        when (element.elementType) {
-          TEXT ->
-            add(P(element.content, true))
-          IMAGE ->
-            add(image(element.content) {
-              width = element.width.px
-              height = element.height.px
-            })
-        }
-      }
+      add(P(slide.content, true))
     }
 
     if (slide.success) {
@@ -129,7 +104,7 @@ private fun Container.displaySlide(slide: SlideData) {
           lowercase()
           onClick {
             AppScope.launch {
-              Rpc.goBackInTime("/").also { refresh(it) }
+              Rpc.goBackInTime(ParentTitle("/", "/")).also { refresh(it) }
             }
           }
         }
@@ -146,62 +121,19 @@ private fun Container.displaySlide(slide: SlideData) {
           hPanel(spacing = spacing, init = init)
       }
     }
-
-    // This is stubbed out for now
-    if (false && slide.hasParents) {
-      simplePanel {
-        marginTop = 10.px
-
-        vPanel {
-          button("Go Back In Time", icon = "fas fa-arrow-alt-circle-up", style = SUCCESS) {
-            lowercase()
-            onClick {
-              if (slide.hasOneParent) {
-                slide.parentTitles[0].also { parentTitle ->
-                  if (parentTitle.isNotBlank())
-                    AppScope.launch {
-                      Rpc.goBackInTime(parentTitle).also { refresh(it) }
-                    }
-                }
-              }
-              else {
-                val dialog =
-                  Dialog<String>("Go back to...") {
-                    vPanel(spacing = 4) {
-                      slide.parentTitles.forEach { parentTitle ->
-                        button(parentTitle, style = PRIMARY) {
-                          lowercase()
-                          onClick { setResult(parentTitle) }
-                        }
-                      }
-                    }
-                  }
-
-                AppScope.launch {
-                  dialog.getResult()?.also { parentTitle ->
-                    if (parentTitle.isNotBlank()) {
-                      Rpc.goBackInTime(parentTitle).also { refresh(it) }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
   }
+
 }
 
 private fun Container.addChoiceButtons(slide: SlideData) {
-  slide.choices.forEach { ct ->
-    button(ct.abbrev, icon = "fas fa-angle-double-right", style = PRIMARY) {
+  slide.choices.forEach { slideChoice ->
+    button(slideChoice.choiceText, icon = "fas fa-angle-double-right", style = PRIMARY) {
       lowercase()
       onClick {
         AppScope.launch {
-          val choiceReason = Rpc.makeChoice(slide.title, ct.abbrev, ct.title, slide.choices.size == 1)
+          val choiceReason = Rpc.makeChoice(slide.fqName, slide.title, slideChoice, slide.choices.size == 1)
           if (choiceReason.reason.isEmpty())
-            promptForReason(slide.title, ct)
+            promptForReason(slide.fqName, slide.title, slideChoice)
           else {
             val newSlide = Rpc.getCurrentSlide()
             refresh(newSlide)
@@ -214,21 +146,19 @@ private fun Container.addChoiceButtons(slide: SlideData) {
 
 private fun String?.wordCount(): Int = this?.split(" ")?.filter { it.isNotEmpty() }?.size ?: 0
 
-private fun promptForReason(fromTitle: String, ct: SlideChoice) {
+private fun promptForReason(fromfqName: String, fromTitle: String, slideChoice: SlideChoice) {
   val submit = Button("OK", disabled = true).apply {
     lowercase()
     verticalPadding(buttonPadding)
   }
-  val wordCount = Span(content = "0 words") {
-    float = PosFloat.RIGHT
-  }
+  val wordCount = Span(content = "0 words") { float = PosFloat.RIGHT }
   val reasonDialog =
     Dialog<String>("Reasoning") {
       val input =
-        TextArea(rows = 3, label = """Reason for your "${ct.abbrev}" decision:""") {
+        TextArea(rows = 3, label = """Reason for your "${slideChoice.choiceText}" decision:""") {
 //          marginLeft = 25.px
 //          paddingLeft = 25.px
-          placeholder = """ I chose "${ct.abbrev}" because..."""
+          placeholder = """ I chose "${slideChoice.choiceText}" because..."""
           autofocus = true
           setEventListener<Text> {
             keyup = { _ ->
@@ -260,7 +190,7 @@ private fun promptForReason(fromTitle: String, ct: SlideChoice) {
   AppScope.launch {
     reasonDialog.getResult()?.also { response ->
       if (response.isNotBlank()) {
-        val newSlide = Rpc.provideReason(fromTitle, ct.abbrev, ct.title, response)
+        val newSlide = Rpc.provideReason(fromfqName, fromTitle, slideChoice, response)
         refresh(newSlide)
       }
     }
