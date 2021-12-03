@@ -61,7 +61,6 @@ private fun Container.displaySlide(slide: SlideData) {
     if (!slide.success) {
       vPanel {
         slide.parentTitles.forEach { parentTitle ->
-
           button(parentTitle.title, style = SUCCESS) {
             onClick {
               AppScope.launch {

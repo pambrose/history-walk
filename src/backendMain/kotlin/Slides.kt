@@ -520,7 +520,6 @@ val text58_woodmensAdvice = """
 
 // <img src="https://www.nps.gov/articles/000/images/Runaway-Slave-Advertisement-1_Columbus-Democrat-Columbus-MS-_18-August-1838_2.jpg" alt="Pic" width="300" height="400" style="border:5px solid black"/>
 
-
 val slides =
   slideDeck {
 
@@ -554,184 +553,213 @@ val slides =
         choice("Back to the main road", slide12_paddyRollersEnd.copyOf())
       }
 
+    val slide25_majorEncounterBluffPatrol =
+      slide("Major Encounter: bluff Patrol", text25_majorEncounterBluffPatrol) {
+        choice("Flee?", slide22_majorEncounterFleePatrolEnd.copyOf())
+        choice("Fight?", slide23_majorEncounterFlight1stPatrolEnd.copyOf())
+      }
+
     val slide20_majorEncounterPatrol =
       slide("Major Encounter: Patrol", text20_majorEncounterPatrol) {
-        choice("...flee?", slide22_majorEncounterFleePatrolEnd.copyOf())
-        choice("...fight?", slide23_majorEncounterFlight1stPatrolEnd.copyOf())
-        choice("...try to bluff (talk your way out of the situation)",
-          slide("Major Encounter: bluff Patrol", text25_majorEncounterBluffPatrol) {
-            choice("...flee?", slide22_majorEncounterFleePatrolEnd.copyOf())
-            choice("...fight?", slide23_majorEncounterFlight1stPatrolEnd.copyOf())
+        choice("Flee?", slide22_majorEncounterFleePatrolEnd.copyOf())
+        choice("Fight?", slide23_majorEncounterFlight1stPatrolEnd.copyOf())
+        choice("Try to bluff (talk your way out of the situation)", slide25_majorEncounterBluffPatrol.copyOf())
+      }
+
+    val slide57_riverCrossing =
+      slide("River Crossing", text57_riverCrossing) {
+        choice("Continue on, into the wilderness?", slide15_winterCrossCountry.copyOf())
+        choice("Follow the horse tracks?", slide("Woodmen’s Advice", text58_woodmensAdvice, success = true))
+      }
+
+    val slide54_majorEncounterFight2ndPatrol =
+      slide("Major Encounter: fight 2nd Patrol", text54_majorEncounterFight2ndPatrol) {
+        choice("Do you agree and go cross-country?",
+          slide("Backroads", text56_backroads) {
+            choice("Approach the cottage?", slide57_riverCrossing.copyOf())
+            choice("Push on to the wilderness?", slide15_winterCrossCountry.copyOf())
           })
+        choice("Or stay on the main road?", slide20_majorEncounterPatrol.copyOf())
+      }
+
+    val slide53_majorEncounter2ndPatrol =
+      slide("Major Encounter: 2nd Patrol", text53_majorEncounter2ndPatrol) {
+        choice("Flee?", slide22_majorEncounterFleePatrolEnd.copyOf())
+        choice("Fight?", slide54_majorEncounterFight2ndPatrol.copyOf())
+        choice("Push on to the wilderness?", slide15_winterCrossCountry.copyOf())
+      }
+
+    val slide51_majorEncounterRamshackleHutContd =
+      slide("Major Encounter: Ramshackle Hut (cont.)", text51_majorEncounterRamshackleHutContd) {
+        choice("Continue", slide12_paddyRollersEnd.copyOf())
+      }
+
+    val slide50_majorEncounterRamshackleHut =
+      slide("Major Encounter: Ramshackle Hut", text50_majorEncounterRamshackleHut) {
+        choice("Enter the ramshackle hut?", slide51_majorEncounterRamshackleHutContd.copyOf())
+        // This circles back to slide 45
+        //choice("Try another building in town?", slide45)
+        choice("Ride on, taking main road out of town?", slide20_majorEncounterPatrol.copyOf())
+      }
+
+    val slide52_majorEncounterPharmacy =
+      slide("Major Encounter: Pharmacy", text52_majorEncounterPharmacy) {
+        // This circles back to slide 45
+        //choice("Try another building in town?")
+        choice(
+          "Push on, desperately hungry and tired, onto the main road out of town?",
+          slide20_majorEncounterPatrol.copyOf()
+        )
+      }
+
+    val slide48_confidentAndArrogantBluff =
+      slide("Confident & Arrogant Bluff", text48_confidentAndArrogantBluff) {
+        choice(
+          "You spend your last dollar to stay the night.",
+          slide("Confident & Arrogant Bluff (cont.)", text49_confidentAndArrogantBluffContd) {
+            choice("Continue down the main road out of town?", slide53_majorEncounter2ndPatrol.copyOf())
+            choice("Head into the wilderness?", slide15_winterCrossCountry.copyOf())
+          })
+        choice(
+          "Push on, desperately hungry and tired, down the main road out of town?",
+          slide20_majorEncounterPatrol.copyOf()
+        )
+        // This circles back to slide 45
+        //choice("Head into back into town and try another building", slide45_thirdTown.copyOf())
+      }
+
+    val slide47_politeAndSubmisseBluff =
+      slide("Polite & Submissive Bluff", text47_politeAndSubmisseBluff) {
+        choice("Knock at the door again, waiting for...", slide12_paddyRollersEnd.copyOf())
+        choice(
+          "Ride on, desperately taking main road out of town?",
+          slide20_majorEncounterPatrol.copyOf()
+        )
+        choice("Escape hurriedly into the wilderness.", slide15_winterCrossCountry.copyOf())
       }
 
     val slide46_majorEncounterModestMansion =
       slide("Major Encounter: Modest Mansion", text46_majorEncounterModestMansion) {
         choice(
-          "...speak politely in a submissive tone, asking meekly for a chance to spend the night?",
-          slide("Polite & Submissive Bluff", text47_politeAndSubmisseBluff) {
-            choice("Knock at the door again, waiting for...", slide12_paddyRollersEnd.copyOf())
-            choice(
-              "Ride on, desperately taking main road out of town?",
-              slide20_majorEncounterPatrol.copyOf()
-            )
-            choice("Escape hurriedly into the wilderness.", slide15_winterCrossCountry.copyOf())
-          }
+          "Speak politely in a submissive tone, asking meekly for a chance to spend the night?",
+          slide47_politeAndSubmisseBluff.copyOf()
         )
         choice(
-          "...speak with confidence, adopting an arrogant tone, asking for a clean room for the night for you and your companion?",
-          slide("Confident & Arrogant Bluff", text48_confidentAndArrogantBluff) {
-            choice(
-              "...you spend your last dollar to stay the night.",
-              slide("Confident & Arrogant Bluff (cont.)", text49_confidentAndArrogantBluffContd) {
-                choice("...continue down the main road out of town?")
-                choice("...head into the wilderness?")
-              })
-            choice("...push on, desperately hungry and tired, down the main road out of town?",
-              slide("Major Encounter: 2nd Patrol", text53_majorEncounter2ndPatrol) {
-                choice("..flee?", slide22_majorEncounterFleePatrolEnd.copyOf())
-                choice("...fight?", slide("Major Encounter: fight 2nd Patrol", text54_majorEncounterFight2ndPatrol) {
-                  choice("Do you agree and go cross-country?",
-                    slide("Backroads", text56_backroads) {
-                      choice("...approach the cottage?")
-                      choice("")
-                    })
-                  choice("Or stay on the main road?", slide("River Crossing", text57_riverCrossing) {
-                    choice("...continue on, into the wilderness?", slide15_winterCrossCountry.copyOf())
-                    choice(
-                      "...follow the horse tracks?",
-                      slide("Woodmen’s Advice", text58_woodmensAdvice, success = true)
-                    )
-                  })
-                })
-                choice("...push on to the wilderness?", slide15_winterCrossCountry.copyOf())
-              })
-            choice("...head into back into town and try another building")
-          }
+          "Speak with confidence, adopting an arrogant tone, asking for a clean room for the night for you and your companion?",
+          slide48_confidentAndArrogantBluff.copyOf()
         )
       }
 
+    val slide45_thirdTown =
+      slide("Third Town", text45_thirdTown) {
+        choice("The ramshackle hut at the edge of town", slide50_majorEncounterRamshackleHut.copyOf())
+        choice("The pharmacy in the town center", slide52_majorEncounterPharmacy.copyOf())
+        choice("A more modest mansion", slide46_majorEncounterModestMansion.copyOf())
+      }
+
+    val slide39_politeAndSubmissiveBluff =
+      slide("Polite & Submissive Bluff", text39_politeAndSubmissiveBluff) {
+        choice("Ride on, desperately taking main road out of town", slide20_majorEncounterPatrol.copyOf())
+        choice("Escape hurriedly into the wilderness", slide15_winterCrossCountry.copyOf())
+      }
+
+    val slide40_confidentAndArrogantBluff =
+      slide("Confident & Arrogant Bluff", text40_confidentAndArrogantBluff) {
+        choice("Continue down the main road out of town?",
+          slide("Main Road out of Second Town", text44_mainRoadOutOfSecondTown) {
+            choice("Continue on the main road to the next town?", slide45_thirdTown.copyOf())
+            choice("Head into the wilderness?", slide15_winterCrossCountry.copyOf())
+          })
+        choice("Head into the wilderness?", slide15_winterCrossCountry.copyOf())
+      }
+
+    val slide38_majorEncounterOrdinaryTavern =
+      slide("Major Encounter: Ordinary Tavern", text38_majorEncounterOrdinaryTavern) {
+        choice(
+          "Speak politely in a submissive tone, asking meekly for a chance to spend the night?",
+          slide39_politeAndSubmissiveBluff.copyOf()
+        )
+        choice(
+          "Speak with confidence, adopting an arrogant tone, asking for the finest ale and a clean room for the night for you and your companion?",
+          slide40_confidentAndArrogantBluff.copyOf()
+        )
+      }
+
+    val slide41_majorEncounterRamshackleHut =
+      slide("Major Encounter: Ramshackle Hut", text41_majorEncounterRamshackleHut) {
+        choice("Enter the ramshackle hut?",
+          slide("Major Encounter: Ramshackle Hut (cont.)", text42_majorEncounterRamshackleHutContd) {
+            choice("Continue", slide12_paddyRollersEnd.copyOf())
+          })
+        // TODO This circles back to slide 37
+        //choice("Try another building in town?")
+        choice("Ride on, taking main road out of town?", slide20_majorEncounterPatrol.copyOf())
+      }
+
     val slide37_secondTown = slide("Second Town", text37_secondTown) {
-      choice(
-        "The ramshackle hut at the edge of town",
-        slide("Major Encounter: Ramshackle Hut", text41_majorEncounterRamshackleHut) {
-          choice("...enter the ramshackle hut?",
-            slide("Major Encounter: Ramshackle Hut (cont.)", text42_majorEncounterRamshackleHutContd) {
-              choice("Continue", slide12_paddyRollersEnd.copyOf())
-            })
-          // TODO This circles back to slide 37
-          //choice("...try another building in town?")
-          choice("...ride on, taking main road out of town?", slide20_majorEncounterPatrol.copyOf())
-        })
-      choice("The ordinary tavern in the town center",
-        slide("Major Encounter: Ordinary Tavern", text38_majorEncounterOrdinaryTavern) {
-          choice("...speak politely in a submissive tone, asking meekly for a chance to spend the night?",
-            slide("Polite & Submissive Bluff", text39_politeAndSubmissiveBluff) {
-              choice("Ride on, desperately taking main road out of town", slide20_majorEncounterPatrol.copyOf())
-              choice("Escape hurriedly into the wilderness", slide15_winterCrossCountry.copyOf())
-            })
-          choice("...speak with confidence, adopting an arrogant tone, asking for the finest ale and a clean room for the night for you and your companion?",
-            slide("Confident & Arrogant Bluff", text40_confidentAndArrogantBluff) {
-              choice("...continue down the main road out of town?",
-                slide("Main Road out of Second Town", text44_mainRoadOutOfSecondTown) {
-                  choice("...continue on the main road to the next town?",
-                    slide("Third Town", text45_thirdTown) {
-                      choice("The ramshackle hut at the edge of town",
-                        slide("Major Encounter: Ramshackle Hut", text50_majorEncounterRamshackleHut) {
-                          choice("...enter the ramshackle hut?",
-                            slide("Major Encounter: Ramshackle Hut (cont.)", text51_majorEncounterRamshackleHutContd) {
-                              choice("Continue", slide12_paddyRollersEnd.copyOf())
-                            })
-                          choice("...try another building in town?",
-                            slide("Third Town", text45_thirdTown) {
-                              // This circles back to slide 50
-                              //choice("The ramshackle hut at the edge of town")
-                              choice(
-                                "The pharmacy in the town center",
-                                slide("Major Encounter: Pharmacy", text52_majorEncounterPharmacy) {
-                                  // This circles back to slide 45
-                                  //choice("...try another building in town?")
-                                  choice(
-                                    "...push on, desperately hungry and tired, onto the main road out of town?",
-                                    slide20_majorEncounterPatrol.copyOf()
-                                  )
-                                }
-                              )
-                              choice("A more modest mansion", slide46_majorEncounterModestMansion.copyOf())
-                            })
-                          choice("...ride on, taking main road out of town?", slide20_majorEncounterPatrol.copyOf())
-                        })
-                      choice(
-                        "The pharmacy in the town center",
-                        slide("Major Encounter: Pharmacy", text52_majorEncounterPharmacy) {
-                          // This circles back to slide 45
-                          //choice("...try another building in town?")
-                          choice(
-                            "...push on, desperately hungry and tired, onto the main road out of town?",
-                            slide20_majorEncounterPatrol.copyOf()
-                          )
-                        }
-                      )
-                      choice("A more modest mansion", slide46_majorEncounterModestMansion.copyOf())
-                    })
-                  choice("..head into the wilderness?", slide15_winterCrossCountry.copyOf())
-                })
-              choice("...head into the wilderness?", slide15_winterCrossCountry.copyOf())
-            })
-        })
+      choice("The ramshackle hut at the edge of town", slide41_majorEncounterRamshackleHut.copyOf())
+      choice("The ordinary tavern in the town center", slide38_majorEncounterOrdinaryTavern.copyOf())
       choice("The bordello in the town center",
         slide("Major Encounter: Bordello", text43_majorEncounterBordello) {
           // This circles back to slide 37
-          choice("...try another building in town?")
+          //choice("Try another building in town?", -2)
           choice(
-            "...push on, desperately hungry and tired, onto the main road out of town?",
+            "Push on, desperately hungry and tired, onto the main road out of town?",
             slide20_majorEncounterPatrol.copyOf()
           )
         })
     }
 
+    val slide31_politeAndSubmissiveBluff =
+      slide("Polite & Submissive Bluff", text31_politeAndSubmissiveBluff) {
+        // TODO This circles back to slide 29
+        //choice("Try another building in town?", slide29_firstTown)
+        choice("Ride on, taking main road out of town?", slide20_majorEncounterPatrol.copyOf())
+      }
+
+    val slide32_confidentAndArrogantBluff =
+      slide("Confident & Arrogant Bluff", text32_confidentAndArrogantBluff) {
+        choice("Continue down the main road out of town?",
+          slide("Main Road out of First Town", text36_mainRoadOutOfTown) {
+            choice("Continue on the main road to the next town?", slide37_secondTown.copyOf())
+            choice("Head into the wilderness", slide15_winterCrossCountry.copyOf())
+          })
+        choice("Head into the wilderness", slide15_winterCrossCountry.copyOf())
+      }
+
     val slide29_firstTown =
       slide("First Town", text29_firstTown) {
-        choice("The stately baronial mansion, set apart on a slight rise",
+        choice(
+          "The stately baronial mansion, set apart on a slight rise",
           slide("Major Encounter: Baronial Mansion", text30_majorEncounterBaronialMansion) {
             choice(
-              "...speak politely in a submissive tone, asking meekly for a chance to spend the night?",
-              slide("Polite & Submissive Bluff", text31_politeAndSubmissiveBluff) {
-                // TODO This circles back to slide 29
-                //choice("...try another building in town?", slide(""))
-                choice("...ride on, taking main road out of town?", slide20_majorEncounterPatrol.copyOf())
-              })
+              "Speak politely in a submissive tone, asking meekly for a chance to spend the night?",
+              slide31_politeAndSubmissiveBluff.copyOf()
+            )
             choice(
-              "...speak with confidence, adopting an arrogant tone, insisting upon the privilege of spending the night as it befits a free man?",
-              slide("Confident & Arrogant Bluff", text32_confidentAndArrogantBluff) {
-                choice("...continue down the main road out of town?",
-                  slide("Main Road out of First Town", text36_mainRoadOutOfTown) {
-                    choice("...continue on the main road to the next town?", slide37_secondTown.copyOf())
-                    choice("...head into the wilderness", slide15_winterCrossCountry.copyOf())
-                  })
-                choice("...head into the wilderness", slide15_winterCrossCountry.copyOf())
-              }
+              "Speak with confidence, adopting an arrogant tone, insisting upon the privilege of spending the night as it befits a free man?",
+              slide32_confidentAndArrogantBluff.copyOf()
             )
           })
         choice(
           "The ramshackle hut at the edge of town",
           slide("Major Encounter: Ramshackle Hut", text33_majorEncounterRamshackleHut) {
-            choice("...enter the ramshackle hut?",
+            choice("Enter the ramshackle hut?",
               slide("Major Encounter: Ramshackle Hut (cont.)", text34_majorEncounterRamshackleHutContd) {
-                choice("Continue", slide12_paddyRollersEnd)
+                choice("Continue", slide12_paddyRollersEnd.copyOf())
               })
             // TODO This circles back to slide 29
-            //choice("...try another building in town?")
-            choice("...ride on, taking main road out of town?", slide20_majorEncounterPatrol.copyOf())
+            //choice("Try another building in town?")
+            choice("Ride on, taking main road out of town?", slide20_majorEncounterPatrol.copyOf())
           }
         )
         choice(
           "The post office in the town center",
           slide("Major Encounter: Post Office", text35_majorEncounterPostOffice) {
             // TODO This circles back to slide 29
-            //choice("...try another building in town?")
+            //choice(".Try another building in town?")
             choice(
-              "...push on, desperately hungry and tired, onto the main road out of town?",
+              "Push on, desperately hungry and tired, onto the main road out of town?",
               slide20_majorEncounterPatrol.copyOf()
             )
           }
@@ -747,21 +775,21 @@ val slides =
             choice(
               "Fight",
               slide("Major Encounter (via Ross): fight 1st Patrol", text24_majorEncounterViaRossFight1stPatrol) {
-                choice("...to continue down the main road into town", slide29_firstTown.copyOf())
+                choice("To continue down the main road into town", slide29_firstTown.copyOf())
                 choice(
-                  "...fearing that the alarm will be raised, to head into the wilderness",
+                  "Fearing that the alarm will be raised, to head into the wilderness",
                   slide15_winterCrossCountry.copyOf()
                 )
               }
             )
             choice(
               "Try to bluff (talk your way out of the situation)",
-              slide("Major Encounter (via Ross): bluff 1st Patrol", text25_majorEncounterBluffPatrol) {
+              slide("Major Encounter (via Ross): bluff 1st Patrol", text26_majorEncounterViaRossBluff1stPatrol) {
                 choice(
                   "Speak politely in a submissive tone, out of respect for their position and status",
                   slide("Polite & Submissive Bluff", text27_politeAndSubmissiveBluff) {
-                    choice("...flee?", slide22_majorEncounterFleePatrolEnd.copyOf())
-                    choice("...fight?", slide23_majorEncounterFlight1stPatrolEnd.copyOf())
+                    choice("Flee?", slide22_majorEncounterFleePatrolEnd.copyOf())
+                    choice("Fight?", slide23_majorEncounterFlight1stPatrolEnd.copyOf())
                   }
                 )
                 choice(
@@ -778,7 +806,6 @@ val slides =
       }
 
 
-// Slide 5
     val slide5_oldBenViaRoss = slide("Old Ben (via Ross): When to Go", text5_oldBenViaRoss) {
       choice(
         "Leave in the summer, when the weather is warmest, and you can easily sleep outdoors",
@@ -788,7 +815,7 @@ val slides =
         "Leave in the autumn, hoping to slip away in the business and hub-bub of harvest time",
         slide10_autumDeparture.copyOf()
       )
-      // TODO This is straight to Paddy Rollers (slide 12) in slides
+      // TODO This is straight to Paddy Rollers (slide 12) in slides, which I think is a mistake
       choice("Leave in the spring, when love is in the air", slide11_springDeparture.copyOf())
       choice(
         "Follow Old Ben’s advice, take the risk of stealing a coat and leave in the winter, right at Christmas, when it is coldest and darkest",
@@ -796,133 +823,80 @@ val slides =
       )
     }
 
-// Slide 7
     val slide7_summer_departure =
       slide("Summer Departure", text7_summerDeparture) {
+        choice("Continue on the main road, with the risk of encountering patrol", slide12_paddyRollersEnd.copyOf())
+        choice("Go off-track, cross-country, with the risk of getting lost", slide8_summer_cross_country.copyOf())
+      }
+
+    val slide13_winterDepartureAlone =
+      slide("Winter Departure", text13_winterDepartureAlone) {
         choice(
-          "Continue on the main road, with the risk of encountering patrol",
-          slide12_paddyRollersEnd.copyOf()
+          "Yes, steal an overcoat",
+          slide("Steal an Overcoat", text14_stealOvercoat) {
+            choice("On the main road", slide20_majorEncounterPatrol.copyOf())
+            choice("Cross-country", slide15_winterCrossCountry.copyOf())
+          }
+        )
+        choice("No, go on the main road", slide12_paddyRollersEnd.copyOf())
+        choice("No, go cross-country", slide15_winterCrossCountry.copyOf())
+      }
+
+    val slide4_decisionWhenToGo =
+      slide("Decision: When to Go", text4_decisionWhenToGo) {
+        choice("Summer Departure", slide7_summer_departure.copyOf())
+        choice("Autumn Departure", slide10_autumDeparture.copyOf())
+        choice("Spring Departure", slide11_springDeparture.copyOf())
+        choice("Winter Departure", slide13_winterDepartureAlone.copyOf())
+      }
+
+    val slide16_rossEncounter =
+      slide("Ross Encounter, then Ben", text16_rossEncounter) {
+        choice(
+          "Yes",
+          slide("Ross Advice", text17_rossAdvice) {
+            choice("Yes, leave now", slide10_autumDeparture.copyOf())
+            choice("No, risk the delay", slide5_oldBenViaRoss.copyOf())
+          }
+        )
+        choice("No", slide5_oldBenViaRoss.copyOf())
+      }
+
+    val slide6_oldBenWhenToGo =
+      slide("Go To Old Ben", text6_oldBenWhenToGo) {
+        choice(
+          "Leave in the summer, when the weather is warmest and you can easily sleep outdoors",
+          slide7_summer_departure.copyOf()
         )
         choice(
-          "Go off-track, cross-country, with the risk of getting lost",
-          slide8_summer_cross_country.copyOf()
+          "Leave in the autumn, hoping to slip away in the business and hub-bub of harvest time",
+          slide10_autumDeparture.copyOf()
+        )
+        choice("Leave in the spring, when love is in the air", slide12_paddyRollersEnd.copyOf())
+        choice(
+          "Follow Old Ben’s advice and leave in the winter, right at Christmas, when it is coldest and darkest",
+          slide13_winterDepartureAlone.copyOf()
         )
       }
 
-// Slide 1
+    val slide3_companionDecision =
+      // TODO The first two choices are the same
+      slide("Companion Decision", text3_companionDecision) {
+        choice("Yes, take your chances and go meet with Ross then meet with Ben", slide16_rossEncounter.copyOf())
+//        choice(
+//          "Yes, take your chances, but skip talking to Ben and just go to meet with Ross",
+//          slide16_rossEncounter.copyOf()
+//        )
+        choice("No, skip Ross and just go to Old Ben", slide6_oldBenWhenToGo.copyOf())
+        choice("No, play it safe and seek escape without talking to Ross or Ben", slide4_decisionWhenToGo.copyOf())
+      }
+
     slide("UGRR Scenario", text1_titlePage, root = true) {
       choice(
         "Continue",
-        // Slide 2
         slide("START: Major Decision", text2_majorDecision) {
-
-          choice(
-            "Yes, tell your two best friends",
-            // TODO The first two choices are the same
-            // Slide 3
-            slide("Companion Decision", text3_companionDecision) {
-              choice(
-                "Yes, take your chances and go meet with Ross then meet with Ben",
-                // Slide 16
-                slide("Ross Encounter, then Ben", text16_rossEncounter) {
-                  choice(
-                    "Yes",
-                    // Slide 17
-                    slide("Ross Advice", text17_rossAdvice) {
-                      choice("Yes, leave now", slide10_autumDeparture.copyOf())
-                      choice("No, risk the delay", slide5_oldBenViaRoss.copyOf())
-                    }
-                  )
-                  choice("No", slide5_oldBenViaRoss.copyOf())
-                }
-              )
-
-              choice(
-                "Yes, take your chances, but skip talking to Ben and just go to meet with Ross",
-                // Slide 16
-                slide("Ross Encounter, skip Ben", text16_rossEncounter) {
-                }
-              )
-
-              choice(
-                "No, skip Ross and just go to Old Ben",
-                // Slide 6
-                slide("Go To Old Ben", text6_oldBenWhenToGo) {
-                  choice(
-                    "Leave in the summer, when the weather is warmest and you can easily sleep outdoors",
-                    slide7_summer_departure.copyOf()
-                  )
-                  choice(
-                    "Leave in the autumn, hoping to slip away in the business and hub-bub of harvest time",
-                    slide10_autumDeparture.copyOf()
-                  )
-                  choice("Leave in the spring, when love is in the air", slide12_paddyRollersEnd.copyOf())
-                  choice(
-                    "Follow Old Ben’s advice and leave in the winter, right at Christmas, when it is coldest and darkest",
-                    // Slide 13
-                    slide("Winter Departure", text13_winterDepartureAlone) {
-                      choice(
-                        "Yes, steal an overcoat",
-                        // Slide 14
-                        slide("Steal an Overcoat", text14_stealOvercoat) {
-                          choice(
-                            "On the Main Road",
-                            // Slide 20
-                            slide("Main Road", text20_majorEncounterPatrol) {
-                              choice(
-                                "Flee",
-                                // Slide 22
-                                slide("Major Encounter Flee Patrol", text22_majorEncounterFleePatrolEnd)
-                              )
-                              choice("Fight", slide23_majorEncounterFlight1stPatrolEnd.copyOf())
-                              choice(
-                                "Bluff (talk your way out of the situation)",
-                                // Slide 25
-                                slide("Major Encounter: Bluff Patrol", text25_majorEncounterBluffPatrol) {
-                                  choice("Flee", slide22_majorEncounterFleePatrolEnd.copyOf())
-                                  choice("Fight", slide23_majorEncounterFlight1stPatrolEnd.copyOf())
-                                }
-                              )
-                            }
-                          )
-                          choice(
-                            "Cross-Country",
-                            // Slide 15
-                            slide("Cross-Country")
-                          )
-                        }
-                      )
-                      choice("No, go on the main road", slide12_paddyRollersEnd.copyOf())
-                      choice(
-                        "No, go cross-country",
-                        slide15_winterCrossCountry.copyOf()
-                      )
-                    }
-                  )
-                }
-              )
-
-              choice(
-                "No, play it safe and seek escape without talking to Ross or Ben",
-                // Slide 4
-                slide("Decision: When to Go", text4_decisionWhenToGo)
-              )
-            })
-
-          choice(
-            "No, do not tell your two best friends",
-            slide("Decision: When to Go", text4_decisionWhenToGo) {
-              choice("Summer Departure", slide7_summer_departure.copyOf())
-              choice("Autumn Departure", slide10_autumDeparture.copyOf())
-              choice("Spring Departure", slide11_springDeparture.copyOf())
-
-              choice("Winter Departure",
-                slide("Winter Departure", text13_winterDepartureAlone) {
-                  choice("")
-                  choice("")
-                })
-            }
-          )
+          choice("Yes, tell your two best friends", slide3_companionDecision.copyOf())
+          choice("No, do not tell your two best friends", slide4_decisionWhenToGo.copyOf())
         },
       )
     }
