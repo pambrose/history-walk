@@ -63,6 +63,8 @@ private fun Container.displaySlide(slide: SlideData) {
       vPanel {
         slide.parentTitles.forEach { parentTitle ->
           button(parentTitle.title, style = SUCCESS) {
+            paddingTop = 5.px
+            paddingBottom = 5.px
             onClick {
               AppScope.launch {
                 Rpc.goBackInTime(parentTitle).also { refresh(it) }
@@ -70,8 +72,8 @@ private fun Container.displaySlide(slide: SlideData) {
             }
           }
           hPanel(justify = JustifyContent.CENTER) {
-            paddingTop = 5.px
-            paddingBottom = 5.px
+            paddingTop = 4.px
+            paddingBottom = 4.px
             icon("fas fa-arrow-alt-circle-down")
           }
         }
