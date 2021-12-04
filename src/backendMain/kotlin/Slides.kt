@@ -1,10 +1,22 @@
 import com.github.pambrose.slides.SlideDeck.Companion.slideDeck
 
-val text1_titlePage = """     
+val text1_titlePage = """ 
+    <p style="margin-bottom:57px;border:3px solid white;">  
+    <font size="+3">
+    <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/jermain-longuen.jpg" alt="Pic" style="width:334px;height:518px;border:3px solid black;float:right;margin-left:10px;"/>  
+    <p style="padding-top:100px;">
+    UGRR Scenario: 
+    <br>
     Jarm Logue, later known as Reverend Jermain W. Longuen
-    
+    </p>
+    </font>
+    <p style="text-align: center;padding-top:50px;">
+    <font size="+2">
     *Ted Webb* <br>
     *Sven Miller*
+    </font>
+    </p>
+    </p> 
 """
 
 val text2_majorDecision = """      
@@ -21,6 +33,10 @@ val text2_majorDecision = """
 """
 
 val text3_companionDecision = """
+    <p style="padding-bottom:60px;">
+    <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/pistol.jpg" alt="Pic" style="width:130px;height:61px;border:1px solid white;float:left"/>  
+    <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/salami.jpg" alt="Pic" style="width:123px;height:76px;border:1px solid white;float:right"/>  
+
     Eager to join you, your friend John Farney asks around and says that 
     you should contact **first** (1) an ‘entrepreneurial’ (and maybe sympathetic?) 
     white man named Ross –– who offers to ‘obtain’ and provide forged free 
@@ -30,7 +46,8 @@ val text3_companionDecision = """
     very wise.
     
     Will you risk beating, torture, or worse by stealing the items that Ross 
-    wants in exchange for what he offers?
+    wants in exchange for what he offers?    
+    </p>
 """
 
 val text4_decisionWhenToGo = """
@@ -294,7 +311,11 @@ val text29_firstTown = """
 """
 
 val text30_majorEncounterBaronialMansion = """
-      A regally dressed servant opens the door and asks your business. Do you...
+      <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/mansion.jpg" alt="Pic" style="width:596px;height:249px;border:3px solid black;display: block;margin-left: auto;margin-right: auto;margin-bottom: 30px;"/>  
+
+      A regally dressed servant opens the door and asks your business. 
+      
+      Do you...
 """
 
 val text31_politeAndSubmissiveBluff = """
@@ -517,8 +538,6 @@ val text58_woodmensAdvice = """
       
       YOU HAVE MADE IT!
 """
-
-// <img src="https://www.nps.gov/articles/000/images/Runaway-Slave-Advertisement-1_Columbus-Democrat-Columbus-MS-_18-August-1838_2.jpg" alt="Pic" width="300" height="400" style="border:5px solid black"/>
 
 val slides =
   slideDeck {
