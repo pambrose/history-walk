@@ -3,9 +3,10 @@ package com.github.pambrose
 import com.github.pambrose.ClientUtils.lowercase
 import com.github.pambrose.ClientUtils.verticalPadding
 import com.github.pambrose.EndPoints.LOGOUT
-import com.github.pambrose.EndPoints.RESET
+import com.github.pambrose.EndPoints.USER_RESET
 import com.github.pambrose.MainPanel.buttonPadding
 import com.github.pambrose.MainPanel.refresh
+import com.github.pambrose.MainPanel.userInfo
 import io.kvision.core.*
 import io.kvision.form.text.Text
 import io.kvision.form.text.TextArea
@@ -21,9 +22,14 @@ import kotlin.math.abs
 object MainPanel : SimplePanel() {
   val buttonPadding = 5.px
   val panel = SimplePanel()
+  lateinit var userInfo: UserInfo
 
   init {
     add(panel)
+
+    AppScope.launch {
+      userInfo = Rpc.getUserInfo()
+    }
   }
 
   fun refresh(slide: SlideData) = panel.displaySlide(slide)
@@ -41,7 +47,10 @@ private fun Container.displaySlide(slide: SlideData) {
       flexPanel(FlexDirection.ROW, FlexWrap.WRAP, JustifyContent.SPACEBETWEEN, AlignItems.CENTER, spacing = 5) {
         paddingBottom = 10.px
 
-        +"Decision count: ${slide.decisionCount}"
+        vPanel {
+          hPanel { +userInfo.email }
+          hPanel { +"Decision count: ${slide.decisionCount}" }
+        }
         button("Logout", "fas fa-sign-out-alt", style = LINK) {
           lowercase()
           onClick {
@@ -53,7 +62,7 @@ private fun Container.displaySlide(slide: SlideData) {
           button("Reset", "fas fa-sync-alt", style = LINK) {
             lowercase()
             onClick {
-              document.location?.href = "/$RESET"
+              document.location?.href = "/$USER_RESET"
             }
           }
       }

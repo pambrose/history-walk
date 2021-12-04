@@ -3,9 +3,10 @@ package com.github.pambrose
 import com.codahale.metrics.jvm.ThreadDump
 import com.github.pambrose.ContentService.Companion.deleteChoices
 import com.github.pambrose.ContentService.Companion.updateLastSlide
+import com.github.pambrose.EndPoints.CONTENT_RESET
 import com.github.pambrose.EndPoints.LOGIN
 import com.github.pambrose.EndPoints.LOGOUT
-import com.github.pambrose.EndPoints.RESET
+import com.github.pambrose.EndPoints.USER_RESET
 import com.github.pambrose.common.util.Version.Companion.versionDesc
 import com.github.pambrose.common.util.isNotNull
 import com.github.pambrose.slides.SlideDeck.Companion.ROOT
@@ -50,7 +51,7 @@ object Routes : KLogging() {
         call.respond(result)
       }
 
-      get(RESET) {
+      get(CONTENT_RESET) {
         try {
           HistoryWalkServer.masterSlides.set(loadSlides())
           call.respondRedirect("/")
@@ -64,15 +65,15 @@ object Routes : KLogging() {
         call.sessions.clear<UserId>()
         call.respondRedirect("/")
       }
-    }
 
-    get("userReset") {
-      transaction {
-        val uuid = call.userId.uuid
-        deleteChoices(uuid)
-        updateLastSlide(uuid, ROOT)
+      get(USER_RESET) {
+        transaction {
+          val uuid = call.userId.uuid
+          deleteChoices(uuid)
+          updateLastSlide(uuid, ROOT)
+        }
+        call.respondRedirect("/")
       }
-      call.respondRedirect("/")
     }
 
     get("ping") {

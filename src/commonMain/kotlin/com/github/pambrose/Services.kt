@@ -9,6 +9,7 @@ interface IRegisterUserService {
 
 @KVService
 interface IContentService {
+  suspend fun getUserInfo(): UserInfo
   suspend fun getCurrentSlide(): SlideData
   suspend fun makeChoice(
     fromPathName: String,

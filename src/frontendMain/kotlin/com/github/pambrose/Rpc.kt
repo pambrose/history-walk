@@ -15,6 +15,11 @@ object Rpc {
       false
     }
 
+  suspend fun getUserInfo() =
+    withAuth {
+      contentService.getUserInfo()
+    }
+
   suspend fun getCurrentSlide() =
     withAuth {
       contentService.getCurrentSlide()

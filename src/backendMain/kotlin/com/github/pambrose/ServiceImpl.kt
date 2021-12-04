@@ -29,6 +29,20 @@ actual class ContentService : IContentService {
   @Inject
   lateinit var call: ApplicationCall
 
+  override suspend fun getUserInfo() =
+    transaction {
+      val uuid = call.userId.uuid
+      UsersTable
+        .select { UsersTable.uuidCol eq UUID.fromString(uuid) }
+        .map { row ->
+          UserInfo(
+            row[UsersTable.fullName],
+            row[UsersTable.email],
+          )
+        }
+        .firstOrNull() ?: UserInfo("Unknown", "Unknown")
+    }
+
   override suspend fun getCurrentSlide(): SlideData {
     logger.debug { "userId=${call.userId}" }
     val uuid = call.userId.uuid

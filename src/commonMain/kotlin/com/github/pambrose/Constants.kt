@@ -7,5 +7,6 @@ object Auth {
 object EndPoints {
   const val LOGIN = "login"
   const val LOGOUT = "logout"
-  const val RESET = "reset"
+  const val USER_RESET = "userreset"
+  const val CONTENT_RESET = "contentreset"
 }

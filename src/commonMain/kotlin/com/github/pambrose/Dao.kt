@@ -15,6 +15,12 @@ data class RegisterData(
 )
 
 @Serializable
+data class UserInfo(
+  val fullName: String,
+  val email: String,
+)
+
+@Serializable
 data class UserId(
   val uuid: String,
 )
