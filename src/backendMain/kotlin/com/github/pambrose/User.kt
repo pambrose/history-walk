@@ -1,11 +1,11 @@
 package com.github.pambrose
 
-import com.github.pambrose.Content.ROOT
 import com.github.pambrose.Email.Companion.EMPTY_EMAIL
 import com.github.pambrose.Email.Companion.UNKNOWN_EMAIL
 import com.github.pambrose.FullName.Companion.EMPTY_FULLNAME
 import com.github.pambrose.common.util.*
 import com.github.pambrose.slides.SlideDeck
+import com.github.pambrose.slides.SlideDeck.Companion.ROOT
 import com.pambrose.common.exposed.get
 import io.ktor.http.*
 import mu.KLogging
@@ -174,27 +174,14 @@ class User {
           .also { logger.info { "queryUserByUuid() returned: ${it?.email ?: " $uuid not found"}" } }
       }
 
-    fun findSlideForUser(uuid: String, slideDeck: SlideDeck) =
+    fun findCurrentSlideForUser(uuid: String, slideDeck: SlideDeck) =
       transaction {
         (UsersTable
           .slice(UsersTable.lastPathName)
           .select { UsersTable.uuidCol eq UUID.fromString(uuid) }
           .map { it[UsersTable.lastPathName] }
           .firstOrNull() ?: error("Missing uuid: $uuid"))
-          .let { pathName ->
-            val slide =
-              if (pathName == ROOT)
-                slideDeck.rootSlide
-              else
-                slideDeck.findSlide(pathName)
-
-            if (slide == null) {
-              logger.error("Invalid slide name: $pathName")
-              slideDeck.rootSlide
-            }
-            else
-              slide
-          }
+          .let { pathName -> slideDeck.findSlide(pathName) }
       }
   }
 }

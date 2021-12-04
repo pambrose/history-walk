@@ -1,7 +1,6 @@
 package com.github.pambrose
 
 import com.codahale.metrics.jvm.ThreadDump
-import com.github.pambrose.Content.ROOT
 import com.github.pambrose.ContentService.Companion.deleteChoices
 import com.github.pambrose.ContentService.Companion.updateLastSlide
 import com.github.pambrose.EndPoints.LOGIN
@@ -9,6 +8,7 @@ import com.github.pambrose.EndPoints.LOGOUT
 import com.github.pambrose.EndPoints.RESET
 import com.github.pambrose.common.util.Version.Companion.versionDesc
 import com.github.pambrose.common.util.isNotNull
+import com.github.pambrose.slides.SlideDeck.Companion.ROOT
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.http.*

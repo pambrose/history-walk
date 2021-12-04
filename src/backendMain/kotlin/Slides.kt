@@ -332,7 +332,7 @@ val text34_majorEncounterRamshackleHutContd = """
       You find yourself resting comfortably, recuperating from a hard journey, enjoying 
       the warm fire and a delicious rustic stew. Unbeknownst to you, the old man, eager 
       to enrich himself with some anticipated reward, has sent his son to fetch the 
-      slave-catchers posted in town...
+      slave-catchers posted in town.
       
 		  After spending the night comfortably, you exit the building to be surprised by...
 """
@@ -594,18 +594,26 @@ val slides =
         choice("Continue", slide12_paddyRollersEnd.copyOf())
       }
 
+    val slide47_politeAndSubmisseBluff =
+      slide("Polite & Submissive Bluff", text47_politeAndSubmisseBluff) {
+        choice("Knock at the door again, waiting for...", slide12_paddyRollersEnd.copyOf())
+        choice(
+          "Ride on, desperately taking main road out of town?",
+          slide20_majorEncounterPatrol.copyOf()
+        )
+        choice("Escape hurriedly into the wilderness.", slide15_winterCrossCountry.copyOf())
+      }
+
     val slide50_majorEncounterRamshackleHut =
       slide("Major Encounter: Ramshackle Hut", text50_majorEncounterRamshackleHut) {
         choice("Enter the ramshackle hut?", slide51_majorEncounterRamshackleHutContd.copyOf())
-        // This circles back to slide 45
-        //choice("Try another building in town?", slide45)
+        choice("Try another building in town?", goBack(-1))
         choice("Ride on, taking main road out of town?", slide20_majorEncounterPatrol.copyOf())
       }
 
     val slide52_majorEncounterPharmacy =
       slide("Major Encounter: Pharmacy", text52_majorEncounterPharmacy) {
-        // This circles back to slide 45
-        //choice("Try another building in town?")
+        choice("Try another building in town?", goBack(-1))
         choice(
           "Push on, desperately hungry and tired, onto the main road out of town?",
           slide20_majorEncounterPatrol.copyOf()
@@ -624,18 +632,7 @@ val slides =
           "Push on, desperately hungry and tired, down the main road out of town?",
           slide20_majorEncounterPatrol.copyOf()
         )
-        // This circles back to slide 45
-        //choice("Head into back into town and try another building", slide45_thirdTown.copyOf())
-      }
-
-    val slide47_politeAndSubmisseBluff =
-      slide("Polite & Submissive Bluff", text47_politeAndSubmisseBluff) {
-        choice("Knock at the door again, waiting for...", slide12_paddyRollersEnd.copyOf())
-        choice(
-          "Ride on, desperately taking main road out of town?",
-          slide20_majorEncounterPatrol.copyOf()
-        )
-        choice("Escape hurriedly into the wilderness.", slide15_winterCrossCountry.copyOf())
+        choice("Head into back into town and try another building", goBack(-2))
       }
 
     val slide46_majorEncounterModestMansion =
@@ -691,8 +688,7 @@ val slides =
           slide("Major Encounter: Ramshackle Hut (cont.)", text42_majorEncounterRamshackleHutContd) {
             choice("Continue", slide12_paddyRollersEnd.copyOf())
           })
-        // TODO This circles back to slide 37
-        //choice("Try another building in town?")
+        choice("Try another building in town?", goBack(-1))
         choice("Ride on, taking main road out of town?", slide20_majorEncounterPatrol.copyOf())
       }
 
@@ -701,21 +697,13 @@ val slides =
       choice("The ordinary tavern in the town center", slide38_majorEncounterOrdinaryTavern.copyOf())
       choice("The bordello in the town center",
         slide("Major Encounter: Bordello", text43_majorEncounterBordello) {
-          // This circles back to slide 37
-          //choice("Try another building in town?", -2)
+          choice("Try another building in town?", goBack(-2))
           choice(
             "Push on, desperately hungry and tired, onto the main road out of town?",
             slide20_majorEncounterPatrol.copyOf()
           )
         })
     }
-
-    val slide31_politeAndSubmissiveBluff =
-      slide("Polite & Submissive Bluff", text31_politeAndSubmissiveBluff) {
-        // TODO This circles back to slide 29
-        //choice("Try another building in town?", slide29_firstTown)
-        choice("Ride on, taking main road out of town?", slide20_majorEncounterPatrol.copyOf())
-      }
 
     val slide32_confidentAndArrogantBluff =
       slide("Confident & Arrogant Bluff", text32_confidentAndArrogantBluff) {
@@ -725,6 +713,12 @@ val slides =
             choice("Head into the wilderness", slide15_winterCrossCountry.copyOf())
           })
         choice("Head into the wilderness", slide15_winterCrossCountry.copyOf())
+      }
+
+    val slide31_politeAndSubmissiveBluff =
+      slide("Polite & Submissive Bluff", text31_politeAndSubmissiveBluff) {
+        choice("Try another building in town?", goBack(-1))
+        choice("Ride on, taking main road out of town?", slide20_majorEncounterPatrol.copyOf())
       }
 
     val slide29_firstTown =
@@ -748,16 +742,14 @@ val slides =
               slide("Major Encounter: Ramshackle Hut (cont.)", text34_majorEncounterRamshackleHutContd) {
                 choice("Continue", slide12_paddyRollersEnd.copyOf())
               })
-            // TODO This circles back to slide 29
-            //choice("Try another building in town?")
+            choice("Try another building in town?", goBack(-1))
             choice("Ride on, taking main road out of town?", slide20_majorEncounterPatrol.copyOf())
           }
         )
         choice(
           "The post office in the town center",
           slide("Major Encounter: Post Office", text35_majorEncounterPostOffice) {
-            // TODO This circles back to slide 29
-            //choice(".Try another building in town?")
+            choice(".Try another building in town?", goBack(-1))
             choice(
               "Push on, desperately hungry and tired, onto the main road out of town?",
               slide20_majorEncounterPatrol.copyOf()

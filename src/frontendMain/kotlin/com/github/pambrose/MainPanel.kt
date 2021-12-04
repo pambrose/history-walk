@@ -16,6 +16,7 @@ import io.kvision.panel.*
 import io.kvision.utils.px
 import kotlinx.browser.document
 import kotlinx.coroutines.launch
+import kotlin.math.abs
 
 object MainPanel : SimplePanel() {
   val buttonPadding = 5.px
@@ -125,18 +126,25 @@ private fun Container.displaySlide(slide: SlideData) {
 }
 
 private fun Container.addChoiceButtons(slide: SlideData) {
-  slide.choices.forEach { slideChoice ->
-    button(slideChoice.choiceText, icon = "fas fa-angle-double-right", style = PRIMARY) {
+  slide.choices.forEach { choice ->
+    button(choice.choiceText, icon = "fas fa-angle-double-right", style = PRIMARY) {
       lowercase()
       onClick {
         AppScope.launch {
-          val choiceReason = Rpc.makeChoice(slide.pathName, slide.title, slideChoice, slide.choices.size == 1)
-          if (choiceReason.reason.isEmpty()) {
-            promptUserForReason(slide.pathName, slide.title, slideChoice)
+          if (choice.offset != 0) {
+            val pos = slide.parentTitles.size - abs(slide.offset) - 1
+            val parentTitle = slide.parentTitles[pos]
+            Rpc.goBackInTime(parentTitle).also { refresh(it) }
           }
           else {
-            val newSlide = Rpc.getCurrentSlide()
-            refresh(newSlide)
+            val choiceReason = Rpc.makeChoice(slide.pathName, slide.title, choice, slide.choices.size == 1)
+            if (choiceReason.reason.isEmpty()) {
+              promptUserForReason(slide.pathName, slide.title, choice)
+            }
+            else {
+              val newSlide = Rpc.getCurrentSlide()
+              refresh(newSlide)
+            }
           }
         }
       }

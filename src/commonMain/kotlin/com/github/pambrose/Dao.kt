@@ -28,7 +28,8 @@ data class SlideData(
   val choices: List<SlideChoice>,
   val verticalChoices: Boolean,
   val parentTitles: List<ParentTitle>,
-  val decisionCount: Long,
+  val offset: Int,
+  val decisionCount: Int,
   val showResetButton: Boolean,
 ) {
   val failure: Boolean
@@ -45,7 +46,7 @@ data class SlideData(
 data class ParentTitle(val pathName: String, val title: String)
 
 @Serializable
-data class SlideChoice(val choiceText: String, val pathName: String, val title: String)
+data class SlideChoice(val choiceText: String, val pathName: String, val title: String, val offset: Int)
 
 @Serializable
 data class UserChoice(

@@ -1,6 +1,6 @@
 package com.github.pambrose
 
-import com.github.pambrose.User.Companion.findSlideForUser
+import com.github.pambrose.User.Companion.findCurrentSlideForUser
 import com.github.pambrose.slides.Slide
 import com.google.inject.Inject
 import com.pambrose.common.exposed.get
@@ -32,7 +32,7 @@ actual class ContentService : IContentService {
   override suspend fun getCurrentSlide(): SlideData {
     logger.debug { "userId=${call.userId}" }
     val uuid = call.userId.uuid
-    val slide = findSlideForUser(uuid, HistoryWalkServer.masterSlides.get())
+    val slide = findCurrentSlideForUser(uuid, HistoryWalkServer.masterSlides.get())
     return slideData(uuid, slide)
   }
 
@@ -54,7 +54,8 @@ actual class ContentService : IContentService {
             SlideChoice(
               row[UserChoiceTable.choiceText],
               row[UserChoiceTable.toPathName],
-              row[UserChoiceTable.toTitle]
+              row[UserChoiceTable.toTitle],
+              0
             ),
             row[UserChoiceTable.reason],
           )
@@ -90,7 +91,7 @@ actual class ContentService : IContentService {
 
       updateLastSlide(uuid, slideChoice.pathName)
 
-      val slide = findSlideForUser(uuid, HistoryWalkServer.masterSlides.get())
+      val slide = findCurrentSlideForUser(uuid, HistoryWalkServer.masterSlides.get())
       slideData(uuid, slide)
     }
 
@@ -98,7 +99,7 @@ actual class ContentService : IContentService {
     transaction {
       val uuid = call.userId.uuid
       updateLastSlide(uuid, parentTitle.pathName)
-      val slide = findSlideForUser(uuid, HistoryWalkServer.masterSlides.get())
+      val slide = findCurrentSlideForUser(uuid, HistoryWalkServer.masterSlides.get())
       slideData(uuid, slide)
     }
 
@@ -150,7 +151,7 @@ actual class ContentService : IContentService {
 
       val choices =
         slide.choices.map { (choice, slide) ->
-          SlideChoice(choice, slide.pathName, slide.title)
+          SlideChoice(choice, slide.pathName, slide.title, slide.offset)
         }
 
       val parentTitles =
@@ -166,8 +167,8 @@ actual class ContentService : IContentService {
 
       return slide.run {
         val count = slideCount(uuid)
-        val showResetButton = EnvVar.SHOW_RESET_BUTTON.getEnv(false)
-        SlideData(pathName, title, content, success, choices, verticalChoices, parentTitles, count, showResetButton)
+        val reset = EnvVar.SHOW_RESET_BUTTON.getEnv(false)
+        SlideData(pathName, title, content, success, choices, verticalChoices, parentTitles, offset, count, reset)
       }
     }
 
@@ -178,6 +179,7 @@ actual class ContentService : IContentService {
           .select { UserChoiceTable.userUuid eq UUID.fromString(uuid) }
           .map { it[0] as Long }
           .first()
+          .toInt()
       }
   }
 }

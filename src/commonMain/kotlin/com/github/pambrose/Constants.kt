@@ -1,9 +1,5 @@
 package com.github.pambrose
 
-object Content {
-  const val ROOT = "/"
-}
-
 object Auth {
   const val AUTH_COOKIE = "HistoryWalkAuth"
 }
