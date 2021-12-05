@@ -115,10 +115,10 @@ val text8_summerCrossCountry = """
 """
 
 val text9_fleeIntoDeepForestEnd = """
-    <p style="margin-top:125px;border:3px solid white;">  
-    <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/deep-forest.jpg" alt="Pic" style="width:233px;height:217px;border:3px solid black;float:right;margin-left:10px;"/>  
+    <p style="padding-bottom:10px;">
+    <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/deep-forest.jpg" alt="Pic" style="width:233px;height:217px;border:2px solid gray;float:right;margin-left:10px;"/>  
 
-    <p style="padding-bottom:50px;">
+    <p>
     You dash into the deep forest, gasping for air, as the sound of hounds follow you.
     You begin to panic as the sounds get louder and closer.
     
