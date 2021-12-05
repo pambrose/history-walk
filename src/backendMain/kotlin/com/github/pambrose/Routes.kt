@@ -7,6 +7,7 @@ import com.github.pambrose.EndPoints.CONTENT_RESET
 import com.github.pambrose.EndPoints.LOGIN
 import com.github.pambrose.EndPoints.LOGOUT
 import com.github.pambrose.EndPoints.USER_RESET
+import com.github.pambrose.HistoryWalkServer.masterSlides
 import com.github.pambrose.common.util.Version.Companion.versionDesc
 import com.github.pambrose.common.util.isNotNull
 import com.github.pambrose.slides.SlideDeck.Companion.ROOT
@@ -17,6 +18,7 @@ import io.ktor.http.ContentType.Text.Plain
 import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.sessions.*
+import io.ktor.util.*
 import io.kvision.remote.applyRoutes
 import mu.KLogging
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -41,14 +43,21 @@ object Routes : KLogging() {
               val userId = UserId(user.uuid.toString())
               call.sessions.set(userId)
               HttpStatusCode.OK
-            } else {
+            }
+            else {
               HttpStatusCode.Unauthorized
             }
-          } else {
+          }
+          else {
             HttpStatusCode.Unauthorized
           }
 
         call.respond(result)
+      }
+
+      get(LOGOUT) {
+        call.sessions.clear<UserId>()
+        call.respondRedirect("/")
       }
 
       get(CONTENT_RESET) {
@@ -61,11 +70,6 @@ object Routes : KLogging() {
         }
       }
 
-      get(LOGOUT) {
-        call.sessions.clear<UserId>()
-        call.respondRedirect("/")
-      }
-
       get(USER_RESET) {
         transaction {
           val uuid = call.userId.uuid
@@ -73,6 +77,42 @@ object Routes : KLogging() {
           updateLastSlide(uuid, ROOT)
         }
         call.respondRedirect("/")
+      }
+
+      get("slide/{slideId}/{version}") {
+        val slideId = call.parameters.getOrFail("slideId")
+        val version =
+          try {
+            call.parameters.getOrFail("version")
+          } catch (e: Exception) {
+            "0"
+          }
+        val slide = masterSlides.get().findSlideById(slideId, version.toInt())
+        if (slide != null) {
+          transaction {
+            val uuid = call.userId.uuid
+            updateLastSlide(uuid, slide.pathName)
+          }
+          call.respondRedirect("/")
+        }
+        else {
+          call.respondText("Slide not found: $slideId/$version", Plain)
+        }
+      }
+
+      get("slide/{slideId}") {
+        val slideId = call.parameters.getOrFail("slideId")
+        val slide = masterSlides.get().findSlideById(slideId, 0)
+        if (slide != null) {
+          transaction {
+            val uuid = call.userId.uuid
+            updateLastSlide(uuid, slide.pathName)
+          }
+          call.respondRedirect("/")
+        }
+        else {
+          call.respondText("Slide not found: $slideId", Plain)
+        }
       }
     }
 

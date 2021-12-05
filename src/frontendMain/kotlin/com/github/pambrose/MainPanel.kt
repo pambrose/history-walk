@@ -2,8 +2,8 @@ package com.github.pambrose
 
 import com.github.pambrose.ClientUtils.lowercase
 import com.github.pambrose.ClientUtils.verticalPadding
+import com.github.pambrose.EndPoints.CONTENT_RESET
 import com.github.pambrose.EndPoints.LOGOUT
-import com.github.pambrose.EndPoints.USER_RESET
 import com.github.pambrose.MainPanel.buttonPadding
 import com.github.pambrose.MainPanel.refresh
 import com.github.pambrose.MainPanel.userInfo
@@ -14,6 +14,8 @@ import io.kvision.html.*
 import io.kvision.html.ButtonStyle.*
 import io.kvision.modal.Dialog
 import io.kvision.panel.*
+import io.kvision.state.ObservableValue
+import io.kvision.state.bind
 import io.kvision.utils.px
 import kotlinx.browser.document
 import kotlinx.coroutines.launch
@@ -22,13 +24,13 @@ import kotlin.math.abs
 object MainPanel : SimplePanel() {
   val buttonPadding = 5.px
   val panel = SimplePanel()
-  lateinit var userInfo: UserInfo
+  val userInfo = ObservableValue(UserInfo("", ""))
 
   init {
     add(panel)
 
     AppScope.launch {
-      userInfo = Rpc.getUserInfo()
+      userInfo.value = Rpc.getUserInfo()
     }
   }
 
@@ -48,7 +50,9 @@ private fun Container.displaySlide(slide: SlideData) {
         paddingBottom = 10.px
 
         vPanel {
-          hPanel { +userInfo.email }
+          hPanel().bind(userInfo) {
+            +it.email
+          }
           hPanel { +"Decision count: ${slide.decisionCount}" }
         }
         button("Logout", "fas fa-sign-out-alt", style = LINK) {
@@ -62,7 +66,7 @@ private fun Container.displaySlide(slide: SlideData) {
           button("Reset", "fas fa-sync-alt", style = LINK) {
             lowercase()
             onClick {
-              document.location?.href = "/$USER_RESET"
+              document.location?.href = "/$CONTENT_RESET"
             }
           }
       }

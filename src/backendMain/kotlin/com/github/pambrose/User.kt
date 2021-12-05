@@ -181,7 +181,7 @@ class User {
           .select { UsersTable.uuidCol eq UUID.fromString(uuid) }
           .map { it[UsersTable.lastPathName] }
           .firstOrNull() ?: error("Missing uuid: $uuid"))
-          .let { pathName -> slideDeck.findSlide(pathName) }
+          .let { pathName -> slideDeck.findSlideByPathName(pathName) }
       }
   }
 }
