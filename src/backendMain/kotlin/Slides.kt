@@ -117,7 +117,6 @@ val text8_summerCrossCountry = """
 val text9_fleeIntoDeepForestEnd = """
     <p style="padding-bottom:10px;">
     <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/deep-forest.jpg" alt="Pic" style="width:233px;height:217px;border:2px solid gray;float:right;margin-left:10px;"/>  
-
     <p>
     You dash into the deep forest, gasping for air, as the sound of hounds follow you.
     You begin to panic as the sounds get louder and closer.
@@ -131,418 +130,460 @@ val text9_fleeIntoDeepForestEnd = """
 """
 
 val text10_autumnDeparture = """
-      As harvest time come along, you decide to make your move, hoping to take advantage 
-      the heightened activity and slip away in the mix. Initially, it seems that you are 
-      successful, making your way off the plantation and down the road into the countryside. 
-      However, as you near the brushy cover on outskirts of the next hamlet, a quick rustling 
-      sound precedes...
+    As harvest time come along, you decide to make your move, hoping to take advantage 
+    the heightened activity and slip away in the mix. Initially, it seems that you are 
+    successful, making your way off the plantation and down the road into the countryside. 
+    However, as you near the brushy cover on outskirts of the next hamlet, a quick rustling 
+    sound precedes...
 """
 
 val text11_springDeparture = """
-      In springtime, it is said that thoughts turn romance and courting, distracting one from 
-      ordinary, difficult, or boring tasks. That is your hope, anyway, as you seek to escape 
-      while adversaries are hopefully off their guard. However, such is not the case. It seem 
-      that you were spotted. At the sound of the harsh braying of pursuing hounds, you flee 
-      blindly into the brush, emerging to...
+    In springtime, it is said that thoughts turn romance and courting, distracting one from 
+    ordinary, difficult, or boring tasks. That is your hope, anyway, as you seek to escape 
+    while adversaries are hopefully off their guard. However, such is not the case. It seem 
+    that you were spotted. At the sound of the harsh braying of pursuing hounds, you flee 
+    blindly into the brush, emerging to...
 """
 
 val text12_paddyRollersEnd = """
-      You are surprised by the sudden appearance of four ‘paddy rollers,’ as slave-catchers 
-      were sometimes called, who were waiting to ambush you. Speedily they seize you up, 
-      bind you, and, after torturing you for information, return you to your owner for a reward.
-      He then cruelly punishes you for trying to escape.
-      
-      THE END.
+    <p>
+    <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/paddyrollers.jpg" alt="Pic" style="width:301px;height:159px;border:2px solid gray;float:right;margin-left:10px;"/>  
+    You are surprised by the sudden appearance of four ‘paddy rollers,’ as slave-catchers 
+    were sometimes called, who were waiting to ambush you. Speedily they seize you up, 
+    bind you, and, after torturing you for information, return you to your owner for a reward.
+    He then cruelly punishes you for trying to escape.
+    
+    THE END.
+    </p>
 """
 
 val text13_winterDepartureAlone = """
-      Will you try to steal an overcoat in order to survive the elements as you hopefully head... North?
+    <p>
+    <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/winterdeparture.jpg" alt="Pic" style="width:187px;height:258px;border:2px solid gray;float:right;margin-left:10px;"/>  
+    <p style="padding-top:100px;padding-bottom:90px;">
+    Will you try to steal an overcoat in order to survive the elements as you hopefully head... North?
+    </p>
+    </p>
 """
 
 val text14_stealOvercoat = """
-      That evening, you creep into the main household, enter the coat room, and grab 
-      your master’s finest winter coat.
-      
-	    Striding outside, toasty warm and with a sense of accomplishment, you begin your journey.
+    <p>
+    <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/winterdeparture.jpg" alt="Pic" style="width:187px;height:258px;border:2px solid gray;float:right;margin-left:10px;"/>  
+    <p style="padding-top:50px;margin-bottom:50px;">
+    That evening, you creep into the main household, enter the coat room, and grab 
+    your master’s finest winter coat.
+    
+    Striding outside, toasty warm and with a sense of accomplishment, you begin your journey.
 
-      You decide to go...
+    You decide to go...
+    </p>
+    </p>
 """
 
 val text15_winterCrossCountry = """
-      The winter is harsh, and as the freezing wind blows your toes begin to go numb, 
-      but fear of the slave-catchers and their dogs drives you deeper into the wilderness.
-      But soon the terrain gets rougher, the snow drifts get deeper, the brush blocks your sight, 
-      and an increasing number of trees start to affect your sense of direction.
-      
-	    You are lost. Suddenly, at the sound of the harsh braying of pursuing hounds, you flee blindly.
-      
-      Where do you go?
+    The winter is harsh, and as the freezing wind blows your toes begin to go numb, 
+    but fear of the slave-catchers and their dogs drives you deeper into the wilderness.
+    But soon the terrain gets rougher, the snow drifts get deeper, the brush blocks your sight, 
+    and an increasing number of trees start to affect your sense of direction.
+    
+    You are lost. Suddenly, at the sound of the harsh braying of pursuing hounds, you flee blindly.
+    
+    Where do you go?
 """
 
 val text16_rossEncounter = """
-      Having risked severe punishment, you have managed to steal some bacon, 
-      flour, bread, fruit preserves, and 12 dollars (two of which you will keep).
-      In the past, you would not have dared to even think of stealing from your 
-      former master, who was also your father. But having been sold, along with 
-      your mother and siblings, to one you thought of as an uncle and then to 
-      have been subjected to savage beatings, you feel no remorse about the deed.
-      
-      As instructed, you go to the dense thicket at the edge of town right near 
-      dusk, when the light is low and it would be difficult for someone to spot 
-      your meeting. You call out, “Ross,” hoping that he’s there, fearing that 
-      you will get caught, and worried that he might cheat you. He asks if you 
-      have what he wants, and when you nod and hold up a sack with the goods, 
-      he steps up close and offers a linen bundle in exchange.
-      
-      Do you complete the deal?
+    <p>
+    <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/ross.jpg" alt="Pic" style="width:164;height:383px;border:2px solid gray;float:right;margin-left:10px;"/>  
+    Having risked severe punishment, you have managed to steal some bacon, 
+    flour, bread, fruit preserves, and 12 dollars (two of which you will keep).
+    In the past, you would not have dared to even think of stealing from your 
+    former master, who was also your father. But having been sold, along with 
+    your mother and siblings, to one you thought of as an uncle and then to 
+    have been subjected to savage beatings, you feel no remorse about the deed.
+    
+    As instructed, you go to the dense thicket at the edge of town right near 
+    dusk, when the light is low and it would be difficult for someone to spot 
+    your meeting. You call out, “Ross,” hoping that he’s there, fearing that 
+    you will get caught, and worried that he might cheat you. He asks if you 
+    have what he wants, and when you nod and hold up a sack with the goods, 
+    he steps up close and offers a linen bundle in exchange.
+    
+    Do you complete the deal?
+    </p>
 """
 
 val text17_rossAdvice = """
-      Ross says the following:
+    Ross says the following:
 
-      <b><i>If you act shy, avoid eye contact, and slink about furtively, you will draw the wrong 
-      kind of attention. Many will suspect you are a fugitive and the authorities or worse 
-      shall come down upon you.</i></b>
+    <b><i>If you act shy, avoid eye contact, and slink about furtively, you will draw the wrong 
+    kind of attention. Many will suspect you are a fugitive and the authorities or worse 
+    shall come down upon you.</i></b>
 
-      <b><i>These free papers are an invitation to act free. Be confident, be forthright, be bold, 
-      take initiate, be relaxed, be engaging—none will take you for slave.</i></b>
-	
-      <b><i>So, do not take the sidetrack or back road—stick to the main thoroughfare, and when you 
-      enter a town, go to the grandest structure and call upon the proprietor for lodging.</i></b>
+    <b><i>These free papers are an invitation to act free. Be confident, be forthright, be bold, 
+    take initiate, be relaxed, be engaging—none will take you for slave.</i></b>
 
-	    As you watch Ross slip away into the growing mist of night, you hear the bark of a dog 
-      in the distance. It both alarms and reminds you that you are now committed to this course 
-      of action. Will you leave immediately, in the Autumn, with the aim of being able to sneak 
-      out unnoticed in the busy comings and goings and extra activity of harvest time? Or will 
-      you risk getting caught by staying a little longer to seek out the advice of old Ben?
+    <b><i>So, do not take the sidetrack or back road—stick to the main thoroughfare, and when you 
+    enter a town, go to the grandest structure and call upon the proprietor for lodging.</i></b>
+
+    As you watch Ross slip away into the growing mist of night, you hear the bark of a dog 
+    in the distance. It both alarms and reminds you that you are now committed to this course 
+    of action. Will you leave immediately, in the Autumn, with the aim of being able to sneak 
+    out unnoticed in the busy comings and goings and extra activity of harvest time? Or will 
+    you risk getting caught by staying a little longer to seek out the advice of old Ben?
 """
 
+// TODO This is not used
 val text18_winterTravelEnd = """
-      ...Without a coat, you freeze to death in the wilderness.
-      
-      THE END.
+    ...Without a coat, you freeze to death in the wilderness.
+    
+    THE END.
 """
 
 val text19_stealOvercoatViaRoss = """
-      That evening, you creep into the main household, enter the coat room, and grab 
-      your master’s finest winter coat.
-      
-	    Striding outside, toasty warm and with a sense of accomplishment, you begin your journey.
+    <p>
+    <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/winterdeparture.jpg" alt="Pic" style="width:187px;height:258px;border:2px solid gray;float:right;margin-left:10px;"/>  
+    <p style="padding-top:50px;margin-bottom:50px;">
+    That evening, you creep into the main household, enter the coat room, and grab 
+    your master’s finest winter coat.
+    
+    Striding outside, toasty warm and with a sense of accomplishment, you begin your journey.
 
-      You decide to go...
+    You decide to go...
+    </p>
+    </p>
 """
 
 val text20_majorEncounterPatrol = """
-	    Rounding the bend on the main road that you have been following, you come to a crossroads 
-      just as two men ride up from the side, one with a rifle slung across back. They quickly 
-      pull along side, grab the reins of your horses, and begin to question you aggressively, 
-      demanding to see your passes, to know your origins and destination, and to learn your 
-      intentions.
-      
-      Do you...
+    <p>
+    <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/patrol.jpg" alt="Pic" style="width:196px;height:379px;border:2px solid gray;float:right;margin-left:10px;"/>  
+    <p style="padding-top:90px;margin-bottom:70px;">
+    Rounding the bend on the main road that you have been following, you come to a crossroads 
+    just as two men ride up from the side, one with a rifle slung across back. They quickly 
+    pull along side, grab the reins of your horses, and begin to question you aggressively, 
+    demanding to see your passes, to know your origins and destination, and to learn your 
+    intentions.
+    
+    Do you...
+    </p>
+    </p>
 """
 
 val text21_majorEncounterViaRoss1stPatrol = """
-      Rounding the bend on the main road that you have been following, you come to a crossroads 
-      just as two men ride up from the side, one with a rifle slung across back. They quickly 
-      pull along side, grab the reins of your horses, and begin to question you aggressively, 
-      demanding to see your passes, to know your origins and destination, and to learn your 
-      intentions.
-      
-      Do you...
+    <p>
+    <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/patrol.jpg" alt="Pic" style="width:196px;height:379px;border:2px solid gray;float:right;margin-left:10px;"/>  
+    <p style="padding-top:90px;margin-bottom:70px;">
+    Rounding the bend on the main road that you have been following, you come to a crossroads 
+    just as two men ride up from the side, one with a rifle slung across back. They quickly 
+    pull along side, grab the reins of your horses, and begin to question you aggressively, 
+    demanding to see your passes, to know your origins and destination, and to learn your 
+    intentions.
+    
+    Do you...
+    </p>
+    </p>
 """
 
 val text22_majorEncounterFleePatrolEnd = """
-      As you turn to run, you hear the loud blast of a pistol, following by an hot, stabbing 
-      pain in your thigh. Stumbling and and falling, you fumble futilely for some weapon.
-      The pain is overwhelming and the bleeding great. As your vision begins to blur, you 
-      know that you will awaken either back at the plantation or in the hereafter... 
-      
-      THE END.
+    <p>
+    <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/fleepatrol.jpg" alt="Pic" style="width:200px;height:300px;border:2px solid gray;float:right;margin-left:10px;"/>  
+    <p style="padding-top:40px;margin-bottom:70px;">
+    As you turn to run, you hear the loud blast of a pistol, following by an hot, stabbing 
+    pain in your thigh. Stumbling and and falling, you fumble futilely for some weapon.
+    The pain is overwhelming and the bleeding great. As your vision begins to blur, you 
+    know that you will awaken either back at the plantation or in the hereafter... 
+    
+    THE END.
+    </p>
+    </p>
 """
 
 val text23_majorEncounterFight1stPatrolEnd = """
-      You and your companion boldly respond by trying to throw the men from their horses.
-      
-      Melee ensues, and you find yourself beaten to a pulp, shortly to be bound, strapped 
-      to the back of horse, and taken back to the plantation. 
-      
-      THE END.
+    You and your companion boldly respond by trying to throw the men from their horses.
+    
+    Melee ensues, and you find yourself beaten to a pulp, shortly to be bound, strapped 
+    to the back of horse, and taken back to the plantation. 
+    
+    THE END.
 """
 
 val text24_majorEncounterViaRossFight1stPatrol = """
-      You and your companion boldly respond by drawing your pistols and firing at the men.
-      Hitting one and causing the horses to panic, the other ride flees in terror as the 
-      wounded rider drops to the ground, unconscious.
-      
-	    Rolling his body into the brush and sending his horse off, you are able to continue 
-      down the main road swiftly.
-      
-	    Do you decide...
+    You and your companion boldly respond by drawing your pistols and firing at the men.
+    Hitting one and causing the horses to panic, the other ride flees in terror as the 
+    wounded rider drops to the ground, unconscious.
+    
+    Rolling his body into the brush and sending his horse off, you are able to continue 
+    down the main road swiftly.
+    
+    Do you decide...
 """
 
 val text25_majorEncounterBluffPatrol = """
-      You try to explain that you have been sent on a mission by your master, which was 
-      not an uncommon occurrence. However, the man with a rifle demands to see your 
-      travel papers. You have none.
-		
-      Having failed at bluffing, will you...
+    You try to explain that you have been sent on a mission by your master, which was 
+    not an uncommon occurrence. However, the man with a rifle demands to see your 
+    travel papers. You have none.
+  
+    Having failed at bluffing, will you...
 """
 
 val text26_majorEncounterViaRossBluff1stPatrol = """
-      You try to explain that you have been sent on a mission by your master, which was 
-      not an uncommon occurrence. However, the man with a rifle demands to see your travel 
-      papers. You show the man the travel papers that Ross gave you.
-      
-		  Do you...
+    You try to explain that you have been sent on a mission by your master, which was 
+    not an uncommon occurrence. However, the man with a rifle demands to see your travel 
+    papers. You show the man the travel papers that Ross gave you.
+    
+    Do you...
 """
 
 val text27_politeAndSubmissiveBluff = """
-      Your polite and submissive tone arouses their suspicions. One man says, “Those papers 
-      look fake!” and the men begin to raise their rifles.
-      
-		  Having failed at bluffing, will you...
+    Your polite and submissive tone arouses their suspicions. One man says, “Those papers 
+    look fake!” and the men begin to raise their rifles.
+    
+    Having failed at bluffing, will you...
 """
 
 val text28_confidentAndArrogantBluff = """
-      Your confident and arrogant tone convince the men that you are purpose is legitimate.
-      Ross’ advice was useful this time.
-      
-      The armed patrol allows you to continue down the main road into town.
+    Your confident and arrogant tone convince the men that you are purpose is legitimate.
+    Ross’ advice was useful this time.
+    
+    The armed patrol allows you to continue down the main road into town.
 """
 
 val text29_firstTown = """
-      Having ridden the main road into town, exhausted and famished, unable to continue, 
-      which building should you approach?
+    Having ridden the main road into town, exhausted and famished, unable to continue, 
+    which building should you approach?
 """
 
 val text30_majorEncounterBaronialMansion = """
-      <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/mansion.jpg" alt="Pic" style="width:596px;height:249px;border:3px solid black;display: block;margin-left: auto;margin-right: auto;margin-bottom: 30px;"/>  
+    <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/mansion.jpg" alt="Pic" style="width:596px;height:249px;border:3px solid gray;display: block;margin-left: auto;margin-right: auto;margin-bottom: 30px;"/>  
 
-      A regally dressed servant opens the door and asks your business. 
-      
-      Do you...
+    A regally dressed servant opens the door and asks your business. 
+    
+    Do you...
 """
 
 val text31_politeAndSubmissiveBluff = """
-      Your polite and submissive tone arouses the servant’s suspicions. An old, 
-      well-dressed woman, brusquely yells from somewhere inside, “Thomas, send 
-      that riff raff away!”
-      
-		  Will you...
+    Your polite and submissive tone arouses the servant’s suspicions. An old, 
+    well-dressed woman, brusquely yells from somewhere inside, “Thomas, send 
+    that riff raff away!”
+    
+    Will you...
 """
 
 val text32_confidentAndArrogantBluff = """
-      Your confident and arrogant tone convinces the servant that you are some men 
-      of importance. He yells to someone inside, “Madam, these fine gentlemen seek your 
-      hospitality. I judge them to be of upright character.”
-      
-      An elderly voice responds from inside, “Fine, they may stay one night in the Petunia 
-      guest chambers, and be on their way.”
-      
-      You and your companion spend one night at the mansion before setting off.
+    Your confident and arrogant tone convinces the servant that you are some men 
+    of importance. He yells to someone inside, “Madam, these fine gentlemen seek your 
+    hospitality. I judge them to be of upright character.”
+    
+    An elderly voice responds from inside, “Fine, they may stay one night in the Petunia 
+    guest chambers, and be on their way.”
+    
+    You and your companion spend one night at the mansion before setting off.
 
-      Do you...
+    Do you...
 """
 
 val text33_majorEncounterRamshackleHut = """
-      A gnarled old face peers from behind a dirty window when you knock. The door opens...
-      a nearly toothless smile greets you, and a wrinkled hand beckons you in.
-      
-		  The hut dwelling friendly old man kindly offers you soup, and a chance to warm your 
-      feet by the fire.
-      
-		  Do you...
+    A gnarled old face peers from behind a dirty window when you knock. The door opens...
+    a nearly toothless smile greets you, and a wrinkled hand beckons you in.
+    
+    The hut dwelling friendly old man kindly offers you soup, and a chance to warm your 
+    feet by the fire.
+    
+    Do you...
 """
 
 val text34_majorEncounterRamshackleHutContd = """
-      You find yourself resting comfortably, recuperating from a hard journey, enjoying 
-      the warm fire and a delicious rustic stew. Unbeknownst to you, the old man, eager 
-      to enrich himself with some anticipated reward, has sent his son to fetch the 
-      slave-catchers posted in town.
-      
-		  After spending the night comfortably, you exit the building to be surprised by...
+    You find yourself resting comfortably, recuperating from a hard journey, enjoying 
+    the warm fire and a delicious rustic stew. Unbeknownst to you, the old man, eager 
+    to enrich himself with some anticipated reward, has sent his son to fetch the 
+    slave-catchers posted in town.
+    
+    After spending the night comfortably, you exit the building to be surprised by...
 """
 
 val text35_majorEncounterPostOffice = """
-      You enter the post office. Several heads turn your way, with sneering expressions 
-      upon seeing you. A postal official says: “You DO NOT belong here, get out before I 
-      call the authorities!”
-      
-		  Will you...
+    You enter the post office. Several heads turn your way, with sneering expressions 
+    upon seeing you. A postal official says: “You DO NOT belong here, get out before I 
+    call the authorities!”
+    
+    Will you...
 """
 
 val text36_mainRoadOutOfTown = """
-      Do you...
+    Do you...
 """
 
 val text37_secondTown = """
-      Having ridden the main road into town, exhausted and famished, unable to continue, 
-      which building should you approach?
+    Having ridden the main road into town, exhausted and famished, unable to continue, 
+    which building should you approach?
 """
 
 val text38_majorEncounterOrdinaryTavern = """
-		  The sounds of merriment, the clinking of glasses, and the smell of tobacco smoke 
-      greet you upon entering the fairly busy establishment. A burly barkeep sporting 
-      bright red lamb chop sideburns, sleeves rolled up past his elbow, and wearing a 
-      filthy apron crosses his arms and scowls, demanding, “What’dya want?”
-      
-      Do you...
+    The sounds of merriment, the clinking of glasses, and the smell of tobacco smoke 
+    greet you upon entering the fairly busy establishment. A burly barkeep sporting 
+    bright red lamb chop sideburns, sleeves rolled up past his elbow, and wearing a 
+    filthy apron crosses his arms and scowls, demanding, “What’dya want?”
+    
+    Do you...
 """
 
 val text39_politeAndSubmissiveBluff = """
-      Your polite and submissive tone arouses the barkeep’s suspicions, “Johnny, we got 
-      some runaways, call the patrol!”
-      
-		  As patrons scramble to pursue you (hoping for a reward), which way will you flee?
+    Your polite and submissive tone arouses the barkeep’s suspicions, “Johnny, we got 
+    some runaways, call the patrol!”
+    
+    As patrons scramble to pursue you (hoping for a reward), which way will you flee?
 """
 
 val text40_confidentAndArrogantBluff = """
-      Your confident and arrogant tone may have convinced the barkeep that you are men 
-      of importance. After grimacing, shaking his head, and looking around twice, he 
-      says, “Harry, get these men two mugs of red ale, a plate, and set them up in room 11!”
+    Your confident and arrogant tone may have convinced the barkeep that you are men 
+    of importance. After grimacing, shaking his head, and looking around twice, he 
+    says, “Harry, get these men two mugs of red ale, a plate, and set them up in room 11!”
 
-      After filling your bellies, spending a dollar, and resting for the night, do you...
+    After filling your bellies, spending a dollar, and resting for the night, do you...
 """
 
 val text41_majorEncounterRamshackleHut = """
-      A gnarled old face peers from behind a dirty window when you knock. The door opens 
-      and a nearly toothless smile greets you, and a wrinkled hand beckons you in.
-      
-		  The old man offers you soup, and a chance to warm your feet by the fire.
+    A gnarled old face peers from behind a dirty window when you knock. The door opens 
+    and a nearly toothless smile greets you, and a wrinkled hand beckons you in.
+    
+    The old man offers you soup, and a chance to warm your feet by the fire.
 
-		  Do you...
+    Do you...
 """
 
 val text42_majorEncounterRamshackleHutContd = """
-      You find yourself resting comfortably, recuperating from a hard journey, enjoying 
-      the warm fire and a delicious rustic stew. Unbeknownst to you, the old man has 
-      sent his son to fetch the slave-catchers posted in town...
-      
-		  After spending the night comfortably, you exit the building to be surprised by...
+    You find yourself resting comfortably, recuperating from a hard journey, enjoying 
+    the warm fire and a delicious rustic stew. Unbeknownst to you, the old man has 
+    sent his son to fetch the slave-catchers posted in town...
+    
+    After spending the night comfortably, you exit the building to be surprised by...
 """
 
 val text43_majorEncounterBordello = """
-      You enter the bordello. Several heads turn your way, with sneering expressions 
-      upon seeing you. A garishly dressed women says: “You DO NOT belong here, get 
-      out before I call the authorities!”
-      
-		  Will you...
+    You enter the bordello. Several heads turn your way, with sneering expressions 
+    upon seeing you. A garishly dressed women says: “You DO NOT belong here, get 
+    out before I call the authorities!”
+    
+    Will you...
 """
 
 val text44_mainRoadOutOfSecondTown = """
-      Do you...
+    Do you...
 """
 
 val text45_thirdTown = """
-      Having ridden the main road into town, exhausted and famished, unable to continue, 
-      which building should you approach?
+    Having ridden the main road into town, exhausted and famished, unable to continue, 
+    which building should you approach?
 """
 
 val text46_majorEncounterModestMansion = """
-      The door opens, after you knock, and a middle-aged man in a worn suit stares out at 
-      you blankly and says, in a somewhat harsh tone, “What is it you wish? Why are you here?”
-		
-      Do you...
+    The door opens, after you knock, and a middle-aged man in a worn suit stares out at 
+    you blankly and says, in a somewhat harsh tone, “What is it you wish? Why are you here?”
+  
+    Do you...
 """
 
 val text47_politeAndSubmisseBluff = """
-      Your polite and submissive tone arouses the man’s suspicions. He slams the door, 
-      and you hear the loud ringing of a bell from the rooftop.
-      
-      Do you...
+    Your polite and submissive tone arouses the man’s suspicions. He slams the door, 
+    and you hear the loud ringing of a bell from the rooftop.
+    
+    Do you...
 """
 
 val text48_confidentAndArrogantBluff = """
-      Your confident and arrogant tone may have convinced the man that you are men of 
-      some importance. However, he will not extend his hospitality freely.
+    Your confident and arrogant tone may have convinced the man that you are men of 
+    some importance. However, he will not extend his hospitality freely.
 """
 
 val text49_confidentAndArrogantBluffContd = """
-      You spend the night comfortably, and the next morning you set off.
-      
-      Do you...
+    You spend the night comfortably, and the next morning you set off.
+    
+    Do you...
 """
 
 val text50_majorEncounterRamshackleHut = """
-      A gnarled old face peers from behind a dirty window when you knock. The door 
-      opens and a nearly toothless smile greets you, and a wrinkled hand beckons you in.
-      
-		  The old man offers you soup, and a chance to warm your feet by the fire.
-		
-      Do you...
+    A gnarled old face peers from behind a dirty window when you knock. The door 
+    opens and a nearly toothless smile greets you, and a wrinkled hand beckons you in.
+    
+    The old man offers you soup, and a chance to warm your feet by the fire.
+  
+    Do you...
 """
 
 val text51_majorEncounterRamshackleHutContd = """
-      You find yourself resting comfortably, recuperating from a hard journey, enjoying 
-      the warm fire and a delicious rustic stew. Unbeknownst to you, the old man has sent 
-      his son to fetch the slave-catchers posted in town...
-      
-		  After spending the night comfortably, you exit the building to be surprised by...
+    You find yourself resting comfortably, recuperating from a hard journey, enjoying 
+    the warm fire and a delicious rustic stew. Unbeknownst to you, the old man has sent 
+    his son to fetch the slave-catchers posted in town...
+    
+    After spending the night comfortably, you exit the building to be surprised by...
 """
 
 val text52_majorEncounterPharmacy = """
-      A bell rings as you enter the pharmacy. A bespeckled clerk peers at you over his 
-      glasses, and coolly declares, “You do not belong here!”
-      
-		  Will you...
+    A bell rings as you enter the pharmacy. A bespeckled clerk peers at you over his 
+    glasses, and coolly declares, “You do not belong here!”
+    
+    Will you...
 """
 
 val text53_majorEncounter2ndPatrol = """
-      After riding for some hours, you enter into a brushy area with low visibility.
-      Suddenly, a rider moves out from the cover of the foliage to block your path forward.
-      You hear a similar rustling behind you as another emerges to block your retreat.
-      They demand information forcefully and menacingly, mentioning something about escaped 
-      slaves in the area assaulting decent citizens.
-      
-      Do you...
+    <p>
+    <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/2ndpatrol.jpg" alt="Pic" style="width:178px;height:417px;border:2px solid gray;float:right;margin-left:10px;"/>  
+    <p style="padding-top:100px;margin-bottom:100px;">
+    After riding for some hours, you enter into a brushy area with low visibility.
+    Suddenly, a rider moves out from the cover of the foliage to block your path forward.
+    You hear a similar rustling behind you as another emerges to block your retreat.
+    They demand information forcefully and menacingly, mentioning something about escaped 
+    slaves in the area assaulting decent citizens.
+    
+    Do you...
+    </p>
+    </p>
 """
 
 val text54_majorEncounterFight2ndPatrol = """
-      You and your companion boldly respond by drawing your pistols and firing at the men.
-      Hitting one and causing the horses to panic, the other ride flees in terror as the 
-      wounded rider drops to the ground, unconscious.
-      
-	    Rolling his body into the brush and sending his horse off, you are able to continue 
-      down the main road swiftly.
-      
-	    Having successfully fought off two patrols now, your companion anxiously suggests 
-      that you both get off the main road and strike out cross-country.
+    You and your companion boldly respond by drawing your pistols and firing at the men.
+    Hitting one and causing the horses to panic, the other ride flees in terror as the 
+    wounded rider drops to the ground, unconscious.
+    
+    Rolling his body into the brush and sending his horse off, you are able to continue 
+    down the main road swiftly.
+    
+    Having successfully fought off two patrols now, your companion anxiously suggests 
+    that you both get off the main road and strike out cross-country.
 """
 
 val text55_majorEncounterBluff2ndPatrol = """
-      You try to explain that you have been sent on a mission by your master, which was 
-      not an uncommon occurrence. However, the man with a rifle demands to see your travel 
-      papers. You have none.
-      
-		  Having failed at bluffing, will you...
+    You try to explain that you have been sent on a mission by your master, which was 
+    not an uncommon occurrence. However, the man with a rifle demands to see your travel 
+    papers. You have none.
+    
+    Having failed at bluffing, will you...
 """
 
 val text56_backroads = """
-      After travelling undetected for days, you are slowly starving.
-		
-      Finally, you come to a clearing and see a lone log cabin.
-      
-      Do you...
+    After travelling undetected for days, you are slowly starving.
+  
+    Finally, you come to a clearing and see a lone log cabin.
+    
+    Do you...
 """
 
 val text57_riverCrossing = """
-      As you approach, you see a white man chopping logs. He looks you up and down and, 
-      in a tone that strikes as sympathetic rather than hostile, he warns you of patrols 
-      in the area and tells you to follow horse tracks across frozen Ohio.
-      
-      Do you...
+    As you approach, you see a white man chopping logs. He looks you up and down and, 
+    in a tone that strikes as sympathetic rather than hostile, he warns you of patrols 
+    in the area and tells you to follow horse tracks across frozen Ohio.
+    
+    Do you...
 """
 
 val text58_woodmensAdvice = """
-      A loud yell alerts you to the fact that you have been spotted. Anxiously, you turn 
-      to see an elderly black man emerge from the brush who says that he has surmised 
-      that you must be runaway slaves. While you hesitate to respond, he tells you that 
-      you are not safe here. To your surprise, he says that he wants to help, producing 
-      a bundle with food. Then, he provides you with the contacts and information you 
-      need to escape safely into Canada...
-      
-      YOU HAVE MADE IT!
+    A loud yell alerts you to the fact that you have been spotted. Anxiously, you turn 
+    to see an elderly black man emerge from the brush who says that he has surmised 
+    that you must be runaway slaves. While you hesitate to respond, he tells you that 
+    you are not safe here. To your surprise, he says that he wants to help, producing 
+    a bundle with food. Then, he provides you with the contacts and information you 
+    need to escape safely into Canada...
+    
+    YOU HAVE MADE IT!
 """
 
 val slides =

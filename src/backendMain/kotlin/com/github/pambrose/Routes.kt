@@ -118,7 +118,7 @@ object Routes : KLogging() {
                       tr {
                         th { +"ID" }
                         th { +"Title" }
-                        th { +"Versions" }
+                        th { +"Instances" }
                       }
                       masterSlides.slideIdMap
                         .toSortedMap()
