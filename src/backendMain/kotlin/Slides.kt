@@ -548,60 +548,60 @@ val text58_woodmensAdvice = """
 val slides =
   slideDeck {
 
-    val slide12_paddyRollersEnd = slide("12", "Paddy Rollers", text12_paddyRollersEnd)
+    val slide12_paddyRollersEnd = slide(12, "Paddy Rollers", text12_paddyRollersEnd)
 
     val slide22_majorEncounterFleePatrolEnd =
-      slide("22", "Major Encounter: Flee Patrol", text22_majorEncounterFleePatrolEnd)
+      slide(22, "Major Encounter: Flee Patrol", text22_majorEncounterFleePatrolEnd)
 
     val slide23_majorEncounterFlight1stPatrolEnd =
-      slide("23", "Major Encounter: Fight 1st Patrol", text23_majorEncounterFight1stPatrolEnd)
+      slide(23, "Major Encounter: Fight 1st Patrol", text23_majorEncounterFight1stPatrolEnd)
 
-    val slide9_deepForrestEnd = slide("9", "Deep Forest", text9_fleeIntoDeepForestEnd)
+    val slide9_deepForrestEnd = slide(9, "Deep Forest", text9_fleeIntoDeepForestEnd)
 
     val slide8_summer_cross_country =
-      slide("8", "Summer Cross-Country", text8_summerCrossCountry) {
+      slide(8, "Summer Cross-Country", text8_summerCrossCountry) {
         choice("Into the deep forest", slide9_deepForrestEnd.copyOf())
         choice("Back to the main road", slide12_paddyRollersEnd.copyOf())
       }
 
-    val slide10_autumDeparture = slide("10", "Autumn Departure", text10_autumnDeparture) {
+    val slide10_autumDeparture = slide(10, "Autumn Departure", text10_autumnDeparture) {
       choice("Continue", slide12_paddyRollersEnd.copyOf())
     }
 
     val slide11_springDeparture =
-      slide("11", "Spring Departure", text11_springDeparture) {
+      slide(11, "Spring Departure", text11_springDeparture) {
         choice("Continue", slide12_paddyRollersEnd.copyOf())
       }
 
     val slide15_winterCrossCountry =
-      slide("15", "Winter Cross-Country", text15_winterCrossCountry) {
+      slide(15, "Winter Cross-Country", text15_winterCrossCountry) {
         choice("Into the deep forest", slide9_deepForrestEnd.copyOf())
         choice("Back to the main road", slide12_paddyRollersEnd.copyOf())
       }
 
     val slide25_majorEncounterBluffPatrol =
-      slide("25", "Major Encounter: bluff Patrol", text25_majorEncounterBluffPatrol) {
+      slide(25, "Major Encounter: bluff Patrol", text25_majorEncounterBluffPatrol) {
         choice("Flee?", slide22_majorEncounterFleePatrolEnd.copyOf())
         choice("Fight?", slide23_majorEncounterFlight1stPatrolEnd.copyOf())
       }
 
     val slide20_majorEncounterPatrol =
-      slide("20", "Major Encounter: Patrol", text20_majorEncounterPatrol) {
+      slide(20, "Major Encounter: Patrol", text20_majorEncounterPatrol) {
         choice("Flee?", slide22_majorEncounterFleePatrolEnd.copyOf())
         choice("Fight?", slide23_majorEncounterFlight1stPatrolEnd.copyOf())
         choice("Try to bluff (talk your way out of the situation)", slide25_majorEncounterBluffPatrol.copyOf())
       }
 
     val slide57_riverCrossing =
-      slide("57", "River Crossing", text57_riverCrossing) {
+      slide(57, "River Crossing", text57_riverCrossing) {
         choice("Continue on, into the wilderness?", slide15_winterCrossCountry.copyOf())
-        choice("Follow the horse tracks?", slide("58", "Woodmen’s Advice", text58_woodmensAdvice, success = true))
+        choice("Follow the horse tracks?", slide(58, "Woodmen’s Advice", text58_woodmensAdvice, success = true))
       }
 
     val slide54_majorEncounterFight2ndPatrol =
-      slide("54", "Major Encounter: fight 2nd Patrol", text54_majorEncounterFight2ndPatrol) {
+      slide(54, "Major Encounter: fight 2nd Patrol", text54_majorEncounterFight2ndPatrol) {
         choice("Do you agree and go cross-country?",
-          slide("56", "Backroads", text56_backroads) {
+          slide(56, "Backroads", text56_backroads) {
             choice("Approach the cottage?", slide57_riverCrossing.copyOf())
             choice("Push on to the wilderness?", slide15_winterCrossCountry.copyOf())
           })
@@ -609,19 +609,19 @@ val slides =
       }
 
     val slide53_majorEncounter2ndPatrol =
-      slide("53", "Major Encounter: 2nd Patrol", text53_majorEncounter2ndPatrol) {
+      slide(53, "Major Encounter: 2nd Patrol", text53_majorEncounter2ndPatrol) {
         choice("Flee?", slide22_majorEncounterFleePatrolEnd.copyOf())
         choice("Fight?", slide54_majorEncounterFight2ndPatrol.copyOf())
         choice("Push on to the wilderness?", slide15_winterCrossCountry.copyOf())
       }
 
     val slide51_majorEncounterRamshackleHutContd =
-      slide("51", "Major Encounter: Ramshackle Hut (cont.)", text51_majorEncounterRamshackleHutContd) {
+      slide(51, "Major Encounter: Ramshackle Hut (cont.)", text51_majorEncounterRamshackleHutContd) {
         choice("Continue", slide12_paddyRollersEnd.copyOf())
       }
 
     val slide47_politeAndSubmisseBluff =
-      slide("47", "Polite & Submissive Bluff", text47_politeAndSubmisseBluff) {
+      slide(47, "Polite & Submissive Bluff", text47_politeAndSubmisseBluff) {
         choice("Knock at the door again, waiting for...", slide12_paddyRollersEnd.copyOf())
         choice(
           "Ride on, desperately taking main road out of town?",
@@ -631,14 +631,14 @@ val slides =
       }
 
     val slide50_majorEncounterRamshackleHut =
-      slide("50", "Major Encounter: Ramshackle Hut", text50_majorEncounterRamshackleHut) {
+      slide(50, "Major Encounter: Ramshackle Hut", text50_majorEncounterRamshackleHut) {
         choice("Enter the ramshackle hut?", slide51_majorEncounterRamshackleHutContd.copyOf())
         choice("Try another building in town?", goBack(-1))
         choice("Ride on, taking main road out of town?", slide20_majorEncounterPatrol.copyOf())
       }
 
     val slide52_majorEncounterPharmacy =
-      slide("52", "Major Encounter: Pharmacy", text52_majorEncounterPharmacy) {
+      slide(52, "Major Encounter: Pharmacy", text52_majorEncounterPharmacy) {
         choice("Try another building in town?", goBack(-1))
         choice(
           "Push on, desperately hungry and tired, onto the main road out of town?",
@@ -647,10 +647,10 @@ val slides =
       }
 
     val slide48_confidentAndArrogantBluff =
-      slide("48", "Confident & Arrogant Bluff", text48_confidentAndArrogantBluff) {
+      slide(48, "Confident & Arrogant Bluff", text48_confidentAndArrogantBluff) {
         choice(
           "You spend your last dollar to stay the night.",
-          slide("49", "Confident & Arrogant Bluff (cont.)", text49_confidentAndArrogantBluffContd) {
+          slide(49, "Confident & Arrogant Bluff (cont.)", text49_confidentAndArrogantBluffContd) {
             choice("Continue down the main road out of town?", slide53_majorEncounter2ndPatrol.copyOf())
             choice("Head into the wilderness?", slide15_winterCrossCountry.copyOf())
           })
@@ -662,7 +662,7 @@ val slides =
       }
 
     val slide46_majorEncounterModestMansion =
-      slide("46", "Major Encounter: Modest Mansion", text46_majorEncounterModestMansion) {
+      slide(46, "Major Encounter: Modest Mansion", text46_majorEncounterModestMansion) {
         choice(
           "Speak politely in a submissive tone, asking meekly for a chance to spend the night?",
           slide47_politeAndSubmisseBluff.copyOf()
@@ -674,22 +674,22 @@ val slides =
       }
 
     val slide45_thirdTown =
-      slide("45", "Third Town", text45_thirdTown) {
+      slide(45, "Third Town", text45_thirdTown) {
         choice("The ramshackle hut at the edge of town", slide50_majorEncounterRamshackleHut.copyOf())
         choice("The pharmacy in the town center", slide52_majorEncounterPharmacy.copyOf())
         choice("A more modest mansion", slide46_majorEncounterModestMansion.copyOf())
       }
 
     val slide39_politeAndSubmissiveBluff =
-      slide("39", "Polite & Submissive Bluff", text39_politeAndSubmissiveBluff) {
+      slide(39, "Polite & Submissive Bluff", text39_politeAndSubmissiveBluff) {
         choice("Ride on, desperately taking main road out of town", slide20_majorEncounterPatrol.copyOf())
         choice("Escape hurriedly into the wilderness", slide15_winterCrossCountry.copyOf())
       }
 
     val slide40_confidentAndArrogantBluff =
-      slide("40", "Confident & Arrogant Bluff", text40_confidentAndArrogantBluff) {
+      slide(40, "Confident & Arrogant Bluff", text40_confidentAndArrogantBluff) {
         choice("Continue down the main road out of town?",
-          slide("44", "Main Road out of Second Town", text44_mainRoadOutOfSecondTown) {
+          slide(44, "Main Road out of Second Town", text44_mainRoadOutOfSecondTown) {
             choice("Continue on the main road to the next town?", slide45_thirdTown.copyOf())
             choice("Head into the wilderness?", slide15_winterCrossCountry.copyOf())
           })
@@ -697,7 +697,7 @@ val slides =
       }
 
     val slide38_majorEncounterOrdinaryTavern =
-      slide("38", "Major Encounter: Ordinary Tavern", text38_majorEncounterOrdinaryTavern) {
+      slide(38, "Major Encounter: Ordinary Tavern", text38_majorEncounterOrdinaryTavern) {
         choice(
           "Speak politely in a submissive tone, asking meekly for a chance to spend the night?",
           slide39_politeAndSubmissiveBluff.copyOf()
@@ -709,9 +709,9 @@ val slides =
       }
 
     val slide41_majorEncounterRamshackleHut =
-      slide("41", "Major Encounter: Ramshackle Hut", text41_majorEncounterRamshackleHut) {
+      slide(41, "Major Encounter: Ramshackle Hut", text41_majorEncounterRamshackleHut) {
         choice("Enter the ramshackle hut?",
-          slide("42", "Major Encounter: Ramshackle Hut (cont.)", text42_majorEncounterRamshackleHutContd) {
+          slide(42, "Major Encounter: Ramshackle Hut (cont.)", text42_majorEncounterRamshackleHutContd) {
             choice("Continue", slide12_paddyRollersEnd.copyOf())
           })
         choice("Try another building in town?", goBack(-1))
@@ -719,11 +719,11 @@ val slides =
       }
 
     val slide37_secondTown =
-      slide("37", "Second Town", text37_secondTown) {
+      slide(37, "Second Town", text37_secondTown) {
         choice("The ramshackle hut at the edge of town", slide41_majorEncounterRamshackleHut.copyOf())
         choice("The ordinary tavern in the town center", slide38_majorEncounterOrdinaryTavern.copyOf())
         choice("The bordello in the town center",
-          slide("43", "Major Encounter: Bordello", text43_majorEncounterBordello) {
+          slide(43, "Major Encounter: Bordello", text43_majorEncounterBordello) {
             choice("Try another building in town?", goBack(-2))
             choice(
               "Push on, desperately hungry and tired, onto the main road out of town?",
@@ -733,9 +733,9 @@ val slides =
       }
 
     val slide32_confidentAndArrogantBluff =
-      slide("32", "Confident & Arrogant Bluff", text32_confidentAndArrogantBluff) {
+      slide(32, "Confident & Arrogant Bluff", text32_confidentAndArrogantBluff) {
         choice("Continue down the main road out of town?",
-          slide("36", "Main Road out of First Town", text36_mainRoadOutOfTown) {
+          slide(36, "Main Road out of First Town", text36_mainRoadOutOfTown) {
             choice("Continue on the main road to the next town?", slide37_secondTown.copyOf())
             choice("Head into the wilderness", slide15_winterCrossCountry.copyOf())
           })
@@ -743,16 +743,16 @@ val slides =
       }
 
     val slide31_politeAndSubmissiveBluff =
-      slide("31", "Polite & Submissive Bluff", text31_politeAndSubmissiveBluff) {
+      slide(31, "Polite & Submissive Bluff", text31_politeAndSubmissiveBluff) {
         choice("Try another building in town?", goBack(-1))
         choice("Ride on, taking main road out of town?", slide20_majorEncounterPatrol.copyOf())
       }
 
     val slide29_firstTown =
-      slide("29", "First Town", text29_firstTown) {
+      slide(29, "First Town", text29_firstTown) {
         choice(
           "The stately baronial mansion, set apart on a slight rise",
-          slide("30", "Major Encounter: Baronial Mansion", text30_majorEncounterBaronialMansion) {
+          slide(30, "Major Encounter: Baronial Mansion", text30_majorEncounterBaronialMansion) {
             choice(
               "Speak politely in a submissive tone, asking meekly for a chance to spend the night?",
               slide31_politeAndSubmissiveBluff.copyOf()
@@ -764,9 +764,9 @@ val slides =
           })
         choice(
           "The ramshackle hut at the edge of town",
-          slide("33", "Major Encounter: Ramshackle Hut", text33_majorEncounterRamshackleHut) {
+          slide(33, "Major Encounter: Ramshackle Hut", text33_majorEncounterRamshackleHut) {
             choice("Enter the ramshackle hut?",
-              slide("34", "Major Encounter: Ramshackle Hut (cont.)", text34_majorEncounterRamshackleHutContd) {
+              slide(34, "Major Encounter: Ramshackle Hut (cont.)", text34_majorEncounterRamshackleHutContd) {
                 choice("Continue", slide12_paddyRollersEnd.copyOf())
               })
             choice("Try another building in town?", goBack(-1))
@@ -775,7 +775,7 @@ val slides =
         )
         choice(
           "The post office in the town center",
-          slide("35", "Major Encounter: Post Office", text35_majorEncounterPostOffice) {
+          slide(35, "Major Encounter: Post Office", text35_majorEncounterPostOffice) {
             choice(".Try another building in town?", goBack(-1))
             choice(
               "Push on, desperately hungry and tired, onto the main road out of town?",
@@ -786,14 +786,14 @@ val slides =
       }
 
     val slide19_steal_overcoat_via_ross =
-      slide("19", "Steal an Overcoat (via Ross)", text19_stealOvercoatViaRoss) {
+      slide(19, "Steal an Overcoat (via Ross)", text19_stealOvercoatViaRoss) {
         choice(
           "On the Main Road",
-          slide("21", "Major Encounter (via Ross): 1st Patrol", text21_majorEncounterViaRoss1stPatrol) {
+          slide(21, "Major Encounter (via Ross): 1st Patrol", text21_majorEncounterViaRoss1stPatrol) {
             choice("Flee", slide22_majorEncounterFleePatrolEnd.copyOf())
             choice(
               "Fight",
-              slide("24", "Major Encounter (via Ross): fight 1st Patrol", text24_majorEncounterViaRossFight1stPatrol) {
+              slide(24, "Major Encounter (via Ross): fight 1st Patrol", text24_majorEncounterViaRossFight1stPatrol) {
                 choice("To continue down the main road into town", slide29_firstTown.copyOf())
                 choice(
                   "Fearing that the alarm will be raised, to head into the wilderness",
@@ -803,17 +803,17 @@ val slides =
             )
             choice(
               "Try to bluff (talk your way out of the situation)",
-              slide("26", "Major Encounter (via Ross): bluff 1st Patrol", text26_majorEncounterViaRossBluff1stPatrol) {
+              slide(26, "Major Encounter (via Ross): bluff 1st Patrol", text26_majorEncounterViaRossBluff1stPatrol) {
                 choice(
                   "Speak politely in a submissive tone, out of respect for their position and status",
-                  slide("27", "Polite & Submissive Bluff", text27_politeAndSubmissiveBluff) {
+                  slide(27, "Polite & Submissive Bluff", text27_politeAndSubmissiveBluff) {
                     choice("Flee?", slide22_majorEncounterFleePatrolEnd.copyOf())
                     choice("Fight?", slide23_majorEncounterFlight1stPatrolEnd.copyOf())
                   }
                 )
                 choice(
                   "Speak with confidence, adopting an arrogant tone?",
-                  slide("28", "Confident & Arrogant Bluff", text28_confidentAndArrogantBluff) {
+                  slide(28, "Confident & Arrogant Bluff", text28_confidentAndArrogantBluff) {
                     choice("Continue", slide29_firstTown.copyOf())
                   }
                 )
@@ -826,7 +826,7 @@ val slides =
 
 
     val slide5_oldBenViaRoss =
-      slide("5", "Old Ben (via Ross): When to Go", text5_oldBenViaRoss) {
+      slide(5, "Old Ben (via Ross): When to Go", text5_oldBenViaRoss) {
         choice(
           "Leave in the summer, when the weather is warmest, and you can easily sleep outdoors",
           slide8_summer_cross_country.copyOf()
@@ -844,16 +844,16 @@ val slides =
       }
 
     val slide7_summer_departure =
-      slide("7", "Summer Departure", text7_summerDeparture) {
+      slide(7, "Summer Departure", text7_summerDeparture) {
         choice("Continue on the main road, with the risk of encountering patrol", slide12_paddyRollersEnd.copyOf())
         choice("Go off-track, cross-country, with the risk of getting lost", slide8_summer_cross_country.copyOf())
       }
 
     val slide13_winterDepartureAlone =
-      slide("13", "Winter Departure", text13_winterDepartureAlone) {
+      slide(13, "Winter Departure", text13_winterDepartureAlone) {
         choice(
           "Yes, steal an overcoat",
-          slide("14", "Steal an Overcoat", text14_stealOvercoat) {
+          slide(14, "Steal an Overcoat", text14_stealOvercoat) {
             choice("On the main road", slide20_majorEncounterPatrol.copyOf())
             choice("Cross-country", slide15_winterCrossCountry.copyOf())
           }
@@ -863,7 +863,7 @@ val slides =
       }
 
     val slide4_decisionWhenToGo =
-      slide("4", "Decision: When to Go", text4_decisionWhenToGo) {
+      slide(4, "Decision: When to Go", text4_decisionWhenToGo) {
         choice("Summer Departure", slide7_summer_departure.copyOf())
         choice("Autumn Departure", slide10_autumDeparture.copyOf())
         choice("Spring Departure", slide11_springDeparture.copyOf())
@@ -871,10 +871,10 @@ val slides =
       }
 
     val slide16_rossEncounter =
-      slide("16", "Ross Encounter, then Ben", text16_rossEncounter) {
+      slide(16, "Ross Encounter, then Ben", text16_rossEncounter) {
         choice(
           "Yes",
-          slide("17", "Ross Advice", text17_rossAdvice) {
+          slide(17, "Ross Advice", text17_rossAdvice) {
             choice("Yes, leave now", slide10_autumDeparture.copyOf())
             choice("No, risk the delay", slide5_oldBenViaRoss.copyOf())
           }
@@ -883,7 +883,7 @@ val slides =
       }
 
     val slide6_oldBenWhenToGo =
-      slide("6", "Go To Old Ben", text6_oldBenWhenToGo) {
+      slide(6, "Go To Old Ben", text6_oldBenWhenToGo) {
         choice(
           "Leave in the summer, when the weather is warmest and you can easily sleep outdoors",
           slide7_summer_departure.copyOf()
@@ -901,7 +901,7 @@ val slides =
 
     val slide3_companionDecision =
       // TODO The first two choices are the same
-      slide("3", "Companion Decision", text3_companionDecision) {
+      slide(3, "Companion Decision", text3_companionDecision) {
         choice("Yes, take your chances and go meet with Ross then meet with Ben", slide16_rossEncounter.copyOf())
 //        choice(
 //          "Yes, take your chances, but skip talking to Ben and just go to meet with Ross",
@@ -911,10 +911,10 @@ val slides =
         choice("No, play it safe and seek escape without talking to Ross or Ben", slide4_decisionWhenToGo.copyOf())
       }
 
-    slide("1", "UGRR Scenario", text1_titlePage, root = true) {
+    slide(1, "UGRR Scenario", text1_titlePage, root = true) {
       choice(
         "Continue",
-        slide("2", "START: Major Decision", text2_majorDecision) {
+        slide(2, "START: Major Decision", text2_majorDecision) {
           choice("Yes, tell your two best friends", slide3_companionDecision.copyOf())
           choice("No, do not tell your two best friends", slide4_decisionWhenToGo.copyOf())
         },

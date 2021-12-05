@@ -85,6 +85,7 @@ kotlin {
             "/logout" to "http://localhost:8080",
             "/contentreset" to "http://localhost:8080",
             "/userreset" to "http://localhost:8080",
+            "/slides" to "http://localhost:8080",
             "/slide/*" to "http://localhost:8080",
             "/kvws/*" to mapOf("target" to "ws://localhost:8080", "ws" to true)
           ),
@@ -123,8 +124,9 @@ kotlin {
         implementation(kotlin("stdlib-jdk8"))
         implementation(kotlin("reflect"))
 
-        //implementation("io.ktor:ktor-server-core:$ktorVersion")
+        implementation("io.ktor:ktor-server-core:$ktorVersion")
         implementation("io.ktor:ktor-server-cio:$ktorVersion")
+        implementation("io.ktor:ktor-html-builder:$ktorVersion")
         implementation("io.ktor:ktor-server-sessions:$ktorVersion")
         implementation("io.ktor:ktor-auth:$ktorVersion")
         implementation("io.ktor:ktor-metrics:$ktorVersion")

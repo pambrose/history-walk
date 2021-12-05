@@ -8,6 +8,7 @@ import com.github.pambrose.EndPoints.LOGIN
 import com.github.pambrose.EndPoints.LOGOUT
 import com.github.pambrose.EndPoints.USER_RESET
 import com.github.pambrose.HistoryWalkServer.masterSlides
+import com.github.pambrose.common.response.respondWith
 import com.github.pambrose.common.util.Version.Companion.versionDesc
 import com.github.pambrose.common.util.isNotNull
 import com.github.pambrose.slides.SlideDeck.Companion.ROOT
@@ -20,6 +21,8 @@ import io.ktor.routing.*
 import io.ktor.sessions.*
 import io.ktor.util.*
 import io.kvision.remote.applyRoutes
+import kotlinx.html.*
+import kotlinx.html.stream.createHTML
 import mu.KLogging
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.io.ByteArrayOutputStream
@@ -27,6 +30,8 @@ import java.lang.management.ManagementFactory
 import kotlin.text.Charsets.UTF_8
 
 object Routes : KLogging() {
+
+  fun HTMLTag.rawHtml(html: String) = unsafe { raw(html) }
 
   fun Route.assignRoutes() {
     applyRoutes(RegisterUserServiceManager)
@@ -62,7 +67,7 @@ object Routes : KLogging() {
 
       get(CONTENT_RESET) {
         try {
-          HistoryWalkServer.masterSlides.set(loadSlides())
+          masterSlides = loadSlides()
           call.respondRedirect("/")
         } catch (e: Exception) {
           logger.error("Error resetting slides", e)
@@ -79,39 +84,69 @@ object Routes : KLogging() {
         call.respondRedirect("/")
       }
 
-      get("slide/{slideId}/{version}") {
-        val slideId = call.parameters.getOrFail("slideId")
-        val version =
-          try {
-            call.parameters.getOrFail("version")
-          } catch (e: Exception) {
-            "0"
+      if (EnvVar.ALLOW_SLIDE_ACCESS.getEnv(false)) {
+        get("slide/{slideId}/{version?}") {
+          val slideId = call.parameters.getOrFail("slideId").toInt()
+          val version =
+            try {
+              call.parameters.getOrFail("version").toInt()
+            } catch (e: Exception) {
+              0
+            }
+          val slide = masterSlides.findSlideById(slideId, version)
+          if (slide != null) {
+            transaction {
+              val uuid = call.userId.uuid
+              updateLastSlide(uuid, slide.pathName)
+            }
+            call.respondRedirect("/")
           }
-        val slide = masterSlides.get().findSlideById(slideId, version.toInt())
-        if (slide != null) {
-          transaction {
-            val uuid = call.userId.uuid
-            updateLastSlide(uuid, slide.pathName)
+          else {
+            call.respondText("Slide not found: $slideId/$version", Plain)
           }
-          call.respondRedirect("/")
         }
-        else {
-          call.respondText("Slide not found: $slideId/$version", Plain)
-        }
-      }
 
-      get("slide/{slideId}") {
-        val slideId = call.parameters.getOrFail("slideId")
-        val slide = masterSlides.get().findSlideById(slideId, 0)
-        if (slide != null) {
-          transaction {
-            val uuid = call.userId.uuid
-            updateLastSlide(uuid, slide.pathName)
+        get("slides") {
+          respondWith {
+            createHTML()
+              .html {
+                body {
+                  div {
+                    //style = "float:left;width:50%;"
+                    table {
+                      style = "width:100%;border-collapse: separate; border-spacing: 10px 5px;"
+                      tr {
+                        th { +"ID" }
+                        th { +"Title" }
+                        th { +"Versions" }
+                      }
+                      masterSlides.slideIdMap
+                        .toSortedMap()
+                        .filter { it.key != -1 }
+                        .forEach { slideId, slides ->
+                          tr {
+                            td {
+                              style = "text-align:right;"
+                              +"$slideId:"
+                            }
+                            td {
+                              style = "width:25%;"
+                              a { href = "/slide/$slideId"; +" ${slides[0].title}" }
+                            }
+                            td {
+                              //style = "padding-right:15px;"
+                              slides.forEachIndexed { i, slide ->
+                                a { href = "/slide/$slideId/$i"; +" $i" }
+                                +" "
+                              }
+                            }
+                          }
+                        }
+                    }
+                  }
+                }
+              }
           }
-          call.respondRedirect("/")
-        }
-        else {
-          call.respondText("Slide not found: $slideId", Plain)
         }
       }
     }

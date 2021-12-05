@@ -1,5 +1,6 @@
 package com.github.pambrose
 
+import com.github.pambrose.HistoryWalkServer.masterSlides
 import com.github.pambrose.User.Companion.findCurrentSlideForUser
 import com.github.pambrose.slides.Slide
 import com.google.inject.Inject
@@ -46,7 +47,7 @@ actual class ContentService : IContentService {
   override suspend fun getCurrentSlide(): SlideData {
     logger.debug { "userId=${call.userId}" }
     val uuid = call.userId.uuid
-    val slide = findCurrentSlideForUser(uuid, HistoryWalkServer.masterSlides.get())
+    val slide = findCurrentSlideForUser(uuid, masterSlides)
     return slideData(uuid, slide)
   }
 
@@ -105,7 +106,7 @@ actual class ContentService : IContentService {
 
       updateLastSlide(uuid, slideChoice.pathName)
 
-      val slide = findCurrentSlideForUser(uuid, HistoryWalkServer.masterSlides.get())
+      val slide = findCurrentSlideForUser(uuid, masterSlides)
       slideData(uuid, slide)
     }
 
@@ -113,7 +114,7 @@ actual class ContentService : IContentService {
     transaction {
       val uuid = call.userId.uuid
       updateLastSlide(uuid, parentTitle.pathName)
-      val slide = findCurrentSlideForUser(uuid, HistoryWalkServer.masterSlides.get())
+      val slide = findCurrentSlideForUser(uuid, masterSlides)
       slideData(uuid, slide)
     }
 

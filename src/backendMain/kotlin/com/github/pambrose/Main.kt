@@ -2,6 +2,7 @@ package com.github.pambrose
 
 import com.github.pambrose.ConfigureFormAuth.configureFormAuth
 import com.github.pambrose.Cookies.assignCookies
+import com.github.pambrose.HistoryWalkServer.masterSlides
 import com.github.pambrose.Property.Companion.assignProperties
 import com.github.pambrose.Routes.assignRoutes
 import com.github.pambrose.common.script.KotlinScript
@@ -28,7 +29,10 @@ import java.util.concurrent.atomic.AtomicReference
 
 //@Version(version = BuildConfig.CORE_VERSION, date = BuildConfig.CORE_RELEASE_DATE)
 object HistoryWalkServer : KLogging() {
-  var masterSlides = AtomicReference(SlideDeck())
+  private val masterSlidesRef = AtomicReference(SlideDeck())
+  var masterSlides
+    get() = masterSlidesRef.get()
+    set(value) = masterSlidesRef.set(value)
 }
 
 fun loadSlides(): SlideDeck {
@@ -83,7 +87,7 @@ fun Application.main() {
 
   assignProperties()
 
-  HistoryWalkServer.masterSlides.set(loadSlides())
+  masterSlides = loadSlides()
 
   install(Compression)
   install(DefaultHeaders)

@@ -72,7 +72,7 @@ private fun Container.displaySlide(slide: SlideData) {
       }
     }
 
-    if (!slide.success) {
+    //if (!slide.success) {
       vPanel {
         slide.parentTitles.forEach { parentTitle ->
           button(parentTitle.title, style = SUCCESS) {
@@ -98,7 +98,7 @@ private fun Container.displaySlide(slide: SlideData) {
         textAlign = TextAlign.CENTER
         +slide.title
       }
-    }
+    //}
 
     simplePanel {
       if (slide.failure)
