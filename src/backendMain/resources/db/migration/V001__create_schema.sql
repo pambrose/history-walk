@@ -31,7 +31,7 @@ CREATE TABLE history.userchoices
 );
 
 CREATE VIEW history.user_decision_counts AS
-SELECT full_name, email, count(user_uuid_ref) as decision_count
+SELECT full_name, email, last_path_name, count(user_uuid_ref) as decision_count
 FROM history.users
          LEFT OUTER JOIN history.userchoices
                          ON history.userchoices.user_uuid_ref = users.id

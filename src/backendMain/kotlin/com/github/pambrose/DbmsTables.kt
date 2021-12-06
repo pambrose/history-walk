@@ -30,5 +30,6 @@ object UserChoiceTable : IntIdTable("history.userchoices") {
 object UserDecisionCountsView : Table("history.user_decision_counts") {
   val fullName = text("full_name")
   val email = text("email")
+  val lastPathName = text("last_path_name")
   val decisionCount = integer("decision_count")
 }

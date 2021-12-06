@@ -67,7 +67,7 @@ class User {
       val id = UsersTable.id
       UsersTable
         .slice(Count(id))
-        .select { id eq UUID.fromString(userUuid) }
+        .select { id eq userUuid.toUuid() }
         .map { it[0] as Long }
         .first() > 0
     }
@@ -78,7 +78,7 @@ class User {
     logger.info { "uuid: $uuid" }
 
     transaction {
-      UsersTable.deleteWhere { UsersTable.id eq UUID.fromString(userUuid) }
+      UsersTable.deleteWhere { UsersTable.id eq userUuid.toUuid() }
     }
   }
 
@@ -149,7 +149,7 @@ class User {
       transaction {
         UsersTable
           .slice(Count(UsersTable.id))
-          .select { UsersTable.id eq UUID.fromString(uuid) }
+          .select { UsersTable.id eq uuid.toUuid() }
           .map { it[0] as Long }
           .first() > 0
       }
@@ -159,7 +159,7 @@ class User {
         UsersTable
           .slice(UsersTable.id)
           .select { UsersTable.email eq email.value }
-          .map { row -> UUID.fromString(row[UsersTable.id].toString()).toUser() }
+          .map { row -> row[UsersTable.id].toUuid().toUser() }
           .firstOrNull()
           .also { logger.info { "queryUserByEmail() returned: ${it?.email ?: " ${email.value} not found"}" } }
       }
@@ -169,7 +169,7 @@ class User {
         UsersTable
           .slice(UsersTable.id)
           .select { UsersTable.id eq uuid }
-          .map { row -> UUID.fromString(row[UsersTable.id].toString()).toUser() }
+          .map { row -> row[UsersTable.id].toUuid().toUser() }
           .firstOrNull()
           .also { logger.info { "queryUserByUuid() returned: ${it?.email ?: " $uuid not found"}" } }
       }
@@ -178,7 +178,7 @@ class User {
       transaction {
         (UsersTable
           .slice(UsersTable.lastPathName)
-          .select { UsersTable.id eq UUID.fromString(uuid) }
+          .select { UsersTable.id eq uuid.toUuid() }
           .map { it[UsersTable.lastPathName] }
           .firstOrNull() ?: error("Missing uuid: $uuid"))
           .let { pathName -> slideDeck.findSlideByPathName(pathName) }

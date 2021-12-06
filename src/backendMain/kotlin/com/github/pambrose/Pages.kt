@@ -16,9 +16,19 @@ object Pages {
             table {
               style = "border-collapse: separate; border-spacing: 10px 5px;"
               tr {
-                th { +"Name" }
-                th { +"Email" }
+                th {
+                  style = "text-align:left;"
+                  +"Name"
+                }
+                th {
+                  style = "text-align:left;"
+                  +"Email"
+                }
                 th { +"Decisions" }
+                th {
+                  style = "text-align:left;"
+                  +"Last Slide"
+                }
               }
               allUserSummaries(uuid)
                 .sortedBy { it.decisionCount }
@@ -30,13 +40,13 @@ object Pages {
                       style = "text-align:center;"
                       +summary.decisionCount.toString()
                     }
+                    td { +summary.lastPathName }
                   }
                 }
             }
           }
         }
       }
-
 
   fun displayAllSlides() =
     createHTML()

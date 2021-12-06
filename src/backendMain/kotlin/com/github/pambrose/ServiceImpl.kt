@@ -9,7 +9,6 @@ import io.ktor.application.*
 import mu.KLogging
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
-import java.util.*
 
 actual class RegisterUserService : IRegisterUserService {
 
@@ -34,7 +33,7 @@ actual class ContentService : IContentService {
     transaction {
       val uuid = call.userId.uuid
       UsersTable
-        .select { UsersTable.id eq UUID.fromString(uuid) }
+        .select { UsersTable.id eq uuid.toUuid() }
         .map { row ->
           UserInfo(
             row[UsersTable.fullName],
@@ -61,7 +60,7 @@ actual class ContentService : IContentService {
       // See if user has an entry for that transition
       val uuid = call.userId.uuid
       (UserChoiceTable
-        .select { (UserChoiceTable.userUuidRef eq UUID.fromString(uuid)) and (UserChoiceTable.fromPathName eq fromPathName) and (UserChoiceTable.toPathName eq slideChoice.pathName) }
+        .select { (UserChoiceTable.userUuidRef eq uuid.toUuid()) and (UserChoiceTable.fromPathName eq fromPathName) and (UserChoiceTable.toPathName eq slideChoice.pathName) }
         .map { row ->
           UserChoice(
             row[UserChoiceTable.fromPathName],
@@ -94,7 +93,7 @@ actual class ContentService : IContentService {
       val uuid = call.userId.uuid
       UserChoiceTable
         .insertAndGetId { row ->
-          row[UserChoiceTable.userUuidRef] = UUID.fromString(uuid)
+          row[UserChoiceTable.userUuidRef] = uuid.toUuid()
           row[UserChoiceTable.fromPathName] = fromPathName
           row[UserChoiceTable.fromTitle] = fromTitle
           row[UserChoiceTable.toPathName] = slideChoice.pathName
@@ -125,7 +124,7 @@ actual class ContentService : IContentService {
 
     fun updateLastSlide(uuid: String, pathName: String) {
       UsersTable
-        .update({ UsersTable.id eq UUID.fromString(uuid) }) { row ->
+        .update({ UsersTable.id eq uuid.toUuid() }) { row ->
           row[UsersTable.lastPathName] = pathName
         }.also { count ->
           if (count != 1)
@@ -135,7 +134,7 @@ actual class ContentService : IContentService {
 
     fun deleteChoices(uuid: String) {
       UserChoiceTable
-        .deleteWhere { UserChoiceTable.userUuidRef eq UUID.fromString(uuid) }
+        .deleteWhere { UserChoiceTable.userUuidRef eq uuid.toUuid() }
         .also { count ->
           logger.info("Deleted $count records for uuid: $uuid")
         }
@@ -192,7 +191,7 @@ actual class ContentService : IContentService {
       transaction {
         UserChoiceTable
           .slice(Count(UserChoiceTable.id))
-          .select { UserChoiceTable.userUuidRef eq UUID.fromString(uuid) }
+          .select { UserChoiceTable.userUuidRef eq uuid.toUuid() }
           .map { it[0] as Long }
           .first()
           .toInt()
@@ -206,7 +205,8 @@ actual class ContentService : IContentService {
             UserSummary(
               row[UserDecisionCountsView.fullName],
               row[UserDecisionCountsView.email],
-              row[UserDecisionCountsView.decisionCount]
+              row[UserDecisionCountsView.lastPathName],
+              row[UserDecisionCountsView.decisionCount],
             )
           }
       }
@@ -216,5 +216,6 @@ actual class ContentService : IContentService {
 data class UserSummary(
   val fullName: String,
   val email: String,
+  val lastPathName: String,
   val decisionCount: Int,
 )

@@ -23,8 +23,10 @@ import io.kvision.remote.kvisionInit
 import kotlinx.coroutines.runBlocking
 import mu.KLogging
 import mu.KotlinLogging
+import org.jetbrains.exposed.dao.id.EntityID
 import org.slf4j.event.Level
 import java.io.File
+import java.util.*
 import java.util.concurrent.atomic.AtomicReference
 
 //@Version(version = BuildConfig.CORE_VERSION, date = BuildConfig.CORE_RELEASE_DATE)
@@ -120,3 +122,7 @@ fun Application.main() {
 typealias PipelineCall = PipelineContext<Unit, ApplicationCall>
 
 val ApplicationCall.userPrincipal get() = sessions.get<UserPrincipal>()
+
+fun String.toUuid() = UUID.fromString(this)
+
+fun <T : Comparable<T>> EntityID<T>.toUuid() = this.toString().toUuid()
