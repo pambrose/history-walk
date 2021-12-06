@@ -1,8 +1,8 @@
 package com.github.pambrose
 
 import com.codahale.metrics.jvm.ThreadDump
-import com.github.pambrose.ContentService.Companion.deleteChoices
-import com.github.pambrose.ContentService.Companion.updateLastSlide
+import com.github.pambrose.DbmsTxs.deleteChoices
+import com.github.pambrose.DbmsTxs.updateLastSlide
 import com.github.pambrose.EndPoints.CONTENT_RESET
 import com.github.pambrose.EndPoints.LOGIN
 import com.github.pambrose.EndPoints.LOGOUT

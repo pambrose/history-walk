@@ -18,21 +18,18 @@ import io.ktor.features.*
 import io.ktor.http.content.*
 import io.ktor.routing.*
 import io.ktor.sessions.*
-import io.ktor.util.pipeline.*
 import io.kvision.remote.kvisionInit
 import kotlinx.coroutines.runBlocking
 import mu.KLogging
 import mu.KotlinLogging
-import org.jetbrains.exposed.dao.id.EntityID
 import org.slf4j.event.Level
 import java.io.File
-import java.util.*
 import java.util.concurrent.atomic.AtomicReference
 
 //@Version(version = BuildConfig.CORE_VERSION, date = BuildConfig.CORE_RELEASE_DATE)
 object HistoryWalkServer : KLogging() {
   private val masterSlidesRef = AtomicReference(SlideDeck())
-  var masterSlides
+  var masterSlides: SlideDeck
     get() = masterSlidesRef.get()
     set(value) = masterSlidesRef.set(value)
 }
@@ -118,11 +115,3 @@ fun Application.main() {
 
   kvisionInit()
 }
-
-typealias PipelineCall = PipelineContext<Unit, ApplicationCall>
-
-val ApplicationCall.userPrincipal get() = sessions.get<UserPrincipal>()
-
-fun String.toUuid() = UUID.fromString(this)
-
-fun <T : Comparable<T>> EntityID<T>.toUuid() = this.toString().toUuid()

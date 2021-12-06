@@ -5,7 +5,7 @@ Creating a Docker Postgres instance: https://hackernoon.com/dont-install-postgre
 ## Instance Creation
 
 ```shell
-docker run --rm   --name pg-docker -e POSTGRES_PASSWORD=docker -d -p 5432:5432 -v $HOME/docker/volumes/history:/var/lib/postgresql/data  postgres
+docker run --rm --name pg-docker -e POSTGRES_PASSWORD=docker -d -p 5432:5432 -v $HOME/docker/volumes/history:/var/lib/postgresql/data  postgres
 ```
 
 ## Database Setup

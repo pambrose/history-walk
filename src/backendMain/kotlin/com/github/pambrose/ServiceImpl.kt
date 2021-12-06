@@ -1,13 +1,16 @@
 package com.github.pambrose
 
+import com.github.pambrose.DbmsTxs.slideData
+import com.github.pambrose.DbmsTxs.updateLastSlide
 import com.github.pambrose.HistoryWalkServer.masterSlides
 import com.github.pambrose.User.Companion.findCurrentSlideForUser
-import com.github.pambrose.slides.Slide
+import com.github.pambrose.Utils.toUuid
 import com.google.inject.Inject
-import com.pambrose.common.exposed.get
 import io.ktor.application.*
 import mu.KLogging
-import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.insertAndGetId
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 
 actual class RegisterUserService : IRegisterUserService {
@@ -116,106 +119,5 @@ actual class ContentService : IContentService {
       slideData(uuid, slide)
     }
 
-  companion object : KLogging() {
-    private const val ltEscape = "---LT---"
-    private const val gtEscape = "---GT---"
-    private const val dquoteEscape = "---DQ---"
-    private const val squoteEscape = "---SQ---"
-
-    fun updateLastSlide(uuid: String, pathName: String) {
-      UsersTable
-        .update({ UsersTable.id eq uuid.toUuid() }) { row ->
-          row[UsersTable.lastPathName] = pathName
-        }.also { count ->
-          if (count != 1)
-            error("Missing uuid: $uuid")
-        }
-    }
-
-    fun deleteChoices(uuid: String) {
-      UserChoiceTable
-        .deleteWhere { UserChoiceTable.userUuidRef eq uuid.toUuid() }
-        .also { count ->
-          logger.info("Deleted $count records for uuid: $uuid")
-        }
-    }
-
-    private fun String.transformText(): String {
-      val escaped = this
-        .replace("<", ltEscape)
-        .replace(">", gtEscape)
-        .replace("\"", dquoteEscape)
-        .replace("\"", squoteEscape)
-
-      return MarkdownParser.toHtml(escaped)
-        .replace(ltEscape, "<")
-        .replace(gtEscape, ">")
-        .replace(dquoteEscape, "'")
-        .replace(squoteEscape, "\"")
-    }
-
-    private fun slideData(uuid: String, slide: Slide): SlideData {
-
-      val content =
-        slide.content
-          .splitToSequence("\n")
-          .map { line -> line.trim() }  // Get rid of leading/trailing whitespace
-          .joinToString("\n")
-          .transformText()                     // Transform markdown to html
-
-      val choices =
-        slide.choices.map { (choice, slide) ->
-          SlideChoice(choice, slide.pathName, slide.title, slide.offset)
-        }
-
-      val parentTitles =
-        mutableListOf<ParentTitle>()
-          .also { parentTitles ->
-            var currSlide = slide.parentSlide
-            while (currSlide != null) {
-              parentTitles += ParentTitle(currSlide.pathName, currSlide.title)
-              currSlide = currSlide.parentSlide
-            }
-          }
-          .reversed()
-
-      return slide
-        .run {
-          val count = decisionCount(uuid)
-          val reset = EnvVar.SHOW_RESET_BUTTON.getEnv(false)
-          SlideData(pathName, title, content, success, choices, verticalChoices, parentTitles, offset, count, reset)
-        }
-    }
-
-    private fun decisionCount(uuid: String) =
-      transaction {
-        UserChoiceTable
-          .slice(Count(UserChoiceTable.id))
-          .select { UserChoiceTable.userUuidRef eq uuid.toUuid() }
-          .map { it[0] as Long }
-          .first()
-          .toInt()
-      }
-
-    fun allUserSummaries(uuid: String) =
-      transaction {
-        UserDecisionCountsView
-          .selectAll()
-          .map { row ->
-            UserSummary(
-              row[UserDecisionCountsView.fullName],
-              row[UserDecisionCountsView.email],
-              row[UserDecisionCountsView.lastPathName],
-              row[UserDecisionCountsView.decisionCount],
-            )
-          }
-      }
-  }
+  companion object : KLogging()
 }
-
-data class UserSummary(
-  val fullName: String,
-  val email: String,
-  val lastPathName: String,
-  val decisionCount: Int,
-)

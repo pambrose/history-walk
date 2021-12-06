@@ -3,6 +3,7 @@ package com.github.pambrose
 import com.github.pambrose.Email.Companion.EMPTY_EMAIL
 import com.github.pambrose.Email.Companion.UNKNOWN_EMAIL
 import com.github.pambrose.FullName.Companion.EMPTY_FULLNAME
+import com.github.pambrose.Utils.toUuid
 import com.github.pambrose.common.util.*
 import com.github.pambrose.slides.SlideDeck
 import com.github.pambrose.slides.SlideDeck.Companion.ROOT

@@ -73,8 +73,9 @@ private fun Container.displaySlide(slide: SlideData) {
     }
 
     //if (!slide.success) {
-      vPanel {
-        slide.parentTitles.forEach { parentTitle ->
+    vPanel {
+      slide.parentTitles
+        .forEach { parentTitle ->
           button(parentTitle.title, style = SUCCESS) {
             paddingTop = 5.px
             paddingBottom = 5.px
@@ -90,14 +91,14 @@ private fun Container.displaySlide(slide: SlideData) {
             icon("fas fa-arrow-alt-circle-down")
           }
         }
-      }
+    }
 
-      h1 {
-        background = Background(Color.rgb(53, 121, 246))
-        color = Color.name(Col.WHITE)
-        textAlign = TextAlign.CENTER
-        +slide.title
-      }
+    h1 {
+      background = Background(Color.rgb(53, 121, 246))
+      color = Color.name(Col.WHITE)
+      textAlign = TextAlign.CENTER
+      +slide.title
+    }
     //}
 
     simplePanel {
@@ -141,30 +142,31 @@ private fun Container.displaySlide(slide: SlideData) {
 }
 
 private fun Container.addChoiceButtons(slide: SlideData) {
-  slide.choices.forEach { choice ->
-    button(choice.choiceText, icon = "fas fa-angle-double-right", style = PRIMARY) {
-      lowercase()
-      onClick {
-        AppScope.launch {
-          if (choice.offset != 0) {
-            val pos = slide.parentTitles.size - abs(slide.offset) - 1
-            val parentTitle = slide.parentTitles[pos]
-            Rpc.goBackInTime(parentTitle).also { refresh(it) }
-          }
-          else {
-            val choiceReason = Rpc.makeChoice(slide.pathName, slide.title, choice, slide.choices.size == 1)
-            if (choiceReason.reason.isEmpty()) {
-              promptUserForReason(slide.pathName, slide.title, choice)
+  slide.choices
+    .forEach { choice ->
+      button(choice.choiceText, icon = "fas fa-angle-double-right", style = PRIMARY) {
+        lowercase()
+        onClick {
+          AppScope.launch {
+            if (choice.offset != 0) {
+              val pos = slide.parentTitles.size - abs(slide.offset) - 1
+              val parentTitle = slide.parentTitles[pos]
+              Rpc.goBackInTime(parentTitle).also { refresh(it) }
             }
             else {
-              val newSlide = Rpc.getCurrentSlide()
-              refresh(newSlide)
+              val choiceReason = Rpc.makeChoice(slide.pathName, slide.title, choice, slide.choices.size == 1)
+              if (choiceReason.reason.isEmpty()) {
+                promptUserForReason(slide.pathName, slide.title, choice)
+              }
+              else {
+                val newSlide = Rpc.getCurrentSlide()
+                refresh(newSlide)
+              }
             }
           }
         }
       }
     }
-  }
 }
 
 private fun String?.wordCount(): Int = this?.split(" ", "\n")?.filter { it.isNotEmpty() }?.size ?: 0

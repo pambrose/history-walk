@@ -1,6 +1,6 @@
 package com.github.pambrose
 
-import com.github.pambrose.ContentService.Companion.allUserSummaries
+import com.github.pambrose.DbmsTxs.allUserSummaries
 import com.github.pambrose.EndPoints.SLIDE
 import com.github.pambrose.HistoryWalkServer.masterSlides
 import kotlinx.html.*
@@ -27,6 +27,10 @@ object Pages {
                 th { +"Decisions" }
                 th {
                   style = "text-align:left;"
+                  +"Success"
+                }
+                th {
+                  style = "text-align:left;"
                   +"Last Slide"
                 }
               }
@@ -39,6 +43,9 @@ object Pages {
                     td {
                       style = "text-align:center;"
                       +summary.decisionCount.toString()
+                    }
+                    td {
+                      +masterSlides.findSlideByPathName(summary.lastPathName).success.toString()
                     }
                     td { +summary.lastPathName }
                   }
@@ -64,7 +71,7 @@ object Pages {
               masterSlides.slideIdMap
                 .toSortedMap()
                 .filter { it.key != -1 }
-                .forEach { slideId, slides ->
+                .forEach { (slideId, slides) ->
                   tr {
                     td {
                       style = "text-align:right;"
@@ -76,10 +83,11 @@ object Pages {
                     }
                     td {
                       //style = "padding-right:15px;"
-                      slides.forEachIndexed { i, slide ->
-                        a { href = "/$SLIDE/$slideId/$i"; +" $i" }
-                        +" "
-                      }
+                      slides
+                        .forEachIndexed { i, slide ->
+                          a { href = "/$SLIDE/$slideId/$i"; +" $i" }
+                          +" "
+                        }
                     }
                   }
                 }
