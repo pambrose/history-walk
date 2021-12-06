@@ -84,7 +84,6 @@ object Routes : KLogging() {
       }
 
       get("summary") {
-        val uuid = call.userId.uuid
         respondWith { displayUserSummary() }
       }
 

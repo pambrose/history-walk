@@ -232,7 +232,7 @@ val text17_rossAdvice = """
     you risk getting caught by staying a little longer to seek out the advice of old Ben?
 """
 
-// TODO This is not used
+// TODO This slide is not used
 val text18_winterTravelEnd = """
     ...Without a coat, you freeze to death in the wilderness.
     
@@ -551,6 +551,7 @@ val text54_majorEncounterFight2ndPatrol = """
     that you both get off the main road and strike out cross-country.
 """
 
+// TODO This slide is not used
 val text55_majorEncounterBluff2ndPatrol = """
     You try to explain that you have been sent on a mission by your master, which was 
     not an uncommon occurrence. However, the man with a rifle demands to see your travel 
