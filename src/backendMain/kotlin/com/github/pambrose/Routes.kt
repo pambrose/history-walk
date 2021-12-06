@@ -6,8 +6,11 @@ import com.github.pambrose.ContentService.Companion.updateLastSlide
 import com.github.pambrose.EndPoints.CONTENT_RESET
 import com.github.pambrose.EndPoints.LOGIN
 import com.github.pambrose.EndPoints.LOGOUT
+import com.github.pambrose.EndPoints.SLIDE
 import com.github.pambrose.EndPoints.USER_RESET
 import com.github.pambrose.HistoryWalkServer.masterSlides
+import com.github.pambrose.Pages.displayAllSlides
+import com.github.pambrose.Pages.displayUserSummary
 import com.github.pambrose.common.response.respondWith
 import com.github.pambrose.common.util.Version.Companion.versionDesc
 import com.github.pambrose.common.util.isNotNull
@@ -21,8 +24,6 @@ import io.ktor.routing.*
 import io.ktor.sessions.*
 import io.ktor.util.*
 import io.kvision.remote.applyRoutes
-import kotlinx.html.*
-import kotlinx.html.stream.createHTML
 import mu.KLogging
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.io.ByteArrayOutputStream
@@ -30,8 +31,6 @@ import java.lang.management.ManagementFactory
 import kotlin.text.Charsets.UTF_8
 
 object Routes : KLogging() {
-
-  fun HTMLTag.rawHtml(html: String) = unsafe { raw(html) }
 
   fun Route.assignRoutes() {
     applyRoutes(RegisterUserServiceManager)
@@ -84,8 +83,13 @@ object Routes : KLogging() {
         call.respondRedirect("/")
       }
 
+      get("summary") {
+        val uuid = call.userId.uuid
+        respondWith { displayUserSummary(uuid) }
+      }
+
       if (EnvVar.ALLOW_SLIDE_ACCESS.getEnv(false)) {
-        get("slide/{slideId}/{version?}") {
+        get("$SLIDE/{slideId}/{version?}") {
           val slideId = call.parameters.getOrFail("slideId").toInt()
           val version =
             try {
@@ -107,46 +111,7 @@ object Routes : KLogging() {
         }
 
         get("slides") {
-          respondWith {
-            createHTML()
-              .html {
-                body {
-                  div {
-                    //style = "float:left;width:50%;"
-                    table {
-                      style = "width:100%;border-collapse: separate; border-spacing: 10px 5px;"
-                      tr {
-                        th { +"ID" }
-                        th { +"Title" }
-                        th { +"Instances" }
-                      }
-                      masterSlides.slideIdMap
-                        .toSortedMap()
-                        .filter { it.key != -1 }
-                        .forEach { slideId, slides ->
-                          tr {
-                            td {
-                              style = "text-align:right;"
-                              +"$slideId:"
-                            }
-                            td {
-                              style = "width:25%;"
-                              a { href = "/slide/$slideId"; +" ${slides[0].title}" }
-                            }
-                            td {
-                              //style = "padding-right:15px;"
-                              slides.forEachIndexed { i, slide ->
-                                a { href = "/slide/$slideId/$i"; +" $i" }
-                                +" "
-                              }
-                            }
-                          }
-                        }
-                    }
-                  }
-                }
-              }
-          }
+          respondWith { displayAllSlides() }
         }
       }
     }

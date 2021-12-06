@@ -1,12 +1,13 @@
 package com.github.pambrose
 
-import org.jetbrains.exposed.dao.id.LongIdTable
+import org.jetbrains.exposed.dao.id.IntIdTable
+import org.jetbrains.exposed.dao.id.UUIDTable
+import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.jodatime.datetime
 
-object UsersTable : LongIdTable("history.users") {
+object UsersTable : UUIDTable("history.users") {
   val created = datetime("created")
   val updated = datetime("updated")
-  val uuidCol = uuid("uuid")
   val email = text("email")
   val fullName = text("full_name")
   val salt = text("salt")
@@ -14,15 +15,20 @@ object UsersTable : LongIdTable("history.users") {
   val lastPathName = text("last_path_name")
 }
 
-object UserChoiceTable : LongIdTable("history.userchoices") {
+object UserChoiceTable : IntIdTable("history.userchoices") {
   val created = datetime("created")
   val updated = datetime("updated")
-  val uuidCol = uuid("uuid")
-  val userUuid = uuid("user_uuid")
+  val userUuidRef = uuid("user_uuid_ref")
   val fromPathName = text("from_path_name")
   val fromTitle = text("from_title")
   val toPathName = text("to_path_name")
   val toTitle = text("to_title")
   val choiceText = text("choice_text")
   val reason = text("reason")
+}
+
+object UserDecisionCountsView : Table("history.user_decision_counts") {
+  val fullName = text("full_name")
+  val email = text("email")
+  val decisionCount = integer("decision_count")
 }

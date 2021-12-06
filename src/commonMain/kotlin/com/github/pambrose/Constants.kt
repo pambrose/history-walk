@@ -9,4 +9,5 @@ object EndPoints {
   const val LOGOUT = "logout"
   const val USER_RESET = "userreset"
   const val CONTENT_RESET = "contentreset"
+  const val SLIDE = "slide"
 }

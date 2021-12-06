@@ -23,7 +23,7 @@ class User {
       measureTime {
         transaction {
           UsersTable
-            .select { UsersTable.uuidCol eq uuid }
+            .select { UsersTable.id eq uuid }
             .map { assignRowVals(it) }
             .firstOrNull() ?: error("UserId not found: ${this@User.uuid}")
         }
@@ -43,7 +43,7 @@ class User {
   val uuid: UUID
 
   //val browserSession: BrowserSession?
-  var userDbmsId: Long = -1
+  var userUuid: String = "-1"
   var email: Email = EMPTY_EMAIL
   var fullName: FullName = EMPTY_FULLNAME
   private var saltBacking: String = ""
@@ -55,7 +55,7 @@ class User {
     get() = digestBacking.ifBlank { throw IllegalArgumentException("Missing digest field") }
 
   private fun assignRowVals(row: ResultRow) {
-    userDbmsId = row[UsersTable.id].value
+    userUuid = row[UsersTable.id].toString()
     email = Email(row[UsersTable.email])
     fullName = FullName(row[UsersTable.fullName])
     saltBacking = row[UsersTable.salt]
@@ -67,7 +67,7 @@ class User {
       val id = UsersTable.id
       UsersTable
         .slice(Count(id))
-        .select { id eq userDbmsId }
+        .select { id eq UUID.fromString(userUuid) }
         .map { it[0] as Long }
         .first() > 0
     }
@@ -78,7 +78,7 @@ class User {
     logger.info { "uuid: $uuid" }
 
     transaction {
-      UsersTable.deleteWhere { UsersTable.id eq userDbmsId }
+      UsersTable.deleteWhere { UsersTable.id eq UUID.fromString(userUuid) }
     }
   }
 
@@ -94,7 +94,7 @@ class User {
       transaction {
         UsersTable
           .slice(Count(UsersTable.id))
-          .select { UsersTable.uuidCol eq uuid }
+          .select { UsersTable.id eq uuid }
           .map { it[0] as Long }
           .first() > 0
       }
@@ -103,7 +103,7 @@ class User {
       transaction {
         UsersTable
           .slice(UsersTable.id)
-          .select { UsersTable.uuidCol eq uuid }
+          .select { UsersTable.id eq uuid }
           .map { it[UsersTable.id].value }
           .firstOrNull() ?: defaultIfMissing
       }
@@ -112,7 +112,7 @@ class User {
       transaction {
         UsersTable
           .slice(UsersTable.email)
-          .select { UsersTable.uuidCol eq uuid }
+          .select { UsersTable.id eq uuid }
           .map { Email(it[0] as String) }
           .firstOrNull() ?: defaultIfMissing
       }
@@ -130,7 +130,7 @@ class User {
             val userDbmsId =
               UsersTable
                 .insertAndGetId { row ->
-                  row[UsersTable.uuidCol] = user.uuid
+                  row[UsersTable.id] = user.uuid
                   row[UsersTable.fullName] = name.value.maxLength(128)
                   row[UsersTable.email] = email.value.maxLength(128)
                   row[UsersTable.salt] = salt
@@ -145,31 +145,31 @@ class User {
 
     fun isNotRegisteredEmail(email: Email) = !isRegisteredEmail(email)
 
-    fun queryUserByEmail(email: Email): User? =
-      transaction {
-        UsersTable
-          .slice(UsersTable.uuidCol)
-          .select { UsersTable.email eq email.value }
-          .map { (it[0] as UUID).toUser() }
-          .firstOrNull()
-          .also { logger.info { "queryUserByEmail() returned: ${it?.email ?: " ${email.value} not found"}" } }
-      }
-
     fun isValidUuid(uuid: String) =
       transaction {
         UsersTable
           .slice(Count(UsersTable.id))
-          .select { UsersTable.uuidCol eq UUID.fromString(uuid) }
+          .select { UsersTable.id eq UUID.fromString(uuid) }
           .map { it[0] as Long }
           .first() > 0
+      }
+
+    fun queryUserByEmail(email: Email): User? =
+      transaction {
+        UsersTable
+          .slice(UsersTable.id)
+          .select { UsersTable.email eq email.value }
+          .map { row -> UUID.fromString(row[UsersTable.id].toString()).toUser() }
+          .firstOrNull()
+          .also { logger.info { "queryUserByEmail() returned: ${it?.email ?: " ${email.value} not found"}" } }
       }
 
     fun queryUserByUuid(uuid: UUID): User? =
       transaction {
         UsersTable
-          .slice(UsersTable.uuidCol)
-          .select { UsersTable.uuidCol eq uuid }
-          .map { (it[0] as UUID).toUser() }
+          .slice(UsersTable.id)
+          .select { UsersTable.id eq uuid }
+          .map { row -> UUID.fromString(row[UsersTable.id].toString()).toUser() }
           .firstOrNull()
           .also { logger.info { "queryUserByUuid() returned: ${it?.email ?: " $uuid not found"}" } }
       }
@@ -178,7 +178,7 @@ class User {
       transaction {
         (UsersTable
           .slice(UsersTable.lastPathName)
-          .select { UsersTable.uuidCol eq UUID.fromString(uuid) }
+          .select { UsersTable.id eq UUID.fromString(uuid) }
           .map { it[UsersTable.lastPathName] }
           .firstOrNull() ?: error("Missing uuid: $uuid"))
           .let { pathName -> slideDeck.findSlideByPathName(pathName) }

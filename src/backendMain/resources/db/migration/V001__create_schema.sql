@@ -4,10 +4,9 @@ create schema history;
 
 CREATE TABLE history.users
 (
-    id             BIGSERIAL UNIQUE PRIMARY KEY,
+    id             UUID UNIQUE PRIMARY KEY,
     created        TIMESTAMPTZ DEFAULT NOW(),
     updated        TIMESTAMPTZ DEFAULT NOW(),
-    uuid           UUID NOT NULL UNIQUE,
     email          TEXT NOT NULL UNIQUE,
     full_name      TEXT NOT NULL,
     salt           TEXT NOT NULL,
@@ -17,11 +16,10 @@ CREATE TABLE history.users
 
 CREATE TABLE history.userchoices
 (
-    id             BIGSERIAL UNIQUE PRIMARY KEY,
+    id             SERIAL UNIQUE PRIMARY KEY,
     created        TIMESTAMPTZ DEFAULT NOW(),
     updated        TIMESTAMPTZ DEFAULT NOW(),
-    uuid           UUID NOT NULL UNIQUE,
-    user_uuid      UUID NOT NULL,
+    user_uuid_ref  UUID REFERENCES history.users ON DELETE CASCADE,
     from_path_name TEXT NOT NULL,
     from_title     TEXT NOT NULL,
     to_path_name   TEXT NOT NULL,
@@ -29,5 +27,13 @@ CREATE TABLE history.userchoices
     choice_text    TEXT NOT NULL,
     reason         TEXT NOT NULL,
 
-    CONSTRAINT user_choices_unique unique (user_uuid, from_path_name, to_path_name)
+    CONSTRAINT user_choices_unique unique (user_uuid_ref, from_path_name, to_path_name)
 );
+
+CREATE VIEW history.user_decision_counts AS
+SELECT full_name, email, count(user_uuid_ref) as decision_count
+FROM history.users
+         LEFT OUTER JOIN history.userchoices
+                         ON history.userchoices.user_uuid_ref = users.id
+GROUP BY history.users.full_name, users.id
+ORDER BY history.users.full_name, users.id;
