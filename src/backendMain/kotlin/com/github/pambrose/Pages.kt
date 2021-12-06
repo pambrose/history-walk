@@ -7,7 +7,7 @@ import kotlinx.html.*
 import kotlinx.html.stream.createHTML
 
 object Pages {
-  fun displayUserSummary(uuid: String) =
+  fun displayUserSummary() =
     createHTML()
       .html {
         body {

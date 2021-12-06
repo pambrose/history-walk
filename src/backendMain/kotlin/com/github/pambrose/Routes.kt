@@ -85,7 +85,7 @@ object Routes : KLogging() {
 
       get("summary") {
         val uuid = call.userId.uuid
-        respondWith { displayUserSummary(uuid) }
+        respondWith { displayUserSummary() }
       }
 
       if (EnvVar.ALLOW_SLIDE_ACCESS.getEnv(false)) {
