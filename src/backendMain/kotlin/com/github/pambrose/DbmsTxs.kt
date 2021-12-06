@@ -69,7 +69,7 @@ object DbmsTxs : KLogging() {
         .toInt()
     }
 
-  fun allUserSummaries(uuid: String) =
+  fun allUserSummaries() =
     transaction {
       UserDecisionCountsView
         .selectAll()

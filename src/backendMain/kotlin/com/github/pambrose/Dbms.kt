@@ -11,7 +11,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import kotlin.time.Duration.Companion.minutes
 
 
-object Db {
+object Dbms {
 
   fun init(config: ApplicationConfig) {
     Database.connect(hikari(config))

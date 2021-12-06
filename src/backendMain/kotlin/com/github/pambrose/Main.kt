@@ -98,7 +98,7 @@ fun Application.main() {
     assignCookies()
   }
 
-  Db.init(environment.config)
+  Dbms.init(environment.config)
 
   install(Authentication) {
     configureFormAuth()

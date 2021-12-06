@@ -128,16 +128,15 @@ class User {
           transaction {
             val salt = newStringSalt()
             val digest = password.sha256(salt)
-            val userDbmsId =
-              UsersTable
-                .insertAndGetId { row ->
-                  row[UsersTable.id] = user.uuid
-                  row[UsersTable.fullName] = name.value.maxLength(128)
-                  row[UsersTable.email] = email.value.maxLength(128)
-                  row[UsersTable.salt] = salt
-                  row[UsersTable.digest] = digest
-                  row[UsersTable.lastPathName] = ROOT
-                }.value
+            UsersTable
+              .insert { row ->
+                row[UsersTable.id] = user.uuid
+                row[UsersTable.fullName] = name.value.maxLength(128)
+                row[UsersTable.email] = email.value.maxLength(128)
+                row[UsersTable.salt] = salt
+                row[UsersTable.digest] = digest
+                row[UsersTable.lastPathName] = ROOT
+              }
           }
           logger.info { "Created user $email ${user.uuid}" }
         }

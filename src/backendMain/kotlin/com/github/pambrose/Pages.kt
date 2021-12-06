@@ -34,7 +34,7 @@ object Pages {
                   +"Last Slide"
                 }
               }
-              allUserSummaries(uuid)
+              allUserSummaries()
                 .sortedBy { it.decisionCount }
                 .forEach { summary ->
                   tr {
@@ -84,7 +84,7 @@ object Pages {
                     td {
                       //style = "padding-right:15px;"
                       slides
-                        .forEachIndexed { i, slide ->
+                        .forEachIndexed { i, _ ->
                           a { href = "/$SLIDE/$slideId/$i"; +" $i" }
                           +" "
                         }
