@@ -1,22 +1,22 @@
 import com.github.pambrose.slides.SlideDeck.Companion.slideDeck
 
 val text1_titlePage = """ 
-    <p style="text-align:center;margin-bottom:57px;border:2px solid white;">  
-    <font size="+3">
+    <div style="text-align:center;">  
     <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/jermain-longuen.jpg" alt="Pic" style="width:334px;height:518px;border:2px solid grey;float:right;margin-left:10px;"/>  
-    <p style="padding-top:100px;">
+    <div style="padding-top:130px;">
+    <font size="+3">
     UGRR Scenario: 
     <br>
     Jarm Logue, later known as Reverend Jermain W. Longuen
-    </p>
     </font>
-    <p style="padding-top:50px;">
+    </div>
+    <div style="padding-top:70px;padding-bottom:40px;">
     <font size="+2">
     *Ted Webb* <br>
     *Sven Miller*
     </font>
-    </p>
-    </p> 
+    </div>
+    </div> 
 """
 
 val text2_majorDecision = """      
@@ -33,10 +33,11 @@ val text2_majorDecision = """
 """
 
 val text3_companionDecision = """
-    <p style="padding-bottom:60px;">
+    <div>
     <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/pistol.jpg" alt="Pic" style="width:130px;height:61px;border:1px solid white;float:left"/>  
     <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/salami.jpg" alt="Pic" style="width:123px;height:76px;border:1px solid white;float:right"/>  
 
+    <p style="padding-top:80px;">
     Eager to join you, your friend John Farney asks around and says that 
     you should contact **first** (1) an ‘entrepreneurial’ (and maybe sympathetic?) 
     white man named Ross –– who offers to ‘obtain’ and provide forged free 
@@ -48,6 +49,7 @@ val text3_companionDecision = """
     Will you risk beating, torture, or worse by stealing the items that Ross 
     wants in exchange for what he offers?    
     </p>
+    </div>
 """
 
 val text4_decisionWhenToGo = """
@@ -115,9 +117,9 @@ val text8_summerCrossCountry = """
 """
 
 val text9_fleeIntoDeepForestEnd = """
-    <p style="padding-bottom:10px;">
+    <div>
     <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/deep-forest.jpg" alt="Pic" style="width:233px;height:217px;border:2px solid gray;float:right;margin-left:10px;"/>  
-    <p>
+    <div style="padding-top:20px;padding-bottom:20px;">
     You dash into the deep forest, gasping for air, as the sound of hounds follow you.
     You begin to panic as the sounds get louder and closer.
     
@@ -125,8 +127,8 @@ val text9_fleeIntoDeepForestEnd = """
     into shreds. 
     
     THE END.
-    </p>
-    </p>
+    </div>
+    </div>
 """
 
 val text10_autumnDeparture = """
@@ -147,7 +149,7 @@ val text11_springDeparture = """
 
 val text12_paddyRollersEnd = """
     <p>
-    <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/paddyrollers.jpg" alt="Pic" style="width:301px;height:159px;border:2px solid gray;float:right;margin-left:10px;"/>  
+    <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/paddyrollers.jpg" alt="Pic" style="width:301px;height:159px;border:2px solid gray;float:right;margin-left:10px;margin-top:10px;"/>  
     You are surprised by the sudden appearance of four ‘paddy rollers,’ as slave-catchers 
     were sometimes called, who were waiting to ambush you. Speedily they seize you up, 
     bind you, and, after torturing you for information, return you to your owner for a reward.
@@ -167,17 +169,21 @@ val text13_winterDepartureAlone = """
 """
 
 val text14_stealOvercoat = """
-    <p>
+    <div>
     <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/winterdeparture.jpg" alt="Pic" style="width:187px;height:258px;border:2px solid gray;float:right;margin-left:10px;"/>  
-    <p style="padding-top:50px;margin-bottom:50px;">
+    <div style="padding-top:60px;margin-bottom:45px;">
+    <p>
     That evening, you creep into the main household, enter the coat room, and grab 
     your master’s finest winter coat.
-    
+    </p>
+    <p>
     Striding outside, toasty warm and with a sense of accomplishment, you begin your journey.
-
+    </p>
+    <p>
     You decide to go...
     </p>
-    </p>
+    </div>
+    </div>
 """
 
 val text15_winterCrossCountry = """
@@ -192,8 +198,8 @@ val text15_winterCrossCountry = """
 """
 
 val text16_rossEncounter = """
-    <p>
-    <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/ross.jpg" alt="Pic" style="width:164;height:383px;border:2px solid gray;float:right;margin-left:10px;"/>  
+    <div>
+    <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/ross.jpg" alt="Pic" style="width:164;height:383px;border:2px solid gray;float:right;margin-left:10px;margin-top:15px;"/>  
     Having risked severe punishment, you have managed to steal some bacon, 
     flour, bread, fruit preserves, and 12 dollars (two of which you will keep).
     In the past, you would not have dared to even think of stealing from your 
@@ -209,7 +215,7 @@ val text16_rossEncounter = """
     he steps up close and offers a linen bundle in exchange.
     
     Do you complete the deal?
-    </p>
+    </div>
 """
 
 val text17_rossAdvice = """
@@ -240,61 +246,68 @@ val text18_winterTravelEnd = """
 """
 
 val text19_stealOvercoatViaRoss = """
-    <p>
+    <div>
     <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/winterdeparture.jpg" alt="Pic" style="width:187px;height:258px;border:2px solid gray;float:right;margin-left:10px;"/>  
-    <p style="padding-top:50px;margin-bottom:50px;">
+    <div style="padding-top:55px;padding-bottom:20px;">
+    <p>
     That evening, you creep into the main household, enter the coat room, and grab 
     your master’s finest winter coat.
-    
+    </p>
+    <p>
     Striding outside, toasty warm and with a sense of accomplishment, you begin your journey.
-
+    </p>
+    <p>
     You decide to go...
     </p>
-    </p>
+    </div>
+    </div>
 """
 
 val text20_majorEncounterPatrol = """
-    <p>
+    <div>
     <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/patrol.jpg" alt="Pic" style="width:196px;height:379px;border:2px solid gray;float:right;margin-left:10px;"/>  
-    <p style="padding-top:90px;margin-bottom:70px;">
+    <p style="padding-top:90px;">
     Rounding the bend on the main road that you have been following, you come to a crossroads 
     just as two men ride up from the side, one with a rifle slung across back. They quickly 
     pull along side, grab the reins of your horses, and begin to question you aggressively, 
     demanding to see your passes, to know your origins and destination, and to learn your 
     intentions.
-    
+    </p>
+    <p style="padding-bottom:65px;">
     Do you...
     </p>
-    </p>
+    </div>
 """
 
 val text21_majorEncounterViaRoss1stPatrol = """
-    <p>
+    <div>
     <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/patrol.jpg" alt="Pic" style="width:196px;height:379px;border:2px solid gray;float:right;margin-left:10px;"/>  
-    <p style="padding-top:90px;margin-bottom:70px;">
+    <p style="padding-top:90px;">
     Rounding the bend on the main road that you have been following, you come to a crossroads 
     just as two men ride up from the side, one with a rifle slung across back. They quickly 
     pull along side, grab the reins of your horses, and begin to question you aggressively, 
     demanding to see your passes, to know your origins and destination, and to learn your 
     intentions.
-    
+    </p>
+    <p style="padding-bottom:65px;">
     Do you...
     </p>
-    </p>
+    </div>
 """
 
 val text22_majorEncounterFleePatrolEnd = """
-    <p>
+    <div>
     <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/fleepatrol.jpg" alt="Pic" style="width:200px;height:300px;border:2px solid gray;float:right;margin-left:10px;"/>  
-    <p style="padding-top:40px;margin-bottom:70px;">
+    <p style="padding-top:60px;">
     As you turn to run, you hear the loud blast of a pistol, following by an hot, stabbing 
     pain in your thigh. Stumbling and and falling, you fumble futilely for some weapon.
     The pain is overwhelming and the bleeding great. As your vision begins to blur, you 
     know that you will awaken either back at the plantation or in the hereafter... 
-    
+    </p>
+    <p style="padding-bottom:40px;">    
     THE END.
     </p>
-    </p>
+    </div>
 """
 
 val text23_majorEncounterFight1stPatrolEnd = """
@@ -525,18 +538,19 @@ val text52_majorEncounterPharmacy = """
 """
 
 val text53_majorEncounter2ndPatrol = """
-    <p>
+    <div>
     <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/2ndpatrol.jpg" alt="Pic" style="width:178px;height:417px;border:2px solid gray;float:right;margin-left:10px;"/>  
-    <p style="padding-top:100px;margin-bottom:100px;">
+    <p style="padding-top:110px;">
     After riding for some hours, you enter into a brushy area with low visibility.
     Suddenly, a rider moves out from the cover of the foliage to block your path forward.
     You hear a similar rustling behind you as another emerges to block your retreat.
     They demand information forcefully and menacingly, mentioning something about escaped 
     slaves in the area assaulting decent citizens.
-    
+    </p>
+    <p style="padding-bottom:85px;">
     Do you...
     </p>
-    </p>
+    </div>
 """
 
 val text54_majorEncounterFight2ndPatrol = """
