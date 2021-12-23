@@ -193,6 +193,11 @@ kotlin {
   }
 }
 
+// This is the workaround for lack of M1 support in 14.17.0
+rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin> {
+  rootProject.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension>().nodeVersion = "16.0.0"
+}
+
 afterEvaluate {
   tasks {
     create("frontendArchive", Jar::class).apply {
