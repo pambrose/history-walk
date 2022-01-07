@@ -657,10 +657,10 @@ val slides =
     val slide54_majorEncounterFight2ndPatrol =
       slide(54, "Major Encounter: fight 2nd Patrol", text54_majorEncounterFight2ndPatrol) {
         choice("Do you agree and go cross-country?",
-          slide(56, "Backroads", text56_backroads) {
-            choice("Approach the cottage?", slide57_riverCrossing.copyOf())
-            choice("Push on to the wilderness?", slide15_winterCrossCountry.copyOf())
-          })
+               slide(56, "Backroads", text56_backroads) {
+                 choice("Approach the cottage?", slide57_riverCrossing.copyOf())
+                 choice("Push on to the wilderness?", slide15_winterCrossCountry.copyOf())
+               })
         choice("Or stay on the main road?", slide20_majorEncounterPatrol.copyOf())
       }
 
@@ -745,10 +745,10 @@ val slides =
     val slide40_confidentAndArrogantBluff =
       slide(40, "Confident & Arrogant Bluff", text40_confidentAndArrogantBluff) {
         choice("Continue down the main road out of town?",
-          slide(44, "Main Road out of Second Town", text44_mainRoadOutOfSecondTown) {
-            choice("Continue on the main road to the next town?", slide45_thirdTown.copyOf())
-            choice("Head into the wilderness?", slide15_winterCrossCountry.copyOf())
-          })
+               slide(44, "Main Road out of Second Town", text44_mainRoadOutOfSecondTown) {
+                 choice("Continue on the main road to the next town?", slide45_thirdTown.copyOf())
+                 choice("Head into the wilderness?", slide15_winterCrossCountry.copyOf())
+               })
         choice("Head into the wilderness?", slide15_winterCrossCountry.copyOf())
       }
 
@@ -767,9 +767,9 @@ val slides =
     val slide41_majorEncounterRamshackleHut =
       slide(41, "Major Encounter: Ramshackle Hut", text41_majorEncounterRamshackleHut) {
         choice("Enter the ramshackle hut?",
-          slide(42, "Major Encounter: Ramshackle Hut (cont.)", text42_majorEncounterRamshackleHutContd) {
-            choice("Continue", slide12_paddyRollersEnd.copyOf())
-          })
+               slide(42, "Major Encounter: Ramshackle Hut (cont.)", text42_majorEncounterRamshackleHutContd) {
+                 choice("Continue", slide12_paddyRollersEnd.copyOf())
+               })
         choice("Try another building in town?", goBack(-1))
         choice("Ride on, taking main road out of town?", slide20_majorEncounterPatrol.copyOf())
       }
@@ -779,22 +779,22 @@ val slides =
         choice("The ramshackle hut at the edge of town", slide41_majorEncounterRamshackleHut.copyOf())
         choice("The ordinary tavern in the town center", slide38_majorEncounterOrdinaryTavern.copyOf())
         choice("The bordello in the town center",
-          slide(43, "Major Encounter: Bordello", text43_majorEncounterBordello) {
-            choice("Try another building in town?", goBack(-2))
-            choice(
-              "Push on, desperately hungry and tired, onto the main road out of town?",
-              slide20_majorEncounterPatrol.copyOf()
-            )
-          })
+               slide(43, "Major Encounter: Bordello", text43_majorEncounterBordello) {
+                 choice("Try another building in town?", goBack(-2))
+                 choice(
+                   "Push on, desperately hungry and tired, onto the main road out of town?",
+                   slide20_majorEncounterPatrol.copyOf()
+                 )
+               })
       }
 
     val slide32_confidentAndArrogantBluff =
       slide(32, "Confident & Arrogant Bluff", text32_confidentAndArrogantBluff) {
         choice("Continue down the main road out of town?",
-          slide(36, "Main Road out of First Town", text36_mainRoadOutOfTown) {
-            choice("Continue on the main road to the next town?", slide37_secondTown.copyOf())
-            choice("Head into the wilderness", slide15_winterCrossCountry.copyOf())
-          })
+               slide(36, "Main Road out of First Town", text36_mainRoadOutOfTown) {
+                 choice("Continue on the main road to the next town?", slide37_secondTown.copyOf())
+                 choice("Head into the wilderness", slide15_winterCrossCountry.copyOf())
+               })
         choice("Head into the wilderness", slide15_winterCrossCountry.copyOf())
       }
 
@@ -822,9 +822,9 @@ val slides =
           "The ramshackle hut at the edge of town",
           slide(33, "Major Encounter: Ramshackle Hut", text33_majorEncounterRamshackleHut) {
             choice("Enter the ramshackle hut?",
-              slide(34, "Major Encounter: Ramshackle Hut (cont.)", text34_majorEncounterRamshackleHutContd) {
-                choice("Continue", slide12_paddyRollersEnd.copyOf())
-              })
+                   slide(34, "Major Encounter: Ramshackle Hut (cont.)", text34_majorEncounterRamshackleHutContd) {
+                     choice("Continue", slide12_paddyRollersEnd.copyOf())
+                   })
             choice("Try another building in town?", goBack(-1))
             choice("Ride on, taking main road out of town?", slide20_majorEncounterPatrol.copyOf())
           }
