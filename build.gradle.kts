@@ -28,6 +28,7 @@ repositories {
   //maven { url = uri("https://kotlin.bintray.com/ktor") }
   //maven { url = uri("https://kotlin.bintray.com/kotlinx") }
   //maven { url = uri("https://maven-central.storage-download.googleapis.com/repos/central/data/") }
+  google()
   mavenCentral()
   maven { url = uri("https://jitpack.io") }
 }
@@ -145,16 +146,16 @@ kotlin {
         //implementation("commons-codec:commons-codec:$commonsCodecVersion")
         //implementation("com.axiomalaska:jdbc-named-parameters:$jdbcNamedParametersVersion")
         //implementation("com.github.andrewoma.kwery:core:$kweryVersion")
+
         implementation("com.vladsch.flexmark:flexmark:$flexmarkVersion")
+
         implementation("com.github.pambrose.common-utils:core-utils:$utilsVersion")
         implementation("com.github.pambrose.common-utils:script-utils-common:$utilsVersion")
         implementation("com.github.pambrose.common-utils:script-utils-kotlin:$utilsVersion")
+        runtimeOnly("org.jetbrains.kotlin:kotlin-scripting-jsr223:$kotlinVersion")
 
         implementation("io.github.microutils:kotlin-logging:$loggingVersion")
         implementation("ch.qos.logback:logback-classic:$logbackVersion")
-
-        runtimeOnly("org.jetbrains.kotlin:kotlin-scripting-jsr223:$kotlinVersion")
-
       }
     }
 
