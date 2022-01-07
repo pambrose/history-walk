@@ -30,7 +30,8 @@ There are 3 repos involved in this project:
 * frontendBrowserWebpack - Bundles the compiled js files into `build/distributions`
 * frontendJar - Packages a standalone "web" frontend jar with all required files into `build/libs/*.jar`
 * backendJar - Packages a backend jar with compiled source files into `build/libs/*.jar`
-* jar - Packages a "fat" jar with all backend sources and dependencies while also embedding frontend resources into `build/libs/*.jar`
+* jar - Packages a "fat" jar with all backend sources and dependencies while also embedding frontend resources
+  into `build/libs/*.jar`
 
 ### Heroku Deployment
 
@@ -38,3 +39,8 @@ There are 3 repos involved in this project:
 * Add config var `GRADLE_TASK = -Pprod=true jar`
 * Add buildpack `heroku/gradle`
 
+### Debug Deployment
+
+* SLIDES_LOCAL_FILENAME=src/backendMain/kotlin/Slides.kt
+* SHOW_RESET_BUTTON=true
+* ALLOW_SLIDE_ACCESS=true
