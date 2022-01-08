@@ -72,7 +72,6 @@ private fun Container.displaySlide(slide: SlideData) {
       }
     }
 
-    //if (!slide.success) {
     vPanel {
       slide.parentTitles
         .forEach { parentTitle ->
@@ -93,13 +92,13 @@ private fun Container.displaySlide(slide: SlideData) {
         }
     }
 
-    h1 {
-      background = Background(Color.rgb(53, 121, 246))
-      color = Color.name(Col.WHITE)
-      textAlign = TextAlign.CENTER
-      +slide.title
-    }
-    //}
+    if (slide.displayTitle)
+      h1 {
+        background = Background(Color.rgb(53, 121, 246))
+        color = Color.name(Col.WHITE)
+        textAlign = TextAlign.CENTER
+        +slide.title
+      }
 
     simplePanel {
       if (slide.failure)

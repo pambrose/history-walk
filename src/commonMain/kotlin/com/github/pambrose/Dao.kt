@@ -35,6 +35,7 @@ data class SlideData(
   val verticalChoices: Boolean,
   val parentTitles: List<ParentTitle>,
   val offset: Int,
+  val displayTitle: Boolean,
   val decisionCount: Int,
   val showResetButton: Boolean,
 ) {

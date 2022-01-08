@@ -53,9 +53,19 @@ object DbmsTxs : KLogging() {
 
     return slide
       .run {
-        val count = decisionCount(uuid)
-        val reset = EnvVar.SHOW_RESET_BUTTON.getEnv(false)
-        SlideData(pathName, title, content, success, choices, verticalChoices, parentTitles, offset, count, reset)
+        SlideData(
+          pathName,
+          title,
+          content,
+          success,
+          choices,
+          verticalChoices,
+          parentTitles,
+          offset,
+          displayTitle,
+          decisionCount(uuid),
+          EnvVar.SHOW_RESET_BUTTON.getEnv(false),
+        )
       }
   }
 

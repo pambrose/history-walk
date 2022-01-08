@@ -66,7 +66,7 @@ val page8Text = """
 val slides2 =
   slideDeck {
 
-    val errorSlide = slide(99, "Incorrect Answer", errorText) {}
+    val errorSlide = slide(99, "Incorrect Answer", errorText, displayTitle = false) {}
 
     val slide3 =
       slide(3, "2nd Decision", page2Text, success = true) {
@@ -77,9 +77,12 @@ val slides2 =
       choice(
         "Continue",
         slide(2, "1st Decision", page1Text) {
-          choice("Head back to the slave quarters and take your chances the rumor was false", errorSlide.copyOf())
+          choice(
+            "Head back to the slave quarters and take your chances the rumor was false",
+            errorSlide.copyOf("Incorrect1")
+          )
           choice("Run away right now", slide3)
-          choice("Wait until the night to escape", errorSlide.copyOf())
+          choice("Wait until the night to escape", errorSlide.copyOf("Incorrect2"))
         },
       )
     }

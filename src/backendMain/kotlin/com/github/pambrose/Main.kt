@@ -30,6 +30,7 @@ import java.util.concurrent.atomic.AtomicReference
 //@Version(version = BuildConfig.CORE_VERSION, date = BuildConfig.CORE_RELEASE_DATE)
 object HistoryWalkServer : KLogging() {
   private val masterSlidesRef = AtomicReference(SlideDeck())
+
   var masterSlides: SlideDeck
     get() = masterSlidesRef.get()
     set(value) = masterSlidesRef.set(value)
