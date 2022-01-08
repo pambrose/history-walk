@@ -83,11 +83,10 @@ object Pages {
                     }
                     td {
                       //style = "padding-right:15px;"
-                      slides
-                        .forEachIndexed { i, _ ->
-                          a { href = "/$SLIDE/$slideId/$i"; +" $i" }
-                          +" "
-                        }
+                      slides.forEachIndexed { i, _ ->
+                        a { href = "/$SLIDE/$slideId/$i"; +" $i" }
+                        +" "
+                      }
                     }
                   }
                 }

@@ -109,7 +109,10 @@ private fun Container.displaySlide(slide: SlideData) {
         background = Background(Color.rgb(89, 181, 95))
 
       border = Border(2.px, BorderStyle.SOLID, Color.name(Col.GRAY))
-      padding = 25.px
+      paddingTop = 25.px
+      paddingLeft = 25.px
+      paddingRight = 25.px
+      paddingBottom = 5.px
 
       add(P(slide.content, true))
     }

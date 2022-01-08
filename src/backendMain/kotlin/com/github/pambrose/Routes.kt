@@ -8,6 +8,7 @@ import com.github.pambrose.EndPoints.LOGIN
 import com.github.pambrose.EndPoints.LOGOUT
 import com.github.pambrose.EndPoints.SLIDE
 import com.github.pambrose.EndPoints.USER_RESET
+import com.github.pambrose.HistoryWalkServer.loadSlides
 import com.github.pambrose.HistoryWalkServer.masterSlides
 import com.github.pambrose.Pages.displayAllSlides
 import com.github.pambrose.Pages.displayUserSummary
