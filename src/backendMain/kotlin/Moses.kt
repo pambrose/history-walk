@@ -231,8 +231,8 @@ val decision20Text = """
 """
 
 val decision21Text = """
-  For the time being you give up your dream of freedom. 
-  After a few months have passed a strange thing happens. 
+  For the time being you give up your dream of freedom.
+  After a few months have passed a strange thing happens.
   An unfamiliar man arrives and speaks with Mr. Gooch. 
   A short time later the overseer comes down and tells you to follow him.
   You ask what is going on and you are told you are being sold.
