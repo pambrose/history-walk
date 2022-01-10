@@ -332,7 +332,7 @@ val decision29Text = """
   Options:
 """
 
-val sucessText = """
+val successText = """
   You decide to stay with the SS Fox.
   Each day you nervously attempt to keep busy and hope you will not be 
   discovered by authorities.
@@ -353,48 +353,116 @@ val slides2 =
 
     val errorSlide = slide(99, "Incorrect Answer", errorText, displayTitle = false) {}
 
-    val slide22 = slide(5, "22nd Decison", decision4Text, success = true)
+    val slideSuccess = slide(5, "Success!", successText, success = true)
+
+    val slide29 = slide(5, "29th Decison", decision29Text) {
+      choice("Stay with the SS Fox", slideSuccess)
+      choice("Ask the captain when the ship will be departing", errorSlide.copyOf("Incorrect1"))
+      choice("Look for a new ship", errorSlide.copyOf("Incorrect2"))
+    }
+
+    val slide28 = slide(5, "28th Decison", decision28Text) {
+      choice("Attempt to sneak onto a ship and stow away", errorSlide.copyOf("Incorrect1"))
+      choice("Attempt to find work on a ship heading north", slide29)
+    }
+
+    val slide27 = slide(5, "27th Decison", decision27Text) {
+      choice("Use it despite your concerns", errorSlide.copyOf("Incorrect1"))
+      choice("Abandon the plan to use it", errorSlide.copyOf("Incorrect2"))
+      choice("Try to blur the ink by getting it wet", slide28)
+      choice("Try to obscure the writing by rubbing dirt over it", errorSlide.copyOf("Incorrect3"))
+    }
+
+    val slide26 = slide(5, "26th Decison", decision26Text) {
+      choice("Ask the child to write you a pass saying you are free to travel to Savannah", slide27)
+      choice("Keep travelling and hope you won’t need documents to avoid arrest", errorSlide.copyOf("Incorrect1"))
+      choice(
+        "Ask the child to write a document stating you are a free African American",
+        errorSlide.copyOf("Incorrect2")
+      )
+    }
+
+    val slide25 = slide(5, "25th Decison", decision25Text) {
+      choice("Stay with the minister all the way into the city", errorSlide.copyOf("Incorrect1"))
+      choice(
+        "After spending time with the minister, you tell him your true predicament, that you are fugitive and ask him for help",
+        errorSlide.copyOf("Incorrect2")
+      )
+      choice("Slip away from the minister and head into the woods", slide26)
+    }
+
+    val slide24 = slide(5, "24th Decison", decision24Text) {
+      choice("Tell this man of God you are a fugitive and seek his assistance", errorSlide.copyOf("Incorrect1"))
+      choice("Tell him you are off running errands for your master", errorSlide.copyOf("Incorrect2"))
+      choice(
+        "Tell him you were given the day off to go visit family on another plantation",
+        errorSlide.copyOf("Incorrect3")
+      )
+      choice(
+        "Tell him you were separated from your master who is headed for Savannah and you are trying to catch up",
+        slide25
+      )
+    }
+
+    val slide23 = slide(5, "23rd Decison", decision23Text) {
+      choice("Continue north", errorSlide.copyOf("Incorrect1"))
+      choice("Head to Savannah", slide24)
+      choice("Wait at the crossing and see if you can learn more about the options", errorSlide.copyOf("Incorrect2"))
+    }
+
+    val slide22 = slide(5, "22nd Decison", decision22Text) {
+      choice("You have to take advantage of this opportunity, you attempt to steal the keys", slide23)
+      choice(
+        "You are worried you will get caught and you wait for a better opportunity",
+        errorSlide.copyOf("Incorrect1")
+      )
+    }
 
     val slide21 = slide(21, "21st Decison", decision21Text) {
-      choice("", errorSlide.copyOf("Incorrect1"))
-      choice("", errorSlide.copyOf("Incorrect2"))
-      choice("", slide22)
+      choice("Stay put and see how this new situation unfolds", slide22)
+      choice(
+        "Talk to fellow Enslaved Africans to gather information about escaping in this new location",
+        errorSlide.copyOf("Incorrect1")
+      )
+      choice("Attempt to run away that evening", errorSlide.copyOf("Incorrect2"))
     }
 
     val slide20 = slide(20, "20th Decison", decision20Text) {
-      choice("", errorSlide.copyOf("Incorrect1"))
-      choice("", errorSlide.copyOf("Incorrect2"))
-      choice("", slide21)
+      choice("Seek the first opportunity to escape again", errorSlide.copyOf("Incorrect1"))
+      choice("Stay put for the time being", slide21)
     }
 
     val slide19 = slide(19, "19th Decison", decision19Text) {
-      choice("", errorSlide.copyOf("Incorrect1"))
-      choice("", errorSlide.copyOf("Incorrect2"))
-      choice("", slide20)
+      choice("Try and find your friend on the nearby plantation", slide20)
+      choice("Continue to travel through the woods", errorSlide.copyOf("Incorrect1"))
+      choice("Travel along the road, at night", errorSlide.copyOf("Incorrect2"))
     }
 
     val slide18 = slide(18, "18th Decison", decision18Text) {
-      choice("", errorSlide.copyOf("Incorrect1"))
-      choice("", errorSlide.copyOf("Incorrect2"))
-      choice("", slide19)
+      choice("Hide under some blankets", slide19)
+      choice("Run outside.", errorSlide.copyOf("Incorrect1"))
+      choice("Act as if you belong there", errorSlide.copyOf("Incorrect2"))
     }
 
     val slide17 = slide(17, "17th Decison", decision17Text) {
-      choice("", errorSlide.copyOf("Incorrect1"))
-      choice("", errorSlide.copyOf("Incorrect2"))
-      choice("", slide18)
+      choice("Return with him to the plantation where he is enslaved", slide18)
+      choice("Politely decline and continue on", errorSlide.copyOf("Incorrect1"))
+      choice("Deceive him and tell him you are on an errand for your master", errorSlide.copyOf("Incorrect2"))
     }
 
     val slide16 = slide(16, "16th Decison", decision16Text) {
-      choice("", errorSlide.copyOf("Incorrect1"))
-      choice("", errorSlide.copyOf("Incorrect2"))
-      choice("", slide17)
+      choice("Swim across the river", errorSlide.copyOf("Incorrect1"))
+      choice(
+        "Look for a crossing upstream, where the river looks narrower, but faster",
+        errorSlide.copyOf("Incorrect2")
+      )
+      choice("Look for downstream for a bridge or watercraft", slide17)
     }
 
     val slide15 = slide(15, "15th Decison", decision15Text) {
-      choice("", errorSlide.copyOf("Incorrect1"))
-      choice("", errorSlide.copyOf("Incorrect2"))
-      choice("", slide16)
+      choice("Find a place to hide and wait for your captors to move on", errorSlide.copyOf("Incorrect1"))
+      choice("Try and break the shackles, thus increasing your speed", slide16)
+      choice("Keep moving shackled together", errorSlide.copyOf("Incorrect2"))
     }
 
     val slide14 = slide(14, "14th Decison", decision14Text) {
@@ -406,7 +474,10 @@ val slides2 =
         "There is no way you can escape right now, you wait for a better opportunity",
         errorSlide.copyOf("Incorrect1")
       )
-      choice("", errorSlide.copyOf("Incorrect2"))
+      choice(
+        "There is no way you can escape right now, you wait for a better opportunity",
+        errorSlide.copyOf("Incorrect2")
+      )
     }
 
     val slide13 = slide(13, "13th Decison", decision13Text) {
@@ -501,17 +572,16 @@ val slides2 =
         choice("Look for someone traveling by road and ask them for assistance", errorSlide.copyOf("Incorrect2"))
       }
 
-    slide(0, "Introduction", introductionPage, root = true) {
+    val slide1 = slide(1, "1st Decision", decision1Text) {
       choice(
-        "Continue",
-        slide(1, "1st Decision", decision1Text) {
-          choice(
-            "Head back to the slave quarters and take your chances the rumor was false",
-            errorSlide.copyOf("Incorrect1")
-          )
-          choice("Run away right now", slide2)
-          choice("Wait until the night to escape", errorSlide.copyOf("Incorrect2"))
-        },
+        "Head back to the slave quarters and take your chances the rumor was false",
+        errorSlide.copyOf("Incorrect1")
       )
+      choice("Run away right now", slide2)
+      choice("Wait until the night to escape", errorSlide.copyOf("Incorrect2"))
+    }
+
+    slide(0, "Introduction", introductionPage, root = true) {
+      choice("Continue", slide1)
     }
   }

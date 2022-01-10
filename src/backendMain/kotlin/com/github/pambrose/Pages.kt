@@ -82,7 +82,6 @@ object Pages {
                       a { href = "/$SLIDE/$slideId"; +" ${slides[0].title}" }
                     }
                     td {
-                      //style = "padding-right:15px;"
                       slides.forEachIndexed { i, _ ->
                         a { href = "/$SLIDE/$slideId/$i"; +" $i" }
                         +" "
