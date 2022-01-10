@@ -62,7 +62,7 @@ object Pages {
           div {
             //style = "float:left;width:50%;"
             table {
-              style = "width:100%;border-collapse: separate; border-spacing: 10px 5px;"
+              style = "width:100%;border-collapse: separate;border-spacing: 10px 5px;text-align: left"
               tr {
                 th { +"ID" }
                 th { +"Title" }
@@ -83,7 +83,7 @@ object Pages {
                     }
                     td {
                       slides.forEachIndexed { i, _ ->
-                        a { href = "/$SLIDE/$slideId/$i"; +" $i" }
+                        a { href = "/$SLIDE/$slideId/$i"; +" ${i + 1}" }
                         +" "
                       }
                     }

@@ -353,27 +353,27 @@ val slides2 =
 
     val errorSlide = slide(99, "Incorrect Answer", errorText, displayTitle = false) {}
 
-    val slideSuccess = slide(5, "Success!", successText, success = true)
+    val slideSuccess = slide(30, "Success!", successText, success = true)
 
-    val slide29 = slide(5, "29th Decison", decision29Text) {
+    val slide29 = slide(29, "29th Decison", decision29Text) {
       choice("Stay with the SS Fox", slideSuccess)
       choice("Ask the captain when the ship will be departing", errorSlide.copyOf("Incorrect1"))
       choice("Look for a new ship", errorSlide.copyOf("Incorrect2"))
     }
 
-    val slide28 = slide(5, "28th Decison", decision28Text) {
+    val slide28 = slide(28, "28th Decison", decision28Text) {
       choice("Attempt to sneak onto a ship and stow away", errorSlide.copyOf("Incorrect1"))
       choice("Attempt to find work on a ship heading north", slide29)
     }
 
-    val slide27 = slide(5, "27th Decison", decision27Text) {
+    val slide27 = slide(27, "27th Decison", decision27Text) {
       choice("Use it despite your concerns", errorSlide.copyOf("Incorrect1"))
       choice("Abandon the plan to use it", errorSlide.copyOf("Incorrect2"))
       choice("Try to blur the ink by getting it wet", slide28)
       choice("Try to obscure the writing by rubbing dirt over it", errorSlide.copyOf("Incorrect3"))
     }
 
-    val slide26 = slide(5, "26th Decison", decision26Text) {
+    val slide26 = slide(26, "26th Decison", decision26Text) {
       choice("Ask the child to write you a pass saying you are free to travel to Savannah", slide27)
       choice("Keep travelling and hope you won’t need documents to avoid arrest", errorSlide.copyOf("Incorrect1"))
       choice(
@@ -382,7 +382,7 @@ val slides2 =
       )
     }
 
-    val slide25 = slide(5, "25th Decison", decision25Text) {
+    val slide25 = slide(25, "25th Decison", decision25Text) {
       choice("Stay with the minister all the way into the city", errorSlide.copyOf("Incorrect1"))
       choice(
         "After spending time with the minister, you tell him your true predicament, that you are fugitive and ask him for help",
@@ -391,7 +391,7 @@ val slides2 =
       choice("Slip away from the minister and head into the woods", slide26)
     }
 
-    val slide24 = slide(5, "24th Decison", decision24Text) {
+    val slide24 = slide(24, "24th Decison", decision24Text) {
       choice("Tell this man of God you are a fugitive and seek his assistance", errorSlide.copyOf("Incorrect1"))
       choice("Tell him you are off running errands for your master", errorSlide.copyOf("Incorrect2"))
       choice(
@@ -404,13 +404,13 @@ val slides2 =
       )
     }
 
-    val slide23 = slide(5, "23rd Decison", decision23Text) {
+    val slide23 = slide(23, "23rd Decison", decision23Text) {
       choice("Continue north", errorSlide.copyOf("Incorrect1"))
       choice("Head to Savannah", slide24)
       choice("Wait at the crossing and see if you can learn more about the options", errorSlide.copyOf("Incorrect2"))
     }
 
-    val slide22 = slide(5, "22nd Decison", decision22Text) {
+    val slide22 = slide(22, "22nd Decison", decision22Text) {
       choice("You have to take advantage of this opportunity, you attempt to steal the keys", slide23)
       choice(
         "You are worried you will get caught and you wait for a better opportunity",
@@ -517,12 +517,12 @@ val slides2 =
       choice("Having second thoughts, you ignore her and keep travelling", slide10)
     }
 
-    val slide8 = slide(5, "8th Decison", decision8Text) {
+    val slide8 = slide(8, "8th Decison", decision8Text) {
       choice("You sneak away to see your mother", slide9)
       choice("You stay with the wagon train", errorSlide.copyOf("Incorrect1"))
     }
 
-    val slide7 = slide(5, "7th Decison", decision7Text) {
+    val slide7 = slide(7, "7th Decison", decision7Text) {
       choice("You run into the woods, trying to hide from the passers by", errorSlide.copyOf("Incorrect1"))
       choice("You approach the group and tell them you are on an errand for your master", slide8)
       choice(
@@ -531,7 +531,7 @@ val slides2 =
       )
     }
 
-    val slide6 = slide(5, "6th Decison", decision6Text) {
+    val slide6 = slide(6, "6th Decison", decision6Text) {
       choice("Tell this stranger you have run away", errorSlide.copyOf("Incorrect1"))
       choice("Tell the gentleman you are a free African American", slide7)
       choice("Tell him you are lost and ask for directions to nearest town", errorSlide.copyOf("Incorrect2"))
