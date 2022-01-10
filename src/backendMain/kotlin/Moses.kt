@@ -234,10 +234,10 @@ val decision21Text = """
   For the time being you give up your dream of freedom. 
   After a few months have passed a strange thing happens. 
   An unfamiliar man arrives and speaks with Mr. Gooch. 
-  A short time later the overseer comes down and tells you to follow him. 
+  A short time later the overseer comes down and tells you to follow him.
   You ask what is going on and you are told you are being sold.
   The man is taking you to Missouri.
-  You quickly bid farewell to some of your friends and you are off on the road 
+  You quickly bid farewell to some of your friends and you are off on the road
   marching to your future.
   You are eventually brought to a person named Mr. Cowpens.
   He is a very kind owner and live is tolerable.
@@ -261,10 +261,10 @@ val decision22Text = """
 val decision23Text = """
   You are successful in your attempt to steal the keys.
   That night you quietly unlock your bonds and slip into the night.
-  After your stay with Mr. Cowpens you look much more respectable and 
+  After your stay with Mr. Cowpens you look much more respectable and
   you feel your chances of deceiving people about your slave status is good.
-  You see a sign on the road, and although you cannot read, you can make out 
-  enough that one way is to Savannah, a busy Georgia port and one continues 
+  You see a sign on the road, and although you cannot read, you can make out
+  enough that one way is to Savannah, a busy Georgia port and one continues
   on to the north.
 
   Options:
@@ -286,12 +286,12 @@ val decision25Text = """
 """
 
 val decision26Text = """
-  You ditch the minister and after a few hours you encounter some African American 
+  You ditch the minister and after a few hours you encounter some African American
   men driving cattle.
   The greet you and ask you where you are headed.
   The men are all enslaved from a plantation out of town.
   They are bringing the cattle into Savannah to sell.
-  You notice there is a little boy who is writing in a note-book as he walks 
+  You notice there is a little boy who is writing in a note-book as he walks
   along with his father.
 
   Options:
@@ -299,7 +299,7 @@ val decision26Text = """
 
 val decision27Text = """
   The boy writes you a pass saying you are free to travel to Savannah unaccompanied.
-  Even though you cannot read, you are concerned the kid’s writing will look childish 
+  Even though you cannot read, you are concerned the kid’s writing will look childish
   or something will give it away.
 
   Options:
@@ -309,10 +309,10 @@ val decision28Text = """
   As you enter the city you are stopped by a sheriff.
   Being a port city, they are always on the lookout for runaways.
   He takes your pass which has been smudged by water.
-  He asks you what happened and you inform him that you fell into a stream 
+  He asks you what happened and you inform him that you fell into a stream
   while your were taking care of some horses.
   He seems to buy your alibi and let’s you move on.
-  As you walk through the bustling city you make it to the waterfront and 
+  As you walk through the bustling city you make it to the waterfront and
   see many tall ships.
 
   Options:
