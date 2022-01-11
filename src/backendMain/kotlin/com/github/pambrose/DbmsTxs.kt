@@ -85,6 +85,7 @@ object DbmsTxs : KLogging() {
         .selectAll()
         .map { row ->
           UserSummary(
+            row[UserDecisionCountsView.id].toString(),
             row[UserDecisionCountsView.fullName],
             row[UserDecisionCountsView.email],
             row[UserDecisionCountsView.lastPathName],
@@ -93,7 +94,25 @@ object DbmsTxs : KLogging() {
         }
     }
 
+  fun allSuccessUsers(successSlideTitle: String) =
+    transaction {
+      UserVisitsView
+        .select { UserVisitsView.toTitle eq successSlideTitle }
+        .map { row ->
+          UserVisits(
+            row[UserVisitsView.id].toString(),
+            row[UserVisitsView.toTitle],
+          )
+        }
+    }
+
+  data class UserVisits(
+    val id: String,
+    val toSlide: String,
+  )
+
   data class UserSummary(
+    val id: String,
     val fullName: String,
     val email: String,
     val lastPathName: String,

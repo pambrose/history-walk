@@ -1,5 +1,6 @@
 package com.github.pambrose
 
+import com.github.pambrose.DbmsTxs.allSuccessUsers
 import com.github.pambrose.DbmsTxs.allUserSummaries
 import com.github.pambrose.EndPoints.SLIDE
 import com.github.pambrose.HistoryWalkServer.masterSlides
@@ -16,36 +17,26 @@ object Pages {
             table {
               style = "border-collapse: separate; border-spacing: 10px 5px;"
               tr {
-                th {
-                  style = "text-align:left;"
-                  +"Name"
-                }
-                th {
-                  style = "text-align:left;"
-                  +"Email"
-                }
+                th { style = "text-align:left;"; +"Name" }
+                th { style = "text-align:left;"; +"Email" }
                 th { +"Decisions" }
-                th {
-                  style = "text-align:left;"
-                  +"Success"
-                }
-                th {
-                  style = "text-align:left;"
-                  +"Last Slide"
-                }
+                th { style = "text-align:left;"; +"Success" }
+                th { style = "text-align:left;"; +"Last Slide" }
               }
+
+              // Find all users that have seen the success slide
+              val seenSuccess = allSuccessUsers(masterSlides.successSlide.title).map { it.id }
+
               allUserSummaries()
                 .sortedBy { it.decisionCount }
                 .forEach { summary ->
                   tr {
                     td { +summary.fullName }
                     td { +summary.email }
+                    td { style = "text-align:center;"; +summary.decisionCount.toString() }
                     td {
-                      style = "text-align:center;"
-                      +summary.decisionCount.toString()
-                    }
-                    td {
-                      +masterSlides.findSlideByPathName(summary.lastPathName).success.toString()
+//                      +masterSlides.findSlideByPathName(summary.lastPathName).success.toString()
+                      +seenSuccess.contains(summary.id).toString()
                     }
                     td { +summary.lastPathName }
                   }

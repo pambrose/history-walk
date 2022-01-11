@@ -27,7 +27,13 @@ object UserChoiceTable : IntIdTable("history.userchoices") {
   val reason = text("reason")
 }
 
+object UserVisitsView : Table("history.user_visits") {
+  val id = uuid("id")
+  val toTitle = text("to_title")
+}
+
 object UserDecisionCountsView : Table("history.user_decision_counts") {
+  val id = uuid("id")
   val fullName = text("full_name")
   val email = text("email")
   val lastPathName = text("last_path_name")

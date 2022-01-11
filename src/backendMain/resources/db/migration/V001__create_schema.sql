@@ -30,10 +30,17 @@ CREATE TABLE history.userchoices
     CONSTRAINT user_choices_unique unique (user_uuid_ref, from_path_name, to_path_name)
 );
 
+CREATE VIEW history.user_visits AS
+SELECT users.id, to_title
+FROM history.users,
+     history.userchoices
+WHERE history.userchoices.user_uuid_ref = users.id;
+
+
 CREATE VIEW history.user_decision_counts AS
-SELECT full_name, email, last_path_name, count(user_uuid_ref) as decision_count
+SELECT users.id, full_name, email, last_path_name, count(user_uuid_ref) as decision_count
 FROM history.users
          LEFT OUTER JOIN history.userchoices
                          ON history.userchoices.user_uuid_ref = users.id
-GROUP BY history.users.full_name, users.id
-ORDER BY history.users.full_name, users.id;
+GROUP BY users.id, users.full_name
+ORDER BY users.id, users.full_name;
