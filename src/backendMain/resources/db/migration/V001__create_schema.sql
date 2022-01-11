@@ -14,7 +14,7 @@ CREATE TABLE history.users
     last_path_name TEXT NOT NULL
 );
 
-CREATE TABLE history.userchoices
+CREATE TABLE history.user_choices
 (
     id             SERIAL UNIQUE PRIMARY KEY,
     created        TIMESTAMPTZ DEFAULT NOW(),
@@ -33,14 +33,14 @@ CREATE TABLE history.userchoices
 CREATE VIEW history.user_visits AS
 SELECT users.id, to_title
 FROM history.users,
-     history.userchoices
-WHERE history.userchoices.user_uuid_ref = users.id;
+     history.user_choices
+WHERE history.user_choices.user_uuid_ref = users.id;
 
 
 CREATE VIEW history.user_decision_counts AS
 SELECT users.id, full_name, email, last_path_name, count(user_uuid_ref) as decision_count
 FROM history.users
-         LEFT OUTER JOIN history.userchoices
-                         ON history.userchoices.user_uuid_ref = users.id
+         LEFT OUTER JOIN history.user_choices
+                         ON history.user_choices.user_uuid_ref = users.id
 GROUP BY users.id, users.full_name
 ORDER BY users.id, users.full_name;

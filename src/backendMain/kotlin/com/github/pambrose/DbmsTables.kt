@@ -15,7 +15,7 @@ object UsersTable : UUIDTable("history.users") {
   val lastPathName = text("last_path_name")
 }
 
-object UserChoiceTable : IntIdTable("history.userchoices") {
+object UserChoiceTable : IntIdTable("history.user_choices") {
   val created = datetime("created")
   val updated = datetime("updated")
   val userUuidRef = uuid("user_uuid_ref")
