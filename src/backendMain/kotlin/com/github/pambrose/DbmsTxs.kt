@@ -1,12 +1,17 @@
 package com.github.pambrose
 
+import com.github.pambrose.EnvVar.SHOW_RESET_BUTTON
 import com.github.pambrose.Utils.toUuid
 import com.github.pambrose.Utils.transformText
 import com.github.pambrose.slides.Slide
 import com.pambrose.common.exposed.get
 import mu.KLogging
-import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.Count
+import org.jetbrains.exposed.sql.deleteWhere
+import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
 
 object DbmsTxs : KLogging() {
   fun updateLastSlide(uuid: String, pathName: String) {
@@ -64,7 +69,7 @@ object DbmsTxs : KLogging() {
           offset,
           displayTitle,
           decisionCount(uuid),
-          EnvVar.SHOW_RESET_BUTTON.getEnv(false),
+          SHOW_RESET_BUTTON.getEnv(false),
         )
       }
   }

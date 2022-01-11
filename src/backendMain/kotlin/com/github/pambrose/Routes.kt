@@ -8,6 +8,7 @@ import com.github.pambrose.EndPoints.LOGIN
 import com.github.pambrose.EndPoints.LOGOUT
 import com.github.pambrose.EndPoints.SLIDE
 import com.github.pambrose.EndPoints.USER_RESET
+import com.github.pambrose.EnvVar.ALLOW_SLIDE_ACCESS
 import com.github.pambrose.HistoryWalkServer.loadSlides
 import com.github.pambrose.HistoryWalkServer.masterSlides
 import com.github.pambrose.Pages.displayAllSlides
@@ -88,7 +89,7 @@ object Routes : KLogging() {
         respondWith { displayUserSummary() }
       }
 
-      if (EnvVar.ALLOW_SLIDE_ACCESS.getEnv(false)) {
+      if (ALLOW_SLIDE_ACCESS.getEnv(false)) {
         get("$SLIDE/{slideId}/{version?}") {
           val slideId = call.parameters.getOrFail("slideId").toInt()
           val version =

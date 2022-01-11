@@ -2,6 +2,14 @@ package com.github.pambrose
 
 import com.github.pambrose.ConfigureFormAuth.configureFormAuth
 import com.github.pambrose.Cookies.assignCookies
+import com.github.pambrose.EnvVar.SLIDES_LOCAL_FILENAME
+import com.github.pambrose.EnvVar.SLIDES_REPO_BRANCH
+import com.github.pambrose.EnvVar.SLIDES_REPO_FILENAME
+import com.github.pambrose.EnvVar.SLIDES_REPO_NAME
+import com.github.pambrose.EnvVar.SLIDES_REPO_OWNER
+import com.github.pambrose.EnvVar.SLIDES_REPO_PATH
+import com.github.pambrose.EnvVar.SLIDES_REPO_TYPE
+import com.github.pambrose.EnvVar.SLIDES_VARIABLE_NAME
 import com.github.pambrose.HistoryWalkServer.loadSlides
 import com.github.pambrose.HistoryWalkServer.masterSlides
 import com.github.pambrose.Property.Companion.assignProperties
@@ -39,7 +47,7 @@ object HistoryWalkServer : KLogging() {
     try {
       runBlocking {
         val src =
-          EnvVar.SLIDES_LOCAL_FILENAME.getEnv("")
+          SLIDES_LOCAL_FILENAME.getEnv("")
             .let { localFilename ->
               if (localFilename.isNotEmpty()) {
                 logger.info { "Loading slides from local file: $localFilename" }
@@ -47,23 +55,23 @@ object HistoryWalkServer : KLogging() {
                 file.readText()
               }
               else {
-                val repoType = EnvVar.SLIDES_REPO_TYPE.getEnv("User")
+                val repoType = SLIDES_REPO_TYPE.getEnv("User")
                 val gh = GitHubFile(
                   GitHubRepo(
                     if (repoType.equals("User", ignoreCase = true)) OwnerType.User else OwnerType.Organization,
-                    EnvVar.SLIDES_REPO_OWNER.getEnv("pambrose"),
-                    EnvVar.SLIDES_REPO_NAME.getEnv("history-walk-content")
+                    SLIDES_REPO_OWNER.getEnv("pambrose"),
+                    SLIDES_REPO_NAME.getEnv("history-walk-content")
                   ),
-                  branchName = EnvVar.SLIDES_REPO_BRANCH.getEnv("master"),
-                  srcPath = EnvVar.SLIDES_REPO_PATH.getEnv("src/main/kotlin"),
-                  fileName = EnvVar.SLIDES_REPO_FILENAME.getEnv("Slides.kt")
+                  branchName = SLIDES_REPO_BRANCH.getEnv("master"),
+                  srcPath = SLIDES_REPO_PATH.getEnv("src/main/kotlin"),
+                  fileName = SLIDES_REPO_FILENAME.getEnv("Slides.kt")
                 )
                 logger.info { "Loading slides from GitHub: $gh" }
                 gh.content
               }
             }
 
-        val varName = EnvVar.SLIDES_VARIABLE_NAME.getEnv("slides")
+        val varName = SLIDES_VARIABLE_NAME.getEnv("slides")
         val code = "$src\n\n$varName"
 
         KotlinScript().use { it.eval(code) as SlideDeck }
