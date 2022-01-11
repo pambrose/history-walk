@@ -601,7 +601,7 @@ val text58_woodmensAdvice = """
     YOU HAVE MADE IT!
 """
 
-val slides =
+val jermainLonguenSlides =
   slideDeck {
 
     val slide12_paddyRollersEnd = slide(12, "Paddy Rollers", text12_paddyRollersEnd)

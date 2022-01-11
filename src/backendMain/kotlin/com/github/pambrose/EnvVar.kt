@@ -14,8 +14,8 @@ enum class EnvVar(val maskFunc: EnvVar.() -> String = { getEnv(UNASSIGNED) }) {
   SLIDES_REPO_BRANCH,
   SLIDES_REPO_PATH,
   SLIDES_REPO_FILENAME,
+  SLIDES_VARIABLE_NAME,
   DBMS_DRIVER_CLASSNAME,
-  DBMS_DRIVER_VARIABLE_NAME,
   DBMS_URL({ getEnvOrNull()?.obfuscate(4) ?: UNASSIGNED }),
   DBMS_USERNAME,
   DBMS_PASSWORD({ getEnvOrNull()?.obfuscate(1) ?: UNASSIGNED });

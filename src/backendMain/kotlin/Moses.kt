@@ -348,7 +348,7 @@ val successText = """
   The End
 """
 
-val slides2 =
+val mosesSlides =
   slideDeck {
 
     val errorSlide = slide(99, "Incorrect Answer", errorText, displayTitle = false) {}
