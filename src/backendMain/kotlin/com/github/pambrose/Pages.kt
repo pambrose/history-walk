@@ -13,7 +13,6 @@ object Pages {
       .html {
         body {
           div {
-            //style = "float:left;width:50%;"
             table {
               style = "border-collapse: separate; border-spacing: 10px 5px;"
               tr {
