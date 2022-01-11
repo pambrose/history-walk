@@ -658,7 +658,7 @@ val slides =
       slide(54, "Major Encounter: fight 2nd Patrol", text54_majorEncounterFight2ndPatrol) {
         choice("Do you agree and go cross-country?",
                slide(56, "Backroads", text56_backroads) {
-                 choice("Approach the cottage?", slide57_riverCrossing.copyOf())
+                 choice("Approach the cottage?", slide57_riverCrossing)
                  choice("Push on to the wilderness?", slide15_winterCrossCountry.copyOf())
                })
         choice("Or stay on the main road?", slide20_majorEncounterPatrol.copyOf())
@@ -667,7 +667,7 @@ val slides =
     val slide53_majorEncounter2ndPatrol =
       slide(53, "Major Encounter: 2nd Patrol", text53_majorEncounter2ndPatrol) {
         choice("Flee?", slide22_majorEncounterFleePatrolEnd.copyOf())
-        choice("Fight?", slide54_majorEncounterFight2ndPatrol.copyOf())
+        choice("Fight?", slide54_majorEncounterFight2ndPatrol)
         choice("Push on to the wilderness?", slide15_winterCrossCountry.copyOf())
       }
 
@@ -707,7 +707,7 @@ val slides =
         choice(
           "You spend your last dollar to stay the night.",
           slide(49, "Confident & Arrogant Bluff (cont.)", text49_confidentAndArrogantBluffContd) {
-            choice("Continue down the main road out of town?", slide53_majorEncounter2ndPatrol.copyOf())
+            choice("Continue down the main road out of town?", slide53_majorEncounter2ndPatrol)
             choice("Head into the wilderness?", slide15_winterCrossCountry.copyOf())
           })
         choice(
@@ -725,7 +725,7 @@ val slides =
         )
         choice(
           "Speak with confidence, adopting an arrogant tone, asking for a clean room for the night for you and your companion?",
-          slide48_confidentAndArrogantBluff.copyOf()
+          slide48_confidentAndArrogantBluff
         )
       }
 
@@ -733,7 +733,7 @@ val slides =
       slide(45, "Third Town", text45_thirdTown) {
         choice("The ramshackle hut at the edge of town", slide50_majorEncounterRamshackleHut.copyOf())
         choice("The pharmacy in the town center", slide52_majorEncounterPharmacy.copyOf())
-        choice("A more modest mansion", slide46_majorEncounterModestMansion.copyOf())
+        choice("A more modest mansion", slide46_majorEncounterModestMansion)
       }
 
     val slide39_politeAndSubmissiveBluff =
@@ -746,7 +746,7 @@ val slides =
       slide(40, "Confident & Arrogant Bluff", text40_confidentAndArrogantBluff) {
         choice("Continue down the main road out of town?",
                slide(44, "Main Road out of Second Town", text44_mainRoadOutOfSecondTown) {
-                 choice("Continue on the main road to the next town?", slide45_thirdTown.copyOf())
+                 choice("Continue on the main road to the next town?", slide45_thirdTown)
                  choice("Head into the wilderness?", slide15_winterCrossCountry.copyOf())
                })
         choice("Head into the wilderness?", slide15_winterCrossCountry.copyOf())
@@ -760,7 +760,7 @@ val slides =
         )
         choice(
           "Speak with confidence, adopting an arrogant tone, asking for the finest ale and a clean room for the night for you and your companion?",
-          slide40_confidentAndArrogantBluff.copyOf()
+          slide40_confidentAndArrogantBluff
         )
       }
 
@@ -777,7 +777,7 @@ val slides =
     val slide37_secondTown =
       slide(37, "Second Town", text37_secondTown) {
         choice("The ramshackle hut at the edge of town", slide41_majorEncounterRamshackleHut.copyOf())
-        choice("The ordinary tavern in the town center", slide38_majorEncounterOrdinaryTavern.copyOf())
+        choice("The ordinary tavern in the town center", slide38_majorEncounterOrdinaryTavern)
         choice("The bordello in the town center",
                slide(43, "Major Encounter: Bordello", text43_majorEncounterBordello) {
                  choice("Try another building in town?", goBack(-2))
@@ -792,7 +792,7 @@ val slides =
       slide(32, "Confident & Arrogant Bluff", text32_confidentAndArrogantBluff) {
         choice("Continue down the main road out of town?",
                slide(36, "Main Road out of First Town", text36_mainRoadOutOfTown) {
-                 choice("Continue on the main road to the next town?", slide37_secondTown.copyOf())
+                 choice("Continue on the main road to the next town?", slide37_secondTown)
                  choice("Head into the wilderness", slide15_winterCrossCountry.copyOf())
                })
         choice("Head into the wilderness", slide15_winterCrossCountry.copyOf())
@@ -815,7 +815,7 @@ val slides =
             )
             choice(
               "Speak with confidence, adopting an arrogant tone, insisting upon the privilege of spending the night as it befits a free man?",
-              slide32_confidentAndArrogantBluff.copyOf()
+              slide32_confidentAndArrogantBluff
             )
           })
         choice(
@@ -895,7 +895,7 @@ val slides =
         choice("Leave in the spring, when love is in the air", slide11_springDeparture.copyOf())
         choice(
           "Follow Old Ben’s advice, take the risk of stealing a coat and leave in the winter, right at Christmas, when it is coldest and darkest",
-          slide19_steal_overcoat_via_ross.copyOf()
+          slide19_steal_overcoat_via_ross
         )
       }
 

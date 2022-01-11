@@ -25,7 +25,7 @@ object Pages {
               }
 
               // Find all users that have seen the success slide
-              val seenSuccess = allSuccessUsers(masterSlides.successSlide.title).map { it.id }
+              val successMoves = allSuccessUsers(masterSlides.successSlide.title).map { it.id }
 
               allUserSummaries()
                 .sortedBy { it.decisionCount }
@@ -34,10 +34,7 @@ object Pages {
                     td { +summary.fullName }
                     td { +summary.email }
                     td { style = "text-align:center;"; +summary.decisionCount.toString() }
-                    td {
-//                      +masterSlides.findSlideByPathName(summary.lastPathName).success.toString()
-                      +seenSuccess.contains(summary.id).toString()
-                    }
+                    td { +successMoves.contains(summary.id).toString() }
                     td { +summary.lastPathName }
                   }
                 }
