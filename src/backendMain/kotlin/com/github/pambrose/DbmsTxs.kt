@@ -26,9 +26,24 @@ object DbmsTxs : KLogging() {
         .joinToString("\n")
         .transformText()                     // Transform markdown to html
 
+    val alreadyVisited =
+      transaction {
+        UserChoiceTable
+          .slice(UserChoiceTable.toTitle)
+          .select { UserChoiceTable.userUuidRef eq uuid.toUuid() and (UserChoiceTable.fromPathName eq slide.pathName) }
+          .map { it[UserChoiceTable.toTitle] }
+      }
+
     val choices =
       slide.choices.map { (choice, slide) ->
-        SlideChoice(choice, slide.pathName, slide.title, !slide.hasChoices && !slide.success, slide.offset)
+        SlideChoice(
+          choice,
+          slide.pathName,
+          slide.title,
+          !slide.hasChoices && !slide.success,
+          slide.offset,
+          slide.title in alreadyVisited
+        )
       }
 
     val parentTitles =

@@ -57,10 +57,11 @@ data class ParentTitle(val pathName: String, val title: String)
 @Serializable
 data class SlideChoice(
   val choiceText: String,
-  val pathName: String,
-  val title: String,
+  val toPathName: String,
+  val toTitle: String,
   val deadEnd: Boolean,
-  val offset: Int
+  val offset: Int,
+  val alreadyVisited: Boolean,
 )
 
 @Serializable

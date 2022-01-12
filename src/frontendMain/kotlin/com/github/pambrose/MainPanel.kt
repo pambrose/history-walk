@@ -150,8 +150,7 @@ private fun Container.displaySlide(slide: SlideData) {
           }
         }
       }
-    }
-    else {
+    } else {
       simplePanel {
         marginTop = 10.px
         val spacing = 4
@@ -169,7 +168,8 @@ private fun Container.displaySlide(slide: SlideData) {
 private fun Container.addChoiceButtons(slide: SlideData) {
   slide.choices
     .forEach { choice ->
-      button(choice.choiceText, icon = "fas fa-angle-double-right", style = PRIMARY) {
+      val icon = if (choice.alreadyVisited) "fas fa-bookmark" else "fas fa-angle-double-right"
+      button(choice.choiceText, icon = icon, style = PRIMARY) {
         lowercase()
         onClick {
           AppScope.launch {
@@ -177,13 +177,11 @@ private fun Container.addChoiceButtons(slide: SlideData) {
               val pos = slide.parentTitles.size - abs(slide.offset) - 1
               val parentTitle = slide.parentTitles[pos]
               Rpc.goBackInTime(parentTitle).also { refresh(it) }
-            }
-            else {
+            } else {
               val choiceReason = Rpc.makeChoice(slide.pathName, slide.title, choice, slide.choices.size == 1)
               if (choiceReason.reason.isEmpty()) {
                 promptUserForReason(slide.pathName, slide.title, choice)
-              }
-              else {
+              } else {
                 val newSlide = Rpc.getCurrentSlide()
                 refresh(newSlide)
               }

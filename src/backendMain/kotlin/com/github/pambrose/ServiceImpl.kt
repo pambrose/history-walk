@@ -63,7 +63,7 @@ actual class ContentService : IContentService {
       // See if user has an entry for that transition
       val uuid = call.userId.uuid
       (UserChoiceTable
-        .select { (UserChoiceTable.userUuidRef eq uuid.toUuid()) and (UserChoiceTable.fromPathName eq fromPathName) and (UserChoiceTable.toPathName eq slideChoice.pathName) }
+        .select { (UserChoiceTable.userUuidRef eq uuid.toUuid()) and (UserChoiceTable.fromPathName eq fromPathName) and (UserChoiceTable.toPathName eq slideChoice.toPathName) }
         .map { row ->
           UserChoice(
             row[UserChoiceTable.fromPathName],
@@ -73,7 +73,8 @@ actual class ContentService : IContentService {
               row[UserChoiceTable.toPathName],
               row[UserChoiceTable.toTitle],
               row[UserChoiceTable.deadEnd],
-              0
+              0,
+              false
             ),
             row[UserChoiceTable.reason],
           )
@@ -82,7 +83,7 @@ actual class ContentService : IContentService {
           )
         .also { userChoice ->
           if (userChoice.reason.isNotBlank()) {
-            updateLastSlide(uuid, slideChoice.pathName)
+            updateLastSlide(uuid, slideChoice.toPathName)
           }
         }
     }
@@ -100,15 +101,15 @@ actual class ContentService : IContentService {
           row[UserChoiceTable.userUuidRef] = uuid.toUuid()
           row[UserChoiceTable.fromPathName] = fromPathName
           row[UserChoiceTable.fromTitle] = fromTitle
-          row[UserChoiceTable.toPathName] = slideChoice.pathName
-          row[UserChoiceTable.toTitle] = slideChoice.title
+          row[UserChoiceTable.toPathName] = slideChoice.toPathName
+          row[UserChoiceTable.toTitle] = slideChoice.toTitle
           row[UserChoiceTable.deadEnd] = slideChoice.deadEnd
           row[UserChoiceTable.choiceText] = slideChoice.choiceText
           row[UserChoiceTable.reason] = reason
         }.value
 
-      logger.info { "Inserted $fromTitle to ${slideChoice.title} ${slideChoice.deadEnd}" }
-      updateLastSlide(uuid, slideChoice.pathName)
+      logger.info { "Inserted $fromTitle to ${slideChoice.toTitle} ${slideChoice.deadEnd}" }
+      updateLastSlide(uuid, slideChoice.toPathName)
 
       val slide = findCurrentSlideForUser(uuid, masterSlides)
       slideData(uuid, slide)
