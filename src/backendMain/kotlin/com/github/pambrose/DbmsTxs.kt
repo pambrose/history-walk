@@ -8,8 +8,14 @@ import com.github.pambrose.slides.Slide
 import com.pambrose.common.exposed.get
 import kotlinx.datetime.LocalDateTime
 import mu.KLogging
-import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.Count
+import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.deleteWhere
+import org.jetbrains.exposed.sql.max
+import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
 
 object DbmsTxs : KLogging() {
   fun slideData(uuid: String, slide: Slide): SlideData {
@@ -86,21 +92,33 @@ object DbmsTxs : KLogging() {
 
   fun correctAnswerStreak(uuid: String) =
     transaction {
-      // Find the time of the last deadend slide
-      val lastWrongAnswer =
-        UserChoiceTable
-          .slice(UserChoiceTable.created.max())
-          .select { UserChoiceTable.userUuidRef eq uuid.toUuid() and (UserChoiceTable.deadEnd eq true) }
-          .map { it[0] as LocalDateTime }
-          .first()
 
-      // Now count the number of correct answers since that time
-      UserChoiceTable
-        .slice(Count(UserChoiceTable.created))
-        .select { UserChoiceTable.userUuidRef eq uuid.toUuid() and (UserChoiceTable.created greater lastWrongAnswer) }
-        .map { it[0] as Long }
-        .first()
-        .toInt()
+      val wrongAnswers =
+        UserChoiceTable
+          .select { UserChoiceTable.userUuidRef eq uuid.toUuid() and (UserChoiceTable.deadEnd eq true) }
+          .count().toInt()
+
+      if (wrongAnswers == 0) {
+        UserChoiceTable
+          .select { UserChoiceTable.userUuidRef eq uuid.toUuid() and (UserChoiceTable.deadEnd eq false) }
+          .count().toInt()
+      } else {
+        // Find the time of the last deadend slide
+        val lastWrongAnswer =
+          UserChoiceTable
+            .slice(UserChoiceTable.created.max())
+            .select { UserChoiceTable.userUuidRef eq uuid.toUuid() and (UserChoiceTable.deadEnd eq true) }
+            .map { it[0] as LocalDateTime }
+            .first()
+
+        // Now count the number of correct answers since that time
+        UserChoiceTable
+          .slice(Count(UserChoiceTable.created))
+          .select { UserChoiceTable.userUuidRef eq uuid.toUuid() and (UserChoiceTable.created greater lastWrongAnswer) }
+          .map { it[0] as Long }
+          .first()
+          .toInt()
+      }
     }
 
   fun allUserSummaries() =
