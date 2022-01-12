@@ -103,7 +103,8 @@ object DbmsTxs : KLogging() {
           .select { UserChoiceTable.userUuidRef eq uuid.toUuid() and (UserChoiceTable.deadEnd eq false) }
           .count().toInt()
       } else {
-        // Find the time of the last deadend slide
+        // We know this will return an answer because we know it is non-zero from above
+        // Find the time of the last wrong slide
         val lastWrongAnswer =
           UserChoiceTable
             .slice(UserChoiceTable.created.max())
