@@ -35,5 +35,8 @@ dbvalidate:
 restart:
 	heroku ps:restart
 
+log:
+	heroku logs --tail
+
 upgrade-wrapper:
 	./gradlew wrapper --gradle-version=7.3.3 --distribution-type=bin
