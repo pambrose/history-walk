@@ -1,37 +1,17 @@
 package com.github.pambrose
 
+import com.github.pambrose.EnvVar.DISPLAY_CONSECUTIVE_CORRECT_ANSWERS
 import com.github.pambrose.EnvVar.SHOW_RESET_BUTTON
 import com.github.pambrose.Utils.toUuid
 import com.github.pambrose.Utils.transformText
 import com.github.pambrose.slides.Slide
 import com.pambrose.common.exposed.get
+import kotlinx.datetime.LocalDateTime
 import mu.KLogging
-import org.jetbrains.exposed.sql.Count
-import org.jetbrains.exposed.sql.deleteWhere
-import org.jetbrains.exposed.sql.select
-import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.jetbrains.exposed.sql.update
 
 object DbmsTxs : KLogging() {
-  fun updateLastSlide(uuid: String, pathName: String) {
-    UsersTable
-      .update({ UsersTable.id eq uuid.toUuid() }) { row ->
-        row[UsersTable.lastPathName] = pathName
-      }.also { count ->
-        if (count != 1)
-          error("Missing uuid: $uuid")
-      }
-  }
-
-  fun deleteChoices(uuid: String) {
-    UserChoiceTable
-      .deleteWhere { UserChoiceTable.userUuidRef eq uuid.toUuid() }
-      .also { count ->
-        logger.info("Deleted $count records for uuid: $uuid")
-      }
-  }
-
   fun slideData(uuid: String, slide: Slide): SlideData {
     val content =
       slide.content
@@ -42,7 +22,7 @@ object DbmsTxs : KLogging() {
 
     val choices =
       slide.choices.map { (choice, slide) ->
-        SlideChoice(choice, slide.pathName, slide.title, slide.offset)
+        SlideChoice(choice, slide.pathName, slide.title, !slide.hasChoices && !slide.success, slide.offset)
       }
 
     val parentTitles =
@@ -69,8 +49,28 @@ object DbmsTxs : KLogging() {
           offset,
           displayTitle,
           decisionCount(uuid),
+          DISPLAY_CONSECUTIVE_CORRECT_ANSWERS.getEnv(true),
+          correctAnswerStreak(uuid),
           SHOW_RESET_BUTTON.getEnv(false),
         )
+      }
+  }
+
+  fun updateLastSlide(uuid: String, pathName: String) {
+    UsersTable
+      .update({ UsersTable.id eq uuid.toUuid() }) { row ->
+        row[UsersTable.lastPathName] = pathName
+      }.also { count ->
+        if (count != 1)
+          error("Missing uuid: $uuid")
+      }
+  }
+
+  fun deleteChoices(uuid: String) {
+    UserChoiceTable
+      .deleteWhere { UserChoiceTable.userUuidRef eq uuid.toUuid() }
+      .also { count ->
+        logger.info("Deleted $count records for uuid: $uuid")
       }
   }
 
@@ -79,6 +79,25 @@ object DbmsTxs : KLogging() {
       UserChoiceTable
         .slice(Count(UserChoiceTable.id))
         .select { UserChoiceTable.userUuidRef eq uuid.toUuid() }
+        .map { it[0] as Long }
+        .first()
+        .toInt()
+    }
+
+  fun correctAnswerStreak(uuid: String) =
+    transaction {
+      // Find the time of the last deadend slide
+      val lastWrongAnswer =
+        UserChoiceTable
+          .slice(UserChoiceTable.created.max())
+          .select { UserChoiceTable.userUuidRef eq uuid.toUuid() and (UserChoiceTable.deadEnd eq true) }
+          .map { it[0] as LocalDateTime }
+          .first()
+
+      // Now count the number of correct answers since that time
+      UserChoiceTable
+        .slice(Count(UserChoiceTable.created))
+        .select { UserChoiceTable.userUuidRef eq uuid.toUuid() and (UserChoiceTable.created greater lastWrongAnswer) }
         .map { it[0] as Long }
         .first()
         .toInt()
@@ -111,6 +130,10 @@ object DbmsTxs : KLogging() {
         }
     }
 
+  data class MaxDeadEndDate(
+    val maxDeadEndDate: LocalDateTime
+  )
+
   data class UserVisits(
     val id: String,
     val toSlide: String,
@@ -123,6 +146,4 @@ object DbmsTxs : KLogging() {
     val lastPathName: String,
     val decisionCount: Int,
   )
-
 }
-

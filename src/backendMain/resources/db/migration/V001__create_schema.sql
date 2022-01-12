@@ -20,12 +20,13 @@ CREATE TABLE history.user_choices
     created        TIMESTAMPTZ DEFAULT NOW(),
     updated        TIMESTAMPTZ DEFAULT NOW(),
     user_uuid_ref  UUID REFERENCES history.users ON DELETE CASCADE,
-    from_path_name TEXT NOT NULL,
-    from_title     TEXT NOT NULL,
-    to_path_name   TEXT NOT NULL,
-    to_title       TEXT NOT NULL,
-    choice_text    TEXT NOT NULL,
-    reason         TEXT NOT NULL,
+    from_path_name TEXT    NOT NULL,
+    from_title     TEXT    NOT NULL,
+    to_path_name   TEXT    NOT NULL,
+    to_title       TEXT    NOT NULL,
+    dead_end       BOOLEAN NOT NULL,
+    choice_text    TEXT    NOT NULL,
+    reason         TEXT    NOT NULL,
 
     CONSTRAINT user_choices_unique unique (user_uuid_ref, from_path_name, to_path_name)
 );

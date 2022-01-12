@@ -50,10 +50,10 @@ private fun Container.displaySlide(slide: SlideData) {
         paddingBottom = 10.px
 
         vPanel {
-          hPanel().bind(userInfo) {
-            +it.email
-          }
-          hPanel { +"Decision count: ${slide.decisionCount}" }
+          hPanel().bind(userInfo) { +it.email }
+          hPanel { +"Total Decisions: ${slide.decisionCount}" }
+          if (slide.displayConsecutiveCorrectAnswers)
+            hPanel { +"Consecutive Correct Answers: ${slide.consecutiveCorrectAnswers}" }
         }
         button("Logout", "fas fa-sign-out-alt", style = LINK) {
           lowercase()

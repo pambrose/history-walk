@@ -18,6 +18,7 @@ There are 3 repos involved in this project:
 * SLIDES_REPO_PATH
 * SLIDES_REPO_FILENAME
 * SLIDES_VARIABLE_NAME - The name of the slides variable.
+* DISPLAY_CONSECUTIVE_CORRECT_ANSWERS
 
 ## Gradle Tasks
 

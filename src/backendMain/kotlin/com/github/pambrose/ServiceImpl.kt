@@ -72,6 +72,7 @@ actual class ContentService : IContentService {
               row[UserChoiceTable.choiceText],
               row[UserChoiceTable.toPathName],
               row[UserChoiceTable.toTitle],
+              row[UserChoiceTable.deadEnd],
               0
             ),
             row[UserChoiceTable.reason],
@@ -101,10 +102,12 @@ actual class ContentService : IContentService {
           row[UserChoiceTable.fromTitle] = fromTitle
           row[UserChoiceTable.toPathName] = slideChoice.pathName
           row[UserChoiceTable.toTitle] = slideChoice.title
+          row[UserChoiceTable.deadEnd] = slideChoice.deadEnd
           row[UserChoiceTable.choiceText] = slideChoice.choiceText
           row[UserChoiceTable.reason] = reason
         }.value
 
+      logger.info { "Inserted $fromTitle to ${slideChoice.title} ${slideChoice.deadEnd}" }
       updateLastSlide(uuid, slideChoice.pathName)
 
       val slide = findCurrentSlideForUser(uuid, masterSlides)

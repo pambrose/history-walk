@@ -137,7 +137,7 @@ kotlin {
         implementation("com.zaxxer:HikariCP:$hikariVersion")
         implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
         implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
-        implementation("org.jetbrains.exposed:exposed-jodatime:$exposedVersion")
+        implementation("org.jetbrains.exposed:exposed-kotlin-datetime:$exposedVersion")
         implementation("com.github.pambrose.common-utils:exposed-utils:$utilsVersion")
 
         //implementation("commons-codec:commons-codec:$commonsCodecVersion")

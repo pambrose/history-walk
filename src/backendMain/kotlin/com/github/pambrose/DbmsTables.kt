@@ -3,7 +3,7 @@ package com.github.pambrose
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.Table
-import org.jetbrains.exposed.sql.jodatime.datetime
+import org.jetbrains.exposed.sql.kotlin.datetime.datetime
 
 object UsersTable : UUIDTable("history.users") {
   val created = datetime("created")
@@ -23,6 +23,7 @@ object UserChoiceTable : IntIdTable("history.user_choices") {
   val fromTitle = text("from_title")
   val toPathName = text("to_path_name")
   val toTitle = text("to_title")
+  val deadEnd = bool("dead_end")
   val choiceText = text("choice_text")
   val reason = text("reason")
 }

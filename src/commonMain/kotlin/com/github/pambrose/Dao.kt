@@ -37,6 +37,8 @@ data class SlideData(
   val offset: Int,
   val displayTitle: Boolean,
   val decisionCount: Int,
+  val displayConsecutiveCorrectAnswers: Boolean,
+  val consecutiveCorrectAnswers: Int,
   val showResetButton: Boolean,
 ) {
   val failure: Boolean
@@ -53,7 +55,13 @@ data class SlideData(
 data class ParentTitle(val pathName: String, val title: String)
 
 @Serializable
-data class SlideChoice(val choiceText: String, val pathName: String, val title: String, val offset: Int)
+data class SlideChoice(
+  val choiceText: String,
+  val pathName: String,
+  val title: String,
+  val deadEnd: Boolean,
+  val offset: Int
+)
 
 @Serializable
 data class UserChoice(
