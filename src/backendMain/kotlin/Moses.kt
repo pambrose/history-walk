@@ -351,7 +351,7 @@ val successText = """
 val mosesSlides =
   slideDeck {
 
-    val errorSlide = slide(99, "Incorrect Answer", errorText, displayTitle = false) {}
+    val errorSlide = slide(99, "Incorrect Decision", errorText, displayTitle = false) {}
 
     val slideSuccess = slide(30, "Success!", successText, success = true)
 

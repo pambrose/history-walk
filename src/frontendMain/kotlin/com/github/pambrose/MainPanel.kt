@@ -7,13 +7,36 @@ import com.github.pambrose.EndPoints.LOGOUT
 import com.github.pambrose.MainPanel.buttonPadding
 import com.github.pambrose.MainPanel.refresh
 import com.github.pambrose.MainPanel.userInfo
-import io.kvision.core.*
+import io.kvision.core.AlignItems
+import io.kvision.core.Background
+import io.kvision.core.Border
+import io.kvision.core.BorderStyle
+import io.kvision.core.Col
+import io.kvision.core.Color
+import io.kvision.core.Container
+import io.kvision.core.FlexDirection
+import io.kvision.core.FlexWrap
+import io.kvision.core.JustifyContent
+import io.kvision.core.PosFloat
+import io.kvision.core.TextAlign
 import io.kvision.form.text.Text
 import io.kvision.form.text.TextArea
-import io.kvision.html.*
-import io.kvision.html.ButtonStyle.*
+import io.kvision.html.Button
+import io.kvision.html.ButtonStyle.LINK
+import io.kvision.html.ButtonStyle.OUTLINESECONDARY
+import io.kvision.html.ButtonStyle.PRIMARY
+import io.kvision.html.ButtonStyle.SUCCESS
+import io.kvision.html.P
+import io.kvision.html.Span
+import io.kvision.html.button
+import io.kvision.html.h1
+import io.kvision.html.icon
 import io.kvision.modal.Dialog
-import io.kvision.panel.*
+import io.kvision.panel.SimplePanel
+import io.kvision.panel.flexPanel
+import io.kvision.panel.hPanel
+import io.kvision.panel.simplePanel
+import io.kvision.panel.vPanel
 import io.kvision.state.ObservableValue
 import io.kvision.state.bind
 import io.kvision.utils.px
@@ -52,8 +75,8 @@ private fun Container.displaySlide(slide: SlideData) {
         vPanel {
           hPanel().bind(userInfo) { +it.email }
           hPanel { +"Total Decisions: ${slide.decisionCount}" }
-          if (slide.displayConsecutiveCorrectAnswers)
-            hPanel { +"Consecutive Correct Answers: ${slide.consecutiveCorrectAnswers}" }
+          if (slide.displayConsecutiveCorrectDecisions)
+            hPanel { +"Consecutive Correct Decisions: ${slide.consecutiveCorrectDecisions}" }
         }
         button("Logout", "fas fa-sign-out-alt", style = LINK) {
           lowercase()

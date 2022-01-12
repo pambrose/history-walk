@@ -1,6 +1,6 @@
 package com.github.pambrose
 
-import com.github.pambrose.EnvVar.DISPLAY_CONSECUTIVE_CORRECT_ANSWERS
+import com.github.pambrose.EnvVar.DISPLAY_CONSECUTIVE_CORRECT_DECISIONS
 import com.github.pambrose.EnvVar.SHOW_RESET_BUTTON
 import com.github.pambrose.Utils.toUuid
 import com.github.pambrose.Utils.transformText
@@ -55,8 +55,8 @@ object DbmsTxs : KLogging() {
           offset,
           displayTitle,
           decisionCount(uuid),
-          DISPLAY_CONSECUTIVE_CORRECT_ANSWERS.getEnv(true),
-          correctAnswerStreak(uuid),
+          DISPLAY_CONSECUTIVE_CORRECT_DECISIONS.getEnv(true),
+          correctDecisionStreak(uuid),
           SHOW_RESET_BUTTON.getEnv(false),
         )
       }
@@ -90,22 +90,22 @@ object DbmsTxs : KLogging() {
         .toInt()
     }
 
-  fun correctAnswerStreak(uuid: String) =
+  fun correctDecisionStreak(uuid: String) =
     transaction {
 
-      val wrongAnswers =
+      val wrongDecsions =
         UserChoiceTable
           .select { UserChoiceTable.userUuidRef eq uuid.toUuid() and (UserChoiceTable.deadEnd eq true) }
           .count().toInt()
 
-      if (wrongAnswers == 0) {
+      if (wrongDecsions == 0) {
         UserChoiceTable
           .select { UserChoiceTable.userUuidRef eq uuid.toUuid() and (UserChoiceTable.deadEnd eq false) }
           .count().toInt()
       } else {
         // We know this will return an answer because we know it is non-zero from above
-        // Find the time of the last wrong slide
-        val lastWrongAnswer =
+        // Find the time of the last wrong decision
+        val lastWrongDecision =
           UserChoiceTable
             .slice(UserChoiceTable.created.max())
             .select { UserChoiceTable.userUuidRef eq uuid.toUuid() and (UserChoiceTable.deadEnd eq true) }
@@ -115,7 +115,7 @@ object DbmsTxs : KLogging() {
         // Now count the number of correct answers since that time
         UserChoiceTable
           .slice(Count(UserChoiceTable.created))
-          .select { UserChoiceTable.userUuidRef eq uuid.toUuid() and (UserChoiceTable.created greater lastWrongAnswer) }
+          .select { UserChoiceTable.userUuidRef eq uuid.toUuid() and (UserChoiceTable.created greater lastWrongDecision) }
           .map { it[0] as Long }
           .first()
           .toInt()

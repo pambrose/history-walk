@@ -37,8 +37,8 @@ data class SlideData(
   val offset: Int,
   val displayTitle: Boolean,
   val decisionCount: Int,
-  val displayConsecutiveCorrectAnswers: Boolean,
-  val consecutiveCorrectAnswers: Int,
+  val displayConsecutiveCorrectDecisions: Boolean,
+  val consecutiveCorrectDecisions: Int,
   val showResetButton: Boolean,
 ) {
   val failure: Boolean

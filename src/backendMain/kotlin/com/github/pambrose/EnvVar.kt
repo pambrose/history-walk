@@ -6,7 +6,7 @@ import com.github.pambrose.common.util.obfuscate
 enum class EnvVar(val maskFunc: EnvVar.() -> String = { getEnv(UNASSIGNED) }) {
 
   SHOW_RESET_BUTTON,
-  DISPLAY_CONSECUTIVE_CORRECT_ANSWERS,
+  DISPLAY_CONSECUTIVE_CORRECT_DECISIONS,
   ALLOW_SLIDE_ACCESS,
   SLIDES_LOCAL_FILENAME,
   SLIDES_REPO_TYPE,
