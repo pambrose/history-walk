@@ -32,5 +32,8 @@ dbreset: dbclean dbmigrate
 dbvalidate:
 	./gradlew flywayValidate
 
+restart:
+	heroku ps:restart
+
 upgrade-wrapper:
 	./gradlew wrapper --gradle-version=7.3.3 --distribution-type=bin
