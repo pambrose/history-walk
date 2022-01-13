@@ -20,11 +20,16 @@ import com.github.pambrose.common.util.GitHubRepo
 import com.github.pambrose.common.util.OwnerType
 import com.github.pambrose.common.util.Version.Companion.versionDesc
 import com.github.pambrose.common.util.getBanner
+import com.github.pambrose.common.util.simpleClassName
 import com.github.pambrose.slides.SlideDeck
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.features.*
+import io.ktor.http.*
+import io.ktor.http.ContentType.Text.Plain
+import io.ktor.http.HttpStatusCode.Companion.NotFound
 import io.ktor.http.content.*
+import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.sessions.*
 import io.kvision.remote.kvisionInit
@@ -110,6 +115,18 @@ fun Application.main() {
 
   install(Authentication) {
     configureFormAuth()
+  }
+
+  install(StatusPages) {
+    // Catch all
+    exception<Throwable> { cause ->
+      logger.info(cause) { " Throwable caught: ${cause.simpleClassName}" }
+      call.respond(NotFound)
+    }
+
+    status(NotFound) {
+      call.respond(TextContent("${it.value} ${it.description}", Plain.withCharset(Charsets.UTF_8), it))
+    }
   }
 
   routing {
