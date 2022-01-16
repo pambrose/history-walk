@@ -45,6 +45,7 @@ object Pages {
                     tr {}
                   }
                 }
+                br {}
               }
           }
         }
