@@ -1,6 +1,7 @@
 package com.github.pambrose
 
 import com.github.pambrose.DbmsTxs.allSuccessUsers
+import com.github.pambrose.DbmsTxs.allUserReasons
 import com.github.pambrose.DbmsTxs.allUserSummaries
 import com.github.pambrose.EndPoints.SLIDE
 import com.github.pambrose.HistoryWalkServer.masterSlides
@@ -8,6 +9,47 @@ import kotlinx.html.*
 import kotlinx.html.stream.createHTML
 
 object Pages {
+  fun displayUserReasons() =
+    createHTML()
+      .html {
+        head {
+          style {
+            unsafe {
+              +"table, th, td {border: 1px solid black; border-collapse: collapse;}"
+              +"th, td {padding: 5px;}"
+            }
+          }
+        }
+        body {
+          div {
+            allUserReasons()
+              .groupBy { it.email }
+              .forEach { (email, userReasons) ->
+
+                p {
+                  b { +"User:" }; +email
+                }
+
+                table {
+                  //style = "border-collapse: separate; border-spacing: 10px 5px;"
+                  tr {
+                    style = "border: 1px solid black;"
+                    th { style = "text-align:left;"; +"From/To" }
+                    th { style = "text-align:left;"; +"Reason" }
+                  }
+                  for (userReason in userReasons) {
+                    tr {
+                      td { +"${userReason.fromTitle} -> ${userReason.toTitle}" }
+                      td { +userReason.reason }
+                    }
+                    tr {}
+                  }
+                }
+              }
+          }
+        }
+      }
+
   fun displayUserSummary() =
     createHTML()
       .html {

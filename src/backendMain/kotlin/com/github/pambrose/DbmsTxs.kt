@@ -8,14 +8,8 @@ import com.github.pambrose.slides.Slide
 import com.pambrose.common.exposed.get
 import kotlinx.datetime.LocalDateTime
 import mu.KLogging
-import org.jetbrains.exposed.sql.Count
-import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.deleteWhere
-import org.jetbrains.exposed.sql.max
-import org.jetbrains.exposed.sql.select
-import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.jetbrains.exposed.sql.update
 
 object DbmsTxs : KLogging() {
   fun slideData(uuid: String, slide: Slide): SlideData {
@@ -137,6 +131,24 @@ object DbmsTxs : KLogging() {
       }
     }
 
+  fun allUserReasons() =
+    transaction {
+      UserReasonsView
+        .selectAll()
+        .map { row ->
+          UserReason(
+            row[UserReasonsView.id].toString(),
+            row[UserReasonsView.fullName],
+            row[UserReasonsView.email],
+            row[UserReasonsView.fromPathName],
+            row[UserReasonsView.toPathName],
+            row[UserReasonsView.fromTitle],
+            row[UserReasonsView.toTitle],
+            row[UserReasonsView.reason],
+          )
+        }
+    }
+
   fun allUserSummaries() =
     transaction {
       UserDecisionCountsView
@@ -179,5 +191,16 @@ object DbmsTxs : KLogging() {
     val email: String,
     val lastPathName: String,
     val decisionCount: Int,
+  )
+
+  data class UserReason(
+    val id: String,
+    val fullName: String,
+    val email: String,
+    val fromPathName: String,
+    val toPathName: String,
+    val fromTitle: String,
+    val toTitle: String,
+    val reason: String,
   )
 }

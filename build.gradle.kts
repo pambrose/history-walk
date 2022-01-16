@@ -84,6 +84,7 @@ kotlin {
             "/contentreset" to "http://localhost:8080",
             "/userreset" to "http://localhost:8080",
             "/summary" to "http://localhost:8080",
+            "/reasons" to "http://localhost:8080",
             "/slides" to "http://localhost:8080",
             "/slide/*" to "http://localhost:8080",
             "/kvws/*" to mapOf("target" to "ws://localhost:8080", "ws" to true)

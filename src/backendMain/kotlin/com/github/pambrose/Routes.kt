@@ -12,6 +12,7 @@ import com.github.pambrose.EnvVar.ALLOW_SLIDE_ACCESS
 import com.github.pambrose.HistoryWalkServer.loadSlides
 import com.github.pambrose.HistoryWalkServer.masterSlides
 import com.github.pambrose.Pages.displayAllSlides
+import com.github.pambrose.Pages.displayUserReasons
 import com.github.pambrose.Pages.displayUserSummary
 import com.github.pambrose.common.response.respondWith
 import com.github.pambrose.common.util.Version.Companion.versionDesc
@@ -87,6 +88,10 @@ object Routes : KLogging() {
 
       get("summary") {
         respondWith { displayUserSummary() }
+      }
+
+      get("reasons") {
+        respondWith { displayUserReasons() }
       }
 
       if (ALLOW_SLIDE_ACCESS.getEnv(false)) {

@@ -45,3 +45,17 @@ FROM history.users
                          ON history.user_choices.user_uuid_ref = users.id
 GROUP BY users.id, users.full_name
 ORDER BY users.id, users.full_name;
+
+CREATE VIEW history.user_reasons AS
+SELECT users.id,
+       full_name,
+       email,
+       from_path_name,
+       to_path_name,
+       from_title,
+       to_title,
+       reason
+FROM history.users
+         JOIN history.user_choices
+              ON history.user_choices.user_uuid_ref = users.id
+ORDER BY users.email, user_choices.created;

@@ -40,3 +40,14 @@ object UserDecisionCountsView : Table("history.user_decision_counts") {
   val lastPathName = text("last_path_name")
   val decisionCount = integer("decision_count")
 }
+
+object UserReasonsView : Table("history.user_reasons") {
+  val id = uuid("id")
+  val fullName = text("full_name")
+  val email = text("email")
+  val fromPathName = text("from_path_name")
+  val fromTitle = text("from_title")
+  val toPathName = text("to_path_name")
+  val toTitle = text("to_title")
+  val reason = text("reason")
+}
