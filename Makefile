@@ -10,6 +10,7 @@ clean:
 	./gradlew clean
 
 jar: clean
+	./gradlew backendMainClasses
 	./gradlew jar
 
 versioncheck:
