@@ -46,6 +46,7 @@ val exposedVersion: String by project
 val flexmarkVersion: String by project
 val h2Version: String by project
 val hikariVersion: String by project
+val khealthVersion: String by project
 val kweryVersion: String by project
 val logbackVersion: String by project
 val loggingVersion: String by project
@@ -132,6 +133,8 @@ kotlin {
         implementation("io.ktor:ktor-metrics:$ktorVersion")
         implementation("com.github.pambrose.common-utils:ktor-server-utils:$utilsVersion")
         implementation("com.github.pambrose:history-walk-slides:$slidesVersion")
+
+        implementation("dev.hayden:khealth:$khealthVersion")
 
         implementation("org.postgresql:postgresql:$pgsqlVersion")
         implementation("com.impossibl.pgjdbc-ng:pgjdbc-ng-all:$pgjdbcVersion")
@@ -280,7 +283,7 @@ afterEvaluate {
 // This is for flyway
 buildscript {
   dependencies {
-    classpath("org.postgresql:postgresql:42.3.1")
+    classpath("org.postgresql:postgresql:42.3.3")
   }
 }
 

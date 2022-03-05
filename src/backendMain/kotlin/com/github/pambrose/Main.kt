@@ -2,26 +2,16 @@ package com.github.pambrose
 
 import com.github.pambrose.ConfigureFormAuth.configureFormAuth
 import com.github.pambrose.Cookies.assignCookies
-import com.github.pambrose.EnvVar.SLIDES_LOCAL_FILENAME
-import com.github.pambrose.EnvVar.SLIDES_REPO_BRANCH
-import com.github.pambrose.EnvVar.SLIDES_REPO_FILENAME
-import com.github.pambrose.EnvVar.SLIDES_REPO_NAME
-import com.github.pambrose.EnvVar.SLIDES_REPO_OWNER
-import com.github.pambrose.EnvVar.SLIDES_REPO_PATH
-import com.github.pambrose.EnvVar.SLIDES_REPO_TYPE
-import com.github.pambrose.EnvVar.SLIDES_VARIABLE_NAME
+import com.github.pambrose.EnvVar.*
 import com.github.pambrose.HistoryWalkServer.loadSlides
 import com.github.pambrose.HistoryWalkServer.masterSlides
 import com.github.pambrose.Property.Companion.assignProperties
 import com.github.pambrose.Routes.assignRoutes
 import com.github.pambrose.common.script.KotlinScript
-import com.github.pambrose.common.util.GitHubFile
-import com.github.pambrose.common.util.GitHubRepo
-import com.github.pambrose.common.util.OwnerType
+import com.github.pambrose.common.util.*
 import com.github.pambrose.common.util.Version.Companion.versionDesc
-import com.github.pambrose.common.util.getBanner
-import com.github.pambrose.common.util.simpleClassName
 import com.github.pambrose.slides.SlideDeck
+import dev.hayden.KHealth
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.features.*
@@ -109,6 +99,14 @@ fun Application.main() {
 
   install(Sessions) {
     assignCookies()
+  }
+
+  install(KHealth) {
+    readyCheckEnabled = false
+
+    healthChecks {
+      check("Server ready") { true }
+    }
   }
 
   Dbms.init(environment.config)
