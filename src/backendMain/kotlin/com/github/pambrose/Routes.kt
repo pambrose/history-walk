@@ -50,12 +50,10 @@ object Routes : KLogging() {
               val userId = UserId(user.uuid.toString())
               call.sessions.set(userId)
               HttpStatusCode.OK
-            }
-            else {
+            } else {
               HttpStatusCode.Unauthorized
             }
-          }
-          else {
+          } else {
             HttpStatusCode.Unauthorized
           }
 
@@ -110,8 +108,7 @@ object Routes : KLogging() {
               updateLastSlide(uuid, slide.pathName)
             }
             call.respondRedirect("/")
-          }
-          else {
+          } else {
             call.respondText("Slide not found: $slideId/$version", Plain)
           }
         }

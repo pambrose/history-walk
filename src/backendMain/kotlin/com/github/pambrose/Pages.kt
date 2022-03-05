@@ -5,8 +5,21 @@ import com.github.pambrose.DbmsTxs.allUserReasons
 import com.github.pambrose.DbmsTxs.allUserSummaries
 import com.github.pambrose.EndPoints.SLIDE
 import com.github.pambrose.HistoryWalkServer.masterSlides
-import kotlinx.html.*
+import kotlinx.html.a
+import kotlinx.html.b
+import kotlinx.html.body
+import kotlinx.html.br
+import kotlinx.html.div
+import kotlinx.html.head
+import kotlinx.html.html
+import kotlinx.html.p
 import kotlinx.html.stream.createHTML
+import kotlinx.html.style
+import kotlinx.html.table
+import kotlinx.html.td
+import kotlinx.html.th
+import kotlinx.html.tr
+import kotlinx.html.unsafe
 
 object Pages {
   fun displayUserReasons() =
