@@ -39,4 +39,4 @@ log:
 	heroku logs --tail
 
 upgrade-wrapper:
-	./gradlew wrapper --gradle-version=7.4 --distribution-type=bin
+	./gradlew wrapper --gradle-version=7.4.2 --distribution-type=bin
