@@ -2,37 +2,29 @@ package com.github.pambrose
 
 import com.github.pambrose.ConfigureFormAuth.configureFormAuth
 import com.github.pambrose.Cookies.assignCookies
-import com.github.pambrose.EnvVar.SLIDES_LOCAL_FILENAME
-import com.github.pambrose.EnvVar.SLIDES_REPO_BRANCH
-import com.github.pambrose.EnvVar.SLIDES_REPO_FILENAME
-import com.github.pambrose.EnvVar.SLIDES_REPO_NAME
-import com.github.pambrose.EnvVar.SLIDES_REPO_OWNER
-import com.github.pambrose.EnvVar.SLIDES_REPO_PATH
-import com.github.pambrose.EnvVar.SLIDES_REPO_TYPE
-import com.github.pambrose.EnvVar.SLIDES_VARIABLE_NAME
+import com.github.pambrose.EnvVar.*
 import com.github.pambrose.HistoryWalkServer.loadSlides
 import com.github.pambrose.HistoryWalkServer.masterSlides
 import com.github.pambrose.Property.Companion.assignProperties
 import com.github.pambrose.Routes.assignRoutes
 import com.github.pambrose.common.script.KotlinScript
-import com.github.pambrose.common.util.GitHubFile
-import com.github.pambrose.common.util.GitHubRepo
-import com.github.pambrose.common.util.OwnerType
+import com.github.pambrose.common.util.*
 import com.github.pambrose.common.util.Version.Companion.versionDesc
-import com.github.pambrose.common.util.getBanner
-import com.github.pambrose.common.util.simpleClassName
 import com.github.pambrose.slides.SlideDeck
-import dev.hayden.KHealth
-import io.ktor.application.*
-import io.ktor.auth.*
-import io.ktor.features.*
 import io.ktor.http.*
 import io.ktor.http.ContentType.Text.Plain
 import io.ktor.http.HttpStatusCode.Companion.NotFound
 import io.ktor.http.content.*
-import io.ktor.response.*
-import io.ktor.routing.*
-import io.ktor.sessions.*
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
+import io.ktor.server.http.content.*
+import io.ktor.server.plugins.callloging.*
+import io.ktor.server.plugins.compression.*
+import io.ktor.server.plugins.defaultheaders.*
+import io.ktor.server.plugins.statuspages.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
+import io.ktor.server.sessions.*
 import io.kvision.remote.kvisionInit
 import kotlinx.coroutines.runBlocking
 import mu.KLogging
@@ -59,7 +51,8 @@ object HistoryWalkServer : KLogging() {
                 logger.info { "Loading slides from local file: $localFilename" }
                 val file = File("../$localFilename")
                 file.readText()
-              } else {
+              }
+              else {
                 val repoType = SLIDES_REPO_TYPE.getEnv("User")
                 val gh = GitHubFile(
                   GitHubRepo(
@@ -111,13 +104,13 @@ fun Application.main() {
     assignCookies()
   }
 
-  install(KHealth) {
-    readyCheckEnabled = false
-
-    healthChecks {
-      check("Server ready") { true }
-    }
-  }
+//  install(KHealth) {
+//    readyCheckEnabled = false
+//
+//    healthChecks {
+//      check("Server ready") { true }
+//    }
+//  }
 
   Dbms.init(environment.config)
 
@@ -127,13 +120,13 @@ fun Application.main() {
 
   install(StatusPages) {
     // Catch all
-    exception<Throwable> { cause ->
+    exception<Throwable> { call, cause ->
       logger.info(cause) { " Throwable caught: ${cause.simpleClassName}" }
       call.respond(NotFound)
     }
 
-    status(NotFound) {
-      call.respond(TextContent("${it.value} ${it.description}", Plain.withCharset(Charsets.UTF_8), it))
+    status(NotFound) { call, code ->
+      call.respond(TextContent("${code.value} ${code.description}", Plain.withCharset(Charsets.UTF_8), code))
     }
   }
 

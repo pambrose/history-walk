@@ -1,9 +1,9 @@
 package com.github.pambrose
 
 import com.github.pambrose.Auth.AUTH_COOKIE
-import io.ktor.application.*
-import io.ktor.auth.*
-import io.ktor.sessions.*
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
+import io.ktor.server.sessions.*
 import mu.KLogging
 import java.time.Instant
 import java.util.*
@@ -11,7 +11,7 @@ import kotlin.collections.set
 import kotlin.time.Duration.Companion.days
 
 object Cookies : KLogging() {
-  fun Sessions.Configuration.assignCookies() {
+  fun SessionsConfig.assignCookies() {
     cookie<UserId>(AUTH_COOKIE) {
       cookie.path = "/"
       cookie.extensions["SameSite"] = "strict"

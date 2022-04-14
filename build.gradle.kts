@@ -46,7 +46,7 @@ val exposedVersion: String by project
 val flexmarkVersion: String by project
 val h2Version: String by project
 val hikariVersion: String by project
-val khealthVersion: String by project
+//val khealthVersion: String by project
 val kweryVersion: String by project
 val logbackVersion: String by project
 val loggingVersion: String by project
@@ -127,14 +127,19 @@ kotlin {
 
         implementation("io.ktor:ktor-server-core:$ktorVersion")
         implementation("io.ktor:ktor-server-cio:$ktorVersion")
-        implementation("io.ktor:ktor-html-builder:$ktorVersion")
+        implementation("io.ktor:ktor-server-html-builder:$ktorVersion")
         implementation("io.ktor:ktor-server-sessions:$ktorVersion")
-        implementation("io.ktor:ktor-auth:$ktorVersion")
-        implementation("io.ktor:ktor-metrics:$ktorVersion")
+        implementation("io.ktor:ktor-server-auth:$ktorVersion")
+        implementation("io.ktor:ktor-server-metrics:$ktorVersion")
+        implementation("io.ktor:ktor-server-compression:$ktorVersion")
+        implementation("io.ktor:ktor-server-call-logging:$ktorVersion")
+        implementation("io.ktor:ktor-server-default-headers:$ktorVersion")
+        implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
+
         implementation("com.github.pambrose.common-utils:ktor-server-utils:$utilsVersion")
         implementation("com.github.pambrose:history-walk-slides:$slidesVersion")
 
-        implementation("dev.hayden:khealth:$khealthVersion")
+        //implementation("dev.hayden:khealth:$khealthVersion")
 
         implementation("org.postgresql:postgresql:$pgsqlVersion")
         implementation("com.impossibl.pgjdbc-ng:pgjdbc-ng-all:$pgjdbcVersion")
@@ -196,9 +201,9 @@ kotlin {
 }
 
 // This is the workaround for lack of M1 support in 14.17.0
-rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin> {
-  rootProject.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension>().nodeVersion = "16.0.0"
-}
+//rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin> {
+//  rootProject.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension>().nodeVersion = "16.0.0"
+//}
 
 afterEvaluate {
   tasks {

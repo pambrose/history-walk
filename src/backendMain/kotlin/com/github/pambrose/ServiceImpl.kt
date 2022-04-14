@@ -6,7 +6,7 @@ import com.github.pambrose.HistoryWalkServer.masterSlides
 import com.github.pambrose.User.Companion.findCurrentSlideForUser
 import com.github.pambrose.Utils.toUuid
 import com.google.inject.Inject
-import io.ktor.application.*
+import io.ktor.server.application.*
 import mu.KLogging
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.insertAndGetId

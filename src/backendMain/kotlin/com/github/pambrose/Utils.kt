@@ -1,7 +1,7 @@
 package com.github.pambrose
 
-import io.ktor.application.*
-import io.ktor.sessions.*
+import io.ktor.server.application.*
+import io.ktor.server.sessions.*
 import io.ktor.util.pipeline.*
 import org.jetbrains.exposed.dao.id.EntityID
 import java.util.*

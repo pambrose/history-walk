@@ -5,8 +5,7 @@ import com.github.pambrose.PropertyNames.HISTORYWALK
 import com.github.pambrose.PropertyNames.SITE
 import com.github.pambrose.common.util.isNotNull
 import com.github.pambrose.common.util.obfuscate
-import io.ktor.application.*
-import io.ktor.config.*
+import io.ktor.server.application.*
 import mu.KLogging
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -35,7 +34,7 @@ enum class Property(
   private fun Application.configProperty(name: String, default: String = "", warn: Boolean = false) =
     try {
       environment.config.property(name).getString()
-    } catch (e: ApplicationConfigurationException) {
+    } catch (e: Throwable /*ApplicationConfigurationException*/) {
       if (warn)
         logger.warn { "Missing $name value in application.conf" }
       default

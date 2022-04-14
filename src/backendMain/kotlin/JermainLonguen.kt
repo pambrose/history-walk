@@ -1,6 +1,6 @@
 import com.github.pambrose.slides.SlideDeck.Companion.slideDeck
 
-val titlePage = """ 
+const val titlePage = """ 
     <div style="text-align:center;">  
     <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/jermain-longuen.jpg" alt="Pic" style="width:334px;height:518px;border:2px solid grey;float:right;margin-left:10px;"/>  
     <div style="padding-top:130px;padding-bottom:20px;">
@@ -19,7 +19,7 @@ val titlePage = """
     </div> 
 """
 
-val majorDecision = """      
+const val majorDecision = """      
     You suffer a horrific and vicious beating, worse than others in 
     the past from your drunken, enraged owner that maims your face 
     (a mangled and broken jaw). While you once thought of him as 
@@ -32,7 +32,7 @@ val majorDecision = """
     slaves on the neighboring plantation? 
 """
 
-val companionDecision = """
+const val companionDecision = """
     <div>
     <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/pistol.jpg" alt="Pic" style="width:130px;height:61px;border:1px solid white;float:left"/>  
     <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/salami.jpg" alt="Pic" style="width:123px;height:76px;border:1px solid white;float:right"/>  
@@ -52,14 +52,14 @@ val companionDecision = """
     </div>
 """
 
-val decisionWhenToGo = """
+const val decisionWhenToGo = """
     * Will you leave in the summer, when the weather is warmest and you can easily sleep outdoors?
     * Will you leave in the autumn, hoping to slip away in the business and hub-bub of harvest time?
     * Will you leave in the spring, when love is in the air?
     * Will you leave in the winter, right at Christmas, when it is coldest and darkest?
 """
 
-val oldBenViaRoss = """
+const val oldBenViaRoss = """
     Old Ben, who has been on the plantation next door some time and is trusted by your partner, 
     relays to him the advice that your chances to escape will be best at Christmas time. 
     He argues that there are four good reasons:
@@ -78,7 +78,7 @@ val oldBenViaRoss = """
     Hmm... sounds good, but then again, if he knew so much, why is he still here?
 """
 
-val oldBenWhenToGo = """      
+const val oldBenWhenToGo = """      
     Old Ben, who has been on the plantation next door some time and is
     trusted by your partner, relays to him the advice that your chances
     to escape will be best at Christmas time. He argues that there are
@@ -97,14 +97,14 @@ val oldBenWhenToGo = """
     When will you leave?
 """
 
-val summerDeparture = """
+const val summerDeparture = """
     The summer heat offers the appeal of warm nights that will make it easier 
     to sleep outdoors. Potentially, cross-country travel might be easier.
     
     Will you...
 """
 
-val summerCrossCountry = """
+const val summerCrossCountry = """
     At first your flight is nearly pleasant, a stroll through the fields.
     But soon the terrain gets rougher, with thicker brush that blocks sight, 
     rough ground that bruises the feet, and an increasing number of trees start 
@@ -116,7 +116,7 @@ val summerCrossCountry = """
     Where do you go?
 """
 
-val fleeIntoDeepForestEnd = """
+const val fleeIntoDeepForestEnd = """
     <div>
     <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/deep-forest.jpg" alt="Pic" style="width:233px;height:217px;border:2px solid gray;float:right;margin-left:10px;"/>  
     <div style="padding-top:20px;padding-bottom:20px;">
@@ -131,7 +131,7 @@ val fleeIntoDeepForestEnd = """
     </div>
 """
 
-val autumnDeparture = """
+const val autumnDeparture = """
     As harvest time come along, you decide to make your move, hoping to take advantage 
     the heightened activity and slip away in the mix. Initially, it seems that you are 
     successful, making your way off the plantation and down the road into the countryside. 
@@ -139,7 +139,7 @@ val autumnDeparture = """
     sound precedes...
 """
 
-val springDeparture = """
+const val springDeparture = """
     In springtime, it is said that thoughts turn romance and courting, distracting one from 
     ordinary, difficult, or boring tasks. That is your hope, anyway, as you seek to escape 
     while adversaries are hopefully off their guard. However, such is not the case. It seem 
@@ -147,7 +147,7 @@ val springDeparture = """
     blindly into the brush, emerging to...
 """
 
-val paddyRollersEnd = """
+const val paddyRollersEnd = """
     <p>
     <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/paddyrollers.jpg" alt="Pic" style="width:301px;height:159px;border:2px solid gray;float:right;margin-left:10px;margin-top:10px;"/>  
     You are surprised by the sudden appearance of four ‘paddy rollers,’ as slave-catchers 
@@ -159,7 +159,7 @@ val paddyRollersEnd = """
     </p>
 """
 
-val winterDepartureAlone = """
+const val winterDepartureAlone = """
     <p>
     <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/winterdeparture.jpg" alt="Pic" style="width:187px;height:258px;border:2px solid gray;float:right;margin-left:10px;"/>  
     <p style="padding-top:100px;padding-bottom:90px;">
@@ -168,7 +168,7 @@ val winterDepartureAlone = """
     </p>
 """
 
-val stealOvercoat = """
+const val stealOvercoat = """
     <div>
     <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/winterdeparture.jpg" alt="Pic" style="width:187px;height:258px;border:2px solid gray;float:right;margin-left:10px;"/>  
     <div style="padding-top:60px;margin-bottom:45px;">
@@ -186,7 +186,7 @@ val stealOvercoat = """
     </div>
 """
 
-val winterCrossCountry = """
+const val winterCrossCountry = """
     The winter is harsh, and as the freezing wind blows your toes begin to go numb, 
     but fear of the slave-catchers and their dogs drives you deeper into the wilderness.
     But soon the terrain gets rougher, the snow drifts get deeper, the brush blocks your sight, 
@@ -197,7 +197,7 @@ val winterCrossCountry = """
     Where do you go?
 """
 
-val rossEncounter = """
+const val rossEncounter = """
     <div>
     <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/ross.jpg" alt="Pic" style="width:164;height:383px;border:2px solid gray;float:right;margin-left:10px;margin-top:15px;"/>  
     Having risked severe punishment, you have managed to steal some bacon, 
@@ -218,7 +218,7 @@ val rossEncounter = """
     </div>
 """
 
-val rossAdvice = """
+const val rossAdvice = """
     Ross says the following:
 
     <b><i>If you act shy, avoid eye contact, and slink about furtively, you will draw the wrong 
@@ -239,13 +239,13 @@ val rossAdvice = """
 """
 
 // TODO This slide is not used
-val winterTravelEnd = """
+const val winterTravelEnd = """
     ...Without a coat, you freeze to death in the wilderness.
     
     THE END.
 """
 
-val stealOvercoatViaRoss = """
+const val stealOvercoatViaRoss = """
     <div>
     <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/winterdeparture.jpg" alt="Pic" style="width:187px;height:258px;border:2px solid gray;float:right;margin-left:10px;"/>  
     <div style="padding-top:55px;padding-bottom:20px;">
@@ -263,7 +263,7 @@ val stealOvercoatViaRoss = """
     </div>
 """
 
-val majorEncounterPatrol = """
+const val majorEncounterPatrol = """
     <div>
     <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/patrol.jpg" alt="Pic" style="width:196px;height:379px;border:2px solid gray;float:right;margin-left:10px;"/>  
     <p style="padding-top:90px;">
@@ -279,7 +279,7 @@ val majorEncounterPatrol = """
     </div>
 """
 
-val majorEncounterViaRoss1stPatrol = """
+const val majorEncounterViaRoss1stPatrol = """
     <div>
     <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/patrol.jpg" alt="Pic" style="width:196px;height:379px;border:2px solid gray;float:right;margin-left:10px;"/>  
     <p style="padding-top:90px;">
@@ -295,7 +295,7 @@ val majorEncounterViaRoss1stPatrol = """
     </div>
 """
 
-val majorEncounterFleePatrolEnd = """
+const val majorEncounterFleePatrolEnd = """
     <div>
     <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/fleepatrol.jpg" alt="Pic" style="width:200px;height:300px;border:2px solid gray;float:right;margin-left:10px;"/>  
     <p style="padding-top:60px;">
@@ -310,7 +310,7 @@ val majorEncounterFleePatrolEnd = """
     </div>
 """
 
-val majorEncounterFight1stPatrolEnd = """
+const val majorEncounterFight1stPatrolEnd = """
     You and your companion boldly respond by trying to throw the men from their horses.
     
     Melee ensues, and you find yourself beaten to a pulp, shortly to be bound, strapped 
@@ -319,7 +319,7 @@ val majorEncounterFight1stPatrolEnd = """
     THE END.
 """
 
-val majorEncounterViaRossFight1stPatrol = """
+const val majorEncounterViaRossFight1stPatrol = """
     You and your companion boldly respond by drawing your pistols and firing at the men.
     Hitting one and causing the horses to panic, the other ride flees in terror as the 
     wounded rider drops to the ground, unconscious.
@@ -330,7 +330,7 @@ val majorEncounterViaRossFight1stPatrol = """
     Do you decide...
 """
 
-val majorEncounterBluffPatrol = """
+const val majorEncounterBluffPatrol = """
     You try to explain that you have been sent on a mission by your master, which was 
     not an uncommon occurrence. However, the man with a rifle demands to see your 
     travel papers. You have none.
@@ -338,7 +338,7 @@ val majorEncounterBluffPatrol = """
     Having failed at bluffing, will you...
 """
 
-val majorEncounterViaRossBluff1stPatrol = """
+const val majorEncounterViaRossBluff1stPatrol = """
     You try to explain that you have been sent on a mission by your master, which was 
     not an uncommon occurrence. However, the man with a rifle demands to see your travel 
     papers. You show the man the travel papers that Ross gave you.
@@ -346,14 +346,14 @@ val majorEncounterViaRossBluff1stPatrol = """
     Do you...
 """
 
-val politeAndSubmissiveBluff = """
+const val politeAndSubmissiveBluff = """
     Your polite and submissive tone arouses their suspicions. One man says, “Those papers 
     look fake!” and the men begin to raise their rifles.
     
     Having failed at bluffing, will you...
 """
 
-val confidentAndArrogantBluff = """
+const val confidentAndArrogantBluff = """
     Your confident and arrogant tone convince the men that you are purpose is legitimate.
     Ross’ advice was useful this time.
     
