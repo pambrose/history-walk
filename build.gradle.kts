@@ -288,7 +288,7 @@ afterEvaluate {
 // This is for flyway
 buildscript {
   dependencies {
-    classpath("org.postgresql:postgresql:42.3.4")
+    classpath("org.postgresql:postgresql:42.3.5")
   }
 }
 
