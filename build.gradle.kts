@@ -24,7 +24,6 @@ version = "1.0.0"
 group = "com.github.pambrose"
 
 repositories {
-  mavenLocal()
   google()
   mavenCentral()
   maven { url = uri("https://jitpack.io") }
@@ -288,7 +287,7 @@ afterEvaluate {
 // This is for flyway
 buildscript {
   dependencies {
-    classpath("org.postgresql:postgresql:42.3.5")
+    classpath("org.postgresql:postgresql:42.4.0")
   }
 }
 
