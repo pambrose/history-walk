@@ -63,7 +63,7 @@ kotlin {
   jvm("backend") {
     compilations.all {
       kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
         freeCompilerArgs = listOf("-Xjsr305=strict")
       }
     }
@@ -176,9 +176,9 @@ kotlin {
       dependencies {
         implementation("io.kvision:kvision:$kvisionVersion")
         implementation("io.kvision:kvision-bootstrap:$kvisionVersion")
-        implementation("io.kvision:kvision-bootstrap-css:$kvisionVersion")
+        implementation("io.kvision:kvision-bootstrap:$kvisionVersion")
         implementation("io.kvision:kvision-bootstrap-dialog:$kvisionVersion")
-        implementation("io.kvision:kvision-datacontainer:$kvisionVersion")
+        implementation("io.kvision:kvision-state:$kvisionVersion")
         implementation("io.kvision:kvision-fontawesome:$kvisionVersion")
         //implementation("io.kvision:kvision-bootstrap-icons:$kvisionVersion")
         implementation("io.kvision:kvision-i18n:$kvisionVersion")
@@ -287,7 +287,7 @@ afterEvaluate {
 // This is for flyway
 buildscript {
   dependencies {
-    classpath("org.postgresql:postgresql:42.4.0")
+    classpath("org.postgresql:postgresql:42.5.1")
   }
 }
 

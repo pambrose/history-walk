@@ -115,7 +115,7 @@ class LoginPanel : Dialog<Credentials>(closeButton = false, escape = false, anim
 
   private fun showRegisterForm() {
     loginPanel.hide()
-    registerPanel.show().focus()
+    registerPanel.focus()
     registerPanel.clearData()
     loginButton.hide()
     userButton.hide()
@@ -124,7 +124,7 @@ class LoginPanel : Dialog<Credentials>(closeButton = false, escape = false, anim
   }
 
   private fun hideRegisterForm() {
-    loginPanel.show().focus()
+    loginPanel.focus()
     registerPanel.hide()
     loginButton.show()
     userButton.show()

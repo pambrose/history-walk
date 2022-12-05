@@ -11,6 +11,7 @@ import com.pambrose.common.exposed.get
 import io.ktor.http.*
 import mu.KLogging
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
 import kotlin.time.measureTime
