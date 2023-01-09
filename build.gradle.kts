@@ -8,7 +8,7 @@ plugins {
   val configVersion: String by System.getProperties()
   val flywayVersion: String by System.getProperties()
 
-  `maven-publish`
+//  `maven-publish`
 
   kotlin("multiplatform") version kotlinVersion
   kotlin("plugin.serialization") version kotlinVersion
@@ -59,9 +59,13 @@ val utilsVersion: String by project
 val webDir = file("src/frontendMain/web")
 val mainClassName = "io.ktor.server.cio.EngineMain"
 
+
 kotlin {
   jvm("backend") {
     compilations.all {
+      java {
+        targetCompatibility = JavaVersion.VERSION_17
+      }
       kotlinOptions {
         jvmTarget = "17"
         freeCompilerArgs = listOf("-Xjsr305=strict")
@@ -71,8 +75,11 @@ kotlin {
 
   js("frontend") {
     browser {
-      runTask {
+      commonWebpackConfig {
         outputFileName = "main.bundle.js"
+      }
+      runTask {
+//        outputFileName = "main.bundle.js"
         sourceMaps = false
         devServer = KotlinWebpackConfig.DevServer(
           open = false,
@@ -92,9 +99,9 @@ kotlin {
           static = mutableListOf("$buildDir/processedResources/frontend/main")
         )
       }
-      webpackTask {
-        outputFileName = "main.bundle.js"
-      }
+//      webpackTask {
+//        outputFileName = "main.bundle.js"
+//      }
       testTask {
         useKarma {
           useChromeHeadless()
@@ -109,7 +116,7 @@ kotlin {
       dependencies {
         api("io.kvision:kvision-server-ktor:$kvisionVersion")
       }
-      kotlin.srcDir("build/generated-src/common")
+      // kotlin.srcDir("build/generated-src/common")
     }
 
     val commonTest by getting {
@@ -176,14 +183,11 @@ kotlin {
       dependencies {
         implementation("io.kvision:kvision:$kvisionVersion")
         implementation("io.kvision:kvision-bootstrap:$kvisionVersion")
-        implementation("io.kvision:kvision-bootstrap:$kvisionVersion")
-        //implementation("io.kvision:kvision-bootstrap-dialog:$kvisionVersion")
         implementation("io.kvision:kvision-state:$kvisionVersion")
         implementation("io.kvision:kvision-fontawesome:$kvisionVersion")
-        //implementation("io.kvision:kvision-bootstrap-icons:$kvisionVersion")
         implementation("io.kvision:kvision-i18n:$kvisionVersion")
       }
-      kotlin.srcDir("build/generated-src/frontend")
+//      kotlin.srcDir("build/generated-src/frontend")
     }
 
     val frontendTest by getting {
@@ -198,11 +202,6 @@ kotlin {
     }
   }
 }
-
-// This is the workaround for lack of M1 support in 14.17.0
-//rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin> {
-//  rootProject.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension>().nodeVersion = "16.0.0"
-//}
 
 afterEvaluate {
   tasks {
@@ -271,18 +270,6 @@ afterEvaluate {
     }
   }
 }
-
-//publishing {
-//  publications {
-//    create<MavenPublication>("maven") {
-//      groupId = "com.github.pambrose"
-//      artifactId = "library"
-//      version = "1.0.0"
-//
-//      from(components["java"])
-//    }
-//  }
-//}
 
 // This is for flyway
 buildscript {
