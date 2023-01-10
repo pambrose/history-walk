@@ -24,12 +24,11 @@ object Dbms {
         jdbcUrl = EnvVar.DBMS_URL.getEnv(Property.DBMS_URL.getRequiredProperty())
         username = EnvVar.DBMS_USERNAME.getEnv(Property.DBMS_USERNAME.getRequiredProperty())
         password = EnvVar.DBMS_PASSWORD.getEnv(Property.DBMS_PASSWORD.getRequiredProperty())
-
         maximumPoolSize = Property.DBMS_MAX_POOL_SIZE.getRequiredProperty().toInt()
-        isAutoCommit = false
+
+        //isAutoCommit = false
         transactionIsolation = "TRANSACTION_REPEATABLE_READ"
-        maxLifetime =
-          Property.DBMS_MAX_LIFETIME_MINS.getRequiredProperty().toInt().minutes.inWholeMilliseconds
+        maxLifetime = Property.DBMS_MAX_LIFETIME_MINS.getRequiredProperty().toInt().minutes.inWholeMilliseconds
         validate()
       }.let { HikariDataSource(it) }
 

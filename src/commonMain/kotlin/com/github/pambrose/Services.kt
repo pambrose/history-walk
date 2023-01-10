@@ -12,17 +12,17 @@ interface IContentService {
   suspend fun getUserInfo(): UserInfo
   suspend fun getCurrentSlide(): SlideData
   suspend fun makeChoice(
-    fromPathName: String,
-    fromTitle: String,
+    fromPathNameStr: String,
+    fromTitleStr: String,
     slideChoice: SlideChoice,
     advance: Boolean
   ): UserChoice
 
   suspend fun provideReason(
-    fromPathName: String,
-    fromTitle: String,
+    fromPathNameStr: String,
+    fromTitleStr: String,
     slideChoice: SlideChoice,
-    reason: String
+    reasonStr: String
   ): SlideData
 
   suspend fun goBackInTime(parentTitle: ParentTitle): SlideData

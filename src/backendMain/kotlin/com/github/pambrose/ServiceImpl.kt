@@ -54,8 +54,8 @@ actual class ContentService : IContentService {
   }
 
   override suspend fun makeChoice(
-    fromPathName: String,
-    fromTitle: String,
+    fromPathNameStr: String,
+    fromTitleStr: String,
     slideChoice: SlideChoice,
     advance: Boolean
   ): UserChoice =
@@ -63,7 +63,7 @@ actual class ContentService : IContentService {
       // See if user has an entry for that transition
       val uuid = call.userId.uuid
       (UserChoiceTable
-        .select { (UserChoiceTable.userUuidRef eq uuid.toUuid()) and (UserChoiceTable.fromPathName eq fromPathName) and (UserChoiceTable.toPathName eq slideChoice.toPathName) }
+        .select { (UserChoiceTable.userUuidRef eq uuid.toUuid()) and (UserChoiceTable.fromPathName eq fromPathNameStr) and (UserChoiceTable.toPathName eq slideChoice.toPathName) }
         .map { row ->
           UserChoice(
             row[UserChoiceTable.fromPathName],
@@ -79,7 +79,7 @@ actual class ContentService : IContentService {
             row[UserChoiceTable.reason],
           )
         }
-        .firstOrNull() ?: UserChoice(fromPathName, fromTitle, slideChoice, if (advance) "Advance" else "")
+        .firstOrNull() ?: UserChoice(fromPathNameStr, fromTitleStr, slideChoice, if (advance) "Advance" else "")
           )
         .also { userChoice ->
           if (userChoice.reason.isNotBlank()) {
@@ -89,26 +89,26 @@ actual class ContentService : IContentService {
     }
 
   override suspend fun provideReason(
-    fromPathName: String,
-    fromTitle: String,
+    fromPathNameStr: String,
+    fromTitleStr: String,
     slideChoice: SlideChoice,
-    reason: String
+    reasonStr: String
   ) =
     transaction {
       val uuid = call.userId.uuid
       UserChoiceTable
         .insertAndGetId { row ->
-          row[UserChoiceTable.userUuidRef] = uuid.toUuid()
-          row[UserChoiceTable.fromPathName] = fromPathName
-          row[UserChoiceTable.fromTitle] = fromTitle
-          row[UserChoiceTable.toPathName] = slideChoice.toPathName
-          row[UserChoiceTable.toTitle] = slideChoice.toTitle
-          row[UserChoiceTable.deadEnd] = slideChoice.deadEnd
-          row[UserChoiceTable.choiceText] = slideChoice.choiceText
-          row[UserChoiceTable.reason] = reason
+          row[userUuidRef] = uuid.toUuid()
+          row[fromPathName] = fromPathNameStr
+          row[fromTitle] = fromTitleStr
+          row[toPathName] = slideChoice.toPathName
+          row[toTitle] = slideChoice.toTitle
+          row[deadEnd] = slideChoice.deadEnd
+          row[choiceText] = slideChoice.choiceText
+          row[reason] = reasonStr
         }.value
 
-      logger.info { "Inserted $fromTitle to ${slideChoice.toTitle} ${slideChoice.deadEnd}" }
+      logger.info { "Inserted $fromTitleStr to ${slideChoice.toTitle} ${slideChoice.deadEnd}" }
       updateLastSlide(uuid, slideChoice.toPathName)
 
       val slide = findCurrentSlideForUser(uuid, masterSlides)
