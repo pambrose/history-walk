@@ -23,9 +23,11 @@ object Dbms : KLogging() {
       .apply {
         driverClassName = EnvVar.DBMS_DRIVER_CLASSNAME.getEnv(Property.DBMS_DRIVER_CLASSNAME.getRequiredProperty())
         jdbcUrl = EnvVar.DBMS_URL.getEnv(Property.DBMS_URL.getRequiredProperty())
-        logger.info { "************ jdbcUrl: [$jdbcUrl"] }
+        logger.info { "************ jdbcUrl: [$jdbcUrl]" }
         username = EnvVar.DBMS_USERNAME.getEnv(Property.DBMS_USERNAME.getRequiredProperty())
+        logger.info { "************ username: [$username]" }
         password = EnvVar.DBMS_PASSWORD.getEnv(Property.DBMS_PASSWORD.getRequiredProperty())
+        logger.info { "************ password: [$password]" }
         maximumPoolSize = Property.DBMS_MAX_POOL_SIZE.getRequiredProperty().toInt()
 
         //isAutoCommit = false
