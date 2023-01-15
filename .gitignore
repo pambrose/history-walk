@@ -6,3 +6,5 @@ out/
 *.iws
 *.idea
 kotlin-js-store
+
+logs/
