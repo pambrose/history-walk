@@ -1,11 +1,12 @@
 package com.github.pambrose
 
 import com.github.pambrose.ClientUtils.withAuth
+import io.kvision.remote.getService
 
 object Rpc {
 
-  private val registerUserService = RegisterUserService()
-  private val contentService = ContentService()
+  private val registerUserService = getService<IRegisterUserService>()
+  private val contentService = getService<IContentService>()
 
   suspend fun registerUser(registerData: RegisterData) =
     try {
