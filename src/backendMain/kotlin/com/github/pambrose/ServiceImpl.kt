@@ -13,6 +13,7 @@ import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 
+@Suppress("ACTUAL_WITHOUT_EXPECT")
 actual class RegisterUserService : IRegisterUserService {
 
   override suspend fun registerUser(registerData: RegisterData): Boolean {
@@ -28,6 +29,7 @@ actual class RegisterUserService : IRegisterUserService {
   companion object : KLogging()
 }
 
+@Suppress("ACTUAL_WITHOUT_EXPECT")
 actual class ContentService : IContentService {
   @Inject
   lateinit var call: ApplicationCall

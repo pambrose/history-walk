@@ -128,7 +128,7 @@ kotlin {
 
     val backendMain by getting {
       dependencies {
-        implementation(kotlin("stdlib-jdk8"))
+       // implementation(kotlin("stdlib-jdk8"))
         implementation(kotlin("reflect"))
 
         implementation("io.ktor:ktor-server-core:$ktorVersion")
@@ -143,6 +143,8 @@ kotlin {
         implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
 
         implementation("com.github.pambrose.common-utils:ktor-server-utils:$utilsVersion")
+        implementation("com.github.pambrose.common-utils:exposed-utils:$utilsVersion")
+
         implementation("com.github.pambrose:history-walk-slides:$slidesVersion")
 
         //implementation("dev.hayden:khealth:$khealthVersion")
@@ -153,7 +155,6 @@ kotlin {
         implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
         implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
         implementation("org.jetbrains.exposed:exposed-kotlin-datetime:$exposedVersion")
-        implementation("com.github.pambrose.common-utils:exposed-utils:$utilsVersion")
 
         //implementation("commons-codec:commons-codec:$commonsCodecVersion")
         //implementation("com.axiomalaska:jdbc-named-parameters:$jdbcNamedParametersVersion")
