@@ -81,7 +81,7 @@ class LoginPanel : Dialog<Credentials>(closeButton = false, escape = false, anim
       Button(tr("Cancel"), "fas fa-times", ButtonStyle.SECONDARY).apply {
         lowercase()
         onClick {
-          this@LoginPanel.hideRegisterForm()
+          this@LoginPanel.showLoginForm()
         }
       }
 
@@ -110,23 +110,27 @@ class LoginPanel : Dialog<Credentials>(closeButton = false, escape = false, anim
     addButton(loginButton)
     addButton(cancelButton)
     addButton(registerButton)
-    hideRegisterForm()
+    showLoginForm()
   }
 
   private fun showRegisterForm() {
     loginPanel.hide()
-    registerPanel.show()
-    registerPanel.focus()
-    registerPanel.clearData()
+    registerPanel.apply {
+      show()
+      focus()
+      clearData()
+    }
     loginButton.hide()
     userButton.hide()
     cancelButton.show()
     registerButton.show()
   }
 
-  private fun hideRegisterForm() {
-    loginPanel.show()
-    loginPanel.focus()
+  private fun showLoginForm() {
+    loginPanel.apply {
+      show()
+      focus()
+    }
     registerPanel.hide()
     loginButton.show()
     userButton.show()
@@ -147,7 +151,7 @@ class LoginPanel : Dialog<Credentials>(closeButton = false, escape = false, anim
       AppScope.launch {
         if (Rpc.registerUser(registerData))
           Alert.show(text = tr("User registered. You can now log in.")) {
-            hideRegisterForm()
+            showLoginForm()
           }
         else
           Alert.show(text = tr("Unsuccessful registration. Please try again."))

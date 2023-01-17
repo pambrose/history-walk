@@ -27,7 +27,6 @@ import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
 import io.ktor.server.util.*
 import io.kvision.remote.applyRoutes
-import io.kvision.remote.getAllServiceManagers
 import mu.KLogging
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.io.ByteArrayOutputStream
@@ -37,8 +36,8 @@ import kotlin.text.Charsets.UTF_8
 object Routes : KLogging() {
 
   fun Route.assignRoutes() {
-    //applyRoutes(RegisterUserServiceManager)
-    getAllServiceManagers().forEach { applyRoutes(it) }
+    applyRoutes(RegisterUserServiceManager)
+    //getAllServiceManagers().forEach { applyRoutes(it) }
 
     authenticate {
       applyRoutes(ContentServiceManager)
