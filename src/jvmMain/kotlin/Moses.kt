@@ -352,17 +352,17 @@ val mosesSlides =
   slideDeck {
     val errorSlide =
       slide(
-        99,
-        "Incorrect Decision",
-        errorText,
+        id = 99,
+        title = "Incorrect Decision",
+        content = errorText,
         displayTitle = false,
       ) {}
 
     val slideSuccess =
       slide(
-        30,
-        "Success!",
-        successText,
+        id = 30,
+        title = "Success!",
+        content = successText,
         success = true,
       )
 
@@ -417,32 +417,32 @@ val mosesSlides =
           slide = errorSlide.copyOf("Incorrect2"),
         )
         choice(
-          "Try to blur the ink by getting it wet",
-          slide28,
+          text = "Try to blur the ink by getting it wet",
+          slide = slide28,
         )
         choice(
-          "Try to obscure the writing by rubbing dirt over it",
-          errorSlide.copyOf("Incorrect3"),
+          text = "Try to obscure the writing by rubbing dirt over it",
+          slide = errorSlide.copyOf("Incorrect3"),
         )
       }
 
     val slide26 =
       slide(
-        26,
-        "26th Decison",
-        decision26Text,
+        id = 26,
+        title = "26th Decison",
+        content = decision26Text,
       ) {
         choice(
-          "Ask the child to write you a pass saying you are free to travel to Savannah",
-          slide27,
+          text = "Ask the child to write you a pass saying you are free to travel to Savannah",
+          slide = slide27,
         )
         choice(
-          "Keep travelling and hope you won’t need documents to avoid arrest",
-          errorSlide.copyOf("Incorrect1"),
+          text = "Keep travelling and hope you won’t need documents to avoid arrest",
+          slide = errorSlide.copyOf("Incorrect1"),
         )
         choice(
-          "Ask the child to write a document stating you are a free African American",
-          errorSlide.copyOf("Incorrect2"),
+          text = "Ask the child to write a document stating you are a free African American",
+          slide = errorSlide.copyOf("Incorrect2"),
         )
       }
 
@@ -571,56 +571,56 @@ val mosesSlides =
         content = decision19Text,
       ) {
         choice(
-          "Try and find your friend on the nearby plantation",
-          slide20,
+          text = "Try and find your friend on the nearby plantation",
+          slide = slide20,
         )
         choice(
-          "Continue to travel through the woods",
-          errorSlide.copyOf("Incorrect1"),
+          text = "Continue to travel through the woods",
+          slide = errorSlide.copyOf("Incorrect1"),
         )
         choice(
-          "Travel along the road, at night",
-          errorSlide.copyOf("Incorrect2"),
+          text = "Travel along the road, at night",
+          slide = errorSlide.copyOf("Incorrect2"),
         )
       }
 
     val slide18 =
       slide(
-        18,
-        "18th Decison",
-        decision18Text,
+        id = 18,
+        title = "18th Decison",
+        content = decision18Text,
       ) {
         choice(
-          "Hide under some blankets",
-          slide19,
+          text = "Hide under some blankets",
+          slide = slide19,
         )
         choice(
-          "Run outside.",
-          errorSlide.copyOf("Incorrect1"),
+          text = "Run outside.",
+          slide = errorSlide.copyOf("Incorrect1"),
         )
         choice(
-          "Act as if you belong there",
-          errorSlide.copyOf("Incorrect2"),
+          text = "Act as if you belong there",
+          slide = errorSlide.copyOf("Incorrect2"),
         )
       }
 
     val slide17 =
       slide(
-        17,
-        "17th Decison",
-        decision17Text,
+        id = 17,
+        title = "17th Decison",
+        content = decision17Text,
       ) {
         choice(
-          "Return with him to the plantation where he is enslaved",
-          slide18,
+          text = "Return with him to the plantation where he is enslaved",
+          slide = slide18,
         )
         choice(
-          "Politely decline and continue on",
-          errorSlide.copyOf("Incorrect1"),
+          text = "Politely decline and continue on",
+          slide = errorSlide.copyOf("Incorrect1"),
         )
         choice(
-          "Deceive him and tell him you are on an errand for your master",
-          errorSlide.copyOf("Incorrect2"),
+          text = "Deceive him and tell him you are on an errand for your master",
+          slide = errorSlide.copyOf("Incorrect2"),
         )
       }
 
@@ -631,8 +631,7 @@ val mosesSlides =
         content = decision16Text,
       ) {
         choice(
-          text = "Swim across the river",
-          slide = errorSlide.copyOf("Incorrect1"),
+          "Swim across the river", errorSlide.copyOf("Incorrect1"),
         )
         choice(
           text = "Look for a crossing upstream, where the river looks narrower, but faster",
@@ -671,196 +670,196 @@ val mosesSlides =
         content = decision14Text,
       ) {
         choice(
-          "It seems desperate given your situation, but you convince the woman whom you are chained to, to sneak off",
-          slide15,
+          text = "It seems desperate given your situation, but you convince the woman whom you are chained to, to sneak off",
+          slide = slide15,
         )
         choice(
-          "There is no way you can escape right now, you wait for a better opportunity",
-          errorSlide.copyOf("Incorrect1"),
+          text = "There is no way you can escape right now, you wait for a better opportunity",
+          slide = errorSlide.copyOf("Incorrect1"),
         )
         choice(
-          "There is no way you can escape right now, you wait for a better opportunity",
-          errorSlide.copyOf("Incorrect2"),
+          text = "There is no way you can escape right now, you wait for a better opportunity",
+          slide = errorSlide.copyOf("Incorrect2"),
         )
       }
 
     val slide13 =
       slide(
-        13,
-        "13th Decison",
-        decision13Text,
+        id = 13,
+        title = "13th Decison",
+        content = decision13Text,
       ) {
         choice(
-          "Keep running atop your horse",
-          errorSlide.copyOf("Incorrect1"),
+          text = "Keep running atop your horse",
+          slide = errorSlide.copyOf("Incorrect1"),
         )
         choice(
-          "Head the warning and stop",
-          slide14,
+          text = "Head the warning and stop",
+          slide = slide14,
         )
         choice(
-          "Dismount the horse and take off on foot into the woods",
-          errorSlide.copyOf("Incorrect2"),
+          text = "Dismount the horse and take off on foot into the woods",
+          slide = errorSlide.copyOf("Incorrect2"),
         )
       }
 
     val slide12 =
       slide(
-        12,
-        "12th Decison",
-        decision12Text,
+        id = 12,
+        title = "12th Decison",
+        content = decision12Text,
       ) {
         choice(
-          "Quietly dismount and attempt to sneak out of town on foot",
-          errorSlide.copyOf("Incorrect1"),
+          text = "Quietly dismount and attempt to sneak out of town on foot",
+          slide = errorSlide.copyOf("Incorrect1"),
         )
         choice(
-          "Start slowly walking away on top of your horse",
-          errorSlide.copyOf("Incorrect2"),
+          text = "Start slowly walking away on top of your horse",
+          slide = errorSlide.copyOf("Incorrect2"),
         )
         choice(
-          "Wait until later to escape",
-          errorSlide.copyOf("Incorrect3"),
+          text = "Wait until later to escape",
+          slide = errorSlide.copyOf("Incorrect3"),
         )
         choice(
-          "Grab a stick and whip your horse to make a speedy getaway",
-          slide13,
+          text = "Grab a stick and whip your horse to make a speedy getaway",
+          slide = slide13,
         )
       }
 
     val slide11 =
       slide(
-        11,
-        "11th Decison",
-        decision11Text,
+        id = 11,
+        title = "11th Decison",
+        content = decision11Text,
       ) {
         choice(
-          "At night, when the guards are asleep, you try and use the object to file through your chains",
-          errorSlide.copyOf("Incorrect1"),
+          text = "At night, when the guards are asleep, you try and use the object to file through your chains",
+          slide = errorSlide.copyOf("Incorrect1"),
         )
         choice(
-          "You wait until you are left alone to file through your chains",
-          slide12,
+          text = "You wait until you are left alone to file through your chains",
+          slide = slide12,
         )
         choice(
-          "You wait for an opportunity to stab on of your captors with it",
-          errorSlide.copyOf("Incorrect2"),
+          text = "You wait for an opportunity to stab on of your captors with it",
+          slide = errorSlide.copyOf("Incorrect2"),
         )
         choice(
-          "You stab a horse with the object, hoping to cause commotion and sneak away",
-          errorSlide.copyOf("Incorrect3"),
+          text = "You stab a horse with the object, hoping to cause commotion and sneak away",
+          slide = errorSlide.copyOf("Incorrect3"),
         )
       }
 
     val slide10 =
       slide(
-        10,
-        "10th Decison",
-        decision10Text,
+        id = 10,
+        title = "10th Decison",
+        content = decision10Text,
       ) {
         choice(
-          "Don’t take it",
-          errorSlide.copyOf("Incorrect1"),
+          text = "Don’t take it",
+          slide = errorSlide.copyOf("Incorrect1"),
         )
         choice(
-          "Subtly take it",
-          slide11,
+          text = "Subtly take it",
+          slide = slide11,
         )
         choice(
-          "Examine the object before taking it",
-          errorSlide.copyOf("Incorrect2"),
+          text = "Examine the object before taking it",
+          slide = errorSlide.copyOf("Incorrect2"),
         )
       }
 
     val slide9 =
       slide(
-        9,
-        "9th Decison",
-        decision9Text,
+        id = 9,
+        title = "9th Decison",
+        content = decision9Text,
       ) {
         choice(
-          "You ask the girl if she knows your mother",
-          errorSlide.copyOf("Incorrect1"),
+          text = "You ask the girl if she knows your mother",
+          slide = errorSlide.copyOf("Incorrect1"),
         )
         choice(
-          "Having second thoughts, you ignore her and keep travelling",
-          slide10,
+          text = "Having second thoughts, you ignore her and keep travelling",
+          slide = slide10,
         )
       }
 
     val slide8 =
       slide(
-        8,
-        "8th Decison",
-        decision8Text,
+        id = 8,
+        title = "8th Decison",
+        content = decision8Text,
       ) {
         choice(
-          "You sneak away to see your mother",
-          slide9,
+          text = "You sneak away to see your mother",
+          slide = slide9,
         )
         choice(
-          "You stay with the wagon train",
-          errorSlide.copyOf("Incorrect1"),
+          text = "You stay with the wagon train",
+          slide = errorSlide.copyOf("Incorrect1"),
         )
       }
 
     val slide7 =
       slide(
-        7,
-        "7th Decison",
-        decision7Text,
+        id = 7,
+        title = "7th Decison",
+        content = decision7Text,
       ) {
         choice(
-          "You run into the woods, trying to hide from the passers by",
-          errorSlide.copyOf("Incorrect1"),
+          text = "You run into the woods, trying to hide from the passers by",
+          slide = errorSlide.copyOf("Incorrect1"),
         )
         choice(
-          "You approach the group and tell them you are on an errand for your master",
-          slide8,
+          text = "You approach the group and tell them you are on an errand for your master",
+          slide = slide8,
         )
         choice(
-          "You approach the group and tell them you are a free African American travelling home after visiting family",
-          errorSlide.copyOf("Incorrect2"),
+          text = "You approach the group and tell them you are a free African American travelling home after visiting family",
+          slide = errorSlide.copyOf("Incorrect2"),
         )
       }
 
     val slide6 =
       slide(
-        6,
-        "6th Decison",
-        decision6Text,
+        id = 6,
+        title = "6th Decison",
+        content = decision6Text,
       ) {
         choice(
-          "Tell this stranger you have run away",
-          errorSlide.copyOf("Incorrect1"),
+          text = "Tell this stranger you have run away",
+          slide = errorSlide.copyOf("Incorrect1"),
         )
         choice(
-          "Tell the gentleman you are a free African American",
-          slide7,
+          text = "Tell the gentleman you are a free African American",
+          slide = slide7,
         )
         choice(
-          "Tell him you are lost and ask for directions to nearest town",
-          errorSlide.copyOf("Incorrect2"),
+          text = "Tell him you are lost and ask for directions to nearest town",
+          slide = errorSlide.copyOf("Incorrect2"),
         )
       }
 
     val slide5 =
       slide(
-        5,
-        "5th Decison",
-        decision5Text,
+        id = 5,
+        title = "5th Decison",
+        content = decision5Text,
       ) {
         choice(
-          "Bypass the farm and continue on your way",
-          errorSlide.copyOf("Incorrect1"),
+          text = "Bypass the farm and continue on your way",
+          slide = errorSlide.copyOf("Incorrect1"),
         )
         choice(
-          "Knock on the door and ask for assistance",
-          errorSlide.copyOf("Incorrect2"),
+          text = "Knock on the door and ask for assistance",
+          slide = errorSlide.copyOf("Incorrect2"),
         )
         choice(
-          "Sneak into the barn and look for food",
-          slide6,
+          text = "Sneak into the barn and look for food",
+          slide = slide6,
         )
       }
 
@@ -910,21 +909,21 @@ val mosesSlides =
 
     val slide2 =
       slide(
-        2,
-        "2nd Decision",
-        decision2Text,
+        id = 2,
+        title = "2nd Decision",
+        content = decision2Text,
       ) {
         choice(
-          "Try and survive in the woods hoping to avoid contact with people who might wish you harm",
-          errorSlide.copyOf("Incorrect1"),
+          text = "Try and survive in the woods hoping to avoid contact with people who might wish you harm",
+          slide = errorSlide.copyOf("Incorrect1"),
         )
         choice(
-          "Travel by night, staying close to the roads and using them as navigation",
-          slide3,
+          text = "Travel by night, staying close to the roads and using them as navigation",
+          slide = slide3,
         )
         choice(
-          "Look for someone traveling by road and ask them for assistance",
-          errorSlide.copyOf("Incorrect2"),
+          text = "Look for someone traveling by road and ask them for assistance",
+          slide = errorSlide.copyOf("Incorrect2"),
         )
       }
 
