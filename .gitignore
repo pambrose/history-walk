@@ -4,6 +4,7 @@ out/
 *.imp
 *.ipr
 *.iws
+*.iml
 *.idea
 kotlin-js-store
 

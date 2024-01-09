@@ -1,16 +1,22 @@
 default: versioncheck
 
 server:
-	./gradlew backendRun
+	./gradlew jvmRun -t
 
 client:
-	./gradlew frontendRun
+	./gradlew jsRun -t
 
 clean:
 	./gradlew clean
 
+build:
+	./gradlew build -xtest
+
 jar: clean
 	./gradlew jar
+
+yarn-unlock:
+	./gradlew kotlinUpgradeYarnLock
 
 versioncheck:
 	./gradlew dependencyUpdates
@@ -39,4 +45,4 @@ log:
 	heroku logs --tail
 
 upgrade-wrapper:
-	./gradlew wrapper --gradle-version=8.0-rc-1 --distribution-type=bin
+	./gradlew wrapper --gradle-version=8.5 --distribution-type=bin

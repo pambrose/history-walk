@@ -24,8 +24,8 @@ There are 3 repos involved in this project:
 
 ### Running
 
-* frontendRun - Starts a webpack dev server on port 3000
-* backendRun - Starts a dev server on port 8080
+* jsRun - Starts a webpack dev server on port 3000
+* jvmRun - Starts a dev server on port 8080
 
 ### Packaging
 
@@ -43,6 +43,6 @@ There are 3 repos involved in this project:
 
 ### Debug Deployment
 
-* SLIDES_LOCAL_FILENAME=src/backendMain/kotlin/Slides.kt
+* SLIDES_LOCAL_FILENAME=src/jvmMain/kotlin/Slides.kt
 * SHOW_RESET_BUTTON=true
 * ALLOW_SLIDE_ACCESS=true
