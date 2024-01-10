@@ -6,22 +6,22 @@
         </encoder>
     </appender>
 
-    <appender name="FILE-ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>logs/ktor.log</file>
-        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>logs/archived/ktor.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
-            <!-- each archived file, size max 10MB -->
-            <maxFileSize>10MB</maxFileSize>
-            <!-- total size of all archive files, if total size > 20GB, it will delete old archived file -->
-            <totalSizeCap>20GB</totalSizeCap>
-            <!-- 60 days to keep -->
-            <maxHistory>60</maxHistory>
-        </rollingPolicy>
+  <!--    <appender name="FILE-ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">-->
+  <!--        <file>logs/ktor.log</file>-->
+  <!--        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">-->
+  <!--            <fileNamePattern>logs/archived/ktor.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>-->
+  <!--            &lt;!&ndash; each archived file, size max 10MB &ndash;&gt;-->
+  <!--            <maxFileSize>10MB</maxFileSize>-->
+  <!--            &lt;!&ndash; total size of all archive files, if total size > 20GB, it will delete old archived file &ndash;&gt;-->
+  <!--            <totalSizeCap>20GB</totalSizeCap>-->
+  <!--            &lt;!&ndash; 60 days to keep &ndash;&gt;-->
+  <!--            <maxHistory>60</maxHistory>-->
+  <!--        </rollingPolicy>-->
 
-        <encoder>
-            <pattern>[%d{ISO8601}]-[%thread] %-5level %logger - %msg%n</pattern>
-        </encoder>
-    </appender>
+  <!--        <encoder>-->
+  <!--            <pattern>[%d{ISO8601}]-[%thread] %-5level %logger - %msg%n</pattern>-->
+  <!--        </encoder>-->
+  <!--    </appender>-->
 
     <root level="INFO">
         <appender-ref ref="FILE-ROLLING"/>
