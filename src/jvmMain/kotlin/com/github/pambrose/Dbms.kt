@@ -30,7 +30,7 @@ object Dbms : KLogging() {
           val dbName = herokuDbmsUrl.substringAfterLast("/")
           val host = herokuDbmsUrl.substringAfter("@").substringBefore(":")
           val port = herokuDbmsUrl.substringAfterLast(":").substringBefore("/")
-          jdbcUrl = "jdbc:postgresql://$host:$port/$dbName"  // ?sslmode=require
+          jdbcUrl = "jdbc:pgsql://$host:$port/$dbName"  // ?sslmode=require
           username = herokuDbmsUrl.substringAfter("://").substringBefore(":")
           password = herokuDbmsUrl.substringAfter("://$username:").substringBefore("@")
         } else {
