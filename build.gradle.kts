@@ -307,7 +307,7 @@ kotlin {
 // This is for flyway
 buildscript {
   dependencies {
-    classpath("org.postgresql:postgresql:42.5.1")
+      classpath("org.postgresql:postgresql:42.7.1")
   }
 }
 
