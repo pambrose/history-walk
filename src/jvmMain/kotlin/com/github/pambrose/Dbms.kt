@@ -12,7 +12,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import kotlin.time.Duration.Companion.minutes
 
 object Dbms : KLogging() {
-  fun init(config: ApplicationConfig) {
+  fun dbmsInit(config: ApplicationConfig) {
     Database.connect(hikari(config))
   }
 

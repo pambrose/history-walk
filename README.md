@@ -32,9 +32,9 @@ There are 3 repos involved in this project:
 
 ### Packaging
 
-* frontendBrowserWebpack - Bundles the compiled js files into `build/dist`
-* frontendJar - Packages a standalone "web" frontend jar with all required files into `build/libs/*.jar`
-* backendJar - Packages a backend jar with compiled source files into `build/libs/*.jar`
+* jsBrowserWebpack - Bundles the compiled js files into `build/dist`
+* jsJar - Packages a standalone "web" frontend jar with all required files into `build/libs/*.jar`
+* jvmJar - Packages a backend jar with compiled source files into `build/libs/*.jar`
 * jar - Packages a "fat" jar with all backend sources and dependencies while also embedding frontend resources
   into `build/libs/*.jar`
 
