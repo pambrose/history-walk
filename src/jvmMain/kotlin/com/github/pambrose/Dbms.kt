@@ -23,6 +23,16 @@ object Dbms : KLogging() {
         if (herokuDbmsUrl.isNotEmpty()) {
           logger.info { "Using Heroku database url: $herokuDbmsUrl" }
           jdbcUrl = "jdbc:" + herokuDbmsUrl
+
+
+          //val dbUrl = System.getenv("DATABASE_URL") ?: url
+
+          val dbName = herokuDbmsUrl.substringAfterLast("/")
+          val host = herokuDbmsUrl.substringAfter("@").substringBefore(":")
+          val port = herokuDbmsUrl.substringAfterLast(":").substringBefore("/")
+          jdbcUrl = "jdbc:postgresql://$host:$port/$dbName?sslmode=require"
+          username = herokuDbmsUrl.substringAfter("://").substringBefore(":")
+          password = herokuDbmsUrl.substringAfter("://$username:").substringBefore("@")
         } else {
           jdbcUrl = EnvVar.DBMS_URL.getEnv(Property.DBMS_URL.getRequiredProperty())
           username = EnvVar.DBMS_USERNAME.getEnv(Property.DBMS_USERNAME.getRequiredProperty())
