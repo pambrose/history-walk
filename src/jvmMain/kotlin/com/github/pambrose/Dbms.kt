@@ -29,7 +29,7 @@ object Dbms : KLogging() {
           val host = herokuDbmsUrl.substringAfter("@").substringBefore(":")
           val port = herokuDbmsUrl.substringAfterLast(":").substringBefore("/")
 
-          jdbcUrl = "jdbc:pgsql://$host:$port/$dbName"  // ?sslmode=require
+          jdbcUrl = "jdbc:pgsql://$host:$port/$dbName?sslmode=require"
           logger.info { "Actual database url: $jdbcUrl" }
         } else {
           username = EnvVar.DBMS_USERNAME.getEnv(Property.DBMS_USERNAME.getRequiredProperty())
