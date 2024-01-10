@@ -7,6 +7,11 @@ import com.github.pambrose.EndPoints.LOGOUT
 import com.github.pambrose.MainPanel.buttonPadding
 import com.github.pambrose.MainPanel.refresh
 import com.github.pambrose.MainPanel.userInfo
+import com.github.pambrose.Rpc.getCurrentSlide
+import com.github.pambrose.Rpc.getUserInfo
+import com.github.pambrose.Rpc.goBackInTime
+import com.github.pambrose.Rpc.makeChoice
+import com.github.pambrose.Rpc.provideReason
 import io.kvision.core.AlignItems
 import io.kvision.core.Background
 import io.kvision.core.Border
@@ -46,7 +51,7 @@ object MainPanel : SimplePanel() {
     add(panel)
 
     AppScope.launch {
-      userInfo.value = Rpc.getUserInfo()
+      userInfo.value = getUserInfo()
     }
   }
 
@@ -95,7 +100,7 @@ private fun Container.displaySlide(slide: SlideData) {
             paddingBottom = 5.px
             onClick {
               AppScope.launch {
-                Rpc.goBackInTime(parentTitle).also { refresh(it) }
+                goBackInTime(parentTitle).also { refresh(it) }
               }
             }
           }
@@ -137,7 +142,7 @@ private fun Container.displaySlide(slide: SlideData) {
           lowercase()
           onClick {
             AppScope.launch {
-              Rpc.goBackInTime(ParentTitle("/", "/")).also { refresh(it) }
+              goBackInTime(ParentTitle("/", "/")).also { refresh(it) }
             }
           }
         }
@@ -167,13 +172,13 @@ private fun Container.addChoiceButtons(slide: SlideData) {
             if (choice.offset != 0) {
               val pos = slide.parentTitles.size - abs(slide.offset) - 1
               val parentTitle = slide.parentTitles[pos]
-              Rpc.goBackInTime(parentTitle).also { refresh(it) }
+              goBackInTime(parentTitle).also { refresh(it) }
             } else {
-              val choiceReason = Rpc.makeChoice(slide.pathName, slide.title, choice, slide.choices.size == 1)
+              val choiceReason = makeChoice(slide.pathName, slide.title, choice, slide.choices.size == 1)
               if (choiceReason.reason.isEmpty()) {
                 promptUserForReason(slide.pathName, slide.title, choice)
               } else {
-                val newSlide = Rpc.getCurrentSlide()
+                val newSlide = getCurrentSlide()
                 refresh(newSlide)
               }
             }
@@ -233,7 +238,7 @@ private fun promptUserForReason(
   AppScope.launch {
     reasonDialog.getResult()?.also { response ->
       if (response.isNotBlank()) {
-        val newSlide = Rpc.provideReason(fromPathName, fromTitle, slideChoice, response)
+        val newSlide = provideReason(fromPathName, fromTitle, slideChoice, response)
         refresh(newSlide)
       }
     }

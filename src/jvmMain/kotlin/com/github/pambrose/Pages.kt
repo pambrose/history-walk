@@ -28,7 +28,7 @@ object Pages {
 
                 p {
                   b {
-                    +"User:"
+                    +"User: "
                   }
                   +email
                 }

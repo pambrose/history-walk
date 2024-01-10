@@ -38,7 +38,7 @@ There are 3 repos involved in this project:
 * jar - Packages a "fat" jar with all backend sources and dependencies while also embedding frontend resources
   into `build/libs/*.jar`
 
-### Heroku Deployment
+## Heroku Deployment
 
 * Add a Procfile
 * Add config var `GRADLE_TASK = -Pprod=true jar`
@@ -54,3 +54,11 @@ heroku pg:credentials:url DATABASE
 * SLIDES_LOCAL_FILENAME=src/jvmMain/kotlin/Slides.kt
 * SHOW_RESET_BUTTON=true
 * ALLOW_SLIDE_ACCESS=true
+
+There are two endpoints for see the student progress:
+
+* /summary
+* /reasons
+
+An overview of the slides for debugging/reviewing is at /slides
+(requires ALLOW_SLIDE_ACCESS=true)

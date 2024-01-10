@@ -1,6 +1,7 @@
 package com.github.pambrose
 
 import com.github.pambrose.MainPanel.refresh
+import com.github.pambrose.Rpc.getCurrentSlide
 import io.kvision.*
 import io.kvision.core.Display
 import io.kvision.panel.root
@@ -23,7 +24,7 @@ class App : Application() {
     }
 
     AppScope.launch {
-      val newSlide = Rpc.getCurrentSlide()
+      val newSlide = getCurrentSlide()
       refresh(newSlide)
     }
   }
