@@ -8,9 +8,18 @@ There are 3 repos involved in this project:
 * [history-walk-slides](https://github.com/pambrose/history-walk-slides)
 * [history-walk-content](https://github.com/pambrose/history-walk-content)
 
+In order to build on Heroku, this is required:
+
+```bash
+ heroku config:set GRADLE_TASK="build"
+```
+
 ## Env Vars
 
+### Local only
 * SLIDES_LOCAL_FILENAME - The name of the local file to be used for the slides.
+
+### Heroku
 * SLIDES_REPO_TYPE
 * SLIDES_REPO_OWNER
 * SLIDES_REPO_NAME

@@ -631,7 +631,8 @@ val mosesSlides =
         content = decision16Text,
       ) {
         choice(
-          "Swim across the river", errorSlide.copyOf("Incorrect1"),
+          text = "Swim across the river",
+          slide = errorSlide.copyOf("Incorrect1"),
         )
         choice(
           text = "Look for a crossing upstream, where the river looks narrower, but faster",
@@ -670,7 +671,8 @@ val mosesSlides =
         content = decision14Text,
       ) {
         choice(
-          text = "It seems desperate given your situation, but you convince the woman whom you are chained to, to sneak off",
+          text = "It seems desperate given your situation, but you convince the woman whom you are chained to, " +
+            "to sneak off",
           slide = slide15,
         )
         choice(
@@ -818,7 +820,8 @@ val mosesSlides =
           slide = slide8,
         )
         choice(
-          text = "You approach the group and tell them you are a free African American travelling home after visiting family",
+          text = "You approach the group and tell them you are a free African American travelling " +
+            "home after visiting family",
           slide = errorSlide.copyOf("Incorrect2"),
         )
       }
