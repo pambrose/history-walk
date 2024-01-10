@@ -38,6 +38,9 @@ dbreset: dbclean dbmigrate
 dbvalidate:
 	./gradlew flywayValidate
 
+creds:
+	heroku pg:credentials:url DATABASE
+
 restart:
 	heroku ps:restart
 
