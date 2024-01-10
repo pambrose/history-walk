@@ -22,7 +22,7 @@ object Dbms : KLogging() {
         val herokuDbmsUrl = System.getenv("DATABASE_URL").orEmpty()
         if (herokuDbmsUrl.isNotEmpty()) {
           logger.info { "Using Heroku database url: $herokuDbmsUrl" }
-          jdbcUrl = herokuDbmsUrl
+          jdbcUrl = "jdbc:" + herokuDbmsUrl
         } else {
           jdbcUrl = EnvVar.DBMS_URL.getEnv(Property.DBMS_URL.getRequiredProperty())
           username = EnvVar.DBMS_USERNAME.getEnv(Property.DBMS_USERNAME.getRequiredProperty())
