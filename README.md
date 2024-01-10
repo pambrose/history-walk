@@ -8,12 +8,6 @@ There are 3 repos involved in this project:
 * [history-walk-slides](https://github.com/pambrose/history-walk-slides)
 * [history-walk-content](https://github.com/pambrose/history-walk-content)
 
-In order to build on Heroku, this is required:
-
-```bash
-heroku config:set GRADLE_TASK="build"
-```
-
 ## Env Vars
 
 ### Local only
@@ -49,6 +43,12 @@ heroku config:set GRADLE_TASK="build"
 * Add a Procfile
 * Add config var `GRADLE_TASK = -Pprod=true jar`
 * Add buildpack `heroku/gradle`
+* In order to build on Heroku, this is required:
+
+```bash
+heroku config:set GRADLE_TASK="build"
+heroku config:set GRADLE_TASK="-Pprod=true jar"
+```
 
 ### Debug Deployment
 
