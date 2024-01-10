@@ -1,4 +1,3 @@
-//@file:Suppress("JAVA_MODULE_DOES_NOT_EXPORT_PACKAGE")
 import com.github.pambrose.slides.SlideDeck.Companion.slideDeck
 
 val titlePage = """
