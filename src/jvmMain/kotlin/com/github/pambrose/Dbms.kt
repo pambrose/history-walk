@@ -19,10 +19,17 @@ object Dbms : KLogging() {
   private fun hikari(config: ApplicationConfig) =
     HikariConfig()
       .apply {
+        val herokuDbmsUrl = System.getenv("DATABASE_URL").orEmpty()
+        if (herokuDbmsUrl.isNotEmpty()) {
+          logger.info { "Using Heroku database url: $herokuDbmsUrl" }
+          jdbcUrl = herokuDbmsUrl
+        } else {
+          jdbcUrl = EnvVar.DBMS_URL.getEnv(Property.DBMS_URL.getRequiredProperty())
+          username = EnvVar.DBMS_USERNAME.getEnv(Property.DBMS_USERNAME.getRequiredProperty())
+          password = EnvVar.DBMS_PASSWORD.getEnv(Property.DBMS_PASSWORD.getRequiredProperty())
+        }
+
         driverClassName = EnvVar.DBMS_DRIVER_CLASSNAME.getEnv(Property.DBMS_DRIVER_CLASSNAME.getRequiredProperty())
-        jdbcUrl = EnvVar.DBMS_URL.getEnv(Property.DBMS_URL.getRequiredProperty())
-        username = EnvVar.DBMS_USERNAME.getEnv(Property.DBMS_USERNAME.getRequiredProperty())
-        password = EnvVar.DBMS_PASSWORD.getEnv(Property.DBMS_PASSWORD.getRequiredProperty())
         maximumPoolSize = Property.DBMS_MAX_POOL_SIZE.getRequiredProperty().toInt()
 
         // isAutoCommit = false

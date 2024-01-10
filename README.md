@@ -11,7 +11,7 @@ There are 3 repos involved in this project:
 In order to build on Heroku, this is required:
 
 ```bash
- heroku config:set GRADLE_TASK="build"
+heroku config:set GRADLE_TASK="build"
 ```
 
 ## Env Vars
