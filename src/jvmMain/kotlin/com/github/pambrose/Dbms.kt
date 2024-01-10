@@ -21,7 +21,7 @@ object Dbms : KLogging() {
       .apply {
         val herokuDbmsUrl = System.getenv("DATABASE_URL").orEmpty()
         if (herokuDbmsUrl.isNotEmpty()) {
-          logger.info { "Using Heroku database url: $herokuDbmsUrl" }
+          logger.info { "Heroku database url: $herokuDbmsUrl" }
 
           username = herokuDbmsUrl.substringAfter("://").substringBefore(":")
           password = herokuDbmsUrl.substringAfter("://$username:").substringBefore("@")

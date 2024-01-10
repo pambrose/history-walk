@@ -43,11 +43,10 @@ There are 3 repos involved in this project:
 * Add a Procfile
 * Add config var `GRADLE_TASK = -Pprod=true jar`
 * Add buildpack `heroku/gradle`
-* In order to build on Heroku, this is required:
 
+To determine the database URL:
 ```bash
-heroku config:set GRADLE_TASK="build"
-heroku config:set GRADLE_TASK="-Pprod=true jar"
+heroku pg:credentials:url DATABASE
 ```
 
 ### Debug Deployment
