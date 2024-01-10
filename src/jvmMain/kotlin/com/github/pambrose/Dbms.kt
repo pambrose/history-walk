@@ -22,21 +22,19 @@ object Dbms : KLogging() {
         val herokuDbmsUrl = System.getenv("DATABASE_URL").orEmpty()
         if (herokuDbmsUrl.isNotEmpty()) {
           logger.info { "Using Heroku database url: $herokuDbmsUrl" }
-          jdbcUrl = "jdbc:" + herokuDbmsUrl
 
-
-          //val dbUrl = System.getenv("DATABASE_URL") ?: url
-
+          username = herokuDbmsUrl.substringAfter("://").substringBefore(":")
+          password = herokuDbmsUrl.substringAfter("://$username:").substringBefore("@")
           val dbName = herokuDbmsUrl.substringAfterLast("/")
           val host = herokuDbmsUrl.substringAfter("@").substringBefore(":")
           val port = herokuDbmsUrl.substringAfterLast(":").substringBefore("/")
+
           jdbcUrl = "jdbc:pgsql://$host:$port/$dbName"  // ?sslmode=require
-          username = herokuDbmsUrl.substringAfter("://").substringBefore(":")
-          password = herokuDbmsUrl.substringAfter("://$username:").substringBefore("@")
+          logger.info { "Actual database url: $jdbcUrl" }
         } else {
-          jdbcUrl = EnvVar.DBMS_URL.getEnv(Property.DBMS_URL.getRequiredProperty())
           username = EnvVar.DBMS_USERNAME.getEnv(Property.DBMS_USERNAME.getRequiredProperty())
           password = EnvVar.DBMS_PASSWORD.getEnv(Property.DBMS_PASSWORD.getRequiredProperty())
+          jdbcUrl = EnvVar.DBMS_URL.getEnv(Property.DBMS_URL.getRequiredProperty())
         }
 
         driverClassName = EnvVar.DBMS_DRIVER_CLASSNAME.getEnv(Property.DBMS_DRIVER_CLASSNAME.getRequiredProperty())
