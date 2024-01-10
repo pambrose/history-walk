@@ -2,7 +2,6 @@ package com.github.pambrose
 
 import com.github.pambrose.Dbms.dbmsInit
 import com.github.pambrose.EnvVar.*
-import com.github.pambrose.HistoryWalkServer.loadSlides
 import com.github.pambrose.HistoryWalkServer.masterSlides
 import com.github.pambrose.Installs.installs
 import com.github.pambrose.Property.Companion.assignProperties
@@ -17,7 +16,9 @@ import com.github.pambrose.common.util.getBanner
 import com.github.pambrose.slides.SlideDeck
 import io.ktor.server.application.*
 import io.kvision.remote.kvisionInit
+import jermainLonguenSlides
 import kotlinx.coroutines.runBlocking
+import mosesSlides
 import mu.two.KLogging
 import mu.two.KotlinLogging
 import java.io.File
@@ -95,7 +96,13 @@ fun Application.main() {
   installs()
   assignRoutes()
 
-  masterSlides = loadSlides()
+  val slideName = SLIDES_VARIABLE_NAME.getEnv("jermainLonguenSlides")
+  masterSlides =
+    if (slideName == "jermainLonguenSlides")
+      jermainLonguenSlides
+    else
+      mosesSlides
+  // masterSlides = loadSlides()
 
   dbmsInit(environment.config)
 
