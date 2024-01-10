@@ -64,6 +64,9 @@ object HistoryWalkServer : KLogging() {
         val varName = SLIDES_VARIABLE_NAME.getEnv("slides")
         val code = "$src\n\n$varName"
 
+        logger.info { "Code top:\n${code.lines().take(10).joinToString("\n")}" }
+        logger.info { "Code bottom:\n${code.lines().takeLast(10).joinToString("\n")}" }
+
         KotlinScript().use { it.eval(code) as SlideDeck }
       }
     } catch (e: Throwable) {
