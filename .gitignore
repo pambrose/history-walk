@@ -9,3 +9,4 @@ out/
 kotlin-js-store
 
 logs/
+secrets/
