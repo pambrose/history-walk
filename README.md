@@ -5,8 +5,16 @@
 There are 3 repos involved in this project:
 
 * [history-walk](https://github.com/pambrose/history-walk)
-* [history-walk-slides](https://github.com/pambrose/history-walk-slides)
 * [history-walk-content](https://github.com/pambrose/history-walk-content)
+* [history-walk-slides](https://github.com/pambrose/history-walk-slides)
+
+The *history-walk* repo is duplicated in the client in *history-walk* and *history-walk-moses*. Only the *history-walk*
+repo should be updated and the other should just pull from GitHub. They differ in env var values.
+
+The *history-walk-content* repo is used to hold the content for the slides. The content is edited there and then
+copied to the *history-walk* repos.
+
+The *history-walk-slides* repo is used to hold the core slide code. It is a dependancy of the other repos.
 
 ## Env Vars
 
