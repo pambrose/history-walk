@@ -14,18 +14,18 @@ import com.github.pambrose.common.util.OwnerType.User
 import com.github.pambrose.common.util.Version.Companion.versionDesc
 import com.github.pambrose.common.util.getBanner
 import com.github.pambrose.slides.SlideDeck
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.server.application.*
 import io.kvision.remote.kvisionInit
 import jermainLonguenSlides
 import kotlinx.coroutines.runBlocking
 import mosesSlides
-import mu.two.KLogging
-import mu.two.KotlinLogging
 import java.io.File
 import java.util.concurrent.atomic.AtomicReference
 
 // @Version(version = BuildConfig.CORE_VERSION, date = BuildConfig.CORE_RELEASE_DATE)
-object HistoryWalkServer : KLogging() {
+object HistoryWalkServer {
+  private val logger = KotlinLogging.logger {}
   private val masterSlidesRef = AtomicReference(SlideDeck())
 
   var masterSlides: SlideDeck

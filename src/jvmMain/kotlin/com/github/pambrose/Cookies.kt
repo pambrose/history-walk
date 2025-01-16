@@ -1,16 +1,16 @@
 package com.github.pambrose
 
 import com.github.pambrose.Auth.AUTH_COOKIE
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.server.application.*
-import io.ktor.server.auth.*
 import io.ktor.server.sessions.*
-import mu.two.KLogging
 import java.time.Instant
 import java.util.*
-import kotlin.collections.set
 import kotlin.time.Duration.Companion.days
 
-object Cookies : KLogging() {
+object Cookies {
+  private val logger = KotlinLogging.logger {}
+
   fun SessionsConfig.assignCookies() {
     cookie<UserId>(AUTH_COOKIE) {
       cookie.path = "/"
@@ -76,7 +76,9 @@ data class BrowserSession(
 //      }
 //      .firstOrNull() ?: ChallengeHistory(invocation)
 
-//  companion object : KLogging() {
+//  companion object {
+//    private val logger = KotlinLogging.logger {}
+
 //    fun createBrowserSession(id: String) =
 //      BrowserSessionsTable
 //        .insertAndGetId { row ->
@@ -106,7 +108,7 @@ data class BrowserSession(
 //  }
 }
 
-data class UserPrincipal(val uuid: UUID, val created: Long = Instant.now().toEpochMilli()) : Principal
+data class UserPrincipal(val uuid: UUID, val created: Long = Instant.now().toEpochMilli())
 
 val ApplicationCall.userId get() = sessions.get<UserId>() ?: error("Missing UserId")
 // val ApplicationCall.browserSession get() = sessions.get<BrowserSession>()

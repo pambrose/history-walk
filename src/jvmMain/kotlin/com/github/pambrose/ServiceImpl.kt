@@ -6,8 +6,8 @@ import com.github.pambrose.HistoryWalkServer.masterSlides
 import com.github.pambrose.User.Companion.findCurrentSlideForUser
 import com.github.pambrose.Utils.toUuid
 import com.google.inject.Inject
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.server.application.*
-import mu.two.KLogging
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.selectAll
@@ -25,7 +25,9 @@ actual class RegisterUserService : IRegisterUserService {
     return true
   }
 
-  companion object : KLogging()
+  companion object {
+    private val logger = KotlinLogging.logger {}
+  }
 }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
@@ -131,5 +133,7 @@ actual class ContentService : IContentService {
       slideData(uuid, slide)
     }
 
-  companion object : KLogging()
+  companion object {
+    private val logger = KotlinLogging.logger {}
+  }
 }

@@ -9,8 +9,8 @@ import com.github.pambrose.slides.Slide
 import com.github.pambrose.slides.SlideDeck
 import com.github.pambrose.slides.SlideDeck.Companion.ROOT
 import com.pambrose.common.exposed.get
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.http.*
-import mu.two.KLogging
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -91,7 +91,9 @@ class User {
 
   override fun toString() = "User(uuid='$uuid', name='$fullName')"
 
-  companion object : KLogging() {
+  companion object {
+    private val logger = KotlinLogging.logger {}
+
     fun UUID.toUser(): User =
       User(
         this,

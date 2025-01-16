@@ -2,16 +2,18 @@ package com.github.pambrose
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.server.config.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import mu.two.KLogging
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.Transaction
 import org.jetbrains.exposed.sql.transactions.transaction
 import kotlin.time.Duration.Companion.minutes
 
-object Dbms : KLogging() {
+object Dbms {
+  private val logger = KotlinLogging.logger {}
+
   fun dbmsInit(config: ApplicationConfig) {
     Database.connect(hikari(config))
   }

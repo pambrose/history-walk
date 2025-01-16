@@ -6,13 +6,15 @@ import com.github.pambrose.Utils.toUuid
 import com.github.pambrose.Utils.transformText
 import com.github.pambrose.slides.Slide
 import com.pambrose.common.exposed.get
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.datetime.LocalDateTime
-import mu.two.KLogging
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 
-object DbmsTxs : KLogging() {
+object DbmsTxs {
+  private val logger = KotlinLogging.logger {}
+
   fun slideData(
     uuid: String,
     slide: Slide,
@@ -96,7 +98,7 @@ object DbmsTxs : KLogging() {
     UserChoiceTable
       .deleteWhere { UserChoiceTable.userUuidRef eq uuid.toUuid() }
       .also { count ->
-        logger.info("Deleted $count records for uuid: $uuid")
+        logger.info { "Deleted $count records for uuid: $uuid" }
       }
   }
 

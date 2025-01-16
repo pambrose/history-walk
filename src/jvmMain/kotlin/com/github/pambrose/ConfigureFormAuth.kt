@@ -4,11 +4,13 @@ import com.github.pambrose.User.Companion.isValidUuid
 import com.github.pambrose.common.util.isNotNull
 import com.github.pambrose.common.util.isNull
 import com.github.pambrose.common.util.sha256
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.server.auth.*
 import io.ktor.server.sessions.*
-import mu.two.KLogging
 
-object ConfigureFormAuth : KLogging() {
+object ConfigureFormAuth {
+  private val logger = KotlinLogging.logger {}
+
   fun AuthenticationConfig.configureFormAuth() {
     form {
       userParamName = "username"

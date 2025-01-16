@@ -18,6 +18,7 @@ import com.github.pambrose.common.response.respondWith
 import com.github.pambrose.common.util.Version.Companion.versionDesc
 import com.github.pambrose.common.util.isNotNull
 import com.github.pambrose.slides.SlideDeck.Companion.ROOT
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.http.*
 import io.ktor.http.ContentType.Text.Plain
 import io.ktor.server.application.*
@@ -28,13 +29,14 @@ import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
 import io.ktor.server.util.*
 import io.kvision.remote.applyRoutes
-import mu.two.KLogging
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.io.ByteArrayOutputStream
 import java.lang.management.ManagementFactory
 import kotlin.text.Charsets.UTF_8
 
-object Routes : KLogging() {
+object Routes {
+  private val logger = KotlinLogging.logger {}
+
   fun Application.assignRoutes() {
     routing {
       applyRoutes(RegisterUserServiceManager)
@@ -72,7 +74,7 @@ object Routes : KLogging() {
             masterSlides = loadSlides()
             call.respondRedirect("/")
           } catch (e: Exception) {
-            logger.error("Error resetting slides", e)
+            logger.error(e) { "Error resetting slides" }
             call.respondText(e.stackTraceToString(), Plain)
           }
         }
@@ -145,9 +147,10 @@ object Routes : KLogging() {
       }
 
       // Allow for static content to be served from the /static/ directory
-      static("static") {
-        resources("static")
-      }
+//      static("static") {
+//        resources("static")
+//      }
+      staticResources("/static", "static")
     }
   }
 
