@@ -9,7 +9,8 @@ There are 3 repos involved in this project:
 * [history-walk-slides](https://github.com/pambrose/history-walk-slides)
 
 The *history-walk* repo is duplicated in the client in *history-walk* and *history-walk-moses*. Only the *history-walk*
-repo should be updated and the other should just pull from GitHub. They differ in env var values.
+repo should be updated and the other should only pull from GitHub. Each is used to create
+a Heroku app with different env vars One is called *jermain-walk* and the other is *moses-walk*.
 
 The *history-walk-content* repo is used to hold the content for the slides. The content is edited there and then
 copied to the *history-walk* repos.
@@ -56,6 +57,10 @@ To determine the database URL:
 ```bash
 heroku pg:credentials:url DATABASE
 ```
+
+### Building the Database
+
+The SQL for the tables is in `src/jvmMain/resources/db/migration/V001__create_schema.sql`
 
 ### Debug Deployment
 
