@@ -40,10 +40,10 @@ object HistoryWalkServer {
             .let { localFilename ->
               if (localFilename.isNotEmpty()) {
                 logger.info { "Loading slides from local file: $localFilename" }
-                // find out current working directory
+                // find out the current working directory
                 val currentWorkingDir = System.getProperty("user.dir")
                 println(currentWorkingDir)
-                val file = File("$localFilename")
+                val file = File(localFilename)
                 file.readText()
               } else {
                 val repoType = SLIDES_REPO_TYPE.getEnv("User")

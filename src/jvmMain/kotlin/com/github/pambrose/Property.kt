@@ -8,7 +8,7 @@ import com.github.pambrose.common.util.obfuscate
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.server.application.*
 import io.ktor.server.config.*
-import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.concurrent.atomics.AtomicBoolean
 
 object PropertyNames {
   const val HISTORYWALK = "historywalk"

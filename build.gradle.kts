@@ -5,8 +5,7 @@ plugins {
     val kvisionVersion: String by System.getProperties()
     val versionsVersion: String by System.getProperties()
     val configVersion: String by System.getProperties()
-    val flywayVersion: String by System.getProperties()
-    // val kotlinterVersion: String by System.getProperties()
+    val kotlinterVersion: String by System.getProperties()
 
 //  `maven-publish`
 
@@ -15,10 +14,9 @@ plugins {
     // This is required by BuildConfig
     // id("idea")
     id("io.kvision") version kvisionVersion
-    // id("org.jmailen.kotlinter") version kotlinterVersion
+    id("org.jmailen.kotlinter") version kotlinterVersion
     id("com.github.ben-manes.versions") version versionsVersion
     // id("com.github.gmazzo.buildconfig") version configVersion
-    id("org.flywaydb.flyway") version flywayVersion
 }
 
 version = "1.0.0"
@@ -192,10 +190,9 @@ kotlin {
         useJUnitPlatform()
     }
 
-//    kotlinter {
-//        ignoreFailures = false
-//        reporters = arrayOf("checkstyle", "plain")
-//    }
+    kotlinter {
+        reporters = arrayOf("checkstyle", "plain")
+    }
 }
 
 dependencies {
