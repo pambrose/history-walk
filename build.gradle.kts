@@ -441,7 +441,7 @@ dependencies {
 // This is for flyway
 buildscript {
     dependencies {
-        classpath("org.postgresql:postgresql:42.7.5")
+        classpath("org.postgresql:postgresql:42.7.8")
     }
 }
 
