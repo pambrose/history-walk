@@ -54,7 +54,13 @@ The *history-walk-slides* repo is used to hold the core slide code. It is a depe
 
 To determine the database URL:
 ```bash
-heroku pg:credentials:url DATABASE
+heroku pg:credentials:url DATABASE -a app-name
+```
+
+### Pushing from a branch
+
+```bash
+git push heroku Jan-2026:main
 ```
 
 ### Debug Deployment
