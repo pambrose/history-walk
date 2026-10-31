@@ -124,7 +124,6 @@ kotlin {
             implementation(libs.ktor.server.status.pages)
 
             implementation(libs.common.utils.ktor)
-            implementation(libs.common.utils.email)
             implementation(libs.common.utils.exposed)
 
             implementation(libs.history.walk.content)

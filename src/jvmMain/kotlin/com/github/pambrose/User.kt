@@ -1,22 +1,20 @@
 package com.github.pambrose
 
 import com.github.pambrose.Email.Companion.EMPTY_EMAIL
-import com.github.pambrose.Email.Companion.UNKNOWN_EMAIL
+import com.pambrose.common.exposed.get
 import com.github.pambrose.FullName.Companion.EMPTY_FULLNAME
 import com.github.pambrose.Utils.toUuid
 import com.pambrose.common.util.*
 import com.github.pambrose.slides.Slide
 import com.github.pambrose.slides.SlideDeck
 import com.github.pambrose.slides.SlideDeck.Companion.ROOT
-import com.pambrose.common.email.EmailUtils.isNotValidEmail
-import com.pambrose.common.exposed.get
 import io.github.oshai.kotlinlogging.KotlinLogging
-import io.ktor.http.*
 import org.jetbrains.exposed.v1.core.*
 import org.jetbrains.exposed.v1.jdbc.*
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.*
 import kotlin.time.measureTime
+import kotlinx.datetime.toKotlinLocalDateTime
 
 class User {
   constructor(uuid: UUID, initFields: Boolean) {
@@ -51,20 +49,10 @@ class User {
   var userUuid: String = "-1"
   var email: Email = EMPTY_EMAIL
   var fullName: FullName = EMPTY_FULLNAME
-  private var saltBacking: String = ""
-  private var digestBacking: String = ""
-
-  val salt: String
-    get() = saltBacking.ifBlank { throw IllegalArgumentException("Missing salt field") }
-  val digest: String
-    get() = digestBacking.ifBlank { throw IllegalArgumentException("Missing digest field") }
-
   private fun assignRowVals(row: ResultRow) {
     userUuid = row[UsersTable.id].toString()
     email = Email(row[UsersTable.email])
     fullName = FullName(row[UsersTable.fullName])
-    saltBacking = row[UsersTable.salt]
-    digestBacking = row[UsersTable.digest]
   }
 
   fun isInDbms() =
@@ -131,49 +119,60 @@ class User {
       }
     }
 
-    private fun queryUserEmail(
-      uuid: UUID,
-      defaultIfMissing: Email = UNKNOWN_EMAIL,
-    ): Email =
+    fun upsertFromGoogle(
+      email: String,
+      fullName: String,
+      pictureUrl: String?,
+      role: Role,
+    ): UUID {
+      val address = email.lowercase()
+      val now = java.time.LocalDateTime.now().toKotlinLocalDateTime()
+      return transaction {
+        with(UsersTable) {
+          val existing = select(id).where { this@with.email eq address }.map { it[id].value }.firstOrNull()
+          if (existing != null) {
+            update({ id eq existing }) { row ->
+              row[this.fullName] = fullName.maxLength(128)
+              row[this.pictureUrl] = pictureUrl
+              row[this.role] = role.name.lowercase()
+              row[lastSignIn] = now
+              row[updated] = now
+            }
+            existing
+          } else {
+            val newId = UUID.randomUUID()
+            insert { row ->
+              row[id] = newId
+              row[this.fullName] = fullName.maxLength(128)
+              row[this.email] = address.maxLength(128)
+              row[this.pictureUrl] = pictureUrl
+              row[this.role] = role.name.lowercase()
+              row[lastPathName] = ROOT
+              row[lastSignIn] = now
+            }
+            logger.info { "Created user $address $newId" }
+            newId
+          }
+        }
+      }
+    }
+
+    fun emailForUuid(uuid: UUID): String? =
       transaction {
         with(UsersTable) {
-          select(email)
-            .where { id eq uuid }
-            .map { Email(it[0] as String) }
-            .firstOrNull() ?: defaultIfMissing
+          select(email).where { id eq uuid }.map { it[email] }.firstOrNull()
         }
       }
 
-    fun createUser(
-      name: FullName,
-      emailVal: Email,
-      password: Password,
-    ): User =
-      User(
-        UUID.randomUUID(),
-        false,
-      )
-        .also { user ->
-          transaction {
-            val saltVal = newStringSalt()
-            val digestVal = password.sha256(saltVal)
-            with(UsersTable) {
-              insert { row ->
-                row[id] = user.uuid
-                row[fullName] = name.value.maxLength(128)
-                row[email] = emailVal.value.maxLength(128)
-                row[salt] = saltVal
-                row[digest] = digestVal
-                row[lastPathName] = ROOT
-              }
-            }
-          }
-          logger.info { "Created user $emailVal ${user.uuid}" }
+    fun userInfoFor(uuid: UUID): UserInfo? =
+      transaction {
+        with(UsersTable) {
+          selectAll()
+            .where { id eq uuid }
+            .map { UserInfo(it[fullName], it[email], it[pictureUrl], Role.valueOf(it[role].uppercase())) }
+            .firstOrNull()
         }
-
-    private fun isRegisteredEmail(email: Email) = queryUserByEmail(email).isNotNull()
-
-    fun isNotRegisteredEmail(email: Email) = !isRegisteredEmail(email)
+      }
 
     fun isValidUuid(uuid: String) =
       transaction {
@@ -230,25 +229,6 @@ value class FullName(val value: String) {
 
   companion object {
     val EMPTY_FULLNAME = FullName("")
-
-    fun Parameters.getFullName(name: String) = this[name]?.let { FullName(it) } ?: EMPTY_FULLNAME
-  }
-}
-
-@JvmInline
-value class Password(val value: String) {
-  val length get() = value.length
-
-  fun isBlank() = value.isBlank()
-
-  fun sha256(salt: String) = value.sha256(salt)
-
-  override fun toString() = value
-
-  companion object {
-    private val EMPTY_PASSWORD = Password("")
-
-    fun Parameters.getPassword(name: String) = this[name]?.let { Password(it) } ?: EMPTY_PASSWORD
   }
 }
 
@@ -258,15 +238,11 @@ value class Email(val value: String) {
 
   fun isNotBlank() = value.isNotBlank()
 
-  fun isNotValidEmail() = value.isNotValidEmail()
-
   override fun toString() = value
 
   companion object {
     val EMPTY_EMAIL = Email("")
     val UNKNOWN_EMAIL = Email(UNKNOWN)
-
-    fun Parameters.getEmail(name: String) = this[name]?.let { Email(it) } ?: EMPTY_EMAIL
   }
 }
 

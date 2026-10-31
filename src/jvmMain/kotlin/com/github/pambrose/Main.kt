@@ -110,7 +110,6 @@ fun Application.main() {
   dbmsInit(environment.config)
 
   initRpc {
-    registerService<IRegisterUserService> { RegisterUserService() }
     registerService<IContentService> { call -> ContentService(call) }
   }
 }

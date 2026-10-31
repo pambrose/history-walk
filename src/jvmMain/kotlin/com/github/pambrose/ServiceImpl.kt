@@ -4,6 +4,7 @@ import com.github.pambrose.DbmsTxs.slideData
 import com.github.pambrose.DbmsTxs.updateLastSlide
 import com.github.pambrose.HistoryWalkServer.masterSlides
 import com.github.pambrose.User.Companion.findCurrentSlideForUser
+import com.github.pambrose.User.Companion.userInfoFor
 import com.github.pambrose.Utils.toUuid
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.server.application.*
@@ -13,40 +14,11 @@ import org.jetbrains.exposed.v1.jdbc.insertAndGetId
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
-class RegisterUserService : IRegisterUserService {
-  override suspend fun registerUser(registerData: RegisterData): Boolean {
-    try {
-      User.createUser(FullName(registerData.fullName), Email(registerData.email), Password(registerData.password))
-    } catch (e: Exception) {
-      logger.error(e) { "Failed to register user" }
-      return false
-    }
-    return true
-  }
-
-  companion object {
-    private val logger = KotlinLogging.logger {}
-  }
-}
-
 class ContentService(
   private val call: ApplicationCall,
 ) : IContentService {
   override suspend fun getUserInfo() =
-    transaction {
-      val uuid = call.userId.uuid
-      with(UsersTable) {
-        selectAll()
-          .where { id eq uuid.toUuid() }
-          .map { row ->
-            UserInfo(
-              row[fullName],
-              row[email],
-            )
-          }
-          .firstOrNull() ?: UserInfo("Unknown", "Unknown")
-      }
-    }
+    userInfoFor(call.userId.uuid.toUuid()) ?: UserInfo("Unknown", "Unknown")
 
   override suspend fun getCurrentSlide(): SlideData {
     logger.debug { "userId=${call.userId}" }

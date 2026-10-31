@@ -18,6 +18,8 @@ data class RegisterData(
 data class UserInfo(
   val fullName: String,
   val email: String,
+  val pictureUrl: String? = null,
+  val role: Role = Role.STUDENT,
 )
 
 @Serializable

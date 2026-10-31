@@ -4,7 +4,6 @@ import com.codahale.metrics.jvm.ThreadDump
 import com.github.pambrose.DbmsTxs.deleteChoices
 import com.github.pambrose.DbmsTxs.updateLastSlide
 import com.github.pambrose.EndPoints.CONTENT_RESET
-import com.github.pambrose.EndPoints.LOGIN
 import com.github.pambrose.EndPoints.LOGOUT
 import com.github.pambrose.EndPoints.SLIDE
 import com.github.pambrose.EndPoints.USER_RESET
@@ -16,7 +15,6 @@ import com.github.pambrose.Pages.displayUserReasons
 import com.github.pambrose.Pages.displayUserSummary
 import com.pambrose.common.response.respondWith
 import com.pambrose.common.util.Version.Companion.versionDesc
-import com.pambrose.common.util.isNotNull
 import com.github.pambrose.slides.SlideDeck.Companion.ROOT
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.http.*
@@ -39,30 +37,10 @@ object Routes {
 
   fun Application.assignRoutes() {
     routing {
-      applyRoutes(RegisterUserServiceManager)
       // getAllServiceManagers().forEach { applyRoutes(it) }
 
       authenticate {
         applyRoutes(ContentServiceManager)
-
-        post(LOGIN) {
-          val principal = call.principal<UserPrincipal>()
-          val result =
-            if (principal != null) {
-              val user = User.queryUserByUuid(principal.uuid)
-              if (user.isNotNull()) {
-                val userId = UserId(user.uuid.toString())
-                call.sessions.set(userId)
-                HttpStatusCode.OK
-              } else {
-                HttpStatusCode.Unauthorized
-              }
-            } else {
-              HttpStatusCode.Unauthorized
-            }
-
-          call.respond(result)
-        }
 
         get(LOGOUT) {
           call.sessions.clear<UserId>()

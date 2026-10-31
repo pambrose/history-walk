@@ -24,7 +24,7 @@ object Dbms {
 
   // Applies any pending migrations in src/jvmMain/resources/db/migration before the app touches the database.
   // Flyway keeps its schema history table in the connection's default schema (public), outside the history schema.
-  private fun migrate(dataSource: DataSource) {
+  internal fun migrate(dataSource: DataSource) {
     Flyway
       .configure()
       .dataSource(dataSource)

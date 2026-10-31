@@ -1,6 +1,5 @@
 package com.github.pambrose
 
-import com.github.pambrose.ConfigureFormAuth.configureFormAuth
 import com.github.pambrose.Cookies.assignCookies
 import com.pambrose.common.util.simpleClassName
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -38,9 +37,7 @@ object Installs {
 //    }
 //  }
 
-    install(Authentication) {
-      configureFormAuth()
-    }
+    install(Authentication) {}
 
     install(StatusPages) {
       // Catch all

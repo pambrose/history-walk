@@ -92,7 +92,6 @@ kilua-rpc-ktor = { group = "dev.kilua", name = "kilua-rpc-ktor", version.ref = "
 utils-bom = { module = "com.pambrose.common-utils:common-utils-bom", version.ref = "utils" }
 common-utils-core = { group = "com.pambrose.common-utils", name = "core-utils" }
 common-utils-ktor = { group = "com.pambrose.common-utils", name = "ktor-server-utils" }
-common-utils-email = { group = "com.pambrose.common-utils", name = "email-utils" }
 common-utils-exposed ={ group = "com.pambrose.common-utils", name = "exposed-utils" }
 common-utils-script-common = { group = "com.pambrose.common-utils", name = "script-utils-common" }
 common-utils-script-kotlin = { group = "com.pambrose.common-utils", name = "script-utils-kotlin"}

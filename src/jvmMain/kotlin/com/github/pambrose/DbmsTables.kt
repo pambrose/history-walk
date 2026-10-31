@@ -11,8 +11,9 @@ object UsersTable : UUIDTable("history.users") {
   val updated = datetime("updated")
   val email = text("email")
   val fullName = text("full_name")
-  val salt = text("salt")
-  val digest = text("digest")
+  val pictureUrl = text("picture_url").nullable()
+  val role = text("role")
+  val lastSignIn = datetime("last_sign_in").nullable()
   val lastPathName = text("last_path_name")
 }
 
