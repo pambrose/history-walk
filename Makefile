@@ -21,20 +21,6 @@ versions:
 depends:
 	./gradlew dependencies
 
-dbinfo:
-	./gradlew flywayInfo
-
-dbclean:
-	./gradlew flywayClean
-
-dbmigrate:
-	./gradlew flywayMigrate
-
-dbreset: dbclean dbmigrate
-
-dbvalidate:
-	./gradlew flywayValidate
-
 creds:
 	heroku pg:credentials:url DATABASE
 

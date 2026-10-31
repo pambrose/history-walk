@@ -66,7 +66,13 @@ git push heroku Jan-2026:main
 
 ### Building the Database
 
-The SQL for the tables is in `src/jvmMain/resources/db/migration/V001__create_schema.sql`
+The schema is managed by [Flyway](https://documentation.red-gate.com/flyway). Migrations live in
+`src/jvmMain/resources/db/migration` and are applied automatically when the server starts, so every
+Heroku deploy brings the database up to date. The initial schema is `V001__create_schema.sql`.
+
+To change the schema, add a new migration with the next version number, e.g. `V002__add_column.sql`.
+Never edit a migration that has already been applied: Flyway checksums applied migrations and will
+refuse to start if one changes.
 
 ### Debug Deployment
 

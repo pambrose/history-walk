@@ -136,6 +136,8 @@ kotlin {
             implementation(libs.hikariCP)
             implementation(libs.exposed.jdbc)
             implementation(libs.exposed.kotlin.datetime)
+            implementation(libs.flyway.core)
+            runtimeOnly(libs.flyway.database.postgresql)
 
             //implementation("commons-codec:commons-codec:$commonsCodecVersion")
             //implementation("com.axiomalaska:jdbc-named-parameters:$jdbcNamedParametersVersion")

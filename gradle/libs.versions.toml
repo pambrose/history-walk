@@ -12,6 +12,7 @@ kvision = "9.7.0"
 versions = "0.67.0"
 exposed = "1.6.0"
 flexmark = "0.64.8"
+flyway = "13.12.0"
 h2Version = "1.4.200"
 hikari = "7.1.0"
 ktor = "3.6.1"
@@ -104,6 +105,9 @@ exposed-core = { group = "org.jetbrains.exposed", name = "exposed-core" }
 exposed-jdbc = { group = "org.jetbrains.exposed", name = "exposed-jdbc" }
 
 exposed-kotlin-datetime = { group = "org.jetbrains.exposed", name = "exposed-kotlin-datetime" }
+
+flyway-core = { group = "org.flywaydb", name = "flyway-core", version.ref = "flyway" }
+flyway-database-postgresql = { group = "org.flywaydb", name = "flyway-database-postgresql", version.ref = "flyway" }
 
 flexmark = { group = "com.vladsch.flexmark", name = "flexmark", version.ref = "flexmark" }
 
