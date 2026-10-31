@@ -17,6 +17,9 @@ h2Version = "1.4.200"
 hikari = "7.1.0"
 ktor = "3.6.1"
 logback = "1.6.6"
+kotest = "6.2.6"
+mockk = "1.14.11"
+testcontainers = "2.0.5"
 logging = "8.0.4"
 pgsql = "42.7.14"
 pgjdbc = "0.8.9"
@@ -115,3 +118,9 @@ flexmark = { group = "com.vladsch.flexmark", name = "flexmark", version.ref = "f
 
 kotlin-logging = { group = "io.github.oshai", name = "kotlin-logging-jvm", version.ref = "logging" }
 logback-classic = { group = "ch.qos.logback", name = "logback-classic", version.ref = "logback" }
+
+# Testing
+kotest-runner = { group = "io.kotest", name = "kotest-runner-junit5", version.ref = "kotest" }
+kotest-assertions = { group = "io.kotest", name = "kotest-assertions-core", version.ref = "kotest" }
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
+testcontainers-postgresql = { group = "org.testcontainers", name = "testcontainers-postgresql", version.ref = "testcontainers" }

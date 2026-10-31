@@ -154,7 +154,12 @@ kotlin {
         }
 
         jvmTest.dependencies {
-            implementation(kotlin("test"))
+            implementation(project.dependencies.platform(libs.ktor.bom))
+            implementation(libs.ktor.server.test.host)
+            implementation(libs.kotest.runner)
+            implementation(libs.kotest.assertions)
+            implementation(libs.mockk)
+            implementation(libs.testcontainers.postgresql)
         }
 
         jsMain.dependencies {
