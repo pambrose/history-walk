@@ -97,9 +97,11 @@ fun Application.main() {
   installs()
   assignRoutes()
 
-  val slideName = SLIDES_VARIABLE_NAME.getEnv("jermainLonguenSlides")
+  val defaultSlides = "jermainLonguenSlides"
+
+  val slideName = SLIDES_VARIABLE_NAME.getEnv(defaultSlides)
   masterSlides =
-    if (slideName == "jermainLonguenSlides")
+    if (slideName == defaultSlides)
       jermainLonguenSlides
     else
       mosesSlides

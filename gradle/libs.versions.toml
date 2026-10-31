@@ -20,6 +20,7 @@ logback = "1.6.6"
 logging = "8.0.4"
 pgsql = "42.7.14"
 pgjdbc = "0.8.9"
+slide-content = "1.2.0"
 slides = "1.8.5"
 utils = "5.2.0"
 
@@ -93,6 +94,7 @@ common-utils-exposed ={ group = "com.pambrose.common-utils", name = "exposed-uti
 common-utils-script-common = { group = "com.pambrose.common-utils", name = "script-utils-common" }
 common-utils-script-kotlin = { group = "com.pambrose.common-utils", name = "script-utils-kotlin"}
 
+history-walk-content = { group = "com.github.pambrose", name = "history-walk-content", version.ref = "slide-content" }
 history-walk-slides = { group = "com.github.pambrose", name = "history-walk-slides", version.ref = "slides" }
 
 postgresql = { group = "org.postgresql", name = "postgresql", version.ref = "pgsql" }

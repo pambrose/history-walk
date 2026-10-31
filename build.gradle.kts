@@ -2,6 +2,7 @@
 
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jmailen.gradle.kotlinter.tasks.LintTask
+import sun.jvmstat.monitor.MonitoredVmUtil.mainClass
 
 plugins {
     idea
@@ -127,6 +128,7 @@ kotlin {
             implementation(libs.common.utils.email)
             implementation(libs.common.utils.exposed)
 
+            implementation(libs.history.walk.content)
             implementation(libs.history.walk.slides)
 
             //implementation("dev.hayden:khealth:$khealthVersion")
