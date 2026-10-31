@@ -1,6 +1,7 @@
 package com.github.pambrose.auth
 
 import com.github.pambrose.SignInError
+import com.github.pambrose.auth.OAuthState.consumeOAuthState
 import com.github.pambrose.auth.OAuthState.rememberOAuthState
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.HttpClient
@@ -76,6 +77,9 @@ fun AuthenticationConfig.configureGoogleAuth(
     client = HttpClient(CIO)
 
     fallback = { cause ->
+      // The fallback answers the callback, so the route's handler, which clears the state cookie, never runs: clear
+      // it here too, so a state is good for one callback however that callback ends
+      consumeOAuthState()
       // The cause names what failed, never the code or the state; it can quote Google's error text from the query
       // string, so it is cut short and stripped of control characters before it reaches the log
       val reason = cause.message.take(MAX_LOGGED_CAUSE).replace(CONTROL_CHARACTER, "?")

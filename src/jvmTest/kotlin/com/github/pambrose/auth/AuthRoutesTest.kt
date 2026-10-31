@@ -9,6 +9,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.plugins.cookies.HttpCookies
 import io.ktor.client.request.get
 import io.ktor.client.request.post
+import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpHeaders.Location
 import io.ktor.http.HttpStatusCode.Companion.Forbidden
@@ -75,6 +76,10 @@ class AuthRoutesTest : StringSpec() {
     }
   }
 
+  // Whether the response deletes the state cookie: an empty value that expires at once
+  private fun HttpResponse.clearsStateCookie() =
+    setCookie().any { it.name == "oauth_state" && it.value.isEmpty() && it.maxAge == 0 }
+
   // A fresh app, cookie jar, and provisioning mock for each test; redirects are returned, not followed
   private fun signInTest(
     provision: (SignInDecision.Admitted) -> UUID = mockk(),
@@ -106,6 +111,33 @@ class AuthRoutesTest : StringSpec() {
     "a stale or direct callback goes back to the prompt" {
       signInTest { client ->
         client.get("/auth/callback?code=x&state=bogus").headers[Location] shouldBe "/?error=failed"
+      }
+    }
+    "a callback with a forged state clears the state cookie" {
+      signInTest { client ->
+        client.get("/auth/login")
+        val r = client.get("/auth/callback?code=x&state=bogus")
+        r.headers[Location] shouldBe "/?error=failed"
+        r.clearsStateCookie() shouldBe true
+      }
+    }
+    "a sign-in cancelled at Google clears the state cookie" {
+      signInTest { client ->
+        val state = Url(client.get("/auth/login").headers[Location]!!).parameters["state"]!!
+        val r = client.get("/auth/callback?error=access_denied&state=$state")
+        r.headers[Location] shouldBe "/?error=failed"
+        r.clearsStateCookie() shouldBe true
+      }
+    }
+    "a signed-in browser's callback clears the state cookie and signs no one in" {
+      signInTest { client ->
+        client.get("/auth/login")
+        client.get("/test/sign-in/$teacher")
+        val r = client.get("/auth/callback?state=x")
+        r.headers[Location] shouldBe "/?error=failed"
+        r.clearsStateCookie() shouldBe true
+        r.setCookie().none { it.name == "HistoryWalkAuth" } shouldBe true
+        client.get("/probe").bodyAsText() shouldBe "teacher ok"
       }
     }
     "an RPC without a session is 401" {
