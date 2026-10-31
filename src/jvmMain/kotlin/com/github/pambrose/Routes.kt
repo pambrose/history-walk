@@ -3,6 +3,8 @@ package com.github.pambrose
 import com.codahale.metrics.jvm.ThreadDump
 import com.github.pambrose.DbmsTxs.deleteChoices
 import com.github.pambrose.DbmsTxs.updateLastSlide
+import com.github.pambrose.auth.UserSession
+import com.github.pambrose.auth.userUuid
 import com.github.pambrose.EndPoints.CONTENT_RESET
 import com.github.pambrose.EndPoints.LOGOUT
 import com.github.pambrose.EndPoints.SLIDE
@@ -43,7 +45,7 @@ object Routes {
         applyRoutes(ContentServiceManager)
 
         get(LOGOUT) {
-          call.sessions.clear<UserId>()
+          call.sessions.clear<UserSession>()
           call.respondRedirect("/")
         }
 
@@ -59,7 +61,7 @@ object Routes {
 
         get(USER_RESET) {
           transaction {
-            val uuid = call.userId.uuid
+            val uuid = call.userUuid
             deleteChoices(uuid)
             updateLastSlide(uuid, ROOT)
           }
@@ -86,7 +88,7 @@ object Routes {
             val slide = masterSlides.findSlideById(slideId, version)
             if (slide != null) {
               transaction {
-                val uuid = call.userId.uuid
+                val uuid = call.userUuid
                 updateLastSlide(uuid, slide.pathName)
               }
               call.respondRedirect("/")

@@ -1,6 +1,6 @@
 package com.github.pambrose
 
-import com.github.pambrose.Cookies.assignCookies
+import com.github.pambrose.auth.installUserSessions
 import com.pambrose.common.util.simpleClassName
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.http.*
@@ -12,7 +12,6 @@ import io.ktor.server.plugins.compression.*
 import io.ktor.server.plugins.defaultheaders.*
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
-import io.ktor.server.sessions.*
 import org.slf4j.event.Level
 
 object Installs {
@@ -25,9 +24,7 @@ object Installs {
       level = Level.INFO
     }
 
-    install(Sessions) {
-      assignCookies()
-    }
+    installUserSessions()
 
 //  install(KHealth) {
 //    readyCheckEnabled = false

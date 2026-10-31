@@ -23,11 +23,6 @@ data class UserInfo(
 )
 
 @Serializable
-data class UserId(
-  val uuid: String,
-)
-
-@Serializable
 data class SlideData(
   val pathName: String,
   val title: String,

@@ -6,6 +6,7 @@ import com.github.pambrose.HistoryWalkServer.masterSlides
 import com.github.pambrose.User.Companion.findCurrentSlideForUser
 import com.github.pambrose.User.Companion.userInfoFor
 import com.github.pambrose.Utils.toUuid
+import com.github.pambrose.auth.userUuid
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.server.application.*
 import org.jetbrains.exposed.v1.core.and
@@ -18,11 +19,11 @@ class ContentService(
   private val call: ApplicationCall,
 ) : IContentService {
   override suspend fun getUserInfo() =
-    userInfoFor(call.userId.uuid.toUuid()) ?: UserInfo("Unknown", "Unknown")
+    userInfoFor(call.userUuid.toUuid()) ?: UserInfo("Unknown", "Unknown")
 
   override suspend fun getCurrentSlide(): SlideData {
-    logger.debug { "userId=${call.userId}" }
-    val uuid = call.userId.uuid
+    logger.debug { "userUuid=${call.userUuid}" }
+    val uuid = call.userUuid
     val slide = findCurrentSlideForUser(uuid, masterSlides)
     return slideData(uuid, slide)
   }
@@ -35,7 +36,7 @@ class ContentService(
   ): UserChoice =
     transaction {
       // See if user has an entry for that transition
-      val uuid = call.userId.uuid
+      val uuid = call.userUuid
       with(UserChoiceTable) {
         selectAll()
           .where {
@@ -73,7 +74,7 @@ class ContentService(
     reasonStr: String,
   ): SlideData =
     transaction {
-      val uuid = call.userId.uuid
+      val uuid = call.userUuid
       with(UserChoiceTable) {
         insertAndGetId { row ->
           row[userUuidRef] = uuid.toUuid()
@@ -96,7 +97,7 @@ class ContentService(
 
   override suspend fun goBackInTime(parentTitle: ParentTitle) =
     transaction {
-      val uuid = call.userId.uuid
+      val uuid = call.userUuid
       updateLastSlide(uuid, parentTitle.pathName)
       val slide = findCurrentSlideForUser(uuid, masterSlides)
       slideData(uuid, slide)
