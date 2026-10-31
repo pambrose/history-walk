@@ -1,23 +1,21 @@
+@file:OptIn(ExperimentalKotlinGradlePluginApi::class)
+
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jmailen.gradle.kotlinter.tasks.LintTask
 
 plugins {
-    val kotlinVersion: String by System.getProperties()
-    val kvisionVersion: String by System.getProperties()
-    val versionsVersion: String by System.getProperties()
-    val configVersion: String by System.getProperties()
-    val kotlinterVersion: String by System.getProperties()
-
-//  `maven-publish`
-
-    kotlin("plugin.serialization") version kotlinVersion
-    kotlin("multiplatform") version kotlinVersion
-    // This is required by BuildConfig
-    // id("idea")
-    id("io.kvision") version kvisionVersion
-    id("org.jmailen.kotlinter") version kotlinterVersion
-    id("com.github.ben-manes.versions") version versionsVersion
-    // id("com.github.gmazzo.buildconfig") version configVersion
+    idea
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.kvision)
+    alias(libs.plugins.versions)
+//    alias(libs.plugins.config)
+    alias(libs.plugins.kotlinter)
+//    alias(libs.plugins.kotest)
+//    alias(libs.plugins.diktat)
+//    alias(libs.plugins.detekt)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.kiluaRpc)
 }
 
 version = "1.0.0"
@@ -38,31 +36,11 @@ repositories {
 //  buildConfigField("long", "BUILD_TIME", "${System.currentTimeMillis()}L")
 //}
 
-// Versions
-val kotlinVersion: String by System.getProperties()
-val kvisionVersion: String by System.getProperties()
-val kiluaVersion: String by System.getProperties()
-val commonsCodecVersion: String by project
-val exposedVersion: String by project
-val flexmarkVersion: String by project
-val h2Version: String by project
-val hikariVersion: String by project
-//val khealthVersion: String by project
-val kweryVersion: String by project
-val logbackVersion: String by project
-val loggingVersion: String by project
-val pgjdbcVersion: String by project
-val pgsqlVersion: String by project
-val jdbcNamedParametersVersion: String by project
-val ktorVersion: String by project
-val slidesVersion: String by project
-val utilsVersion: String by project
-
 val webDir = file("src/jsMain/web")
 val mainClassName = "io.ktor.server.cio.EngineMain"
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(libs.versions.jvm.get().toInt())
     jvm {
 //        withJava()
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
@@ -100,15 +78,17 @@ kotlin {
         all {
             languageSettings {
                 optIn("kotlin.time.ExperimentalTime")
+                optIn("kotlin.uuid.ExperimentalUuidApi")
                 optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
                 optIn("kotlinx.coroutines.DelicateCoroutinesApi")
+                optIn("kotlin.concurrent.atomics.ExperimentalAtomicApi")
             }
         }
 
         val commonMain by getting {
             dependencies {
-                api("dev.kilua:kilua-rpc-ktor:${kiluaVersion}")
-                implementation("io.kvision:kvision-common-remote:${kvisionVersion}")
+                api(libs.kilua.rpc.ktor)
+                implementation(libs.kvision.common.remote)
             }
         }
 
@@ -121,47 +101,64 @@ kotlin {
 
         val jvmMain by getting {
             dependencies {
-                implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
+                implementation(project.dependencies.platform(libs.kotlin.bom))
+                implementation(libs.kotlin.reflect)
 
-                implementation("io.ktor:ktor-server-core:$ktorVersion")
-                implementation("io.ktor:ktor-server-cio:$ktorVersion")
-                implementation("io.ktor:ktor-server-html-builder:$ktorVersion")
-                implementation("io.ktor:ktor-server-sessions:$ktorVersion")
-                implementation("io.ktor:ktor-server-auth:$ktorVersion")
-                implementation("io.ktor:ktor-server-metrics:$ktorVersion")
-                implementation("io.ktor:ktor-server-metrics-micrometer:$ktorVersion")
-                implementation("io.ktor:ktor-server-compression:$ktorVersion")
-                implementation("io.ktor:ktor-server-call-logging:$ktorVersion")
-                implementation("io.ktor:ktor-server-default-headers:$ktorVersion")
-                implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
+                implementation(project.dependencies.platform(libs.ktor.bom))
+//                implementation(libs.bundles.ktor.client)
+                implementation(libs.ktor.server.core)
 
-                implementation("com.github.pambrose.common-utils:ktor-server-utils:$utilsVersion")
-                implementation("com.github.pambrose.common-utils:exposed-utils:$utilsVersion")
+                implementation(project.dependencies.platform(libs.utils.bom))
+                implementation(libs.common.utils.core)
 
-                implementation("com.github.pambrose:history-walk-slides:$slidesVersion")
+                implementation(project.dependencies.platform(libs.exposed.bom))
+                implementation(libs.exposed.core)
+
+//                implementation(libs.dropwizard.metrics)
+
+                implementation(libs.kotlin.logging)
+
+                implementation(libs.kotlin.reflect)
+
+                implementation(libs.ktor.server.core)
+                implementation(libs.ktor.server.cio)
+                implementation(libs.ktor.server.html.builder)
+                implementation(libs.ktor.server.sessions)
+                implementation(libs.ktor.server.auth)
+                implementation(libs.ktor.server.metrics)
+                implementation(libs.ktor.server.metrics.micrometer)
+                implementation(libs.ktor.server.compression)
+                implementation(libs.ktor.server.call.logging)
+                implementation(libs.ktor.server.default.headers)
+                implementation(libs.ktor.server.status.pages)
+
+//                implementation(libs.common.utils.ktor.server.core)
+                implementation(libs.common.utils.exposed)
+
+                implementation(libs.history.walk.slides)
 
                 //implementation("dev.hayden:khealth:$khealthVersion")
 
-                implementation("org.postgresql:postgresql:$pgsqlVersion")
-                implementation("com.impossibl.pgjdbc-ng:pgjdbc-ng-all:$pgjdbcVersion")
-                implementation("com.zaxxer:HikariCP:$hikariVersion")
-                implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
-                implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
-                implementation("org.jetbrains.exposed:exposed-kotlin-datetime:$exposedVersion")
+                implementation(libs.postgresql)
+                implementation(libs.pgjdbc.ng)
+                implementation(libs.hikariCP)
+                implementation(libs.exposed.core)
+                implementation(libs.exposed.jdbc)
+                implementation(libs.exposed.kotlin.datetime)
 
                 //implementation("commons-codec:commons-codec:$commonsCodecVersion")
                 //implementation("com.axiomalaska:jdbc-named-parameters:$jdbcNamedParametersVersion")
                 //implementation("com.github.andrewoma.kwery:core:$kweryVersion")
 
-                implementation("com.vladsch.flexmark:flexmark:$flexmarkVersion")
+                implementation(libs.flexmark)
 
-                implementation("com.github.pambrose.common-utils:core-utils:$utilsVersion")
-                implementation("com.github.pambrose.common-utils:script-utils-common:$utilsVersion")
-                implementation("com.github.pambrose.common-utils:script-utils-kotlin:$utilsVersion")
-                runtimeOnly("org.jetbrains.kotlin:kotlin-scripting-jsr223:$kotlinVersion")
+                implementation(libs.common.utils.core)
+                implementation(libs.common.utils.script.common)
+                implementation(libs.common.utils.script.kotlin)
+                runtimeOnly(libs.kotlin.scripting.jsr223)
 
-                implementation("io.github.oshai:kotlin-logging-jvm:$loggingVersion")
-                implementation("ch.qos.logback:logback-classic:$logbackVersion")
+                implementation(libs.kotlin.logging)
+                implementation(libs.logback.classic)
             }
         }
 
@@ -173,17 +170,17 @@ kotlin {
 
         val jsMain by getting {
             dependencies {
-                implementation("io.kvision:kvision:$kvisionVersion")
-                implementation("io.kvision:kvision-bootstrap:$kvisionVersion")
-                implementation("io.kvision:kvision-state:$kvisionVersion")
-                implementation("io.kvision:kvision-fontawesome:$kvisionVersion")
+                implementation(libs.kvision.core)
+                implementation(libs.kvision.bootstrap)
+                implementation(libs.kvision.state)
+                implementation(libs.kvision.fontawesome)
             }
         }
 
         val jsTest by getting {
             dependencies {
                 implementation(kotlin("test-js"))
-                implementation("io.kvision:kvision-testutils:$kvisionVersion")
+                implementation(libs.kvision.testutils)
             }
         }
     }

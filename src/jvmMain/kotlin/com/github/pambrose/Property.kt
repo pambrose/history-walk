@@ -77,28 +77,28 @@ enum class Property(
     (
       System.getProperty(propertyValue) ?: default
       )
-      .also { if (errorOnNonInit && !initialized.get()) error(notInitialized(this)) }
+      .also { if (errorOnNonInit && !initialized.load()) error(notInitialized(this)) }
 
   fun getProperty(default: Boolean) =
     (
       System.getProperty(propertyValue)?.toBoolean() ?: default
       )
-      .also { if (!initialized.get()) error(notInitialized(this)) }
+      .also { if (!initialized.load()) error(notInitialized(this)) }
 
   fun getProperty(default: Int) =
     (
       System.getProperty(propertyValue)?.toIntOrNull() ?: default
       )
-      .also { if (!initialized.get()) error(notInitialized(this)) }
+      .also { if (!initialized.load()) error(notInitialized(this)) }
 
   fun getPropertyOrNull(errorOnNonInit: Boolean = true): String? =
-    System.getProperty(propertyValue).also { if (errorOnNonInit && !initialized.get()) error(notInitialized(this)) }
+    System.getProperty(propertyValue).also { if (errorOnNonInit && !initialized.load()) error(notInitialized(this)) }
 
   fun getRequiredProperty() =
     (
       getPropertyOrNull() ?: error("Missing $propertyValue value")
       )
-      .also { if (!initialized.get()) error(notInitialized(this)) }
+      .also { if (!initialized.load()) error(notInitialized(this)) }
 
   fun setProperty(value: String) {
     System.setProperty(
@@ -129,7 +129,7 @@ enum class Property(
     private val logger = KotlinLogging.logger {}
     private val initialized = AtomicBoolean(false)
 
-    fun assignInitialized() = initialized.set(true)
+    fun assignInitialized() = initialized.store(true)
 
     private fun notInitialized(prop: Property) = "Property ${prop.name} not initialized"
 

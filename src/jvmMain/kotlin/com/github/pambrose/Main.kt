@@ -16,7 +16,6 @@ import com.github.pambrose.common.util.getBanner
 import com.github.pambrose.slides.SlideDeck
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.server.application.*
-import io.kvision.remote.kvisionInit
 import jermainLonguenSlides
 import kotlinx.coroutines.runBlocking
 import mosesSlides
@@ -106,5 +105,5 @@ fun Application.main() {
 
   dbmsInit(environment.config)
 
-  kvisionInit()
+  // kvisionInit()
 }

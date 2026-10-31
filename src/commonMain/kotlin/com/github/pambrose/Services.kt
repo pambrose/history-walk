@@ -1,13 +1,13 @@
 package com.github.pambrose
 
-import io.kvision.annotations.KVService
+import dev.kilua.rpc.annotations.RpcService
 
-@KVService
+@RpcService
 interface IRegisterUserService {
   suspend fun registerUser(registerData: RegisterData): Boolean
 }
 
-@KVService
+@RpcService
 interface IContentService {
   suspend fun getUserInfo(): UserInfo
 
