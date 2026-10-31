@@ -6,6 +6,7 @@ import com.github.pambrose.HistoryWalkServer.masterSlides
 import com.github.pambrose.User.Companion.findCurrentSlideForUser
 import com.github.pambrose.User.Companion.userInfoFor
 import com.github.pambrose.Utils.toUuid
+import com.github.pambrose.auth.SchoolConfig
 import com.github.pambrose.auth.userUuid
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.server.application.*
@@ -19,7 +20,7 @@ class ContentService(
   private val call: ApplicationCall,
 ) : IContentService {
   override suspend fun getUserInfo() =
-    userInfoFor(call.userUuid.toUuid()) ?: UserInfo("Unknown", "Unknown")
+    userInfoFor(call.userUuid.toUuid(), SchoolConfig.teacherEmails) ?: UserInfo("Unknown", "Unknown")
 
   override suspend fun getCurrentSlide(): SlideData {
     logger.debug { "userUuid=${call.userUuid}" }

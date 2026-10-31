@@ -34,8 +34,8 @@ object SessionConfig {
   // DEV-ONLY fixed secret so local development works without SESSION_SECRET. NEVER use in production.
   const val DEV_ONLY_SECRET = "dev-only-insecure-session-secret-change-me"
 
-  // AES/CBC requires a 16-byte (block-size) IV. Ktor's default IV generator sizes the IV to the 32-byte key, which
-  // fails AES-256 init ("Wrong IV length"), so we generate a correct 16-byte IV.
+  // AES/CBC requires a 16-byte (block-size) IV. Ktor 3.6.1 already uses 16 bytes; we keep the explicit generator so
+  // the IV size does not depend on the library default.
   private const val AES_IV_LENGTH = 16
 
   private val LOOPBACK_HOSTS = setOf("localhost", "127.0.0.1", "::1")

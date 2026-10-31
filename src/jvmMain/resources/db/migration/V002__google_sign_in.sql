@@ -1,5 +1,6 @@
 -- Emails are stored lowercased from here on; normalise rows created before.
 UPDATE history.users SET email = lower(email);
+ALTER TABLE history.users ADD CONSTRAINT users_email_lowercase CHECK (email = lower(email));
 
 -- Google sign-in replaces passwords: drop the credential columns, record the profile picture, role and last sign-in.
 ALTER TABLE history.users

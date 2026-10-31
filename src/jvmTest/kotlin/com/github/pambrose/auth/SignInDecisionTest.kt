@@ -9,8 +9,10 @@ import com.github.pambrose.auth.SignInDecision.Admitted
 import com.github.pambrose.auth.SignInDecision.Rejected
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
+import kotlinx.serialization.json.Json
 
 class SignInDecisionTest : StringSpec() {
+  private val lenientJson = Json { ignoreUnknownKeys = true }
   private val teachers = setOf("pambrose@athenian.org")
 
   private fun info(
@@ -62,6 +64,17 @@ class SignInDecisionTest : StringSpec() {
     "the wrong-domain message names the account" {
       WRONG_DOMAIN.message("jsmith@gmail.com") shouldBe
         "jsmith@gmail.com isn't an athenian.org account. Please sign in with your school account."
+    }
+    "a look-alike suffix or a subdomain is refused" {
+      info("27x@evilathenian.org", hd = "athenian.org").signInDecision("athenian.org", teachers) shouldBe
+        Rejected(WRONG_DOMAIN, "27x@evilathenian.org")
+      info("27x@sub.athenian.org", hd = "athenian.org").signInDecision("athenian.org", teachers) shouldBe
+        Rejected(WRONG_DOMAIN, "27x@sub.athenian.org")
+    }
+    "userinfo without a name still decodes and is admitted" {
+      val json = """{"id":"1","email":"27msmith@athenian.org","verified_email":true,"hd":"athenian.org","extra":1}"""
+      val parsed = lenientJson.decodeFromString<GoogleUserInfo>(json)
+      parsed.signInDecision("athenian.org", teachers) shouldBe Admitted("27msmith@athenian.org", "", null, Role.STUDENT)
     }
     "codes round-trip" {
       SignInError.entries.forEach { SignInError.fromCode(it.code) shouldBe it }

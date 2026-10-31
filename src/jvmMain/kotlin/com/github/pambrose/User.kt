@@ -4,6 +4,8 @@ import com.github.pambrose.Email.Companion.EMPTY_EMAIL
 import com.pambrose.common.exposed.get
 import com.github.pambrose.FullName.Companion.EMPTY_FULLNAME
 import com.github.pambrose.Utils.toUuid
+import com.github.pambrose.auth.Roles.roleFor
+import com.github.pambrose.auth.SchoolConfig
 import com.pambrose.common.util.*
 import com.github.pambrose.slides.Slide
 import com.github.pambrose.slides.SlideDeck
@@ -55,17 +57,6 @@ class User {
     fullName = FullName(row[UsersTable.fullName])
   }
 
-  fun isInDbms() =
-    transaction {
-      val id = UsersTable.id
-      with(UsersTable) {
-        select(Count(id))
-          .where { id eq userUuid.toUuid() }
-          .map { it[0] as Long }
-          .first() > 0
-      }
-    }
-
   fun deleteUser() {
     logger.info { "Deleting User: $uuid $fullName" }
     logger.info { "User Email: $email" }
@@ -104,20 +95,6 @@ class User {
             .first() > 0
         }
       }
-
-    private fun queryUserDbmsId(
-      uuid: UUID,
-      defaultIfMissing: Long = -1,
-    ) {
-      transaction {
-        with(UsersTable) {
-          select(id)
-            .where { id eq uuid }
-            .map { it[id].value }
-            .firstOrNull() ?: defaultIfMissing
-        }
-      }
-    }
 
     fun upsertFromGoogle(
       email: String,
@@ -164,45 +141,17 @@ class User {
         }
       }
 
-    fun userInfoFor(uuid: UUID): UserInfo? =
+    /** The role is derived from [teacherEmails] now, as the route guards do, not the one stored at last sign-in. */
+    fun userInfoFor(
+      uuid: UUID,
+      teacherEmails: Set<String> = SchoolConfig.teacherEmails,
+    ): UserInfo? =
       transaction {
         with(UsersTable) {
           selectAll()
             .where { id eq uuid }
-            .map { UserInfo(it[fullName], it[email], it[pictureUrl], Role.valueOf(it[role].uppercase())) }
+            .map { UserInfo(it[fullName], it[email], it[pictureUrl], roleFor(it[email], teacherEmails) ?: Role.STUDENT) }
             .firstOrNull()
-        }
-      }
-
-    fun isValidUuid(uuid: String) =
-      transaction {
-        with(UsersTable) {
-          select(Count(id))
-            .where { id eq uuid.toUuid() }
-            .map { it[0] as Long }
-            .first() > 0
-        }
-      }
-
-    fun queryUserByEmail(emailVal: Email): User? =
-      transaction {
-        with(UsersTable) {
-          select(id)
-            .where { email eq emailVal.value }
-            .map { row -> row[id].toUuid().toUser() }
-            .firstOrNull()
-            .also { logger.info { "queryUserByEmail() returned: ${it?.email ?: " ${emailVal.value} not found"}" } }
-        }
-      }
-
-    fun queryUserByUuid(uuid: UUID): User? =
-      transaction {
-        with(UsersTable) {
-          select(id)
-            .where { id eq uuid }
-            .map { row -> row[id].toUuid().toUser() }
-            .firstOrNull()
-            .also { logger.info { "queryUserByUuid() returned: ${it?.email ?: " $uuid not found"}" } }
         }
       }
 
@@ -242,7 +191,6 @@ value class Email(val value: String) {
 
   companion object {
     val EMPTY_EMAIL = Email("")
-    val UNKNOWN_EMAIL = Email(UNKNOWN)
   }
 }
 

@@ -271,7 +271,7 @@ private fun Container.header(
       navLink("student reasons", "fas fa-comments") { document.location?.href = "/$REASONS" }
     }
     navLink("logout", "fas fa-sign-out-alt") { postTo("/$LOGOUT") }
-    if (slide.showResetButton)
+    if (isTeacher && slide.showResetButton)
       navLink("reset", "fas fa-sync-alt") { document.location?.href = "/$CONTENT_RESET" }
   }
 }

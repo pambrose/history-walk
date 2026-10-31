@@ -6,7 +6,9 @@ import com.github.pambrose.User.Companion.userInfoFor
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.flywaydb.core.Flyway
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
+import java.sql.SQLException
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
@@ -91,7 +93,7 @@ class UserRepositoryTest : StringSpec() {
       val a = upsertFromGoogle("pambrose@athenian.org", "Paul", null, Role.TEACHER)
       val b = upsertFromGoogle("PAmbrose@Athenian.org", "Paul Ambrose", "https://lh3.googleusercontent.com/a/p", Role.TEACHER)
       b shouldBe a
-      val info = userInfoFor(a)!!
+      val info = userInfoFor(a, setOf("pambrose@athenian.org"))!!
       info.fullName shouldBe "Paul Ambrose"
       info.pictureUrl shouldBe "https://lh3.googleusercontent.com/a/p"
       info.role shouldBe Role.TEACHER
@@ -103,6 +105,25 @@ class UserRepositoryTest : StringSpec() {
     "V002 lowercases existing emails so a returning user keeps the same row" {
       emailForUuid(legacyId) shouldBe "mixed.case@athenian.org"
       upsertFromGoogle("mixed.case@athenian.org", "Legacy", null, Role.STUDENT) shouldBe legacyId
+    }
+
+    "the role comes from the current teacher list, not the stored one" {
+      val id = upsertFromGoogle("27promoted@athenian.org", "Promoted", null, Role.STUDENT)
+      userInfoFor(id, emptySet())!!.role shouldBe Role.STUDENT
+      userInfoFor(id, setOf("27promoted@athenian.org"))!!.role shouldBe Role.TEACHER
+    }
+
+    "a mixed-case email cannot be inserted directly" {
+      shouldThrow<SQLException> {
+        ds.connection.use { c ->
+          c.prepareStatement(
+            "insert into history.users (id, email, full_name, last_path_name) values (?, 'Mixed@Athenian.org', 'X', 'root')",
+          ).use { ps ->
+            ps.setObject(1, UUID.randomUUID())
+            ps.executeUpdate()
+          }
+        }
+      }
     }
 
     "emailForUuid finds the address, or null" {

@@ -14,6 +14,7 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpHeaders.Location
 import io.ktor.http.HttpStatusCode.Companion.Forbidden
 import io.ktor.http.HttpStatusCode.Companion.Found
+import io.ktor.http.HttpStatusCode.Companion.OK
 import io.ktor.http.HttpStatusCode.Companion.Unauthorized
 import io.ktor.http.Url
 import io.ktor.http.setCookie
@@ -67,6 +68,9 @@ class AuthRoutesTest : StringSpec() {
       }
       get("/test/complete-gmail") {
         call.completeSignIn(info("jsmith@gmail.com", hd = null), provision, "athenian.org", teachers)
+      }
+      signedInApi {
+        authenticate(GOOGLE_AUTH) { get("/api-probe") { call.respondText("api ok") } }
       }
       authenticate(GOOGLE_AUTH) {
         teachersOnly(emails::get, { teachers }) {
@@ -167,6 +171,15 @@ class AuthRoutesTest : StringSpec() {
       signInTest { client ->
         client.get("/test/sign-in/$teacher")
         client.get("/probe").bodyAsText() shouldBe "teacher ok"
+      }
+    }
+    "a valid session passes signedInApi, and no session is 401" {
+      signInTest { client ->
+        client.get("/api-probe").status shouldBe Unauthorized
+        client.get("/test/sign-in/$student")
+        val r = client.get("/api-probe")
+        r.status shouldBe OK
+        r.bodyAsText() shouldBe "api ok"
       }
     }
     "a session naming a deleted user is 401 on RPC" {

@@ -39,13 +39,17 @@ digits) and the teachers listed in `TEACHER_EMAILS` are admitted; anyone else is
 
 ### Google Cloud setup
 
-1. In Google Cloud Console, create an OAuth client of type **Web application**.
-2. Add these authorized redirect URIs:
+1. In Google Cloud Console, create (or choose) a project in the athenian.org organization.
+2. Configure the OAuth consent screen with user type **Internal**, so only athenian.org Workspace accounts can sign
+   in. (External in Testing mode would block students.)
+3. Create an OAuth client of type **Web application**, and copy its client id and client secret
+   (`GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` below).
+4. Add these authorized redirect URIs:
    * `https://<jermain-app>.herokuapp.com/auth/callback`
    * `https://<moses-app>.herokuapp.com/auth/callback`
    * `http://localhost:8080/auth/callback` (running the jar, or `make server` alone)
    * `http://localhost:3000/auth/callback` (with `make client`, whose dev server proxies `/auth/*`)
-3. Set the environment variables below. The server refuses to start without `GOOGLE_CLIENT_ID`,
+5. Set the environment variables below. The server refuses to start without `GOOGLE_CLIENT_ID`,
    `GOOGLE_CLIENT_SECRET`, and `OAUTH_CALLBACK_URL`.
 
 | Variable | Purpose |
@@ -62,6 +66,10 @@ Generate `SESSION_SECRET` with:
 ```bash
 openssl rand -hex 32
 ```
+
+Use a distinct `SESSION_SECRET` for each Heroku app. Rotating it signs everyone out.
+
+`./gradlew jvmTest` needs Docker running: `UserRepositoryTest` uses a Testcontainers Postgres.
 
 Locally, `OAUTH_CALLBACK_URL` must match the port the browser uses: `http://localhost:3000/auth/callback` when
 browsing the `make client` dev server, `http://localhost:8080/auth/callback` otherwise. A callback host of

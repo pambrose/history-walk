@@ -12,6 +12,7 @@ import io.ktor.server.plugins.calllogging.*
 import io.ktor.server.plugins.compression.*
 import io.ktor.server.plugins.defaultheaders.*
 import io.ktor.server.plugins.statuspages.*
+import io.ktor.server.request.*
 import io.ktor.server.response.*
 import org.slf4j.event.Level
 
@@ -23,6 +24,9 @@ object Installs {
     install(DefaultHeaders)
     install(CallLogging) {
       level = Level.INFO
+      // Log status, method, and path only: the default format appends a redirect's Location, which for /auth/login is
+      // the Google URL with the OAuth state
+      format { call -> "${call.response.status()}: ${call.request.httpMethod.value} ${call.request.path()}" }
     }
 
     installUserSessions()

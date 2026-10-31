@@ -14,7 +14,7 @@ import java.net.URLEncoder
 data class GoogleUserInfo(
   val id: String,
   val email: String,
-  val name: String,
+  val name: String = "",
   val picture: String? = null,
   @SerialName("verified_email") val verifiedEmail: Boolean? = null,
   val hd: String? = null,
