@@ -4,6 +4,10 @@ object Auth {
   const val AUTH_COOKIE = "HistoryWalkAuth"
 }
 
+object School {
+  const val DEFAULT_DOMAIN = "athenian.org"
+}
+
 object EndPoints {
   const val LOGIN = "login"
   const val LOGOUT = "logout"
