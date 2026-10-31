@@ -9,7 +9,6 @@ object School {
 }
 
 object EndPoints {
-  const val LOGIN = "login"
   const val LOGOUT = "logout"
   const val AUTH_LOGIN = "auth/login"
   const val AUTH_CALLBACK = "auth/callback"

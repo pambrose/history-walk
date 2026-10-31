@@ -4,6 +4,8 @@ import io.kvision.core.CssSize
 import io.kvision.core.StyledComponent
 import io.kvision.core.TextTransform
 import io.kvision.html.Button
+import kotlinx.browser.document
+import org.w3c.dom.HTMLFormElement
 
 object ClientUtils {
   fun Button.lowercase() {
@@ -25,4 +27,13 @@ object ClientUtils {
         throw e
       }
     }
+
+  /** Submits a POST (no fields) to [path], e.g. for logout, which a plain link (a GET) cannot do. */
+  fun postTo(path: String) {
+    val form = document.createElement("form") as HTMLFormElement
+    form.method = "post"
+    form.action = path
+    document.body?.appendChild(form)
+    form.submit()
+  }
 }

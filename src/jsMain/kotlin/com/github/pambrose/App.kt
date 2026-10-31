@@ -11,6 +11,7 @@ import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
+import org.w3c.dom.url.URLSearchParams
 
 val AppScope = CoroutineScope(window.asCoroutineDispatcher())
 
@@ -35,7 +36,15 @@ class App : Application() {
   }
 }
 
+private fun showRefusalFromUrl() {
+  val params = URLSearchParams(window.location.search)
+  val code = params.get(SignInError.ERROR_PARAM) ?: return
+  Security.signInError.value = SignInError.fromCode(code)?.message(params.get(SignInError.EMAIL_PARAM))
+  window.history.replaceState(null, "", "/")
+}
+
 fun main() {
+  showRefusalFromUrl()
   registerRemoteTypes()
   startApplication(::App, js("import.meta.webpackHot").unsafeCast<Hot?>(), BootstrapModule, FontAwesomeModule, CoreModule)
 }
