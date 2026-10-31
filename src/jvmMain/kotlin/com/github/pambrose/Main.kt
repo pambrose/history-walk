@@ -6,6 +6,8 @@ import com.github.pambrose.HistoryWalkServer.masterSlides
 import com.github.pambrose.Installs.installs
 import com.github.pambrose.Property.Companion.assignProperties
 import com.github.pambrose.Routes.assignRoutes
+import com.github.pambrose.auth.verifyAuthConfig
+import com.github.pambrose.slides.SlideDeck
 import com.pambrose.common.script.KotlinScript
 import com.pambrose.common.util.GitHubFile
 import com.pambrose.common.util.GitHubRepo
@@ -13,7 +15,6 @@ import com.pambrose.common.util.OwnerType.Organization
 import com.pambrose.common.util.OwnerType.User
 import com.pambrose.common.util.Version.Companion.versionDesc
 import com.pambrose.common.util.getBanner
-import com.github.pambrose.slides.SlideDeck
 import dev.kilua.rpc.initRpc
 import dev.kilua.rpc.registerService
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -93,6 +94,9 @@ fun Application.main() {
   }
 
   assignProperties()
+
+  // Fails startup before anything is installed if a required sign-in setting is missing
+  verifyAuthConfig()
 
   installs()
   assignRoutes()

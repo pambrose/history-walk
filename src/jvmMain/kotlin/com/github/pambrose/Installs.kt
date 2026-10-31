@@ -1,5 +1,6 @@
 package com.github.pambrose
 
+import com.github.pambrose.auth.configureGoogleAuth
 import com.github.pambrose.auth.installUserSessions
 import com.pambrose.common.util.simpleClassName
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -34,7 +35,7 @@ object Installs {
 //    }
 //  }
 
-    install(Authentication) {}
+    install(Authentication) { configureGoogleAuth() }
 
     install(StatusPages) {
       // Catch all

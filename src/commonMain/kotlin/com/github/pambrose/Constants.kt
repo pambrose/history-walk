@@ -11,7 +11,11 @@ object School {
 object EndPoints {
   const val LOGIN = "login"
   const val LOGOUT = "logout"
+  const val AUTH_LOGIN = "auth/login"
+  const val AUTH_CALLBACK = "auth/callback"
   const val USER_RESET = "userreset"
   const val CONTENT_RESET = "contentreset"
+  const val SUMMARY = "summary"
+  const val REASONS = "reasons"
   const val SLIDE = "slide"
 }
