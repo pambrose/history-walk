@@ -1,3 +1,6 @@
+-- Emails are stored lowercased from here on; normalise rows created before.
+UPDATE history.users SET email = lower(email);
+
 -- Google sign-in replaces passwords: drop the credential columns, record the profile picture, role and last sign-in.
 ALTER TABLE history.users
   DROP COLUMN salt,

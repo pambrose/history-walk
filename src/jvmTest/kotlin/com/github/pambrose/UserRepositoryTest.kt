@@ -5,6 +5,7 @@ import com.github.pambrose.User.Companion.upsertFromGoogle
 import com.github.pambrose.User.Companion.userInfoFor
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import org.flywaydb.core.Flyway
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -20,6 +21,7 @@ import java.util.*
 class UserRepositoryTest : StringSpec() {
   private lateinit var container: PostgreSQLContainer
   private lateinit var ds: HikariDataSource
+  private val legacyId = UUID.randomUUID()
 
   private fun addChoice(userId: UUID) =
     transaction {
@@ -48,6 +50,17 @@ class UserRepositoryTest : StringSpec() {
             maximumPoolSize = 4
           },
         )
+      // A V001-era row with a mixed-case email exists before V002 is applied.
+      Flyway.configure().dataSource(ds).locations("classpath:db/migration").target("001").load().migrate()
+      ds.connection.use { c ->
+        c.prepareStatement(
+          "insert into history.users (id, email, full_name, salt, digest, last_path_name) values (?, ?, 'Legacy', 's', 'd', 'root')",
+        ).use { ps ->
+          ps.setObject(1, legacyId)
+          ps.setString(2, "Mixed.Case@Athenian.org")
+          ps.executeUpdate()
+        }
+      }
       Dbms.migrate(ds)
       Database.connect(ds)
     }
@@ -85,6 +98,11 @@ class UserRepositoryTest : StringSpec() {
       transaction {
         UsersTable.selectAll().where { UsersTable.id eq a }.single()[UsersTable.lastSignIn].shouldNotBeNull()
       }
+    }
+
+    "V002 lowercases existing emails so a returning user keeps the same row" {
+      emailForUuid(legacyId) shouldBe "mixed.case@athenian.org"
+      upsertFromGoogle("mixed.case@athenian.org", "Legacy", null, Role.STUDENT) shouldBe legacyId
     }
 
     "emailForUuid finds the address, or null" {
