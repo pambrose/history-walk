@@ -5,25 +5,24 @@ import com.github.pambrose.User.Companion.upsertFromGoogle
 import com.github.pambrose.User.Companion.userInfoFor
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import org.flywaydb.core.Flyway
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
-import java.sql.SQLException
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.testcontainers.postgresql.PostgreSQLContainer
+import java.sql.SQLException
 import java.util.*
 
 class UserRepositoryTest : StringSpec() {
   private lateinit var container: PostgreSQLContainer
   private lateinit var ds: HikariDataSource
-  private val legacyId = UUID.randomUUID()
 
   private fun addChoice(userId: UUID) =
     transaction {
@@ -52,17 +51,6 @@ class UserRepositoryTest : StringSpec() {
             maximumPoolSize = 4
           },
         )
-      // A V001-era row with a mixed-case email exists before V002 is applied.
-      Flyway.configure().dataSource(ds).locations("classpath:db/migration").target("001").load().migrate()
-      ds.connection.use { c ->
-        c.prepareStatement(
-          "insert into history.users (id, email, full_name, salt, digest, last_path_name) values (?, ?, 'Legacy', 's', 'd', 'root')",
-        ).use { ps ->
-          ps.setObject(1, legacyId)
-          ps.setString(2, "Mixed.Case@Athenian.org")
-          ps.executeUpdate()
-        }
-      }
       Dbms.migrate(ds)
       Database.connect(ds)
     }
@@ -72,7 +60,7 @@ class UserRepositoryTest : StringSpec() {
       container.stop()
     }
 
-    "both migrations are applied" {
+    "the schema migration is applied" {
       val rows = mutableListOf<Pair<String, Boolean>>()
       ds.connection.use { c ->
         c.createStatement().use { st ->
@@ -80,7 +68,7 @@ class UserRepositoryTest : StringSpec() {
             .use { rs -> while (rs.next()) rows += rs.getString(1) to rs.getBoolean(2) }
         }
       }
-      rows.map { it.first }.shouldContainExactly("001", "002")
+      rows.map { it.first }.shouldContainExactly("001")
       rows.all { it.second } shouldBe true
     }
 
@@ -102,11 +90,6 @@ class UserRepositoryTest : StringSpec() {
       }
     }
 
-    "V002 lowercases existing emails so a returning user keeps the same row" {
-      emailForUuid(legacyId) shouldBe "mixed.case@athenian.org"
-      upsertFromGoogle("mixed.case@athenian.org", "Legacy", null, Role.STUDENT) shouldBe legacyId
-    }
-
     "the role comes from the current teacher list, not the stored one" {
       val id = upsertFromGoogle("27promoted@athenian.org", "Promoted", null, Role.STUDENT)
       userInfoFor(id, emptySet())!!.role shouldBe Role.STUDENT
@@ -114,16 +97,22 @@ class UserRepositoryTest : StringSpec() {
     }
 
     "a mixed-case email cannot be inserted directly" {
-      shouldThrow<SQLException> {
+      fun insertUser(email: String) =
         ds.connection.use { c ->
           c.prepareStatement(
-            "insert into history.users (id, email, full_name, last_path_name) values (?, 'Mixed@Athenian.org', 'X', 'root')",
+            "insert into history.users (id, email, full_name, role, last_path_name) values (?, ?, 'X', 'student', 'root')",
           ).use { ps ->
             ps.setObject(1, UUID.randomUUID())
+            ps.setString(2, email)
             ps.executeUpdate()
           }
         }
-      }
+
+      // The same insert with a lowercase address succeeds, so the failure below is the lowercase check itself.
+      insertUser("27lower@athenian.org") shouldBe 1
+      val e = shouldThrow<SQLException> { insertUser("27Mixed@Athenian.org") }
+      e.sqlState shouldBe "23514" // check_violation
+      e.message.orEmpty() shouldContain "users_email_lowercase"
     }
 
     "emailForUuid finds the address, or null" {
