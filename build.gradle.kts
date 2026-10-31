@@ -2,7 +2,6 @@
 
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jmailen.gradle.kotlinter.tasks.LintTask
-import sun.jvmstat.monitor.MonitoredVmUtil.mainClass
 
 plugins {
     idea
