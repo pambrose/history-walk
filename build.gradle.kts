@@ -1,22 +1,21 @@
+@file:OptIn(ExperimentalKotlinGradlePluginApi::class)
+
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jmailen.gradle.kotlinter.tasks.LintTask
 
 plugins {
-    val kotlinVersion: String by System.getProperties()
-    val kvisionVersion: String by System.getProperties()
-    val versionsVersion: String by System.getProperties()
-    val configVersion: String by System.getProperties()
-    val kotlinterVersion: String by System.getProperties()
-
-//  `maven-publish`
-
-    kotlin("plugin.serialization") version kotlinVersion
-    kotlin("multiplatform") version kotlinVersion
-    // This is required by BuildConfig
-    // id("idea")
-    id("io.kvision") version kvisionVersion
-    id("org.jmailen.kotlinter") version kotlinterVersion
-    id("com.github.ben-manes.versions") version versionsVersion
-    // id("com.github.gmazzo.buildconfig") version configVersion
+    idea
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.kvision)
+    alias(libs.plugins.versions)
+//    alias(libs.plugins.config)
+    alias(libs.plugins.kotlinter)
+//    alias(libs.plugins.kotest)
+//    alias(libs.plugins.diktat)
+//    alias(libs.plugins.detekt)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.kiluaRpc)
 }
 
 version = "1.0.0"
@@ -37,40 +36,22 @@ repositories {
 //  buildConfigField("long", "BUILD_TIME", "${System.currentTimeMillis()}L")
 //}
 
-// Versions
-val kotlinVersion: String by System.getProperties()
-val kvisionVersion: String by System.getProperties()
-val commonsCodecVersion: String by project
-val exposedVersion: String by project
-val flexmarkVersion: String by project
-val h2Version: String by project
-val hikariVersion: String by project
-//val khealthVersion: String by project
-val kweryVersion: String by project
-val logbackVersion: String by project
-val loggingVersion: String by project
-val pgjdbcVersion: String by project
-val pgsqlVersion: String by project
-val jdbcNamedParametersVersion: String by project
-val ktorVersion: String by project
-val slidesVersion: String by project
-val utilsVersion: String by project
-
 val webDir = file("src/jsMain/web")
 val mainClassName = "io.ktor.server.cio.EngineMain"
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(libs.versions.jvm.get().toInt())
     jvm {
 //        withJava()
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
         compilerOptions {
-            freeCompilerArgs = listOf("-Xjsr305=strict", "-Xcontext-receivers")
+            freeCompilerArgs = listOf("-Xjsr305=strict")
+            freeCompilerArgs.add("-Xcontext-parameters")
         }
 
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
         mainRun {
-            mainClass.set(mainClassName)
+            mainClass = mainClassName
         }
     }
 
@@ -87,26 +68,27 @@ kotlin {
             })
         }
         binaries.executable()
+        compilerOptions {
+            target.set("es2015")
+            freeCompilerArgs.add("-Xcontext-parameters")
+        }
     }
 
     sourceSets {
         all {
-            tasks {
-//                withType<FormatTask> {
-//                    this.source = this.source.minus(fileTree("build")).asFileTree
-//                }
-            }
-
             languageSettings {
                 optIn("kotlin.time.ExperimentalTime")
+                optIn("kotlin.uuid.ExperimentalUuidApi")
                 optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
                 optIn("kotlinx.coroutines.DelicateCoroutinesApi")
+                optIn("kotlin.concurrent.atomics.ExperimentalAtomicApi")
             }
         }
 
         val commonMain by getting {
             dependencies {
-                api("io.kvision:kvision-server-ktor:$kvisionVersion")
+                api(libs.kilua.rpc.ktor)
+                implementation(libs.kvision.common.remote)
             }
         }
 
@@ -119,47 +101,64 @@ kotlin {
 
         val jvmMain by getting {
             dependencies {
-                implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
+                implementation(project.dependencies.platform(libs.kotlin.bom))
+                implementation(libs.kotlin.reflect)
 
-                implementation("io.ktor:ktor-server-core:$ktorVersion")
-                implementation("io.ktor:ktor-server-cio:$ktorVersion")
-                implementation("io.ktor:ktor-server-html-builder:$ktorVersion")
-                implementation("io.ktor:ktor-server-sessions:$ktorVersion")
-                implementation("io.ktor:ktor-server-auth:$ktorVersion")
-                implementation("io.ktor:ktor-server-metrics:$ktorVersion")
-                implementation("io.ktor:ktor-server-metrics-micrometer:$ktorVersion")
-                implementation("io.ktor:ktor-server-compression:$ktorVersion")
-                implementation("io.ktor:ktor-server-call-logging:$ktorVersion")
-                implementation("io.ktor:ktor-server-default-headers:$ktorVersion")
-                implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
+                implementation(project.dependencies.platform(libs.ktor.bom))
+//                implementation(libs.bundles.ktor.client)
+                implementation(libs.ktor.server.core)
 
-                implementation("com.github.pambrose.common-utils:ktor-server-utils:$utilsVersion")
-                implementation("com.github.pambrose.common-utils:exposed-utils:$utilsVersion")
+                implementation(project.dependencies.platform(libs.utils.bom))
+                implementation(libs.common.utils.core)
 
-                implementation("com.github.pambrose:history-walk-slides:$slidesVersion")
+                implementation(project.dependencies.platform(libs.exposed.bom))
+                implementation(libs.exposed.core)
+
+//                implementation(libs.dropwizard.metrics)
+
+                implementation(libs.kotlin.logging)
+
+                implementation(libs.kotlin.reflect)
+
+                implementation(libs.ktor.server.core)
+                implementation(libs.ktor.server.cio)
+                implementation(libs.ktor.server.html.builder)
+                implementation(libs.ktor.server.sessions)
+                implementation(libs.ktor.server.auth)
+                implementation(libs.ktor.server.metrics)
+                implementation(libs.ktor.server.metrics.micrometer)
+                implementation(libs.ktor.server.compression)
+                implementation(libs.ktor.server.call.logging)
+                implementation(libs.ktor.server.default.headers)
+                implementation(libs.ktor.server.status.pages)
+
+//                implementation(libs.common.utils.ktor.server.core)
+                implementation(libs.common.utils.exposed)
+
+                implementation(libs.history.walk.slides)
 
                 //implementation("dev.hayden:khealth:$khealthVersion")
 
-                implementation("org.postgresql:postgresql:$pgsqlVersion")
-                implementation("com.impossibl.pgjdbc-ng:pgjdbc-ng-all:$pgjdbcVersion")
-                implementation("com.zaxxer:HikariCP:$hikariVersion")
-                implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
-                implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
-                implementation("org.jetbrains.exposed:exposed-kotlin-datetime:$exposedVersion")
+                implementation(libs.postgresql)
+                implementation(libs.pgjdbc.ng)
+                implementation(libs.hikariCP)
+                implementation(libs.exposed.core)
+                implementation(libs.exposed.jdbc)
+                implementation(libs.exposed.kotlin.datetime)
 
                 //implementation("commons-codec:commons-codec:$commonsCodecVersion")
                 //implementation("com.axiomalaska:jdbc-named-parameters:$jdbcNamedParametersVersion")
                 //implementation("com.github.andrewoma.kwery:core:$kweryVersion")
 
-                implementation("com.vladsch.flexmark:flexmark:$flexmarkVersion")
+                implementation(libs.flexmark)
 
-                implementation("com.github.pambrose.common-utils:core-utils:$utilsVersion")
-                implementation("com.github.pambrose.common-utils:script-utils-common:$utilsVersion")
-                implementation("com.github.pambrose.common-utils:script-utils-kotlin:$utilsVersion")
-                runtimeOnly("org.jetbrains.kotlin:kotlin-scripting-jsr223:$kotlinVersion")
+                implementation(libs.common.utils.core)
+                implementation(libs.common.utils.script.common)
+                implementation(libs.common.utils.script.kotlin)
+                runtimeOnly(libs.kotlin.scripting.jsr223)
 
-                implementation("io.github.oshai:kotlin-logging-jvm:$loggingVersion")
-                implementation("ch.qos.logback:logback-classic:$logbackVersion")
+                implementation(libs.kotlin.logging)
+                implementation(libs.logback.classic)
             }
         }
 
@@ -171,17 +170,17 @@ kotlin {
 
         val jsMain by getting {
             dependencies {
-                implementation("io.kvision:kvision:$kvisionVersion")
-                implementation("io.kvision:kvision-bootstrap:$kvisionVersion")
-                implementation("io.kvision:kvision-state:$kvisionVersion")
-                implementation("io.kvision:kvision-fontawesome:$kvisionVersion")
+                implementation(libs.kvision.core)
+                implementation(libs.kvision.bootstrap)
+                implementation(libs.kvision.state)
+                implementation(libs.kvision.fontawesome)
             }
         }
 
         val jsTest by getting {
             dependencies {
                 implementation(kotlin("test-js"))
-                implementation("io.kvision:kvision-testutils:$kvisionVersion")
+                implementation(libs.kvision.testutils)
             }
         }
     }
@@ -189,274 +188,19 @@ kotlin {
     tasks.withType<Test>().configureEach {
         useJUnitPlatform()
     }
-
-    kotlinter {
-        reporters = arrayOf("checkstyle", "plain")
-    }
 }
 
-dependencies {
-    implementation(kotlin("stdlib-jdk8"))
+tasks.withType<LintTask> {
+    // Exclude all generated files from lint checks, including KSP-generated files
+    source = source.minus(fileTree("build/generated")).asFileTree
+    source = source.minus(fileTree("build/generated/ksp")).asFileTree
 }
 
-//kotlin {
-//    jvmToolchain(17)
-//    jvm {
-//        withJava()
-//        compilations.all {
-//            kotlinOptions {
-//                freeCompilerArgs = listOf("-Xjsr305=strict")
-//            }
-//        }
-//        @OptIn(ExperimentalKotlinGradlePluginApi::class)
-//        mainRun {
-//            mainClass.set(mainClassName)
-//        }
-//    }
-//
-//    js(IR) {
-//        browser {
-//            commonWebpackConfig(Action {
-//                outputFileName = "main.bundle.js"
-//            })
-//            runTask {
-////        outputFileName = "main.bundle.js"
-//                sourceMaps = false
-//                devServer = DevServer(
-//                    open = false,
-//                    port = 3000,
-//                    proxy = mutableMapOf(
-//                        "/login" to "http://localhost:8080",
-//                        "/logout" to "http://localhost:8080",
-//                        "/contentreset" to "http://localhost:8080",
-//                        "/userreset" to "http://localhost:8080",
-//                        "/summary" to "http://localhost:8080",
-//                        "/reasons" to "http://localhost:8080",
-//                        "/slides" to "http://localhost:8080",
-//                        "/slide/*" to "http://localhost:8080",
-//                        "/kv/*" to "http://localhost:8080",
-//                        "/kvws/*" to mapOf("target" to "ws://localhost:8080", "ws" to true)
-//                    ),
-//                    static = mutableListOf("${layout.buildDirectory.asFile.get()}/processedResources/js/main")
-//                )
-//            }
-////      webpackTask {
-////        outputFileName = "main.bundle.js"
-////      }
-//            testTask(Action {
-//                useKarma {
-//                    useChromeHeadless()
-//                }
-//            })
-//        }
-//        binaries.executable()
-//    }
-//
-//    sourceSets {
-//        all {
-//            tasks.withType<LintTask> {
-//                this.source = this.source.minus(fileTree("build")).asFileTree
-//            }
-//
-//            tasks.withType<FormatTask> {
-//                this.source = this.source.minus(fileTree("build")).asFileTree
-//            }
-//
-//            languageSettings {
-//                optIn("kotlin.time.ExperimentalTime")
-//                optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
-//                optIn("kotlinx.coroutines.DelicateCoroutinesApi")
-//            }
-//        }
-//
-//        val commonMain by getting {
-//            dependencies {
-//                api("io.kvision:kvision-server-ktor:$kvisionVersion")
-//            }
-//            // kotlin.srcDir("build/generated-src/common")
-//        }
-//
-//        val commonTest by getting {
-//            dependencies {
-//                implementation(kotlin("test-common"))
-//                implementation(kotlin("test-annotations-common"))
-//            }
-//        }
-//
-//        val jvmMain by getting {
-//            dependencies {
-//                // implementation(kotlin("stdlib-jdk8"))
-//                implementation(kotlin("reflect"))
-//
-//                implementation("io.ktor:ktor-server-core:$ktorVersion")
-//                implementation("io.ktor:ktor-server-cio:$ktorVersion")
-//                implementation("io.ktor:ktor-server-html-builder:$ktorVersion")
-//                implementation("io.ktor:ktor-server-sessions:$ktorVersion")
-//                implementation("io.ktor:ktor-server-auth:$ktorVersion")
-//                implementation("io.ktor:ktor-server-metrics:$ktorVersion")
-//                implementation("io.ktor:ktor-server-metrics-micrometer:$ktorVersion")
-//                implementation("io.ktor:ktor-server-compression:$ktorVersion")
-//                implementation("io.ktor:ktor-server-call-logging-jvm:$ktorVersion")
-//                implementation("io.ktor:ktor-server-default-headers:$ktorVersion")
-//                implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
-//
-//                implementation("com.github.pambrose.common-utils:ktor-server-utils:$utilsVersion")
-//                implementation("com.github.pambrose.common-utils:exposed-utils:$utilsVersion")
-//
-//                implementation("com.github.pambrose:history-walk-slides:$slidesVersion")
-//
-//                //implementation("dev.hayden:khealth:$khealthVersion")
-//
-//                implementation("org.postgresql:postgresql:$pgsqlVersion")
-//                implementation("com.impossibl.pgjdbc-ng:pgjdbc-ng-all:$pgjdbcVersion")
-//                implementation("com.zaxxer:HikariCP:$hikariVersion")
-//                implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
-//                implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
-//                implementation("org.jetbrains.exposed:exposed-kotlin-datetime:$exposedVersion")
-//
-//                //implementation("commons-codec:commons-codec:$commonsCodecVersion")
-//                //implementation("com.axiomalaska:jdbc-named-parameters:$jdbcNamedParametersVersion")
-//                //implementation("com.github.andrewoma.kwery:core:$kweryVersion")
-//
-//                implementation("com.vladsch.flexmark:flexmark:$flexmarkVersion")
-//
-//                implementation("com.github.pambrose.common-utils:core-utils:$utilsVersion")
-//                implementation("com.github.pambrose.common-utils:script-utils-common:$utilsVersion")
-//                implementation("com.github.pambrose.common-utils:script-utils-kotlin:$utilsVersion")
-//                runtimeOnly("org.jetbrains.kotlin:kotlin-scripting-jsr223:$kotlinVersion")
-//
-//                implementation("io.github.oshai:kotlin-logging-jvm:$loggingVersion")
-//                implementation("ch.qos.logback:logback-classic:$logbackVersion")
-//            }
-//        }
-//
-//        val jvmTest by getting {
-//            dependencies {
-//                implementation(kotlin("test"))
-//                //  implementation(kotlin("test-junit"))
-//            }
-//        }
-//
-//        val jsMain by getting {
-////      resources.srcDir(webDir)
-//            dependencies {
-//                implementation("io.kvision:kvision:$kvisionVersion")
-//                implementation("io.kvision:kvision-bootstrap:$kvisionVersion")
-//                implementation("io.kvision:kvision-state:$kvisionVersion")
-//                implementation("io.kvision:kvision-fontawesome:$kvisionVersion")
-//            }
-////      kotlin.srcDir("build/generated-src/frontend")
-//        }
-//
-//        val jsTest by getting {
-//            dependencies {
-//                implementation(kotlin("test-js"))
-//                implementation("io.kvision:kvision-testutils:$kvisionVersion")
-//            }
-//        }
-//
-//        all {
-//            languageSettings.optIn("kotlin.time.ExperimentalTime")
-//        }
-//    }
-//
-//    tasks.withType<Test>().configureEach {
-//        useJUnitPlatform()
-//    }
-//
-//    kotlinter {
-//        ignoreFailures = false
-//        reporters = arrayOf("checkstyle", "plain")
-//    }
-//}
-
-//afterEvaluate {
-//  tasks {
-//    create("frontendArchive", Jar::class).apply {
-//      dependsOn("frontendBrowserProductionWebpack")
-//      group = "package"
-//      archiveAppendix.set("frontend")
-//      val distribution =
-//        project.tasks.getByName("frontendBrowserProductionWebpack", KotlinWebpack::class).destinationDirectory
-//      from(distribution) {
-//        include("*.*")
-//      }
-//      from(webDir)
-//      duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-//      into("/assets")
-//      inputs.files(distribution, webDir)
-//      outputs.file(archiveFile)
-//      manifest {
-//        attributes(
-//          mapOf(
-//            "Implementation-Title" to rootProject.name,
-//            "Implementation-Group" to rootProject.group,
-//            "Implementation-Version" to rootProject.version,
-//            "Timestamp" to System.currentTimeMillis()
-//          )
-//        )
-//      }
-//    }
-//    getByName("backendProcessResources", Copy::class) {
-//      duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-//    }
-//    getByName("backendJar").group = "package"
-//    create("jar", Jar::class).apply {
-//      dependsOn("frontendArchive", "backendJar")
-//      group = "package"
-//      manifest {
-//        attributes(
-//          mapOf(
-//            "Implementation-Title" to rootProject.name,
-//            "Implementation-Group" to rootProject.group,
-//            "Implementation-Version" to rootProject.version,
-//            "Timestamp" to System.currentTimeMillis(),
-//            "Main-Class" to mainClassName
-//          )
-//        )
-//      }
-//      val dependencies = configurations["backendRuntimeClasspath"].filter { it.name.endsWith(".jar") } +
-//          project.tasks["backendJar"].outputs.files +
-//          project.tasks["frontendArchive"].outputs.files
-//      dependencies.forEach {
-//        if (it.isDirectory) from(it) else from(zipTree(it))
-//      }
-//      exclude("META-INF/*.RSA", "META-INF/*.SF", "META-INF/*.DSA")
-//      inputs.files(dependencies)
-//      outputs.file(archiveFile)
-//      duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-//    }
-//    create("backendRun", JavaExec::class) {
-//      dependsOn("compileKotlinBackend")
-//      group = "run"
-//      mainClass.set(mainClassName)
-//      classpath =
-//        configurations["backendRuntimeClasspath"] + project.tasks["compileKotlinBackend"].outputs.files +
-//            project.tasks["backendProcessResources"].outputs.files
-//      workingDir = buildDir
-//    }
-//  }
-//}
-
-// This is for flyway
-buildscript {
-    dependencies {
-        classpath("org.postgresql:postgresql:42.7.8")
-    }
+kotlinter {
+    reporters = arrayOf("checkstyle", "plain")
 }
 
-//tasks.findByName("lintKotlinCommonMain")?.apply {
-//    dependsOn("kspCommonMainKotlinMetadata")
-//}
-
-dependencies {
-    implementation(kotlin("stdlib-jdk8"))
+// This will allow us to grab recent -SNAPSHOT versions from jitpack.io
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor(0, "seconds")
 }
-
-//flyway {
-//  driver = "org.postgresql.Driver"
-//  url = "jdbc:postgresql://localhost:5432/historywalk"
-//  user = "postgres"
-//  password = "docker"
-//  locations = arrayOf("filesystem:src/backendMain/resources/db/migration")
-//}

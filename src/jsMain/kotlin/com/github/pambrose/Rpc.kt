@@ -1,7 +1,7 @@
 package com.github.pambrose
 
 import com.github.pambrose.ClientUtils.withAuth
-import io.kvision.remote.getService
+import dev.kilua.rpc.getService
 
 object Rpc {
   private val registerUserService = getService<IRegisterUserService>()

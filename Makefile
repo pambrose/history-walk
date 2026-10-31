@@ -1,4 +1,4 @@
-default: versioncheck
+default: versions
 
 server:
 	./gradlew jvmRun -t
@@ -15,7 +15,7 @@ build: clean
 yarn-unlock:
 	./gradlew kotlinUpgradeYarnLock
 
-versioncheck:
+versions:
 	./gradlew dependencyUpdates
 
 depends:
@@ -45,4 +45,4 @@ log:
 	heroku logs --tail
 
 upgrade-wrapper:
-	./gradlew wrapper --gradle-version=9.2.1 --distribution-type=bin
+	./gradlew wrapper --gradle-version=9.8.2 --distribution-type=bin

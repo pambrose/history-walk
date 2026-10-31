@@ -12,7 +12,6 @@ import io.kvision.html.ButtonStyle
 import io.kvision.html.ButtonStyle.PRIMARY
 import io.kvision.modal.Alert
 import io.kvision.modal.Dialog
-import io.kvision.remote.Credentials
 import io.kvision.utils.ENTER_KEY
 import kotlinx.coroutines.launch
 
