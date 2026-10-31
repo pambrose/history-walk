@@ -25,5 +25,15 @@ enum class SignInError(
     const val EMAIL_PARAM = "email"
 
     fun fromCode(code: String?): SignInError? = entries.firstOrNull { it.code == code }
+
+    private const val MAX_EMAIL_LENGTH = 254
+    private val emailPattern = Regex("^[^\\s@\\u0000-\\u001F\\u007F]{1,64}@[^\\s@\\u0000-\\u001F\\u007F]{1,253}$")
+
+    /**
+     * The `email` from a refusal redirect, only if it looks like an address (it is shown in the sign-in prompt, and
+     * anyone can craft the URL); otherwise null, so the generic message is shown.
+     */
+    fun refusalEmailOrNull(raw: String?): String? =
+      raw?.takeIf { it.length <= MAX_EMAIL_LENGTH && emailPattern.matches(it) }
   }
 }

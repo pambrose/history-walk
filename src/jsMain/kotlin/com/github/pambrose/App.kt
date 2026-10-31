@@ -24,6 +24,8 @@ class App : Application() {
   }
 
   override fun start() {
+    showRefusalFromUrl()
+
     root("kvapp") {
       display = Display.INLINEBLOCK
       add(MainPanel)
@@ -39,12 +41,12 @@ class App : Application() {
 private fun showRefusalFromUrl() {
   val params = URLSearchParams(window.location.search)
   val code = params.get(SignInError.ERROR_PARAM) ?: return
-  Security.signInError.value = SignInError.fromCode(code)?.message(params.get(SignInError.EMAIL_PARAM))
+  val email = SignInError.refusalEmailOrNull(params.get(SignInError.EMAIL_PARAM))
+  Security.signInError.value = SignInError.fromCode(code)?.message(email)
   window.history.replaceState(null, "", "/")
 }
 
 fun main() {
-  showRefusalFromUrl()
   registerRemoteTypes()
   startApplication(::App, js("import.meta.webpackHot").unsafeCast<Hot?>(), BootstrapModule, FontAwesomeModule, CoreModule)
 }
