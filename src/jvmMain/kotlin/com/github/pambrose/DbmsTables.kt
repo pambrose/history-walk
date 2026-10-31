@@ -1,9 +1,10 @@
 package com.github.pambrose
 
-import org.jetbrains.exposed.dao.id.IntIdTable
-import org.jetbrains.exposed.dao.id.UUIDTable
-import org.jetbrains.exposed.sql.Table
-import org.jetbrains.exposed.sql.kotlin.datetime.datetime
+import org.jetbrains.exposed.v1.core.dao.id.IntIdTable
+import org.jetbrains.exposed.v1.core.dao.id.java.UUIDTable
+import org.jetbrains.exposed.v1.core.Table
+import org.jetbrains.exposed.v1.core.java.javaUUID
+import org.jetbrains.exposed.v1.datetime.datetime
 
 object UsersTable : UUIDTable("history.users") {
   val created = datetime("created")
@@ -18,7 +19,7 @@ object UsersTable : UUIDTable("history.users") {
 object UserChoiceTable : IntIdTable("history.user_choices") {
   val created = datetime("created")
   val updated = datetime("updated")
-  val userUuidRef = uuid("user_uuid_ref")
+  val userUuidRef = javaUUID("user_uuid_ref")
   val fromPathName = text("from_path_name")
   val fromTitle = text("from_title")
   val toPathName = text("to_path_name")
@@ -29,12 +30,12 @@ object UserChoiceTable : IntIdTable("history.user_choices") {
 }
 
 object UserVisitsView : Table("history.user_visits") {
-  val id = uuid("id")
+  val id = javaUUID("id")
   val toTitle = text("to_title")
 }
 
 object UserDecisionCountsView : Table("history.user_decision_counts") {
-  val id = uuid("id")
+  val id = javaUUID("id")
   val fullName = text("full_name")
   val email = text("email")
   val lastPathName = text("last_path_name")
@@ -42,7 +43,7 @@ object UserDecisionCountsView : Table("history.user_decision_counts") {
 }
 
 object UserReasonsView : Table("history.user_reasons") {
-  val id = uuid("id")
+  val id = javaUUID("id")
   val fullName = text("full_name")
   val email = text("email")
   val fromPathName = text("from_path_name")

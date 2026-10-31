@@ -2,7 +2,7 @@ package com.github.pambrose
 
 import com.github.pambrose.ConfigureFormAuth.configureFormAuth
 import com.github.pambrose.Cookies.assignCookies
-import com.github.pambrose.common.util.simpleClassName
+import com.pambrose.common.util.simpleClassName
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.http.*
 import io.ktor.http.content.*

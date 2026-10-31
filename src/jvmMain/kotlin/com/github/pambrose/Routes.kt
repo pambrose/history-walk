@@ -14,9 +14,9 @@ import com.github.pambrose.HistoryWalkServer.masterSlides
 import com.github.pambrose.Pages.displayAllSlides
 import com.github.pambrose.Pages.displayUserReasons
 import com.github.pambrose.Pages.displayUserSummary
-import com.github.pambrose.common.response.respondWith
-import com.github.pambrose.common.util.Version.Companion.versionDesc
-import com.github.pambrose.common.util.isNotNull
+import com.pambrose.common.response.respondWith
+import com.pambrose.common.util.Version.Companion.versionDesc
+import com.pambrose.common.util.isNotNull
 import com.github.pambrose.slides.SlideDeck.Companion.ROOT
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.http.*
@@ -28,8 +28,8 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
 import io.ktor.server.util.*
-import io.kvision.remote.applyRoutes
-import org.jetbrains.exposed.sql.transactions.transaction
+import dev.kilua.rpc.applyRoutes
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.io.ByteArrayOutputStream
 import java.lang.management.ManagementFactory
 import kotlin.text.Charsets.UTF_8

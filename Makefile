@@ -4,7 +4,7 @@ server:
 	./gradlew jvmRun -t
 
 client:
-	./gradlew jsRun -t
+	./gradlew jsBrowserDevelopmentRun -t
 
 clean:
 	./gradlew clean

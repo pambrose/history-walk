@@ -1,7 +1,7 @@
 package com.github.pambrose
 
-import com.github.pambrose.common.util.isNotNull
-import com.github.pambrose.common.util.obfuscate
+import com.pambrose.common.util.isNotNull
+import com.pambrose.common.util.obfuscate
 
 enum class EnvVar(val maskFunc: EnvVar.() -> String = { getEnv(UNASSIGNED) }) {
   SHOW_RESET_BUTTON,

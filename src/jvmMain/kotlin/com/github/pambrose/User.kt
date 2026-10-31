@@ -4,16 +4,17 @@ import com.github.pambrose.Email.Companion.EMPTY_EMAIL
 import com.github.pambrose.Email.Companion.UNKNOWN_EMAIL
 import com.github.pambrose.FullName.Companion.EMPTY_FULLNAME
 import com.github.pambrose.Utils.toUuid
-import com.github.pambrose.common.util.*
+import com.pambrose.common.util.*
 import com.github.pambrose.slides.Slide
 import com.github.pambrose.slides.SlideDeck
 import com.github.pambrose.slides.SlideDeck.Companion.ROOT
+import com.pambrose.common.email.EmailUtils.isNotValidEmail
 import com.pambrose.common.exposed.get
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.http.*
-import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.v1.core.*
+import org.jetbrains.exposed.v1.jdbc.*
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.*
 import kotlin.time.measureTime
 

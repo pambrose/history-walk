@@ -3,7 +3,7 @@ package com.github.pambrose
 import io.ktor.server.application.*
 import io.ktor.server.sessions.*
 import io.ktor.util.pipeline.*
-import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import java.util.*
 
 object Utils {

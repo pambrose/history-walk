@@ -6,9 +6,9 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.server.config.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.Transaction
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.v1.jdbc.Database
+import org.jetbrains.exposed.v1.jdbc.JdbcTransaction
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import kotlin.time.Duration.Companion.minutes
 
 object Dbms {
@@ -48,7 +48,7 @@ object Dbms {
         validate()
       }.let { HikariDataSource(it) }
 
-  suspend fun <T> dbQuery(block: Transaction.() -> T): T =
+  suspend fun <T> dbQuery(block: JdbcTransaction.() -> T): T =
     withContext(Dispatchers.IO) {
       transaction {
         block()

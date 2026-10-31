@@ -5,6 +5,8 @@ import com.github.pambrose.Rpc.getCurrentSlide
 import io.kvision.*
 import io.kvision.core.Display
 import io.kvision.panel.root
+import io.kvision.remote.registerRemoteTypes
+import io.kvision.utils.useModule
 import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
@@ -12,9 +14,12 @@ import kotlinx.coroutines.launch
 
 val AppScope = CoroutineScope(window.asCoroutineDispatcher())
 
+@JsModule("./modules/css/kvapp.css")
+external object kvappCss
+
 class App : Application() {
   init {
-    require("css/kvapp.css")
+    useModule(kvappCss)
   }
 
   override fun start() {
@@ -31,5 +36,6 @@ class App : Application() {
 }
 
 fun main() {
-  startApplication(::App, module.hot, BootstrapModule, FontAwesomeModule, CoreModule)
+  registerRemoteTypes()
+  startApplication(::App, js("import.meta.webpackHot").unsafeCast<Hot?>(), BootstrapModule, FontAwesomeModule, CoreModule)
 }

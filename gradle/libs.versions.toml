@@ -1,7 +1,7 @@
 [versions]
 # Kotlin and JVM
 kotlin = "2.4.20"
-jvm = "21"
+jvm = "25"
 
 config = "3.0.3"
 kiluaRpc = "0.0.46"
@@ -9,15 +9,15 @@ kotlinter = "5.7.0"
 # Required by kilua
 ksp = "2.3.12"
 kvision = "9.7.0"
-versions = "0.53.0"
-exposed = "0.61.0"
+versions = "0.67.0"
+exposed = "1.6.0"
 flexmark = "0.64.8"
 h2Version = "1.4.200"
-hikari = "7.0.2"
+hikari = "7.1.0"
 ktor = "3.6.1"
-logback = "1.5.24"
-logging = "7.0.13"
-pgsql = "42.7.8"
+logback = "1.6.6"
+logging = "8.0.4"
+pgsql = "42.7.14"
 pgjdbc = "0.8.9"
 slides = "1.8.5"
 utils = "5.2.0"
@@ -33,7 +33,7 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 kotlinter = { id = "org.jmailen.kotlinter", version.ref = "kotlinter" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kvision = { id = "io.kvision", version.ref = "kvision" }
-versions = { id = "com.github.ben-manes.versions", version.ref = "versions" }
+versions = { id = "io.github.ben-manes.versions", version.ref = "versions" }
 
 
 [libraries]
@@ -87,7 +87,8 @@ kilua-rpc-ktor = { group = "dev.kilua", name = "kilua-rpc-ktor", version.ref = "
 utils-bom = { module = "com.pambrose.common-utils:common-utils-bom", version.ref = "utils" }
 common-utils-core = { group = "com.pambrose.common-utils", name = "core-utils" }
 common-utils-ktor = { group = "com.pambrose.common-utils", name = "ktor-server-utils" }
-common-utils-exposed = { group = "com.pambrose.common-utils", name = "exposed-utils" }
+common-utils-email = { group = "com.pambrose.common-utils", name = "email-utils" }
+common-utils-exposed ={ group = "com.pambrose.common-utils", name = "exposed-utils" }
 common-utils-script-common = { group = "com.pambrose.common-utils", name = "script-utils-common" }
 common-utils-script-kotlin = { group = "com.pambrose.common-utils", name = "script-utils-kotlin"}
 

@@ -5,16 +5,15 @@ import com.github.pambrose.DbmsTxs.updateLastSlide
 import com.github.pambrose.HistoryWalkServer.masterSlides
 import com.github.pambrose.User.Companion.findCurrentSlideForUser
 import com.github.pambrose.Utils.toUuid
-import com.google.inject.Inject
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.server.application.*
-import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.insertAndGetId
-import org.jetbrains.exposed.sql.selectAll
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.v1.core.and
+import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.jdbc.insertAndGetId
+import org.jetbrains.exposed.v1.jdbc.selectAll
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
-@Suppress("ACTUAL_WITHOUT_EXPECT")
-actual class RegisterUserService : IRegisterUserService {
+class RegisterUserService : IRegisterUserService {
   override suspend fun registerUser(registerData: RegisterData): Boolean {
     try {
       User.createUser(FullName(registerData.fullName), Email(registerData.email), Password(registerData.password))
@@ -30,11 +29,9 @@ actual class RegisterUserService : IRegisterUserService {
   }
 }
 
-@Suppress("ACTUAL_WITHOUT_EXPECT")
-actual class ContentService : IContentService {
-  @Inject
-  lateinit var call: ApplicationCall
-
+class ContentService(
+  private val call: ApplicationCall,
+) : IContentService {
   override suspend fun getUserInfo() =
     transaction {
       val uuid = call.userId.uuid

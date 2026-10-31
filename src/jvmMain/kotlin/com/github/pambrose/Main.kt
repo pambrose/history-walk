@@ -6,14 +6,16 @@ import com.github.pambrose.HistoryWalkServer.masterSlides
 import com.github.pambrose.Installs.installs
 import com.github.pambrose.Property.Companion.assignProperties
 import com.github.pambrose.Routes.assignRoutes
-import com.github.pambrose.common.script.KotlinScript
-import com.github.pambrose.common.util.GitHubFile
-import com.github.pambrose.common.util.GitHubRepo
-import com.github.pambrose.common.util.OwnerType.Organization
-import com.github.pambrose.common.util.OwnerType.User
-import com.github.pambrose.common.util.Version.Companion.versionDesc
-import com.github.pambrose.common.util.getBanner
+import com.pambrose.common.script.KotlinScript
+import com.pambrose.common.util.GitHubFile
+import com.pambrose.common.util.GitHubRepo
+import com.pambrose.common.util.OwnerType.Organization
+import com.pambrose.common.util.OwnerType.User
+import com.pambrose.common.util.Version.Companion.versionDesc
+import com.pambrose.common.util.getBanner
 import com.github.pambrose.slides.SlideDeck
+import dev.kilua.rpc.initRpc
+import dev.kilua.rpc.registerService
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.server.application.*
 import jermainLonguenSlides
@@ -105,5 +107,8 @@ fun Application.main() {
 
   dbmsInit(environment.config)
 
-  // kvisionInit()
+  initRpc {
+    registerService<IRegisterUserService> { RegisterUserService() }
+    registerService<IContentService> { call -> ContentService(call) }
+  }
 }

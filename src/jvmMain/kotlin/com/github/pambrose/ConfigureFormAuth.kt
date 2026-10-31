@@ -1,9 +1,9 @@
 package com.github.pambrose
 
 import com.github.pambrose.User.Companion.isValidUuid
-import com.github.pambrose.common.util.isNotNull
-import com.github.pambrose.common.util.isNull
-import com.github.pambrose.common.util.sha256
+import com.pambrose.common.util.isNotNull
+import com.pambrose.common.util.isNull
+import com.pambrose.common.util.sha256
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.server.auth.*
 import io.ktor.server.sessions.*
