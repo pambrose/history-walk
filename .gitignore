@@ -10,3 +10,4 @@ kotlin-js-store
 
 logs/
 secrets/
+.env
