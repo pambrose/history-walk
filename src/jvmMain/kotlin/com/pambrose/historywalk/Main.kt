@@ -10,8 +10,8 @@ import com.pambrose.historywalk.Installs.installs
 import com.pambrose.historywalk.Property.Companion.assignProperties
 import com.pambrose.historywalk.Routes.assignRoutes
 import com.pambrose.historywalk.auth.verifyAuthConfig
-import com.pambrose.historywalk.content.jermainLonguenSlides
-import com.pambrose.historywalk.content.mosesSlides
+import com.pambrose.historywalk.content.slideDeckFor
+import com.pambrose.historywalk.content.slideDeckName
 import com.pambrose.historywalk.dbms.Dbms.dbmsInit
 import com.pambrose.historywalk.slides.SlideDeck
 import dev.kilua.rpc.initRpc
@@ -55,17 +55,16 @@ fun Application.main() {
   // Fails startup before anything is installed if a required sign-in setting is missing
   verifyAuthConfig()
 
+  // Fails startup too if SLIDES_VARIABLE_NAME names no deck, rather than serve the other walk
+  val slidesName = SLIDES_VARIABLE_NAME.getEnvOrNull()
+  masterSlides = slideDeckFor(slidesName)
+  logger.info {
+    val setting = slidesName?.let { "\"$it\"" } ?: "unset"
+    "Serving the ${slideDeckName(slidesName)} slide deck (SLIDES_VARIABLE_NAME is $setting)"
+  }
+
   installs()
   assignRoutes()
-
-  val defaultSlides = "jermain"
-
-  val slideName = SLIDES_VARIABLE_NAME.getEnv(defaultSlides)
-  masterSlides =
-    if (slideName == defaultSlides)
-      jermainLonguenSlides
-    else
-      mosesSlides
 
   dbmsInit(environment.config)
 

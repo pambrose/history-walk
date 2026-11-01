@@ -23,8 +23,9 @@ make coverage           # the tests plus Kover reports (build/reports/kover/html
 ./gradlew jvmTest --tests 'com.pambrose.historywalk.auth.AuthRoutesTest'   # one spec
 make lint               # kotlinter (./gradlew lintKotlin); make format fixes what it can
 make zizmor             # audit .github (workflows, dependabot.yml) as the zizmor workflow does
-make ci                 # every CI gate: lint, zizmor, tests with coverage, docker-build, then docker-smoke
-make build              # clean + fat jar at build/libs/history-walk-<version>.jar (server + bundled JS client)
+make ci                 # every CI gate: lint, zizmor, tests with coverage, docker-build, procfile-check, docker-smoke
+make build              # clean + fat jar at build/libs/history-walk.jar (server + bundled JS client; no version)
+make procfile-check     # after a build: fails unless the jar the Procfile runs is in build/libs
 make docker-build       # fat jar, then image history-walk:<version>; make docker-run runs it with .env against make db
 make docker-smoke       # start the image against a throwaway Postgres and check /ping, /version, headers, the 401
 ```
@@ -58,10 +59,11 @@ An explicit anti-goal: a student must never see another student's data or progre
 
 **Slides.** Decks are Kotlin DSL values in `jvmMain/content/` (`jermainLonguenSlides`, `mosesSlides`) built with
 `slides/SlideDeck.slideDeck { slide(...) { choice(...) } }`; content is HTML/markdown in raw strings, rendered through
-`MarkdownParser`. `Main.kt` picks the deck: `SLIDES_VARIABLE_NAME == "jermain"` selects Jermain, anything else
-Moses. The decks are compiled into the jar: nothing fetches or evaluates slide code at runtime, so a content change
-ships with a release. Slide images are jar resources under `src/jvmMain/resources/static/images`, referenced as
-`/static/images/<name>`.
+`MarkdownParser`. `Main.kt` picks the deck with `slideDeckFor` (`content/SlideDecks.kt`): `SLIDES_VARIABLE_NAME` is
+`jermain` (the default when unset or blank) or `moses`, trimmed and in any case; any other value stops the server at
+startup, naming the value. The decks are compiled into the jar: nothing fetches or evaluates slide code at runtime, so
+a content change ships with a release. Slide images are jar resources under `src/jvmMain/resources/static/images`,
+referenced as `/static/images/<name>`.
 
 A go-back choice, `goBack(-n)`, returns the student to the slide's n-th ancestor (-1 is its parent);
 `SlideData.goBackTarget` (commonMain) works it out for the client, and `SlideContentTest` checks that every Jermain
@@ -120,8 +122,9 @@ shared between two parents, a go-back past the root, a missing image, or a succe
 deck's (the summary page counts successes by that title).
 
 **CI** (`.github/workflows`, all actions pinned to commit SHAs): `tests.yml` runs `jvmTest` with Kover on pushes and
-pull requests to master; `docker.yml` runs `make docker-build` and `make docker-smoke`, which starts the image against a
-throwaway Postgres and checks `/ping`, `/version`, the page shell's `Cache-Control`, and a 401 for an unsigned RPC call;
+pull requests to master; `docker.yml` runs `make docker-build`, `make procfile-check` (the Procfile's jar exists), and
+`make docker-smoke`, which starts the image against a throwaway Postgres and checks `/ping`, `/version`, the page
+shell's `Cache-Control`, and a 401 for an unsigned RPC call;
 `zizmor.yml` audits `.github` changes; `lint.yml` runs `make lint`; `dependency-graph.yml` submits `jvmRuntimeClasspath`
 so Dependabot sees the JVM libraries; `cleanup-runs.yml` deletes runs older than 30 days every Monday, keeping the
 newest 10. `.gitignore` ignores dot-directories, so `.github/` is re-included explicitly. `make ci` runs the same gates
@@ -133,5 +136,9 @@ constants are SCREAMING_SNAKE_CASE, as ktlint's property-naming rule requires.
 - IntelliJ has twice auto-imported JDK-internal classes (`sun.jvmstat...`, `sun.jvm.hotspot.HelloWorld.e`) into Kotlin
   files, which breaks the build; delete such imports.
 - Heroku: each app's env vars are listed in `heroku.md` and the README's "Google sign-in" section; the Procfile runs
-  `java -jar build/libs/history-walk-1.0.0.jar -port=$PORT`, so the Docker image and Heroku both run the same fat jar.
+  `java -jar build/libs/history-walk.jar -port=$PORT`, so the Docker image and Heroku both run the same fat jar.
+- `./gradlew jar` (what Heroku's `GRADLE_TASK` and the Makefile run) is Gradle's prefix match for `jarWithJs`, the Kilua
+  RPC plugin's fat jar: Kotlin Multiplatform has no `jar` task. `build.gradle.kts` names it `history-walk.jar` with no
+  version, so a version bump does not leave the Procfile and the Dockerfile pointing at a file the build no longer
+  writes; `make procfile-check` (in `make ci` and `docker.yml`) guards the Procfile. Keep the three names in step.
 - `docs/superpowers/` holds the Google sign-in design spec and implementation plan; they predate folding `V002` into `V001`.

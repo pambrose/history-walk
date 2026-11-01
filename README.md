@@ -20,7 +20,8 @@ The *history-walk-slides* repo is used to hold the core slide code. It is a depe
 ## Env Vars
 
 ### Heroku
-* SLIDES_VARIABLE_NAME - `jermain` for the Jermain Longuen walk; any other value (e.g. `moses`) selects the Moses walk.
+* SLIDES_VARIABLE_NAME - `jermain` for the Jermain Longuen walk (the default when unset), or `moses` for the Moses walk,
+  in any case. Any other value stops the server at startup with an error naming it.
 * DISPLAY_CONSECUTIVE_CORRECT_DECISIONS
 * CLIENT_VERSION_CHECK_INTERVAL_SECS - How often an open page asks whether its version is current (default 60).
 * CLIENT_RELOAD_WARNING_INTERVAL_SECS - How long an out-of-date page shows its reload dialog before it reloads itself
@@ -84,7 +85,9 @@ with a logged warning. Any other host is production and requires `SESSION_SECRET
 * jsJar - Packages a standalone "web" frontend jar with all required files into `build/libs/*.jar`
 * jvmJar - Packages a backend jar with compiled source files into `build/libs/*.jar`
 * jar - Packages a "fat" jar with all backend sources and dependencies while also embedding frontend resources
-  into `build/libs/*.jar`
+  into `build/libs/history-walk.jar`. The name has no version, so the Procfile and the Dockerfile name the same file in
+  every release; `make procfile-check`, run after a build, fails if the Procfile names a file the build did not write.
+  (`jar` is Gradle's prefix match for the Kilua RPC plugin's `jarWithJs` task.)
 
 ## Docker
 

@@ -37,5 +37,11 @@ jobs:
       - name: Build the fat jar and the Docker image
         run: make docker-build DOCKER_IMAGE=history-walk-ci
 
+      # Heroku starts the jar the Procfile names, so a build that writes another file name (as a versioned name did
+      # after each version bump) leaves the dyno unable to start. The checkout is clean, so only the jar just built
+      # can satisfy it.
+      - name: Check that the Procfile runs the jar the build wrote
+        run: make procfile-check
+
       - name: Start the image against Postgres and check that it answers
         run: make docker-smoke DOCKER_IMAGE=history-walk-ci
