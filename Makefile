@@ -5,9 +5,17 @@ GRADLE_VERSION ?= 9.8.2
 APP ?=
 HEROKU_APP_FLAG := $(if $(APP),-a $(APP))
 
+# Local Postgres for the jermain and moses targets; override any of these, e.g. `make moses DB_PORT=5433`.
+DB_CONTAINER ?= pg-docker
+DB_IMAGE     ?= postgres:18
+DB_USER      ?= postgres
+DB_PASSWORD  ?= docker
+DB_PORT      ?= 5432
+DB_DATA_DIR  ?= $(HOME)/docker/volumes/$(DB_CONTAINER)
+
 .DEFAULT_GOAL := help
 
-.PHONY: help server client build clean tests versions depends yarn-unlock upgrade-wrapper creds restart log
+.PHONY: help jermain moses reset-jermain reset-moses stop-db server client build clean tests versions depends yarn-unlock upgrade-wrapper creds restart log
 
 ##@ General
 
@@ -17,6 +25,42 @@ help: ## Show this help
 		/^[a-zA-Z0-9_-]+:.*## / { printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 
 ##@ Development
+
+jermain: ## Start Postgres in Docker and create the jermain database if missing
+moses: ## Start Postgres in Docker and create the moses database if missing
+
+# Each target creates the database named after itself ($@), in the shared container.
+jermain moses:
+	@if docker container inspect $(DB_CONTAINER) >/dev/null 2>&1; then \
+		docker start $(DB_CONTAINER) >/dev/null; \
+	else \
+		mkdir -p $(DB_DATA_DIR) && \
+		docker run -d --name $(DB_CONTAINER) \
+			-e POSTGRES_USER=$(DB_USER) -e POSTGRES_PASSWORD=$(DB_PASSWORD) \
+			-p 127.0.0.1:$(DB_PORT):5432 -v $(DB_DATA_DIR):/var/lib/postgresql \
+			--restart unless-stopped $(DB_IMAGE) >/dev/null; \
+	fi
+	@# Probe over TCP: the image's first-run init server listens only on the socket, then restarts.
+	@until docker exec $(DB_CONTAINER) pg_isready -q -h 127.0.0.1 -U $(DB_USER); do sleep 1; done
+	@docker exec $(DB_CONTAINER) psql -U $(DB_USER) -tAc "SELECT 1 FROM pg_database WHERE datname = '$@'" | grep -qx 1 \
+		|| docker exec $(DB_CONTAINER) createdb -U $(DB_USER) $@
+	@echo "Postgres ready: jdbc:pgsql://localhost:$(DB_PORT)/$@ (user $(DB_USER))"
+
+reset-jermain: ## Drop and recreate the jermain database (all its data is lost)
+reset-moses: ## Drop and recreate the moses database (all its data is lost)
+
+# $* is the database name; the prerequisite makes sure the container is up and the database exists.
+reset-jermain reset-moses: reset-%: %
+	@docker exec $(DB_CONTAINER) dropdb -U $(DB_USER) --force $*
+	@docker exec $(DB_CONTAINER) createdb -U $(DB_USER) $*
+	@echo "Reset $*: the database is empty; Flyway rebuilds the schema on the next server start"
+
+stop-db: ## Stop the Postgres container, and with it both databases (the data is kept)
+	@if docker container inspect $(DB_CONTAINER) >/dev/null 2>&1; then \
+		docker stop $(DB_CONTAINER) >/dev/null && echo "Stopped $(DB_CONTAINER); make jermain or make moses starts it again"; \
+	else \
+		echo "No $(DB_CONTAINER) container to stop"; \
+	fi
 
 server: ## Run the Ktor server on port 8080 with continuous rebuild
 	$(GRADLE) jvmRun -t
