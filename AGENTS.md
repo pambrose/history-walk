@@ -204,12 +204,18 @@ private.
 - `FakeServer.kt` replaces the page's `fetch`, so a call takes the real path (`Rpc`, `withAuth`, Kilua's client):
   `FakeServer.on(IContentService::makeChoice) { call -> returns(...) }` answers a route with a result,
   `Reply.Refused` (a `ServiceException`), or `Reply.HttpError` (a 401 is a `SecurityException`), and `callsTo` lists
-  what the page sent, decoded with `call.param<T>(i)`. By default the user is `testStudent` on `testSlide()`. Until a
-  first call succeeds, KVision's `SecurityMgr.withAuth` takes any failure for a signed-out user and parks the call
-  behind the sign-in dialog for good, so a spec must not let the page's first call fail.
+  what the page sent, decoded with `call.param<T>(i)`. By default the user is `testStudent` on `testSlide()`. A 401
+  parks the call behind the sign-in dialog for good and leaves the singleton `Security` signed out for the rest of the
+  run, so only `WithAuthTest` sends one, and it runs last: Kotest runs the specs in name order.
 - `LoginPromptTest`, `SignInDialogTest`, `ErrorToastTest` (`orErrorToast`, `launchOrErrorToast`), `OnClickWhenIdleTest`
   (the busy gate), `ReasonDialogTest` (the five-word gate), and `ChoiceFlowTest` (a click on a choice through
   `MainPanel`: makeChoice, the reason dialog, provideReason, the next slide).
+- The version check: `VersionCheckStateTest` (the pure decisions: when the dialog is held back, when the server's
+  warning stamp is kept, the reload put off while a reason is written, the reload remembered in `sessionStorage`),
+  `VersionCheckLoopTest` (the loop with a fake server and UI, on Kotest's virtual clock, `coroutineTestScope`), and
+  `KVisionVersionCheckUiTest` (the real dialog, gone from the DOM and KVision's modal list once closed).
+- `WithAuthTest` (only a 401 reaches the sign-in dialog; a 503 or a refusal reaches the caller as itself, even while
+  the page counts as signed out) and `PageShowReloadTest` (a page restored from the back/forward cache reloads).
 - Kotest reports to Karma only once every spec has run, so each JS spec sets `timeout = CLIENT_TEST_TIMEOUT_MS`, and a
   test that hangs fails by name; `karma.config.d/kotest.js` lets the whole run go two minutes without a word before
   Karma gives up. The timeout is not in a Kotest `ProjectConfig`, which the KSP processor drops from the JS entry point
