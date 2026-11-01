@@ -19,6 +19,9 @@ plugins {
     alias(libs.plugins.versions)
     alias(libs.plugins.config)
     alias(libs.plugins.kotlinter)
+    // Kover 0.9.11 is the source of every build's "Deprecated Gradle features ... incompatible with Gradle 10" line:
+    // it calls Configuration.setVisible, which Gradle 9.8 deprecates for removal in Gradle 11 (Gradle's summary always
+    // names the next major). Kover's fix (Kotlin/kotlinx-kover#838) is merged but not yet released.
     alias(libs.plugins.kover)
 //    alias(libs.plugins.diktat)
 //    alias(libs.plugins.detekt)
@@ -207,7 +210,11 @@ kotlin {
             implementation(libs.kvision.rest)
         }
 
+        // kvision-testutils brings kotlin-test at the Kotlin version KVision was built with, and the Kotlin/JS compiler
+        // refuses a kotlin-test older than itself. kotlin("test") takes the Kotlin plugin's own version, so the client
+        // specs still compile when Kotlin is a patch release ahead of KVision.
         jsTest.dependencies {
+            implementation(kotlin("test"))
             implementation(libs.kvision.testutils)
         }
     }
