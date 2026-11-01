@@ -46,16 +46,13 @@ object Dbms {
       .apply {
         val herokuDbmsUrl = System.getenv("DATABASE_URL").orEmpty()
         if (herokuDbmsUrl.isNotEmpty()) {
-          logger.info { "Heroku database url: $herokuDbmsUrl" }
+          // DATABASE_URL holds the password, and the logs go to Papertrail, so only the description is logged.
+          val heroku = HerokuDatabaseUrl.parse(herokuDbmsUrl)
+          logger.info { "Heroku database: ${heroku.description}" }
 
-          username = herokuDbmsUrl.substringAfter("://").substringBefore(":")
-          password = herokuDbmsUrl.substringAfter("://$username:").substringBefore("@")
-          val dbName = herokuDbmsUrl.substringAfterLast("/")
-          val host = herokuDbmsUrl.substringAfter("@").substringBefore(":")
-          val port = herokuDbmsUrl.substringAfterLast(":").substringBefore("/")
-
-          jdbcUrl = "jdbc:pgsql://$host:$port/$dbName?ssl.mode=require"
-          logger.info { "Actual database url: $jdbcUrl" }
+          username = heroku.username
+          password = heroku.password
+          jdbcUrl = heroku.jdbcUrl
         } else {
           username = EnvVar.DBMS_USERNAME.getEnv(Property.DBMS_USERNAME.getRequiredProperty())
           password = EnvVar.DBMS_PASSWORD.getEnv(Property.DBMS_PASSWORD.getRequiredProperty())
