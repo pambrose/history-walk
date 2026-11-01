@@ -3,7 +3,7 @@
 kotlin = "2.4.20"
 jvm = "25"
 
-config = "3.0.3"
+config = "6.1.2"
 kiluaRpc = "0.0.46"
 kotlinter = "5.7.0"
 # Required by kilua
@@ -28,7 +28,7 @@ pgjdbc = "0.8.9"
 utils = "5.2.0"
 
 [plugins]
-#config = { id = "com.github.gmazzo.buildconfig", version.ref = "config" }
+config = { id = "com.github.gmazzo.buildconfig", version.ref = "config" }
 #detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 #diktat = { id = "com.saveourtool.diktat", version.ref = "diktat" }
 kiluaRpc = { id = "dev.kilua.rpc", version.ref = "kiluaRpc" }
