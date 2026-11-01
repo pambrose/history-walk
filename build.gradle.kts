@@ -23,7 +23,7 @@ repositories {
 }
 
 //buildConfig {
-//  packageName("com.github.pambrose")
+//  packageName("com.pambrose.historywalk")
 //  buildConfigField("String", "CORE_NAME", "\"${project.name}\"")
 //  buildConfigField("String", "CORE_VERSION", provider { "\"${project.version}\"" })
 //  buildConfigField("String", "CORE_RELEASE_DATE", "\"9/17/21\"")
@@ -102,6 +102,7 @@ kotlin {
             implementation(libs.kotlin.logging)
 
             implementation(libs.ktor.server.cio)
+            implementation(libs.ktor.server.config.yaml)
             implementation(libs.ktor.server.html.builder)
             implementation(libs.ktor.server.sessions)
             implementation(libs.ktor.server.auth)

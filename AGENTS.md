@@ -19,7 +19,7 @@ make reset-jermain      # drop and recreate one database (reset-moses for the ot
 make server             # Ktor on :8080, continuous rebuild (./gradlew jvmRun -t)
 make client             # webpack dev server on :3000 with hot reload, proxying server routes to :8080
 make tests              # ./gradlew jvmTest --rerun (needs Docker: UserRepositoryTest uses Testcontainers)
-./gradlew jvmTest --tests 'com.github.pambrose.auth.AuthRoutesTest'   # one spec
+./gradlew jvmTest --tests 'com.pambrose.historywalk.auth.AuthRoutesTest'   # one spec
 ./gradlew lintKotlin    # kotlinter; formatKotlin to fix
 make build              # clean + fat jar at build/libs/history-walk-<version>.jar (server + bundled JS client)
 make docker-build       # fat jar, then image history-walk:<version>; make docker-run runs it with .env against make db

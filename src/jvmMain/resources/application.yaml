@@ -1,0 +1,8 @@
+ktor:
+  deployment:
+    port: 8080
+    watch:
+      - build/classes/kotlin/jvm/main
+  application:
+    modules:
+      - com.pambrose.historywalk.MainKt.main
