@@ -100,7 +100,9 @@ fun Route.signInRoutes(userInfoClient: HttpClient = HttpClient(CIO)) {
 
     get(AUTH_CALLBACK) {
       // The state says this server started a sign-in; the cookie says this browser did. Both, or the callback is not
-      // this browser's to complete.
+      // this browser's to complete. The provider's verifyState (googleOAuthSettings) has checked both before redeeming
+      // the code; the cookie is checked again here, so the refusal does not rest on the provider's settings alone, and
+      // cleared, so the state is good for one callback.
       if (!call.consumeOAuthState())
         return@get call.respondRedirect(signInFailedUrl)
 

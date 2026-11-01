@@ -45,7 +45,7 @@ class SignedNonceManager(
     return signed && clock() < Instant.fromEpochSeconds(expiresAt)
   }
 
-  // URL-safe and free of dots, as the state travels in a URL and a cookie
+  // URL-safe, as the state travels in URLs, and free of dots, which the state is split on
   private fun sign(unsigned: String): String = hmacSha256Base64Url(key, unsigned)
 
   companion object {
@@ -56,7 +56,10 @@ class SignedNonceManager(
 
 private const val HMAC_SHA256 = "HmacSHA256"
 
-/** The HMAC-SHA256 of [text] under [key], in base64url without padding, which signs a state and derives a verifier. */
+/**
+ * The HMAC-SHA256 of [text] under [key], in base64url without padding: it signs a state, binds the state cookie to its
+ * state, and derives a verifier.
+ */
 internal fun hmacSha256Base64Url(
   key: ByteArray,
   text: String,
