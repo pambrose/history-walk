@@ -1,8 +1,8 @@
 package com.pambrose.historywalk
 
 import com.codahale.metrics.jvm.ThreadDump
-import com.pambrose.historywalk.dbms.DbmsTxs.deleteChoices
-import com.pambrose.historywalk.dbms.DbmsTxs.updateLastSlide
+import com.pambrose.common.response.respondWith
+import com.pambrose.common.util.Version.Companion.versionDesc
 import com.pambrose.historywalk.EndPoints.CONTENT_RESET
 import com.pambrose.historywalk.EndPoints.REASONS
 import com.pambrose.historywalk.EndPoints.SLIDE
@@ -20,9 +20,9 @@ import com.pambrose.historywalk.auth.signInRoutes
 import com.pambrose.historywalk.auth.signedInApi
 import com.pambrose.historywalk.auth.teachersOnly
 import com.pambrose.historywalk.auth.userUuid
+import com.pambrose.historywalk.dbms.DbmsTxs.deleteChoices
+import com.pambrose.historywalk.dbms.DbmsTxs.updateLastSlide
 import com.pambrose.historywalk.slides.SlideDeck.Companion.ROOT
-import com.pambrose.common.response.respondWith
-import com.pambrose.common.util.Version.Companion.versionDesc
 import dev.kilua.rpc.applyRoutes
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.http.CacheControl

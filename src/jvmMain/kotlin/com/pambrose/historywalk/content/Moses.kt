@@ -2,7 +2,7 @@ package com.pambrose.historywalk.content
 
 import com.pambrose.historywalk.slides.SlideDeck.Companion.slideDeck
 
-const val introductionPage = """
+const val INTRODUCTION_PAGE = """
     <div style="text-align:center;">
     <div style="padding-top:10px;">
     <font size="+3">
@@ -25,9 +25,9 @@ const val introductionPage = """
     </div>
 """
 
-const val errorText = "Incorrect. Try again."
+const val ERROR_TEXT = "Incorrect. Try again."
 
-const val decision1Text = """
+const val DECISION1_TEXT = """
   You are on the way home from a exhausting day of harvesting rice, when a
   friend motions for you to come over and chat. He has heard that you are
   in line to be punished for not taking proper care of tools. You cannot
@@ -37,7 +37,7 @@ const val decision1Text = """
   Options:
 """
 
-const val decision2Text = """
+const val DECISION2_TEXT = """
   As you and your fellow Enslaved Africans head back to the plantation you lag behind
   and quietly sneak into the woods. You now realize you have little provisions and
   no real plan of escape.
@@ -45,7 +45,7 @@ const val decision2Text = """
   Options:
 """
 
-const val decision3Text = """
+const val DECISION3_TEXT = """
   You travel close the road by night. After a week of travel you are awoken abruptly
   during the day as you sleep by a very surly man. He accuses you of being a fugitive
   and marches you off to the local jail. Eventually you are collected by Mr. Gooch.
@@ -55,7 +55,7 @@ const val decision3Text = """
   Options:
 """
 
-const val decision4Text = """
+const val DECISION4_TEXT = """
   It takes a few hours and is very painful, but you manage to slip the irons off.
   You head into the woods fearful of what might follow you and after a few hours
   you come to river that is 50 yards across.
@@ -63,7 +63,7 @@ const val decision4Text = """
   Options:
 """
 
-const val decision5Text = """
+const val DECISION5_TEXT = """
   You travel upriver looking for a shallow or narrow place to cross.
   Luck is with you today and you find a canoe of Native American origin.
   You set the canoe out into the river and paddle across to the other side.
@@ -75,7 +75,7 @@ const val decision5Text = """
   Options:
 """
 
-const val decision6Text = """
+const val DECISION6_TEXT = """
   You rummage around the barn and find some food.
   Exhausted, you fall asleep in a pile of hay.
   You are not sure how long you sleep for, but you are awoken by an
@@ -84,7 +84,7 @@ const val decision6Text = """
   Options:
 """
 
-const val decision7Text = """
+const val DECISION7_TEXT = """
   You tell him you are free. He asks for your papers proving you are free.
   Which you do not have. He tells you to get out of here before you get
   him in trouble. It is the middle of the day and you amble down the road.
@@ -93,7 +93,7 @@ const val decision7Text = """
   Options:
 """
 
-const val decision8Text = """
+const val DECISION8_TEXT = """
   You approach the group and tell them you are on an errand for your master.
   They offer to accompany you to your destination.
   As you travel with them you realize you recognize the country you are
@@ -103,14 +103,14 @@ const val decision8Text = """
   Options:
 """
 
-const val decision9Text = """
+const val DECISION9_TEXT = """
   You make your way to the plantation where you spent the first ten years
   of your live. Along the way you encounter a young African American girl.
 
   Options:
 """
 
-const val decision10Text = """
+const val DECISION10_TEXT = """
   You ignore the girl and keep walking past her.
   You walk into the night and as you near the plantation of your youth you are
   ambushed by a patrol out looking for fugitives.
@@ -126,14 +126,14 @@ const val decision10Text = """
   Options:
 """
 
-const val decision11Text = """
+const val DECISION11_TEXT = """
   The object is made out of iron and it is about ten inches long.
   It has a sharp point, but is otherwise flat and rough on both sides.
 
   Options:
 """
 
-const val decision12Text = """
+const val DECISION12_TEXT = """
   You discreetly break a link on the chains and now your hands are free.
   Your captors have stopped by an inn to have lunch.
   They could be out any moment.
@@ -141,7 +141,7 @@ const val decision12Text = """
   Options:
 """
 
-const val decision13Text = """
+const val DECISION13_TEXT = """
   You grab a switch a whack your horse in the hindquarters.
   And like that your horse is sprinting down the street and heading out of town.
   You hang on for dear life, never having travelled this fast in your life.
@@ -150,7 +150,7 @@ const val decision13Text = """
   Options:
 """
 
-const val decision14Text = """
+const val DECISION14_TEXT = """
   You pull on the reins and bring your horse to a halt.
   You are quickly surrounded by your pursuers.
   You are hit in the side of the head by a rifle but and knocked unconscious.
@@ -164,7 +164,7 @@ const val decision14Text = """
   Options:
 """
 
-const val decision15Text = """
+const val DECISION15_TEXT = """
   The two of you quietly slip away from the crude camp.
   Although you are heavily encumbered you eventually make it 50 yards
   away and then you pick up the pace.
@@ -172,7 +172,7 @@ const val decision15Text = """
   Options:
 """
 
-const val decision16Text = """
+const val DECISION16_TEXT = """
   You find a suitable rock to try and break a link in the chains binding you together.
   You bring the rock up and drive it down onto a link near your co-captive’s neck.
   It works and you are untethered. As you travel a heavy rain sets in.
@@ -181,7 +181,7 @@ const val decision16Text = """
   Options:
 """
 
-const val decision17Text = """
+const val DECISION17_TEXT = """
   You move upstream looking for a safe crossing.
   Amazingly you find another canoe and jump in.
   There is no paddle so the two of you use your hands to navigate across the
@@ -196,14 +196,14 @@ const val decision17Text = """
   Options:
 """
 
-const val decision18Text = """
+const val DECISION18_TEXT = """
   You make it to his plantation and he leads you inside his quarters and offers you
   some food. All of a sudden he is startled by the noise of some approaching.
 
   Options:
 """
 
-const val decision19Text = """
+const val DECISION19_TEXT = """
   The two of you hide under blankets and you go unnoticed as the master of the
   plantation enters to inquire about the harvest.
   You cannot believe that you are not discovered.
@@ -213,7 +213,7 @@ const val decision19Text = """
   Options:
 """
 
-const val decision20Text = """
+const val DECISION20_TEXT = """
   You enter the plantation as the sun goes down and attempt to find you friend.
   However, a pair of dogs sniffs you out and alerts others to your presence.
   You are apprehended and marched off to the local gaols to await your repatriation
@@ -232,7 +232,7 @@ const val decision20Text = """
   Options:
 """
 
-const val decision21Text = """
+const val DECISION21_TEXT = """
   For the time being you give up your dream of freedom.
   After a few months have passed a strange thing happens.
   An unfamiliar man arrives and speaks with Mr. Gooch.
@@ -247,7 +247,7 @@ const val decision21Text = """
   Options:
 """
 
-const val decision22Text = """
+const val DECISION22_TEXT = """
   You stay with Mr. Cowpens and work as a domestic servant.
   This life is much more bearable from life with Mr. Gooch.
   You put on some weight and you have moments of joy.
@@ -260,7 +260,7 @@ const val decision22Text = """
   Options:
 """
 
-const val decision23Text = """
+const val DECISION23_TEXT = """
   You are successful in your attempt to steal the keys.
   That night you quietly unlock your bonds and slip into the night.
   After your stay with Mr. Cowpens you look much more respectable and
@@ -272,7 +272,7 @@ const val decision23Text = """
   Options:
 """
 
-const val decision24Text = """
+const val DECISION24_TEXT = """
   You make your way down the road to Savannah.
   You travel by night and sleep in the woods during the day.
   One night as you travel you encounter a minister walking along the road.
@@ -280,14 +280,14 @@ const val decision24Text = """
   Options:
 """
 
-const val decision25Text = """
+const val DECISION25_TEXT = """
   The minister offers to walk with you to Savannah and help you find your master.
   You are now with in five miles of the city.
 
   Options:
 """
 
-const val decision26Text = """
+const val DECISION26_TEXT = """
   You ditch the minister and after a few hours you encounter some African American
   men driving cattle.
   The greet you and ask you where you are headed.
@@ -299,7 +299,7 @@ const val decision26Text = """
   Options:
 """
 
-const val decision27Text = """
+const val DECISION27_TEXT = """
   The boy writes you a pass saying you are free to travel to Savannah unaccompanied.
   Even though you cannot read, you are concerned the kid’s writing will look childish
   or something will give it away.
@@ -307,7 +307,7 @@ const val decision27Text = """
   Options:
 """
 
-const val decision28Text = """
+const val DECISION28_TEXT = """
   As you enter the city you are stopped by a sheriff.
   Being a port city, they are always on the lookout for runaways.
   He takes your pass which has been smudged by water.
@@ -320,7 +320,7 @@ const val decision28Text = """
   Options:
 """
 
-const val decision29Text = """
+const val DECISION29_TEXT = """
   You ask around for a ship captain.
   Eventually you are directed to a man who is the captain of the SS Fox.
   You approach him and ask if he is in need of your services.
@@ -334,7 +334,7 @@ const val decision29Text = """
   Options:
 """
 
-const val successText = """
+const val SUCCESS_TEXT = """
   You decide to stay with the SS Fox.
   Each day you nervously attempt to keep busy and hope you will not be
   discovered by authorities.
@@ -356,7 +356,7 @@ val mosesSlides =
       slide(
         id = 99,
         title = "Incorrect Decision",
-        content = errorText,
+        content = ERROR_TEXT,
         displayTitle = false,
       ) {}
 
@@ -364,7 +364,7 @@ val mosesSlides =
       slide(
         id = 30,
         title = "Success!",
-        content = successText,
+        content = SUCCESS_TEXT,
         success = true,
       )
 
@@ -372,7 +372,7 @@ val mosesSlides =
       slide(
         id = 29,
         title = "29th Decison",
-        content = decision29Text,
+        content = DECISION29_TEXT,
       ) {
         choice(
           text = "Stay with the SS Fox",
@@ -392,7 +392,7 @@ val mosesSlides =
       slide(
         id = 28,
         title = "28th Decison",
-        content = decision28Text,
+        content = DECISION28_TEXT,
       ) {
         choice(
           text = "Attempt to sneak onto a ship and stow away",
@@ -408,7 +408,7 @@ val mosesSlides =
       slide(
         id = 27,
         title = "27th Decison",
-        content = decision27Text,
+        content = DECISION27_TEXT,
       ) {
         choice(
           text = "Use it despite your concerns",
@@ -432,7 +432,7 @@ val mosesSlides =
       slide(
         id = 26,
         title = "26th Decison",
-        content = decision26Text,
+        content = DECISION26_TEXT,
       ) {
         choice(
           text = "Ask the child to write you a pass saying you are free to travel to Savannah",
@@ -452,7 +452,7 @@ val mosesSlides =
       slide(
         id = 25,
         title = "25th Decison",
-        content = decision25Text,
+        content = DECISION25_TEXT,
       ) {
         choice(
           text = "Stay with the minister all the way into the city",
@@ -473,7 +473,7 @@ val mosesSlides =
       slide(
         id = 24,
         title = "24th Decison",
-        content = decision24Text,
+        content = DECISION24_TEXT,
       ) {
         choice(
           text = "Tell this man of God you are a fugitive and seek his assistance",
@@ -498,7 +498,7 @@ val mosesSlides =
       slide(
         id = 23,
         title = "23rd Decison",
-        content = decision23Text,
+        content = DECISION23_TEXT,
       ) {
         choice(
           text = "Continue north",
@@ -518,7 +518,7 @@ val mosesSlides =
       slide(
         id = 22,
         title = "22nd Decison",
-        content = decision22Text,
+        content = DECISION22_TEXT,
       ) {
         choice(
           text = "You have to take advantage of this opportunity, you attempt to steal the keys",
@@ -534,7 +534,7 @@ val mosesSlides =
       slide(
         id = 21,
         title = "21st Decison",
-        content = decision21Text,
+        content = DECISION21_TEXT,
       ) {
         choice(
           text = "Stay put and see how this new situation unfolds",
@@ -554,7 +554,7 @@ val mosesSlides =
       slide(
         id = 20,
         title = "20th Decison",
-        content = decision20Text,
+        content = DECISION20_TEXT,
       ) {
         choice(
           text = "Seek the first opportunity to escape again",
@@ -570,7 +570,7 @@ val mosesSlides =
       slide(
         id = 19,
         title = "19th Decison",
-        content = decision19Text,
+        content = DECISION19_TEXT,
       ) {
         choice(
           text = "Try and find your friend on the nearby plantation",
@@ -590,7 +590,7 @@ val mosesSlides =
       slide(
         id = 18,
         title = "18th Decison",
-        content = decision18Text,
+        content = DECISION18_TEXT,
       ) {
         choice(
           text = "Hide under some blankets",
@@ -610,7 +610,7 @@ val mosesSlides =
       slide(
         id = 17,
         title = "17th Decison",
-        content = decision17Text,
+        content = DECISION17_TEXT,
       ) {
         choice(
           text = "Return with him to the plantation where he is enslaved",
@@ -630,7 +630,7 @@ val mosesSlides =
       slide(
         id = 16,
         title = "16th Decison",
-        content = decision16Text,
+        content = DECISION16_TEXT,
       ) {
         choice(
           text = "Swim across the river",
@@ -650,7 +650,7 @@ val mosesSlides =
       slide(
         id = 15,
         title = "15th Decison",
-        content = decision15Text,
+        content = DECISION15_TEXT,
       ) {
         choice(
           text = "Find a place to hide and wait for your captors to move on",
@@ -670,7 +670,7 @@ val mosesSlides =
       slide(
         id = 14,
         title = "14th Decison",
-        content = decision14Text,
+        content = DECISION14_TEXT,
       ) {
         choice(
           text = "It seems desperate given your situation, but you convince the woman whom you are chained to, " +
@@ -691,7 +691,7 @@ val mosesSlides =
       slide(
         id = 13,
         title = "13th Decison",
-        content = decision13Text,
+        content = DECISION13_TEXT,
       ) {
         choice(
           text = "Keep running atop your horse",
@@ -711,7 +711,7 @@ val mosesSlides =
       slide(
         id = 12,
         title = "12th Decison",
-        content = decision12Text,
+        content = DECISION12_TEXT,
       ) {
         choice(
           text = "Quietly dismount and attempt to sneak out of town on foot",
@@ -735,7 +735,7 @@ val mosesSlides =
       slide(
         id = 11,
         title = "11th Decison",
-        content = decision11Text,
+        content = DECISION11_TEXT,
       ) {
         choice(
           text = "At night, when the guards are asleep, you try and use the object to file through your chains",
@@ -759,7 +759,7 @@ val mosesSlides =
       slide(
         id = 10,
         title = "10th Decison",
-        content = decision10Text,
+        content = DECISION10_TEXT,
       ) {
         choice(
           text = "Don’t take it",
@@ -779,7 +779,7 @@ val mosesSlides =
       slide(
         id = 9,
         title = "9th Decison",
-        content = decision9Text,
+        content = DECISION9_TEXT,
       ) {
         choice(
           text = "You ask the girl if she knows your mother",
@@ -795,7 +795,7 @@ val mosesSlides =
       slide(
         id = 8,
         title = "8th Decison",
-        content = decision8Text,
+        content = DECISION8_TEXT,
       ) {
         choice(
           text = "You sneak away to see your mother",
@@ -811,7 +811,7 @@ val mosesSlides =
       slide(
         id = 7,
         title = "7th Decison",
-        content = decision7Text,
+        content = DECISION7_TEXT,
       ) {
         choice(
           text = "You run into the woods, trying to hide from the passers by",
@@ -832,7 +832,7 @@ val mosesSlides =
       slide(
         id = 6,
         title = "6th Decison",
-        content = decision6Text,
+        content = DECISION6_TEXT,
       ) {
         choice(
           text = "Tell this stranger you have run away",
@@ -852,7 +852,7 @@ val mosesSlides =
       slide(
         id = 5,
         title = "5th Decison",
-        content = decision5Text,
+        content = DECISION5_TEXT,
       ) {
         choice(
           text = "Bypass the farm and continue on your way",
@@ -872,7 +872,7 @@ val mosesSlides =
       slide(
         id = 4,
         title = "4th Decison",
-        content = decision4Text,
+        content = DECISION4_TEXT,
       ) {
         choice(
           text = "You aren’t a strong swimmer, you head back the direction you came from",
@@ -896,7 +896,7 @@ val mosesSlides =
       slide(
         id = 3,
         title = "3rd Decision",
-        content = decision3Text,
+        content = DECISION3_TEXT,
       ) {
         choice(
           text = "This is not a good time to escape, you should wait and devise a better plan",
@@ -916,7 +916,7 @@ val mosesSlides =
       slide(
         id = 2,
         title = "2nd Decision",
-        content = decision2Text,
+        content = DECISION2_TEXT,
       ) {
         choice(
           text = "Try and survive in the woods hoping to avoid contact with people who might wish you harm",
@@ -936,7 +936,7 @@ val mosesSlides =
       slide(
         id = 1,
         title = "1st Decision",
-        content = decision1Text,
+        content = DECISION1_TEXT,
       ) {
         choice(
           text = "Head back to the slave quarters and take your chances the rumor was false",
@@ -955,7 +955,7 @@ val mosesSlides =
     slide(
       id = 0,
       title = "Introduction",
-      content = introductionPage,
+      content = INTRODUCTION_PAGE,
       root = true,
     ) {
       choice(

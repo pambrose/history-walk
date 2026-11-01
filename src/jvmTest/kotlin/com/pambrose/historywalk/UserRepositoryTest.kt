@@ -70,7 +70,8 @@ class UserRepositoryTest : StringSpec() {
       val rows = mutableListOf<Pair<String, Boolean>>()
       ds.connection.use { c ->
         c.createStatement().use { st ->
-          st.executeQuery("select version, success from public.flyway_schema_history order by installed_rank")
+          st
+            .executeQuery("select version, success from public.flyway_schema_history order by installed_rank")
             .use { rs -> while (rs.next()) rows += rs.getString(1) to rs.getBoolean(2) }
         }
       }
@@ -85,14 +86,19 @@ class UserRepositoryTest : StringSpec() {
 
     "a later sign-in updates the same row, whatever the case" {
       val a = upsertFromGoogle("pambrose@athenian.org", "Paul", null, Role.TEACHER)
-      val b = upsertFromGoogle("PAmbrose@Athenian.org", "Paul Ambrose", "https://lh3.googleusercontent.com/a/p", Role.TEACHER)
+      val b =
+        upsertFromGoogle("PAmbrose@Athenian.org", "Paul Ambrose", "https://lh3.googleusercontent.com/a/p", Role.TEACHER)
       b shouldBe a
       val info = userInfoFor(a, setOf("pambrose@athenian.org"))!!
       info.fullName shouldBe "Paul Ambrose"
       info.pictureUrl shouldBe "https://lh3.googleusercontent.com/a/p"
       info.role shouldBe Role.TEACHER
       transaction {
-        UsersTable.selectAll().where { UsersTable.id eq a }.single()[UsersTable.lastSignIn].shouldNotBeNull()
+        UsersTable
+          .selectAll()
+          .where { UsersTable.id eq a }
+          .single()[UsersTable.lastSignIn]
+          .shouldNotBeNull()
       }
     }
 
@@ -105,7 +111,8 @@ class UserRepositoryTest : StringSpec() {
     "a mixed-case email cannot be inserted directly" {
       fun insertUser(email: String) =
         ds.connection.use { c ->
-          c.prepareStatement(
+          c
+            .prepareStatement(
             "insert into history.users (id, email, full_name, role, last_path_name) values (?, ?, 'X', 'student', 'root')",
           ).use { ps ->
             ps.setObject(1, UUID.randomUUID())
@@ -133,14 +140,23 @@ class UserRepositoryTest : StringSpec() {
       addChoice(student)
       addChoice(teacher)
       transaction {
-        UserDecisionCountsView.selectAll().map { it[UserDecisionCountsView.id] }.distinct()
+        UserDecisionCountsView
+          .selectAll()
+          .map { it[UserDecisionCountsView.id] }
+          .distinct()
           .also { ids ->
             (student in ids) shouldBe true
             (teacher in ids) shouldBe false
           }
-        UserReasonsView.selectAll().map { it[UserReasonsView.id] }.distinct()
+        UserReasonsView
+          .selectAll()
+          .map { it[UserReasonsView.id] }
+          .distinct()
           .also { ids -> ids shouldContainExactly listOf(student) }
-        UserVisitsView.selectAll().map { it[UserVisitsView.id] }.distinct()
+        UserVisitsView
+          .selectAll()
+          .map { it[UserVisitsView.id] }
+          .distinct()
           .also { ids -> ids shouldContainExactly listOf(student) }
       }
     }

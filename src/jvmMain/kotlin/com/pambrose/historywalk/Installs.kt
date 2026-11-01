@@ -1,8 +1,8 @@
 package com.pambrose.historywalk
 
+import com.pambrose.common.util.simpleClassName
 import com.pambrose.historywalk.auth.configureGoogleAuth
 import com.pambrose.historywalk.auth.installUserSessions
-import com.pambrose.common.util.simpleClassName
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.http.*
 import io.ktor.http.content.*
@@ -80,6 +80,5 @@ object Installs {
         )
       }
     }
-
   }
 }

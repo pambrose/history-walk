@@ -3,7 +3,9 @@ package com.pambrose.historywalk
 import com.pambrose.common.util.isNotNull
 import com.pambrose.common.util.obfuscate
 
-enum class EnvVar(val maskFunc: EnvVar.() -> String = { getEnv(UNASSIGNED) }) {
+enum class EnvVar(
+  val maskFunc: EnvVar.() -> String = { getEnv(UNASSIGNED) },
+) {
   SHOW_RESET_BUTTON,
   DISPLAY_CONSECUTIVE_CORRECT_DECISIONS,
   ALLOW_SLIDE_ACCESS,

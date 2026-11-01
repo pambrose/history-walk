@@ -41,7 +41,10 @@ data class SlideData(
 }
 
 @Serializable
-data class ParentTitle(val pathName: String, val title: String)
+data class ParentTitle(
+  val pathName: String,
+  val title: String,
+)
 
 @Serializable
 data class SlideChoice(

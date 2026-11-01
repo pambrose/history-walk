@@ -18,7 +18,8 @@ object Utils {
       .replace("\"", DQUOTE_ESCAPE)
       .replace("\"", SQUOTE_ESCAPE)
 
-    return MarkdownParser.toHtml(escaped)
+    return MarkdownParser
+      .toHtml(escaped)
       .replace(LT_ESCAPE, "<")
       .replace(GT_ESCAPE, ">")
       .replace(DQUOTE_ESCAPE, "'")

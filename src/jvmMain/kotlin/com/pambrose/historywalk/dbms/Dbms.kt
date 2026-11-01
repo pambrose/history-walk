@@ -67,7 +67,10 @@ object Dbms {
 
         // isAutoCommit = false
         transactionIsolation = "TRANSACTION_REPEATABLE_READ"
-        maxLifetime = Property.DBMS_MAX_LIFETIME_MINS.getRequiredProperty().toInt().minutes.inWholeMilliseconds
+        maxLifetime = Property.DBMS_MAX_LIFETIME_MINS
+          .getRequiredProperty()
+          .toInt()
+          .minutes.inWholeMilliseconds
         validate()
       }.let { HikariDataSource(it) }
 

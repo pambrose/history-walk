@@ -28,7 +28,7 @@ ORIGIN_URL   ?=
 
 .DEFAULT_GOAL := help
 
-.PHONY: help db reset-jermain reset-moses stop-db server client build clean tests docker-build docker-run versions depends yarn-unlock upgrade-wrapper creds restart log served-version
+.PHONY: help db reset-jermain reset-moses stop-db server client build clean tests lint format docker-build docker-run versions depends yarn-unlock upgrade-wrapper creds restart log served-version
 
 ##@ General
 
@@ -89,6 +89,12 @@ clean: ## Remove build outputs
 
 tests: ## Run the JVM tests every time (needs Docker for Testcontainers)
 	$(GRADLE) jvmTest --rerun
+
+lint: ## Check the Kotlin sources with kotlinter (generated sources are skipped)
+	$(GRADLE) lintKotlin
+
+format: ## Reformat the Kotlin sources with kotlinter, fixing what lint can fix by itself
+	$(GRADLE) formatKotlin
 
 ##@ Docker
 

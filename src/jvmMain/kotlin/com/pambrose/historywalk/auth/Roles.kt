@@ -6,7 +6,8 @@ object Roles {
   private val studentLocalPart = Regex("^\\d\\d")
 
   fun parseTeacherEmails(raw: String?): Set<String> =
-    raw.orEmpty()
+    raw
+      .orEmpty()
       .split(",")
       .map { it.trim().lowercase() }
       .filter { it.isNotEmpty() }

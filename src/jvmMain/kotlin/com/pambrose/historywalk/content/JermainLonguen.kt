@@ -2,7 +2,7 @@ package com.pambrose.historywalk.content
 
 import com.pambrose.historywalk.slides.SlideDeck.Companion.slideDeck
 
-const val titlePage = """
+const val TITLE_PAGE = """
     <div style="text-align:center;">
     <img src="/static/images/jermain-longuen.jpg" alt="Pic" style="width:334px;height:518px;border:2px solid grey;float:right;margin-left:10px;"/>
     <div style="padding-top:130px;padding-bottom:20px;">
@@ -21,7 +21,7 @@ const val titlePage = """
     </div>
 """
 
-const val majorDecision = """
+const val MAJOR_DECISION = """
     You suffer a horrific and vicious beating, worse than others in
     the past from your drunken, enraged owner that maims your face
     (a mangled and broken jaw). While you once thought of him as
@@ -34,7 +34,7 @@ const val majorDecision = """
     slaves on the neighboring plantation?
 """
 
-const val companionDecision = """
+const val COMPANION_DECISION = """
     <div>
     <img src="/static/images/pistol.jpg" alt="Pic" style="width:130px;height:61px;border:1px solid white;float:left"/>
     <img src="/static/images/salami.jpg" alt="Pic" style="width:123px;height:76px;border:1px solid white;float:right"/>
@@ -54,14 +54,14 @@ const val companionDecision = """
     </div>
 """
 
-const val decisionWhenToGo = """
+const val DECISION_WHEN_TO_GO = """
     * Will you leave in the summer, when the weather is warmest and you can easily sleep outdoors?
     * Will you leave in the autumn, hoping to slip away in the business and hub-bub of harvest time?
     * Will you leave in the spring, when love is in the air?
     * Will you leave in the winter, right at Christmas, when it is coldest and darkest?
 """
 
-const val oldBenViaRoss = """
+const val OLD_BEN_VIA_ROSS = """
     Old Ben, who has been on the plantation next door some time and is trusted by your partner,
     relays to him the advice that your chances to escape will be best at Christmas time.
     He argues that there are four good reasons:
@@ -80,7 +80,7 @@ const val oldBenViaRoss = """
     Hmm... sounds good, but then again, if he knew so much, why is he still here?
 """
 
-const val oldBenWhenToGo = """
+const val OLD_BEN_WHEN_TO_GO = """
     Old Ben, who has been on the plantation next door some time and is
     trusted by your partner, relays to him the advice that your chances
     to escape will be best at Christmas time. He argues that there are
@@ -99,14 +99,14 @@ const val oldBenWhenToGo = """
     When will you leave?
 """
 
-const val summerDeparture = """
+const val SUMMER_DEPARTURE = """
     The summer heat offers the appeal of warm nights that will make it easier
     to sleep outdoors. Potentially, cross-country travel might be easier.
 
     Will you...
 """
 
-const val summerCrossCountry = """
+const val SUMMER_CROSS_COUNTRY = """
     At first your flight is nearly pleasant, a stroll through the fields.
     But soon the terrain gets rougher, with thicker brush that blocks sight,
     rough ground that bruises the feet, and an increasing number of trees start
@@ -118,7 +118,7 @@ const val summerCrossCountry = """
     Where do you go?
 """
 
-const val fleeIntoDeepForestEnd = """
+const val FLEE_INTO_DEEP_FOREST_END = """
     <div>
     <img src="/static/images/deep-forest.jpg" alt="Pic" style="width:233px;height:217px;border:2px solid gray;float:right;margin-left:10px;"/>
     <div style="padding-top:20px;padding-bottom:20px;">
@@ -133,7 +133,7 @@ const val fleeIntoDeepForestEnd = """
     </div>
 """
 
-const val autumnDeparture = """
+const val AUTUMN_DEPARTURE = """
     As harvest time come along, you decide to make your move, hoping to take advantage
     the heightened activity and slip away in the mix. Initially, it seems that you are
     successful, making your way off the plantation and down the road into the countryside.
@@ -141,7 +141,7 @@ const val autumnDeparture = """
     sound precedes...
 """
 
-const val springDeparture = """
+const val SPRING_DEPARTURE = """
     In springtime, it is said that thoughts turn romance and courting, distracting one from
     ordinary, difficult, or boring tasks. That is your hope, anyway, as you seek to escape
     while adversaries are hopefully off their guard. However, such is not the case. It seem
@@ -149,7 +149,7 @@ const val springDeparture = """
     blindly into the brush, emerging to...
 """
 
-const val paddyRollersEnd = """
+const val PADDY_ROLLERS_END = """
     <p>
     <img src="/static/images/paddyrollers.jpg" alt="Pic" style="width:301px;height:159px;border:2px solid gray;float:right;margin-left:10px;margin-top:10px;"/>
     You are surprised by the sudden appearance of four ‘paddy rollers,’ as slave-catchers
@@ -161,7 +161,7 @@ const val paddyRollersEnd = """
     </p>
 """
 
-const val winterDepartureAlone = """
+const val WINTER_DEPARTURE_ALONE = """
     <p>
     <img src="/static/images/winterdeparture.jpg" alt="Pic" style="width:187px;height:258px;border:2px solid gray;float:right;margin-left:10px;"/>
     <p style="padding-top:100px;padding-bottom:90px;">
@@ -170,7 +170,7 @@ const val winterDepartureAlone = """
     </p>
 """
 
-const val stealOvercoat = """
+const val STEAL_OVERCOAT = """
     <div>
     <img src="/static/images/winterdeparture.jpg" alt="Pic" style="width:187px;height:258px;border:2px solid gray;float:right;margin-left:10px;"/>
     <div style="padding-top:60px;margin-bottom:45px;">
@@ -188,7 +188,7 @@ const val stealOvercoat = """
     </div>
 """
 
-const val winterCrossCountry = """
+const val WINTER_CROSS_COUNTRY = """
     The winter is harsh, and as the freezing wind blows your toes begin to go numb,
     but fear of the slave-catchers and their dogs drives you deeper into the wilderness.
     But soon the terrain gets rougher, the snow drifts get deeper, the brush blocks your sight,
@@ -199,7 +199,7 @@ const val winterCrossCountry = """
     Where do you go?
 """
 
-const val rossEncounter = """
+const val ROSS_ENCOUNTER = """
     <div>
     <img src="/static/images/ross.jpg" alt="Pic" style="width:164;height:383px;border:2px solid gray;float:right;margin-left:10px;margin-top:15px;"/>
     Having risked severe punishment, you have managed to steal some bacon,
@@ -220,7 +220,7 @@ const val rossEncounter = """
     </div>
 """
 
-const val rossAdvice = """
+const val ROSS_ADVICE = """
     Ross says the following:
 
     <b><i>If you act shy, avoid eye contact, and slink about furtively, you will draw the wrong
@@ -241,13 +241,13 @@ const val rossAdvice = """
 """
 
 // TODO This slide is not used
-const val winterTravelEnd = """
+const val WINTER_TRAVEL_END = """
     ...Without a coat, you freeze to death in the wilderness.
 
     THE END.
 """
 
-const val stealOvercoatViaRoss = """
+const val STEAL_OVERCOAT_VIA_ROSS = """
     <div>
     <img src="/static/images/winterdeparture.jpg" alt="Pic" style="width:187px;height:258px;border:2px solid gray;float:right;margin-left:10px;"/>
     <div style="padding-top:55px;padding-bottom:20px;">
@@ -265,7 +265,7 @@ const val stealOvercoatViaRoss = """
     </div>
 """
 
-const val majorEncounterPatrol = """
+const val MAJOR_ENCOUNTER_PATROL = """
     <div>
     <img src="/static/images/patrol.jpg" alt="Pic" style="width:196px;height:379px;border:2px solid gray;float:right;margin-left:10px;"/>
     <p style="padding-top:90px;">
@@ -281,7 +281,7 @@ const val majorEncounterPatrol = """
     </div>
 """
 
-const val majorEncounterViaRoss1stPatrol = """
+const val MAJOR_ENCOUNTER_VIA_ROSS1ST_PATROL = """
     <div>
     <img src="/static/images/patrol.jpg" alt="Pic" style="width:196px;height:379px;border:2px solid gray;float:right;margin-left:10px;"/>
     <p style="padding-top:90px;">
@@ -297,7 +297,7 @@ const val majorEncounterViaRoss1stPatrol = """
     </div>
 """
 
-const val majorEncounterFleePatrolEnd = """
+const val MAJOR_ENCOUNTER_FLEE_PATROL_END = """
     <div>
     <img src="/static/images/fleepatrol.jpg" alt="Pic" style="width:200px;height:300px;border:2px solid gray;float:right;margin-left:10px;"/>
     <p style="padding-top:60px;">
@@ -312,7 +312,7 @@ const val majorEncounterFleePatrolEnd = """
     </div>
 """
 
-const val majorEncounterFight1stPatrolEnd = """
+const val MAJOR_ENCOUNTER_FIGHT1ST_PATROL_END = """
     You and your companion boldly respond by trying to throw the men from their horses.
 
     Melee ensues, and you find yourself beaten to a pulp, shortly to be bound, strapped
@@ -321,7 +321,7 @@ const val majorEncounterFight1stPatrolEnd = """
     THE END.
 """
 
-const val majorEncounterViaRossFight1stPatrol = """
+const val MAJOR_ENCOUNTER_VIA_ROSS_FIGHT1ST_PATROL = """
     You and your companion boldly respond by drawing your pistols and firing at the men.
     Hitting one and causing the horses to panic, the other ride flees in terror as the
     wounded rider drops to the ground, unconscious.
@@ -332,7 +332,7 @@ const val majorEncounterViaRossFight1stPatrol = """
     Do you decide...
 """
 
-const val majorEncounterBluffPatrol = """
+const val MAJOR_ENCOUNTER_BLUFF_PATROL = """
     You try to explain that you have been sent on a mission by your master, which was
     not an uncommon occurrence. However, the man with a rifle demands to see your
     travel papers. You have none.
@@ -340,7 +340,7 @@ const val majorEncounterBluffPatrol = """
     Having failed at bluffing, will you...
 """
 
-const val majorEncounterViaRossBluff1stPatrol = """
+const val MAJOR_ENCOUNTER_VIA_ROSS_BLUFF1ST_PATROL = """
     You try to explain that you have been sent on a mission by your master, which was
     not an uncommon occurrence. However, the man with a rifle demands to see your travel
     papers. You show the man the travel papers that Ross gave you.
@@ -348,26 +348,26 @@ const val majorEncounterViaRossBluff1stPatrol = """
     Do you...
 """
 
-const val politeAndSubmissiveBluff = """
+const val POLITE_AND_SUBMISSIVE_BLUFF = """
     Your polite and submissive tone arouses their suspicions. One man says, “Those papers
     look fake!” and the men begin to raise their rifles.
 
     Having failed at bluffing, will you...
 """
 
-const val confidentAndArrogantBluff = """
+const val CONFIDENT_AND_ARROGANT_BLUFF = """
     Your confident and arrogant tone convince the men that you are purpose is legitimate.
     Ross’ advice was useful this time.
 
     The armed patrol allows you to continue down the main road into town.
 """
 
-const val firstTown = """
+const val FIRST_TOWN = """
     Having ridden the main road into town, exhausted and famished, unable to continue,
     which building should you approach?
 """
 
-const val majorEncounterBaronialMansion = """
+const val MAJOR_ENCOUNTER_BARONIAL_MANSION = """
     <img src="/static/images/mansion.jpg" alt="Pic" style="width:596px;height:249px;border:3px solid gray;display: block;margin-left: auto;margin-right: auto;margin-bottom: 30px;"/>
 
     A regally dressed servant opens the door and asks your business.
@@ -375,7 +375,7 @@ const val majorEncounterBaronialMansion = """
     Do you...
 """
 
-const val text31PoliteAndSubmissiveBluff = """
+const val TEXT31_POLITE_AND_SUBMISSIVE_BLUFF = """
     Your polite and submissive tone arouses the servant’s suspicions. An old,
     well-dressed woman, brusquely yells from somewhere inside, “Thomas, send
     that riff raff away!”
@@ -383,7 +383,7 @@ const val text31PoliteAndSubmissiveBluff = """
     Will you...
 """
 
-const val text32ConfidentAndArrogantBluff = """
+const val TEXT32_CONFIDENT_AND_ARROGANT_BLUFF = """
     Your confident and arrogant tone convinces the servant that you are some men
     of importance. He yells to someone inside, “Madam, these fine gentlemen seek your
     hospitality. I judge them to be of upright character.”
@@ -396,7 +396,7 @@ const val text32ConfidentAndArrogantBluff = """
     Do you...
 """
 
-const val majorEncounterRamshackleHut = """
+const val MAJOR_ENCOUNTER_RAMSHACKLE_HUT = """
     A gnarled old face peers from behind a dirty window when you knock. The door opens...
     a nearly toothless smile greets you, and a wrinkled hand beckons you in.
 
@@ -406,7 +406,7 @@ const val majorEncounterRamshackleHut = """
     Do you...
 """
 
-const val majorEncounterRamshackleHutContd = """
+const val MAJOR_ENCOUNTER_RAMSHACKLE_HUT_CONTD = """
     You find yourself resting comfortably, recuperating from a hard journey, enjoying
     the warm fire and a delicious rustic stew. Unbeknownst to you, the old man, eager
     to enrich himself with some anticipated reward, has sent his son to fetch the
@@ -415,7 +415,7 @@ const val majorEncounterRamshackleHutContd = """
     After spending the night comfortably, you exit the building to be surprised by...
 """
 
-const val majorEncounterPostOffice = """
+const val MAJOR_ENCOUNTER_POST_OFFICE = """
     You enter the post office. Several heads turn your way, with sneering expressions
     upon seeing you. A postal official says: “You DO NOT belong here, get out before I
     call the authorities!”
@@ -423,16 +423,16 @@ const val majorEncounterPostOffice = """
     Will you...
 """
 
-const val mainRoadOutOfTown = """
+const val MAIN_ROAD_OUT_OF_TOWN = """
     Do you...
 """
 
-const val secondTown = """
+const val SECOND_TOWN = """
     Having ridden the main road into town, exhausted and famished, unable to continue,
     which building should you approach?
 """
 
-const val majorEncounterOrdinaryTavern = """
+const val MAJOR_ENCOUNTER_ORDINARY_TAVERN = """
     The sounds of merriment, the clinking of glasses, and the smell of tobacco smoke
     greet you upon entering the fairly busy establishment. A burly barkeep sporting
     bright red lamb chop sideburns, sleeves rolled up past his elbow, and wearing a
@@ -441,14 +441,14 @@ const val majorEncounterOrdinaryTavern = """
     Do you...
 """
 
-const val text39PoliteAndSubmissiveBluff = """
+const val TEXT39_POLITE_AND_SUBMISSIVE_BLUFF = """
     Your polite and submissive tone arouses the barkeep’s suspicions, “Johnny, we got
     some runaways, call the patrol!”
 
     As patrons scramble to pursue you (hoping for a reward), which way will you flee?
 """
 
-const val text40ConfidentAndArrogantBluff = """
+const val TEXT40_CONFIDENT_AND_ARROGANT_BLUFF = """
     Your confident and arrogant tone may have convinced the barkeep that you are men
     of importance. After grimacing, shaking his head, and looking around twice, he
     says, “Harry, get these men two mugs of red ale, a plate, and set them up in room 11!”
@@ -456,7 +456,7 @@ const val text40ConfidentAndArrogantBluff = """
     After filling your bellies, spending a dollar, and resting for the night, do you...
 """
 
-const val text41MajorEncounterRamshackleHut = """
+const val TEXT41_MAJOR_ENCOUNTER_RAMSHACKLE_HUT = """
     A gnarled old face peers from behind a dirty window when you knock. The door opens
     and a nearly toothless smile greets you, and a wrinkled hand beckons you in.
 
@@ -465,7 +465,7 @@ const val text41MajorEncounterRamshackleHut = """
     Do you...
 """
 
-const val text42MajorEncounterRamshackleHutContd = """
+const val TEXT42_MAJOR_ENCOUNTER_RAMSHACKLE_HUT_CONTD = """
     You find yourself resting comfortably, recuperating from a hard journey, enjoying
     the warm fire and a delicious rustic stew. Unbeknownst to you, the old man has
     sent his son to fetch the slave-catchers posted in town...
@@ -473,7 +473,7 @@ const val text42MajorEncounterRamshackleHutContd = """
     After spending the night comfortably, you exit the building to be surprised by...
 """
 
-const val majorEncounterBordello = """
+const val MAJOR_ENCOUNTER_BORDELLO = """
     You enter the bordello. Several heads turn your way, with sneering expressions
     upon seeing you. A garishly dressed women says: “You DO NOT belong here, get
     out before I call the authorities!”
@@ -481,41 +481,41 @@ const val majorEncounterBordello = """
     Will you...
 """
 
-const val mainRoadOutOfSecondTown = """
+const val MAIN_ROAD_OUT_OF_SECOND_TOWN = """
     Do you...
 """
 
-const val thirdTown = """
+const val THIRD_TOWN = """
     Having ridden the main road into town, exhausted and famished, unable to continue,
     which building should you approach?
 """
 
-const val majorEncounterModestMansion = """
+const val MAJOR_ENCOUNTER_MODEST_MANSION = """
     The door opens, after you knock, and a middle-aged man in a worn suit stares out at
     you blankly and says, in a somewhat harsh tone, “What is it you wish? Why are you here?”
 
     Do you...
 """
 
-const val politeAndSubmisseBluff = """
+const val POLITE_AND_SUBMISSE_BLUFF = """
     Your polite and submissive tone arouses the man’s suspicions. He slams the door,
     and you hear the loud ringing of a bell from the rooftop.
 
     Do you...
 """
 
-const val text48ConfidentAndArrogantBluff = """
+const val TEXT48_CONFIDENT_AND_ARROGANT_BLUFF = """
     Your confident and arrogant tone may have convinced the man that you are men of
     some importance. However, he will not extend his hospitality freely.
 """
 
-const val text49ConfidentAndArrogantBluffContd = """
+const val TEXT49_CONFIDENT_AND_ARROGANT_BLUFF_CONTD = """
     You spend the night comfortably, and the next morning you set off.
 
     Do you...
 """
 
-const val text50MajorEncounterRamshackleHut = """
+const val TEXT50_MAJOR_ENCOUNTER_RAMSHACKLE_HUT = """
     A gnarled old face peers from behind a dirty window when you knock. The door
     opens and a nearly toothless smile greets you, and a wrinkled hand beckons you in.
 
@@ -524,7 +524,7 @@ const val text50MajorEncounterRamshackleHut = """
     Do you...
 """
 
-const val text51MajorEncounterRamshackleHutContd = """
+const val TEXT51_MAJOR_ENCOUNTER_RAMSHACKLE_HUT_CONTD = """
     You find yourself resting comfortably, recuperating from a hard journey, enjoying
     the warm fire and a delicious rustic stew. Unbeknownst to you, the old man has sent
     his son to fetch the slave-catchers posted in town...
@@ -532,14 +532,14 @@ const val text51MajorEncounterRamshackleHutContd = """
     After spending the night comfortably, you exit the building to be surprised by...
 """
 
-const val majorEncounterPharmacy = """
+const val MAJOR_ENCOUNTER_PHARMACY = """
     A bell rings as you enter the pharmacy. A bespeckled clerk peers at you over his
     glasses, and coolly declares, “You do not belong here!”
 
     Will you...
 """
 
-const val majorEncounter2ndPatrol = """
+const val MAJOR_ENCOUNTER2ND_PATROL = """
     <div>
     <img src="/static/images/2ndpatrol.jpg" alt="Pic" style="width:178px;height:417px;border:2px solid gray;float:right;margin-left:10px;"/>
     <p style="padding-top:110px;">
@@ -555,7 +555,7 @@ const val majorEncounter2ndPatrol = """
     </div>
 """
 
-const val majorEncounterFight2ndPatrol = """
+const val MAJOR_ENCOUNTER_FIGHT2ND_PATROL = """
     You and your companion boldly respond by drawing your pistols and firing at the men.
     Hitting one and causing the horses to panic, the other ride flees in terror as the
     wounded rider drops to the ground, unconscious.
@@ -568,7 +568,7 @@ const val majorEncounterFight2ndPatrol = """
 """
 
 // TODO This slide is not used
-const val text55MajorEncounterBluff2ndPatrol = """
+const val TEXT55_MAJOR_ENCOUNTER_BLUFF2ND_PATROL = """
     You try to explain that you have been sent on a mission by your master, which was
     not an uncommon occurrence. However, the man with a rifle demands to see your travel
     papers. You have none.
@@ -576,7 +576,7 @@ const val text55MajorEncounterBluff2ndPatrol = """
     Having failed at bluffing, will you...
 """
 
-const val backroads = """
+const val BACKROADS = """
     After travelling undetected for days, you are slowly starving.
 
     Finally, you come to a clearing and see a lone log cabin.
@@ -584,7 +584,7 @@ const val backroads = """
     Do you...
 """
 
-const val riverCrossing = """
+const val RIVER_CROSSING = """
     As you approach, you see a white man chopping logs. He looks you up and down and,
     in a tone that strikes as sympathetic rather than hostile, he warns you of patrols
     in the area and tells you to follow horse tracks across frozen Ohio.
@@ -592,7 +592,7 @@ const val riverCrossing = """
     Do you...
 """
 
-const val woodmensAdvice = """
+const val WOODMENS_ADVICE = """
     A loud yell alerts you to the fact that you have been spotted. Anxiously, you turn
     to see an elderly black man emerge from the brush who says that he has surmised
     that you must be runaway slaves. While you hesitate to respond, he tells you that
@@ -609,35 +609,35 @@ val jermainLonguenSlides =
       slide(
         id = 12,
         title = "Paddy Rollers",
-        content = paddyRollersEnd,
+        content = PADDY_ROLLERS_END,
       )
 
     val slide22MajorEncounterFleePatrolEnd =
       slide(
         id = 22,
         title = "Major Encounter: Flee Patrol",
-        content = majorEncounterFleePatrolEnd,
+        content = MAJOR_ENCOUNTER_FLEE_PATROL_END,
       )
 
     val slide23MajorEncounterFlight1stPatrolEnd =
       slide(
         id = 23,
         title = "Major Encounter: Fight 1st Patrol",
-        content = majorEncounterFight1stPatrolEnd,
+        content = MAJOR_ENCOUNTER_FIGHT1ST_PATROL_END,
       )
 
     val slide9DeepForrestEnd =
       slide(
         id = 9,
         title = "Deep Forest",
-        content = fleeIntoDeepForestEnd,
+        content = FLEE_INTO_DEEP_FOREST_END,
       )
 
     val slide8SummerCrossCountry =
       slide(
         id = 8,
         title = "Summer Cross-Country",
-        content = summerCrossCountry,
+        content = SUMMER_CROSS_COUNTRY,
       ) {
         choice(
           text = "Into the deep forest",
@@ -653,7 +653,7 @@ val jermainLonguenSlides =
       slide(
         id = 10,
         title = "Autumn Departure",
-        content = autumnDeparture,
+        content = AUTUMN_DEPARTURE,
       ) {
         choice(
           text = "Continue",
@@ -665,7 +665,7 @@ val jermainLonguenSlides =
       slide(
         id = 11,
         title = "Spring Departure",
-        content = springDeparture,
+        content = SPRING_DEPARTURE,
       ) {
         choice(
           text = "Continue",
@@ -677,7 +677,7 @@ val jermainLonguenSlides =
       slide(
         id = 15,
         title = "Winter Cross-Country",
-        content = winterCrossCountry,
+        content = WINTER_CROSS_COUNTRY,
       ) {
         choice(
           text = "Into the deep forest",
@@ -693,7 +693,7 @@ val jermainLonguenSlides =
       slide(
         id = 25,
         title = "Major Encounter: bluff Patrol",
-        content = majorEncounterBluffPatrol,
+        content = MAJOR_ENCOUNTER_BLUFF_PATROL,
       ) {
         choice(
           text = "Flee?",
@@ -709,7 +709,7 @@ val jermainLonguenSlides =
       slide(
         id = 20,
         title = "Major Encounter: Patrol",
-        content = majorEncounterPatrol,
+        content = MAJOR_ENCOUNTER_PATROL,
       ) {
         choice(
           text = "Flee?",
@@ -729,7 +729,7 @@ val jermainLonguenSlides =
       slide(
         id = 57,
         title = "River Crossing",
-        content = riverCrossing,
+        content = RIVER_CROSSING,
       ) {
         choice(
           text = "Continue on, into the wilderness?",
@@ -740,7 +740,7 @@ val jermainLonguenSlides =
           slide = slide(
             id = 58,
             title = "Woodmen’s Advice",
-            content = woodmensAdvice,
+            content = WOODMENS_ADVICE,
             success = true,
           ),
         )
@@ -750,14 +750,14 @@ val jermainLonguenSlides =
       slide(
         id = 54,
         title = "Major Encounter: fight 2nd Patrol",
-        content = majorEncounterFight2ndPatrol,
+        content = MAJOR_ENCOUNTER_FIGHT2ND_PATROL,
       ) {
         choice(
           text = "Do you agree and go cross-country?",
           slide = slide(
             id = 56,
             title = "Backroads",
-            content = backroads,
+            content = BACKROADS,
           ) {
             choice(
               text = "Approach the cottage?",
@@ -779,7 +779,7 @@ val jermainLonguenSlides =
       slide(
         id = 53,
         title = "Major Encounter: 2nd Patrol",
-        content = majorEncounter2ndPatrol,
+        content = MAJOR_ENCOUNTER2ND_PATROL,
       ) {
         choice(
           text = "Flee?",
@@ -799,7 +799,7 @@ val jermainLonguenSlides =
       slide(
         id = 51,
         title = "Major Encounter: Ramshackle Hut (cont.)",
-        content = text51MajorEncounterRamshackleHutContd,
+        content = TEXT51_MAJOR_ENCOUNTER_RAMSHACKLE_HUT_CONTD,
       ) {
         choice(
           text = "Continue",
@@ -811,7 +811,7 @@ val jermainLonguenSlides =
       slide(
         id = 47,
         title = "Polite & Submissive Bluff",
-        content = politeAndSubmisseBluff,
+        content = POLITE_AND_SUBMISSE_BLUFF,
       ) {
         choice(
           text = "Knock at the door again, waiting for...",
@@ -831,7 +831,7 @@ val jermainLonguenSlides =
       slide(
         id = 50,
         title = "Major Encounter: Ramshackle Hut",
-        content = text50MajorEncounterRamshackleHut,
+        content = TEXT50_MAJOR_ENCOUNTER_RAMSHACKLE_HUT,
       ) {
         choice(
           text = "Enter the ramshackle hut?",
@@ -851,7 +851,7 @@ val jermainLonguenSlides =
       slide(
         id = 52,
         title = "Major Encounter: Pharmacy",
-        content = majorEncounterPharmacy,
+        content = MAJOR_ENCOUNTER_PHARMACY,
       ) {
         choice(
           text = "Try another building in town?",
@@ -867,14 +867,14 @@ val jermainLonguenSlides =
       slide(
         id = 48,
         title = "Confident & Arrogant Bluff",
-        content = text48ConfidentAndArrogantBluff,
+        content = TEXT48_CONFIDENT_AND_ARROGANT_BLUFF,
       ) {
         choice(
           text = "You spend your last dollar to stay the night.",
           slide = slide(
             id = 49,
             title = "Confident & Arrogant Bluff (cont.)",
-            content = text49ConfidentAndArrogantBluffContd,
+            content = TEXT49_CONFIDENT_AND_ARROGANT_BLUFF_CONTD,
           ) {
             choice(
               text = "Continue down the main road out of town?",
@@ -900,7 +900,7 @@ val jermainLonguenSlides =
       slide(
         id = 46,
         title = "Major Encounter: Modest Mansion",
-        content = majorEncounterModestMansion,
+        content = MAJOR_ENCOUNTER_MODEST_MANSION,
       ) {
         choice(
           text = "Speak politely in a submissive tone, asking meekly for a chance to spend the night?",
@@ -917,7 +917,7 @@ val jermainLonguenSlides =
       slide(
         id = 45,
         title = "Third Town",
-        content = thirdTown,
+        content = THIRD_TOWN,
       ) {
         choice(
           text = "The ramshackle hut at the edge of town",
@@ -937,7 +937,7 @@ val jermainLonguenSlides =
       slide(
         id = 39,
         title = "Polite & Submissive Bluff",
-        content = text39PoliteAndSubmissiveBluff,
+        content = TEXT39_POLITE_AND_SUBMISSIVE_BLUFF,
       ) {
         choice(
           text = "Ride on, desperately taking main road out of town",
@@ -953,14 +953,14 @@ val jermainLonguenSlides =
       slide(
         id = 40,
         title = "Confident & Arrogant Bluff",
-        content = text40ConfidentAndArrogantBluff,
+        content = TEXT40_CONFIDENT_AND_ARROGANT_BLUFF,
       ) {
         choice(
           text = "Continue down the main road out of town?",
           slide = slide(
             id = 44,
             title = "Main Road out of Second Town",
-            content = mainRoadOutOfSecondTown,
+            content = MAIN_ROAD_OUT_OF_SECOND_TOWN,
           ) {
             choice(
               text = "Continue on the main road to the next town?",
@@ -982,7 +982,7 @@ val jermainLonguenSlides =
       slide(
         id = 38,
         title = "Major Encounter: Ordinary Tavern",
-        content = majorEncounterOrdinaryTavern,
+        content = MAJOR_ENCOUNTER_ORDINARY_TAVERN,
       ) {
         choice(
           text = "Speak politely in a submissive tone, asking meekly for a chance to spend the night?",
@@ -999,14 +999,14 @@ val jermainLonguenSlides =
       slide(
         id = 41,
         title = "Major Encounter: Ramshackle Hut",
-        content = text41MajorEncounterRamshackleHut,
+        content = TEXT41_MAJOR_ENCOUNTER_RAMSHACKLE_HUT,
       ) {
         choice(
           text = "Enter the ramshackle hut?",
           slide = slide(
             id = 42,
             title = "Major Encounter: Ramshackle Hut (cont.)",
-            content = text42MajorEncounterRamshackleHutContd,
+            content = TEXT42_MAJOR_ENCOUNTER_RAMSHACKLE_HUT_CONTD,
           ) {
             choice(
               text = "Continue",
@@ -1028,7 +1028,7 @@ val jermainLonguenSlides =
       slide(
         id = 37,
         title = "Second Town",
-        content = secondTown,
+        content = SECOND_TOWN,
       ) {
         choice(
           text = "The ramshackle hut at the edge of town",
@@ -1043,7 +1043,7 @@ val jermainLonguenSlides =
           slide = slide(
             id = 43,
             title = "Major Encounter: Bordello",
-            content = majorEncounterBordello,
+            content = MAJOR_ENCOUNTER_BORDELLO,
           ) {
             choice(
               text = "Try another building in town?",
@@ -1061,14 +1061,14 @@ val jermainLonguenSlides =
       slide(
         id = 32,
         title = "Confident & Arrogant Bluff",
-        content = text32ConfidentAndArrogantBluff,
+        content = TEXT32_CONFIDENT_AND_ARROGANT_BLUFF,
       ) {
         choice(
           text = "Continue down the main road out of town?",
           slide = slide(
             id = 36,
             title = "Main Road out of First Town",
-            content = mainRoadOutOfTown,
+            content = MAIN_ROAD_OUT_OF_TOWN,
           ) {
             choice(
               text = "Continue on the main road to the next town?",
@@ -1090,7 +1090,7 @@ val jermainLonguenSlides =
       slide(
         id = 31,
         title = "Polite & Submissive Bluff",
-        content = text31PoliteAndSubmissiveBluff,
+        content = TEXT31_POLITE_AND_SUBMISSIVE_BLUFF,
       ) {
         choice(
           text = "Try another building in town?",
@@ -1106,14 +1106,14 @@ val jermainLonguenSlides =
       slide(
         id = 29,
         title = "First Town",
-        content = firstTown,
+        content = FIRST_TOWN,
       ) {
         choice(
           text = "The stately baronial mansion, set apart on a slight rise",
           slide = slide(
             id = 30,
             title = "Major Encounter: Baronial Mansion",
-            content = majorEncounterBaronialMansion,
+            content = MAJOR_ENCOUNTER_BARONIAL_MANSION,
           ) {
             choice(
               text = "Speak politely in a submissive tone, asking meekly for a chance to spend the night?",
@@ -1131,14 +1131,14 @@ val jermainLonguenSlides =
           slide = slide(
             id = 33,
             title = "Major Encounter: Ramshackle Hut",
-            content = majorEncounterRamshackleHut,
+            content = MAJOR_ENCOUNTER_RAMSHACKLE_HUT,
           ) {
             choice(
               text = "Enter the ramshackle hut?",
               slide = slide(
                 id = 34,
                 title = "Major Encounter: Ramshackle Hut (cont.)",
-                content = majorEncounterRamshackleHutContd,
+                content = MAJOR_ENCOUNTER_RAMSHACKLE_HUT_CONTD,
               ) {
                 choice(
                   text = "Continue",
@@ -1161,7 +1161,7 @@ val jermainLonguenSlides =
           slide = slide(
             id = 35,
             title = "Major Encounter: Post Office",
-            content = majorEncounterPostOffice,
+            content = MAJOR_ENCOUNTER_POST_OFFICE,
           ) {
             choice(
               text = ".Try another building in town?",
@@ -1179,14 +1179,14 @@ val jermainLonguenSlides =
       slide(
         id = 19,
         title = "Steal an Overcoat (via Ross)",
-        content = stealOvercoatViaRoss,
+        content = STEAL_OVERCOAT_VIA_ROSS,
       ) {
         choice(
           text = "On the Main Road",
           slide = slide(
             id = 21,
             title = "Major Encounter (via Ross): 1st Patrol",
-            content = majorEncounterViaRoss1stPatrol,
+            content = MAJOR_ENCOUNTER_VIA_ROSS1ST_PATROL,
           ) {
             choice(
               text = "Flee",
@@ -1197,7 +1197,7 @@ val jermainLonguenSlides =
               slide = slide(
                 id = 24,
                 title = "Major Encounter (via Ross): fight 1st Patrol",
-                content = majorEncounterViaRossFight1stPatrol,
+                content = MAJOR_ENCOUNTER_VIA_ROSS_FIGHT1ST_PATROL,
               ) {
                 choice(
                   text = "To continue down the main road into town",
@@ -1214,14 +1214,14 @@ val jermainLonguenSlides =
               slide = slide(
                 id = 26,
                 title = "Major Encounter (via Ross): bluff 1st Patrol",
-                content = majorEncounterViaRossBluff1stPatrol,
+                content = MAJOR_ENCOUNTER_VIA_ROSS_BLUFF1ST_PATROL,
               ) {
                 choice(
                   text = "Speak politely in a submissive tone, out of respect for their position and status",
                   slide = slide(
                     id = 27,
                     title = "Polite & Submissive Bluff",
-                    content = politeAndSubmissiveBluff,
+                    content = POLITE_AND_SUBMISSIVE_BLUFF,
                   ) {
                     choice(
                       text = "Flee?",
@@ -1238,7 +1238,7 @@ val jermainLonguenSlides =
                   slide = slide(
                     id = 28,
                     title = "Confident & Arrogant Bluff",
-                    content = confidentAndArrogantBluff,
+                    content = CONFIDENT_AND_ARROGANT_BLUFF,
                   ) {
                     choice(
                       text = "Continue",
@@ -1260,7 +1260,7 @@ val jermainLonguenSlides =
       slide(
         id = 5,
         title = "Old Ben (via Ross): When to Go",
-        content = oldBenViaRoss,
+        content = OLD_BEN_VIA_ROSS,
       ) {
         choice(
           text = "Leave in the summer, when the weather is warmest, and you can easily sleep outdoors",
@@ -1286,7 +1286,7 @@ val jermainLonguenSlides =
       slide(
         id = 7,
         title = "Summer Departure",
-        content = summerDeparture,
+        content = SUMMER_DEPARTURE,
       ) {
         choice(
           text = "Continue on the main road, with the risk of encountering patrol",
@@ -1302,14 +1302,14 @@ val jermainLonguenSlides =
       slide(
         id = 13,
         title = "Winter Departure",
-        content = winterDepartureAlone,
+        content = WINTER_DEPARTURE_ALONE,
       ) {
         choice(
           text = "Yes, steal an overcoat",
           slide = slide(
             id = 14,
             title = "Steal an Overcoat",
-            content = stealOvercoat,
+            content = STEAL_OVERCOAT,
           ) {
             choice(
               text = "On the main road",
@@ -1335,7 +1335,7 @@ val jermainLonguenSlides =
       slide(
         id = 4,
         title = "Decision: When to Go",
-        content = decisionWhenToGo,
+        content = DECISION_WHEN_TO_GO,
       ) {
         choice(
           text = "Summer Departure",
@@ -1359,14 +1359,14 @@ val jermainLonguenSlides =
       slide(
         id = 16,
         title = "Ross Encounter, then Ben",
-        content = rossEncounter,
+        content = ROSS_ENCOUNTER,
       ) {
         choice(
           text = "Yes",
           slide = slide(
             id = 17,
             title = "Ross Advice",
-            content = rossAdvice,
+            content = ROSS_ADVICE,
           ) {
             choice(
               text = "Yes, leave now",
@@ -1388,7 +1388,7 @@ val jermainLonguenSlides =
       slide(
         id = 6,
         title = "Go To Old Ben",
-        content = oldBenWhenToGo,
+        content = OLD_BEN_WHEN_TO_GO,
       ) {
         choice(
           text = "Leave in the summer, when the weather is warmest and you can easily sleep outdoors",
@@ -1413,7 +1413,7 @@ val jermainLonguenSlides =
       slide(
         id = 3,
         title = "Companion Decision",
-        content = companionDecision,
+        content = COMPANION_DECISION,
       ) {
         choice(
           text = "Yes, take your chances and go meet with Ross then meet with Ben",
@@ -1436,7 +1436,7 @@ val jermainLonguenSlides =
     slide(
       id = 1,
       title = "UGRR Scenario",
-      content = titlePage,
+      content = TITLE_PAGE,
       root = true,
     ) {
       choice(
@@ -1444,7 +1444,7 @@ val jermainLonguenSlides =
         slide = slide(
           id = 2,
           title = "START: Major Decision",
-          content = majorDecision,
+          content = MAJOR_DECISION,
         ) {
           choice(
             text = "Yes, tell your two best friends",
