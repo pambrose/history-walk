@@ -15,7 +15,7 @@ import org.w3c.dom.url.URLSearchParams
 
 val AppScope = CoroutineScope(window.asCoroutineDispatcher())
 
-@JsModule("./modules/css/kvapp.css")
+@JsModule("/kotlin/modules/css/kvapp.css")
 external object kvappCss
 
 class App : Application() {

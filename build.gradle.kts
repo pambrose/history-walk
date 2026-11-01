@@ -18,12 +18,8 @@ plugins {
     alias(libs.plugins.kiluaRpc)
 }
 
-version = "1.0.0"
-group = "com.github.pambrose"
-
 repositories {
     mavenCentral()
-    // mavenLocal()
 }
 
 //buildConfig {
@@ -39,7 +35,6 @@ val mainClassName = "io.ktor.server.cio.EngineMain"
 kotlin {
     jvmToolchain(libs.versions.jvm.get().toInt())
     jvm {
-//        withJava()
         compilerOptions {
             freeCompilerArgs.add("-Xjsr305=strict")
         }
