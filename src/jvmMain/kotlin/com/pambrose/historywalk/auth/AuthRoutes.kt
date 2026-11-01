@@ -1,8 +1,11 @@
 package com.pambrose.historywalk.auth
 
+import com.pambrose.historywalk.Auth.DEFAULT_LOGIN_GREETING
 import com.pambrose.historywalk.EndPoints.AUTH_CALLBACK
+import com.pambrose.historywalk.EndPoints.AUTH_GREETING
 import com.pambrose.historywalk.EndPoints.AUTH_LOGIN
 import com.pambrose.historywalk.EndPoints.LOGOUT
+import com.pambrose.historywalk.EnvVar
 import com.pambrose.historywalk.User
 import com.pambrose.historywalk.auth.OAuthState.consumeOAuthState
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -12,12 +15,14 @@ import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
+import io.ktor.http.ContentType
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.auth.OAuthAccessTokenResponse
 import io.ktor.server.auth.authenticate
 import io.ktor.server.auth.principal
 import io.ktor.server.response.respondRedirect
+import io.ktor.server.response.respondText
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
@@ -67,11 +72,18 @@ suspend fun ApplicationCall.completeSignIn(
   }
 }
 
+/** The sign-in dialog's title: [value] (LOGIN_GREETING) trimmed, or [DEFAULT_LOGIN_GREETING] when it is unset or blank. */
+internal fun loginGreeting(value: String? = EnvVar.LOGIN_GREETING.getEnvOrNull()): String =
+  value?.trim()?.takeIf { it.isNotEmpty() } ?: DEFAULT_LOGIN_GREETING
+
 /**
  * The sign-in and sign-out routes. They are page navigations, so a browser without a session is redirected to Google,
  * which it can follow; they stay outside the RPC guard ([signedInApi]).
  */
 fun Route.signInRoutes() {
+  // The sign-in dialog's title. Open to all: the dialog is shown before anyone is signed in.
+  get(AUTH_GREETING) { call.respondText(loginGreeting(), ContentType.Text.Plain) }
+
   authenticate(GOOGLE_AUTH) {
     // The provider sends a browser without a session to Google; one that gets here is signed in already
     get(AUTH_LOGIN) { call.respondRedirect("/") }

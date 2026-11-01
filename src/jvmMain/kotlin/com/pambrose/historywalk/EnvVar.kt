@@ -25,6 +25,7 @@ enum class EnvVar(val maskFunc: EnvVar.() -> String = { getEnv(UNASSIGNED) }) {
   SESSION_SECRET({ getEnvOrNull()?.obfuscate(1) ?: UNASSIGNED }),
   SCHOOL_EMAIL_DOMAIN,
   TEACHER_EMAILS,
+  LOGIN_GREETING,
   ;
 
   fun isDefined(): Boolean = getEnvOrNull().isNotNull()

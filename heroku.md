@@ -13,6 +13,7 @@ GOOGLE_CLIENT_SECRET = (from Google Cloud)
 OAUTH_CALLBACK_URL = https://<jermain-app>.herokuapp.com/auth/callback
 SESSION_SECRET = (openssl rand -hex 32)
 TEACHER_EMAILS = (comma-separated teacher addresses)
+LOGIN_GREETING = (optional; sign-in dialog title, default "History Walk")
 
 ### Moses
 
@@ -27,4 +28,5 @@ GOOGLE_CLIENT_SECRET = (from Google Cloud)
 OAUTH_CALLBACK_URL = https://<moses-app>.herokuapp.com/auth/callback
 SESSION_SECRET = (openssl rand -hex 32)
 TEACHER_EMAILS = (comma-separated teacher addresses)
+LOGIN_GREETING = (optional; sign-in dialog title, default "History Walk")
 

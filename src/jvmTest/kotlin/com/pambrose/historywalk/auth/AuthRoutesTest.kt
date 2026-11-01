@@ -151,6 +151,18 @@ class AuthRoutesTest : StringSpec() {
         client.post("/rpc/routeContentServiceManager0").status shouldBe Unauthorized
       }
     }
+    "the sign-in greeting is served without a session" {
+      signInTest { client ->
+        val r = client.get("/auth/greeting")
+        r.status shouldBe OK
+        r.bodyAsText() shouldBe loginGreeting()
+      }
+    }
+    "the sign-in greeting is LOGIN_GREETING trimmed, or History Walk when unset or blank" {
+      loginGreeting(null) shouldBe "History Walk"
+      loginGreeting("   ") shouldBe "History Walk"
+      loginGreeting("  Jermain Walk ") shouldBe "Jermain Walk"
+    }
     "slide images are served without a session" {
       signInTest { client ->
         val r = client.get("/static/images/jermain-longuen.jpg")

@@ -60,6 +60,7 @@ digits) and the teachers listed in `TEACHER_EMAILS` are admitted; anyone else is
 | `SESSION_SECRET` | Key for the session cookie and signed state; required in production |
 | `SCHOOL_EMAIL_DOMAIN` | Defaults to `athenian.org` |
 | `TEACHER_EMAILS` | Comma-separated teacher addresses; the only accounts with the teacher view. Empty means no teachers |
+| `LOGIN_GREETING` | Title of the sign-in dialog; defaults to `History Walk` |
 
 Generate `SESSION_SECRET` with:
 

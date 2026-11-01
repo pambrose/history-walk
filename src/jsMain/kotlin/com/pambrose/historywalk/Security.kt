@@ -6,6 +6,8 @@ import io.kvision.state.ObservableValue
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Shows the sign-in prompt once for the life of the page, then parks for good.
@@ -39,6 +41,10 @@ object Security : SecurityMgr() {
   private val loginPrompt =
     LoginPrompt {
       Modal.getAllModals().filter { it.visible && it !== signInDialog }.forEach { it.hide() }
+      // NonCancellable, so cancelling the call that triggered sign-in cannot stop the dialog from opening; the timeout
+      // keeps a slow server from holding it back, in which case the default title stays.
+      withContext(NonCancellable) { withTimeoutOrNull(3.seconds) { fetchLoginGreeting() } }
+        ?.let { signInDialog.caption = it }
       signInDialog.getResult()
     }
 
