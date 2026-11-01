@@ -1,8 +1,8 @@
 package com.pambrose.historywalk
 
-import com.pambrose.historywalk.DbmsTxs.allSuccessUsers
-import com.pambrose.historywalk.DbmsTxs.allUserReasons
-import com.pambrose.historywalk.DbmsTxs.allUserSummaries
+import com.pambrose.historywalk.dbms.DbmsTxs.allSuccessUsers
+import com.pambrose.historywalk.dbms.DbmsTxs.allUserReasons
+import com.pambrose.historywalk.dbms.DbmsTxs.allUserSummaries
 import com.pambrose.historywalk.EndPoints.SLIDE
 import com.pambrose.historywalk.HistoryWalkServer.masterSlides
 import kotlinx.html.*

@@ -1,8 +1,8 @@
 package com.pambrose.historywalk
 
 import com.codahale.metrics.jvm.ThreadDump
-import com.pambrose.historywalk.DbmsTxs.deleteChoices
-import com.pambrose.historywalk.DbmsTxs.updateLastSlide
+import com.pambrose.historywalk.dbms.DbmsTxs.deleteChoices
+import com.pambrose.historywalk.dbms.DbmsTxs.updateLastSlide
 import com.pambrose.historywalk.EndPoints.CONTENT_RESET
 import com.pambrose.historywalk.EndPoints.REASONS
 import com.pambrose.historywalk.EndPoints.SLIDE

@@ -1,13 +1,14 @@
 package com.pambrose.historywalk
 
-import com.pambrose.historywalk.DbmsTxs.slideData
-import com.pambrose.historywalk.DbmsTxs.updateLastSlide
 import com.pambrose.historywalk.HistoryWalkServer.masterSlides
 import com.pambrose.historywalk.User.Companion.findCurrentSlideForUser
 import com.pambrose.historywalk.User.Companion.userInfoFor
 import com.pambrose.historywalk.Utils.toUuid
 import com.pambrose.historywalk.auth.SchoolConfig
 import com.pambrose.historywalk.auth.userUuid
+import com.pambrose.historywalk.dbms.DbmsTxs.slideData
+import com.pambrose.historywalk.dbms.DbmsTxs.updateLastSlide
+import com.pambrose.historywalk.dbms.UserChoiceTable
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.server.application.*
 import org.jetbrains.exposed.v1.core.and

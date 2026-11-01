@@ -1,7 +1,10 @@
-package com.pambrose.historywalk
+package com.pambrose.historywalk.dbms
 
 import com.pambrose.historywalk.EnvVar.DISPLAY_CONSECUTIVE_CORRECT_DECISIONS
 import com.pambrose.historywalk.EnvVar.SHOW_RESET_BUTTON
+import com.pambrose.historywalk.ParentTitle
+import com.pambrose.historywalk.SlideChoice
+import com.pambrose.historywalk.SlideData
 import com.pambrose.historywalk.Utils.toUuid
 import com.pambrose.historywalk.Utils.transformText
 import com.pambrose.historywalk.slides.Slide

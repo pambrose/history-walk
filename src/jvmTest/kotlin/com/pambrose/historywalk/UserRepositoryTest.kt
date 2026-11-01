@@ -3,6 +3,12 @@ package com.pambrose.historywalk
 import com.pambrose.historywalk.User.Companion.emailForUuid
 import com.pambrose.historywalk.User.Companion.upsertFromGoogle
 import com.pambrose.historywalk.User.Companion.userInfoFor
+import com.pambrose.historywalk.dbms.Dbms
+import com.pambrose.historywalk.dbms.UserChoiceTable
+import com.pambrose.historywalk.dbms.UserDecisionCountsView
+import com.pambrose.historywalk.dbms.UserReasonsView
+import com.pambrose.historywalk.dbms.UserVisitsView
+import com.pambrose.historywalk.dbms.UsersTable
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.kotest.assertions.throwables.shouldThrow

@@ -1,15 +1,16 @@
 package com.pambrose.historywalk
 
 import com.pambrose.historywalk.Email.Companion.EMPTY_EMAIL
-import com.pambrose.common.exposed.get
 import com.pambrose.historywalk.FullName.Companion.EMPTY_FULLNAME
 import com.pambrose.historywalk.Utils.toUuid
 import com.pambrose.historywalk.auth.Roles.roleFor
 import com.pambrose.historywalk.auth.SchoolConfig
-import com.pambrose.common.util.*
+import com.pambrose.historywalk.dbms.UsersTable
 import com.pambrose.historywalk.slides.Slide
 import com.pambrose.historywalk.slides.SlideDeck
 import com.pambrose.historywalk.slides.SlideDeck.Companion.ROOT
+import com.pambrose.common.exposed.get
+import com.pambrose.common.util.*
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.jetbrains.exposed.v1.core.*
 import org.jetbrains.exposed.v1.jdbc.*

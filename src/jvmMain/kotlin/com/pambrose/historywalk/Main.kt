@@ -1,6 +1,6 @@
 package com.pambrose.historywalk
 
-import com.pambrose.historywalk.Dbms.dbmsInit
+import com.pambrose.historywalk.dbms.Dbms.dbmsInit
 import com.pambrose.historywalk.EnvVar.*
 import com.pambrose.historywalk.HistoryWalkServer.masterSlides
 import com.pambrose.historywalk.Installs.installs

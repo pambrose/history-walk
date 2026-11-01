@@ -65,8 +65,8 @@ slide orphans saved progress, and `findSlideByPathName` silently falls back to t
 
 **Database.** `Dbms.migrate` runs Flyway (`src/jvmMain/resources/db/migration`) before `Database.connect` on every
 startup, so each deploy migrates. Never edit an applied migration (Flyway checksums them); add `V002__...sql`. Note
-`V001` begins with `drop schema if exists history cascade`. Tables are Exposed objects in `DbmsTables.kt`; queries are
-in `DbmsTxs.kt` and `User.kt`.
+`V001` begins with `drop schema if exists history cascade`. Tables are Exposed objects in `dbms/DbmsTables.kt`; queries are
+in `dbms/DbmsTxs.kt` and `User.kt`.
 
 **Dev proxy.** In `make client`, the browser talks to :3000; `webpack.config.d/proxy.js` forwards `/auth`, `/rpc*`,
 `/static`, and the teacher/reset pages to :8080. A new server route that the browser loads directly must be added there.
