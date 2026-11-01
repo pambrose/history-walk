@@ -229,9 +229,12 @@ private.
 against a throwaway Postgres and checks `/ping`, `/version`, the page shell's `Cache-Control`, and a 401 for an unsigned
 RPC call; `zizmor.yml` audits `.github` changes; `lint.yml` runs `make lint`; `dependency-graph.yml` submits
 `jvmRuntimeClasspath` so Dependabot sees the JVM libraries; `cleanup-runs.yml` deletes runs older than 30 days every
-Monday, keeping the newest 10. `.gitignore` ignores dot-directories, so `.github/` is re-included explicitly. `make ci`
-runs the same gates locally. The lint and format tasks skip `build/generated` by path (see `build.gradle.kts`); the
-slide decks' text constants are SCREAMING_SNAKE_CASE, as ktlint's property-naming rule requires.
+Monday, keeping the newest 10. `dependabot.yml` proposes action updates and new digests for the Dockerfile's base image
+(pinned by digest, tag kept) weekly, 7 days after each release, but for the JVM libraries only security updates
+(`open-pull-requests-limit: 0`; `make versions` lists the rest). `.gitignore` ignores dot-directories, so `.github/` is
+re-included explicitly. `make ci` runs the same gates locally. The lint and format tasks skip `build/generated` by path
+(see `build.gradle.kts`); the slide decks' text constants are SCREAMING_SNAKE_CASE, as ktlint's property-naming rule
+requires.
 
 ## Gotchas
 
