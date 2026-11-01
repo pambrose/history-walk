@@ -109,7 +109,7 @@ fun Application.main() {
   installs()
   assignRoutes()
 
-  val defaultSlides = "jermainLonguenSlides"
+  val defaultSlides = "jermain"
 
   val slideName = SLIDES_VARIABLE_NAME.getEnv(defaultSlides)
   masterSlides =

@@ -54,7 +54,7 @@ An explicit anti-goal: a student must never see another student's data or progre
 
 **Slides.** Decks are Kotlin DSL values in `jvmMain/content/` (`jermainLonguenSlides`, `mosesSlides`) built with
 `slides/SlideDeck.slideDeck { slide(...) { choice(...) } }`; content is HTML/markdown in raw strings, rendered through
-`MarkdownParser`. `Main.kt` picks the deck: `SLIDES_VARIABLE_NAME == "jermainLonguenSlides"` selects Jermain, anything else
+`MarkdownParser`. `Main.kt` picks the deck: `SLIDES_VARIABLE_NAME == "jermain"` selects Jermain, anything else
 Moses. (`HistoryWalkServer.loadSlides()` and the `SLIDES_REPO_*` / `SLIDES_LOCAL_FILENAME` vars are from when decks were
 fetched from the history-walk-content repo at runtime; that call is commented out.) Slide images are jar resources under
 `src/jvmMain/resources/static/images`, referenced as `/static/images/<name>`.

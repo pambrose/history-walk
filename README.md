@@ -29,7 +29,7 @@ The *history-walk-slides* repo is used to hold the core slide code. It is a depe
 * SLIDES_REPO_BRANCH
 * SLIDES_REPO_PATH
 * SLIDES_REPO_FILENAME
-* SLIDES_VARIABLE_NAME - The name of the slides variable.
+* SLIDES_VARIABLE_NAME - `jermain` for the Jermain Longuen walk; any other value (e.g. `moses`) selects the Moses walk.
 * DISPLAY_CONSECUTIVE_CORRECT_DECISIONS
 
 ## Google sign-in
@@ -108,8 +108,8 @@ make docker-run     # serves http://localhost:8080 using .env
   the container is the container itself.
 * `OAUTH_CALLBACK_URL` becomes `http://localhost:<DOCKER_PORT>/auth/callback`, which must be an authorized redirect URI.
 
-Use `DOCKER_PORT=8090` to run beside `make server`, and `DOCKER_DB=moses` (with `SLIDES_VARIABLE_NAME` set to the Moses
-deck) for the Moses walk. The container's health check probes `/ping`.
+Use `DOCKER_PORT=8090` to run beside `make server`, and `DOCKER_DB=moses` (with
+`SLIDES_VARIABLE_NAME=moses` in `.env`) for the Moses walk. The container's health check probes `/ping`.
 
 ## Heroku Deployment
 

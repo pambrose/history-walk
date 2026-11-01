@@ -7,7 +7,7 @@ PAPERTRAIL_API_TOKEN (assigned)
 ALLOW_SLIDE_ACCESS = true
 GRADLE_TASK = -Pprod=true jar
 SLIDES_REPO_FILENAME = JermainLonguen.kt
-SLIDES_VARIABLE_NAME = jermainLonguenSlides
+SLIDES_VARIABLE_NAME = jermain
 GOOGLE_CLIENT_ID = (from Google Cloud)
 GOOGLE_CLIENT_SECRET = (from Google Cloud)
 OAUTH_CALLBACK_URL = https://<jermain-app>.herokuapp.com/auth/callback
@@ -22,7 +22,7 @@ PAPERTRAIL_API_TOKEN (assigned)
 ALLOW_SLIDE_ACCESS = true
 GRADLE_TASK = -Pprod=true jar
 SLIDES_REPO_FILENAME = Moses.kt
-SLIDES_VARIABLE_NAME = mosesSlides
+SLIDES_VARIABLE_NAME = moses
 GOOGLE_CLIENT_ID = (from Google Cloud)
 GOOGLE_CLIENT_SECRET = (from Google Cloud)
 OAUTH_CALLBACK_URL = https://<moses-app>.herokuapp.com/auth/callback
