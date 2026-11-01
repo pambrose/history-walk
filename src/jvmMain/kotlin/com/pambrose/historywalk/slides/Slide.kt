@@ -22,6 +22,12 @@ class Slide(
   val isSubTree: Boolean get() = parentSlide?.isSubTree ?: !root
   val pathName: String get() = "${parentSlide?.pathName ?: ""}/$title"
 
+  /** A choice that leads here is a wrong turn: this slide offers no way on and is not the success slide. */
+  val isDeadEnd: Boolean get() = !hasChoices && !success
+
+  /** The slides above this one, the root first. */
+  val ancestors: List<Slide> get() = generateSequence(parentSlide) { it.parentSlide }.toList().asReversed()
+
   init {
     if (offset == 0)
       require(title.isNotEmpty()) { "Slide title cannot be empty" }
