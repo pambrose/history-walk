@@ -110,9 +110,11 @@ goes around `withAuth`, so a signed-out page is left to the sign-in dialog.
 
 JVM tests only (`src/jvmTest`), Kotest `StringSpec` + MockK + Ktor test host. Route tests call `appRoutes(...)` with
 injected `findEmail`/`teacherEmails` lambdas instead of a database. The database specs (`UserRepositoryTest`,
-`DbmsTxsTest`, `ContentServiceTest`) each start their own `TestPostgres`, a Testcontainers `postgres:18` with the real
-Flyway migration applied, and share the small deck and helpers in `TestWalk.kt`. `ContentServiceTest` mocks
-`ApplicationCall.userUuid` (a `mockkStatic` of `UserSessionKt`) to drive the RPC service as a signed-in user.
+`DbmsTxsTest`, `ContentServiceTest`, `PagesTest`) each start their own `TestPostgres`, a Testcontainers `postgres:18`
+with the real Flyway migration applied, and share the small deck and helpers in `TestWalk.kt`. `ContentServiceTest`
+mocks `ApplicationCall.userUuid` (a `mockkStatic` of `UserSessionKt`) to drive the RPC service as a signed-in user.
+`PagesTest` renders the teacher pages from Postgres, checking that a student's reason or name reaches the page as text,
+never markup, and drives `/summary`, `/reasons`, `/slides`, and the `/slide/{id}/{version}` jump as a signed-in teacher.
 `SlideContentTest` walks both real decks from the root and fails on a path name that does not find its slide, a slide
 shared between two parents, a go-back past the root, a missing image, or a success slide whose title differs from the
 deck's (the summary page counts successes by that title).
