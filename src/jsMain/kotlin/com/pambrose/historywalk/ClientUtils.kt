@@ -1,6 +1,7 @@
 package com.pambrose.historywalk
 
 import dev.kilua.rpc.SecurityException
+import dev.kilua.rpc.ServiceException
 import io.kvision.core.BsBgColor
 import io.kvision.core.BsColor
 import io.kvision.core.CssSize
@@ -64,6 +65,10 @@ object ClientUtils {
       throw e
     } catch (e: SecurityException) {
       // Not a failure to report: sign-in is Security's job (see above). The scope's handler logs it.
+      throw e
+    } catch (e: ServiceException) {
+      // The server refused the request and said why (ContentService's checks), so retrying it will not help. The click
+      // handler that made it shows the message and the student's real slide (MainPanel's onClickWhenIdle).
       throw e
     } catch (e: Throwable) {
       console.log("Showing \"$failureMessage\" after: $e")

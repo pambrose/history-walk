@@ -7,6 +7,7 @@ import com.pambrose.historywalk.ClientUtils.launchOrErrorToast
 import com.pambrose.historywalk.ClientUtils.lowercase
 import com.pambrose.historywalk.ClientUtils.orErrorToast
 import com.pambrose.historywalk.ClientUtils.postTo
+import com.pambrose.historywalk.ClientUtils.showErrorToast
 import com.pambrose.historywalk.ClientUtils.verticalPadding
 import com.pambrose.historywalk.EndPoints.LOGOUT
 import com.pambrose.historywalk.EndPoints.REASONS
@@ -20,6 +21,7 @@ import com.pambrose.historywalk.Rpc.getUserInfo
 import com.pambrose.historywalk.Rpc.goBackInTime
 import com.pambrose.historywalk.Rpc.makeChoice
 import com.pambrose.historywalk.Rpc.provideReason
+import dev.kilua.rpc.ServiceException
 import io.kvision.core.AlignItems
 import io.kvision.core.Background
 import io.kvision.core.Border
@@ -87,6 +89,11 @@ private fun Button.onClickWhenIdle(action: suspend () -> Unit) {
       launchOrErrorToast(CLICK_FAILED) {
         try {
           action()
+        } catch (e: ServiceException) {
+          // The server refused the move, most likely made from a page left behind in another tab: say why, and show
+          // the slide the student is really on
+          showErrorToast(e.message ?: CLICK_FAILED)
+          MainPanel.refresh(getCurrentSlide())
         } finally {
           busy.value = false
         }
@@ -196,10 +203,6 @@ private fun Container.addChoiceButtons(slide: SlideData) {
     }
 }
 
-private fun String?.wordCount(): Int = this?.split(" ", "\n")?.filter { it.isNotEmpty() }?.size ?: 0
-
-private const val MIN_REASON_WORDS = 5
-
 /**
  * Asks why the student made [slideChoice] and records it, returning the next slide, or null if the student cancels.
  * If saving fails, a toast says so and the dialog opens again with the reason in it, so nothing typed is lost.
@@ -240,18 +243,20 @@ private fun reasonDialog(
       TextArea(rows = 3, value = draft, label = """Reason for your "${slideChoice.choiceText}" decision:""") {
         placeholder = """ I chose "${slideChoice.choiceText}" because..."""
         autofocus = true
+        maxlength = ReasonRule.MAX_LENGTH
       }
     // The value follows the textarea's input event, so typing, pasting, dictation, and drag-and-drop all count
     addBeforeDisposeHook(
       input.subscribe { text ->
-        val count = text.wordCount()
-        submit.disabled = count < MIN_REASON_WORDS
+        // ReasonRule is the rule ContentService.provideReason enforces, so a reason the dialog accepts is not refused
+        val count = ReasonRule.wordCount(text)
+        submit.disabled = count < ReasonRule.MIN_WORDS
         wordCount.content = if (count == 1) "1 word" else "$count words"
       },
     )
     add(input)
     add(wordCount)
-    add(Span("Use at least $MIN_REASON_WORDS words.") { color = Color.name(Col.GRAY) })
+    add(Span("Use at least ${ReasonRule.MIN_WORDS} words.") { color = Color.name(Col.GRAY) })
     addButton(
       Button("Cancel", style = OUTLINESECONDARY).apply {
         lowercase()
