@@ -304,5 +304,15 @@ kover {
                 packages("dev.kilua.rpc")
             }
         }
+        // The coverage floor that koverVerify enforces (in tests.yml, make ci, and make coverage), so a change that
+        // deletes tests or adds untested code fails CI instead of quietly lowering the figure. It measures what koverLog
+        // prints as "application line coverage": the JVM code, less the filters above (minBound counts covered lines as
+        // a percentage by default). It is a ratchet: when koverLog shows coverage a point or more above the floor, raise
+        // the floor to a point or two under the new figure, never lower it to let a change through.
+        verify {
+            rule("JVM line coverage floor") {
+                minBound(90)
+            }
+        }
     }
 }

@@ -36,9 +36,10 @@ jobs:
       - uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6.4.0
 
       # --continue runs the rest when a spec fails, so both suites report and the coverage reports are still produced;
-      # koverLog prints the JVM total in the job log (Kover measures the JVM code only)
+      # koverLog prints the JVM total in the job log (Kover measures the JVM code only), and koverVerify fails the job
+      # when that total is under the floor in build.gradle.kts (with --continue, any failed task still fails the run)
       - name: Run tests with coverage
-        run: ./gradlew jvmTest jsTest koverXmlReport koverHtmlReport koverLog --continue
+        run: ./gradlew jvmTest jsTest koverXmlReport koverHtmlReport koverLog koverVerify --continue
 
       - name: Upload test reports
         if: always()
