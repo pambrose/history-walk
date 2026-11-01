@@ -32,17 +32,17 @@ session are not listed: the go-back offsets, the quotes in slide text, and lint.
 | [8](#issue-8)   | ✅ | Medium   | Client (a11y)  | The reason dialog's OK stays disabled for dictated or pasted text                      |
 | [9](#issue-9)   | ✅ | Medium   | Ops            | The Procfile pins `history-walk-1.0.0.jar`, so a version bump breaks Heroku            |
 | [10](#issue-10) | ✅ | Medium   | Content        | Renaming or moving a slide silently sends students back to the start                   |
-| [11](#issue-11) | ⬜ | Medium   | Privacy        | On a shared computer, class data and a student's page outlive sign-out                 |
-| [12](#issue-12) | ⬜ | Medium   | Tests          | The client has no tests                                                                |
+| [11](#issue-11) | ✅ | Medium   | Privacy        | On a shared computer, class data and a student's page outlive sign-out                 |
+| [12](#issue-12) | ✅ | Medium   | Tests          | The client has no tests                                                                |
 | [13](#issue-13) | ✅ | Low      | Server         | `/userreset` is a GET that deletes all of the caller's choices, and is untested        |
 | [14](#issue-14) | ✅ | Low      | Auth / tests   | The callback's cookie check is untested, because the HTTP clients cannot be injected   |
 | [15](#issue-15) | ✅ | Low      | Auth           | Sessions last 14 days and cannot be revoked on the server                              |
-| [16](#issue-16) | ⬜ | Low      | Client         | A forced reload can come without the update dialog ever shown, losing a typed reason   |
-| [17](#issue-17) | ⬜ | Low      | Client         | Nothing stops a reload loop while a stale bundle is still served                       |
-| [18](#issue-18) | ⬜ | Low      | Client         | Before the first successful call, any error shows the sign-in dialog                   |
+| [16](#issue-16) | ✅ | Low      | Client         | A forced reload can come without the update dialog ever shown, losing a typed reason   |
+| [17](#issue-17) | ✅ | Low      | Client         | Nothing stops a reload loop while a stale bundle is still served                       |
+| [18](#issue-18) | ✅ | Low      | Client         | Before the first successful call, any error shows the sign-in dialog                   |
 | [19](#issue-19) | ✅ | Low      | Ops            | An unknown `SLIDES_VARIABLE_NAME` silently serves the Moses walk                       |
 | [20](#issue-20) | ⬜ | Low      | Database       | `V001` begins with `drop schema if exists history cascade`                             |
-| [21](#issue-21) | ⬜ | Low      | Client         | Panels and dialogs are never disposed, so each slide leaks a little                    |
+| [21](#issue-21) | ✅ | Low      | Client         | Panels and dialogs are never disposed, so each slide leaks a little                    |
 | [22](#issue-22) | ⬜ | Low      | Supply chain   | Dependabot covers only GitHub Actions, and the Docker base image is not pinned         |
 | [23](#issue-23) | ⬜ | Low      | CI             | No coverage floor, so coverage can fall without a failing check                        |
 | [24](#issue-24) | ⬜ | Low      | Build          | Gradle deprecations block Gradle 10, and patch updates are pending                     |
@@ -260,11 +260,11 @@ Things checked and found sound:
   - For edits that are needed, add a path-alias map (or a migration that rewrites the stored path names).
 
 <a id="issue-11"></a>
-### ⬜ 11. On a shared computer, class data and a student's page outlive sign-out
+### ✅ 11. On a shared computer, class data and a student's page outlive sign-out
 
-- **Status:** the server part is done in Wave 3: the teacher pages, `/userreset`, and the sign-in and sign-out routes
-  send `Cache-Control: no-store, private` (`noStore` in `RouteGuards.kt`). The client's `pageshow` reload is still open
-  (Step 11).
+- **Status:** done. Wave 3: the teacher pages, `/userreset`, and the sign-in and sign-out routes send
+  `Cache-Control: no-store, private` (`noStore` in `RouteGuards.kt`). Wave 4: the client reloads a page restored from
+  the back/forward cache (`reloadWhenRestoredFromCache` in `App.kt`).
 - **Severity:** Medium (the project's rule: no student sees another's data)
 - **Where:**
   - `Routes.kt:111-117` and `:150-152`, the teacher pages, sent with no `Cache-Control`
@@ -283,8 +283,11 @@ Things checked and found sound:
   - Keep the bundle's ETag scheme as it is.
 
 <a id="issue-12"></a>
-### ⬜ 12. The client has no tests
+### ✅ 12. The client has no tests
 
+- **Status:** done in Wave 4: Kotest 6 runs in headless Chrome (`jsTest`, in the required CI check and `make ci`),
+  with specs for `LoginPrompt`, `SignInDialog`, the error toasts, the busy gate, the reason dialog, the choice flow,
+  the version check, `withAuth`, and the `pageshow` reload. `ReasonRuleTest` runs on both targets.
 - **Severity:** Medium
 - **Where:** there is no `src/jsTest`, although `build.gradle.kts:197-199` declares `kvision-testutils` for it
 - **Problem:**
@@ -350,8 +353,10 @@ Things checked and found sound:
   - Add a per-user session version that sign-out increments and `SessionValidation` checks.
 
 <a id="issue-16"></a>
-### ⬜ 16. A forced reload can come without the update dialog ever shown, losing a typed reason
+### ✅ 16. A forced reload can come without the update dialog ever shown, losing a typed reason
 
+- **Status:** done in Wave 4: the page echoes the server's warning stamp only from an answer whose dialog it showed,
+  and a reload that falls due while a reason is being written is put off, the countdown included.
 - **Severity:** Low
 - **Where:** `ClientVersionCheck.kt:45`, with `ServerVersionCheck.kt`
 - **Problem:**
@@ -362,8 +367,11 @@ Things checked and found sound:
   dialog is open.
 
 <a id="issue-17"></a>
-### ⬜ 17. Nothing stops a reload loop while a stale bundle is still served
+### ✅ 17. Nothing stops a reload loop while a stale bundle is still served
 
+- **Status:** done in Wave 4, keyed on the bundle's own `apiVersion` rather than the server's, which no answer carries
+  without an RPC change: a page that reloaded and came back with the same bundle shows the dialog and its link once,
+  and never forces another reload.
 - **Severity:** Low
 - **Where:** `ClientVersionCheck.kt:65-72`
 - **Problem:**
@@ -374,8 +382,10 @@ Things checked and found sound:
   there after that reload, show the dialog without reloading again.
 
 <a id="issue-18"></a>
-### ⬜ 18. Before the first successful call, any error shows the sign-in dialog
+### ✅ 18. Before the first successful call, any error shows the sign-in dialog
 
+- **Status:** done in Wave 4: `ClientUtils.withAuth` lets only a 401 reach KVision's sign-in handling. If the server
+  is down at start-up, the page shows the "page not loaded" toast (twice, once per start-up call).
 - **Severity:** Low
 - **Where:** `App.kt:38-41`, through KVision's `SecurityMgr.withAuth`
 - **Problem:**
@@ -411,10 +421,10 @@ Things checked and found sound:
     refuse to migrate if so.
 
 <a id="issue-21"></a>
-### ⬜ 21. Panels and dialogs are never disposed, so each slide leaks a little
+### ✅ 21. Panels and dialogs are never disposed, so each slide leaks a little
 
-- **Status:** partly done in Wave 2: `displaySlide` disposes its panels and each reason dialog is disposed. The
-  `Alert.show` in `ClientVersionCheck.kt` is still never disposed; it belongs with Step 11.
+- **Status:** done. Wave 2: `displaySlide` disposes its panels and each reason dialog is disposed. Wave 4: the version
+  check's update dialog is disposed when it closes (`KVisionVersionCheckUiTest` checks it is gone).
 - **Severity:** Low
 - **Where:**
   - `MainPanel.kt:71`, `removeAll()` in `displaySlide`
@@ -510,8 +520,8 @@ decision from the teachers before any code changes; any schema change goes in a 
 
 | Step | Status | Issues | Work | Files |
 |------|:------:|--------|------|-------|
-| 11 | ⬜ | [16](#issue-16), [17](#issue-17), [18](#issue-18), [11](#issue-11) (client) | Version-check fixes, the retry message, the `pageshow` reload | `ClientVersionCheck.kt`, `ClientUtils.kt`, `App.kt` |
-| 12 | ⬜ | [12](#issue-12) | Set up `jsTest`, cover Steps 4 and 11 and `LoginPrompt`, and run it in CI and `make ci` | `src/jsTest/**`, `build.gradle.kts`, `tests.yml`, `Makefile` |
+| 11 | ✅ | [16](#issue-16), [17](#issue-17), [18](#issue-18), [11](#issue-11) (client) | Version-check fixes, the retry message, the `pageshow` reload | `ClientVersionCheck.kt`, `ClientUtils.kt`, `App.kt` |
+| 12 | ✅ | [12](#issue-12) | Set up `jsTest`, cover Steps 4 and 11 and `LoginPrompt`, and run it in CI and `make ci` | `src/jsTest/**`, `build.gradle.kts`, `tests.yml`, `Makefile` |
 
 Steps 11 and 12 can run in parallel: Step 12 can start with `LoginPrompt` and `SignInDialog` while Step 11 is in
 progress, then add the version-check tests once it lands.

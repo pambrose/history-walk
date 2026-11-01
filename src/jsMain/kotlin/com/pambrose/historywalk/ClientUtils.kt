@@ -34,16 +34,29 @@ object ClientUtils {
     paddingBottom = size
   }
 
-  suspend fun <T> withAuth(block: suspend () -> T) =
-    Security.withAuth {
-      try {
-        block()
-      } catch (e: Exception) {
-        // A SecurityException just means "not signed in"; Security.afterError logs that.
-        if (e !is SecurityException) console.log("Request failed: $e")
-        throw e
-      }
-    }
+  /**
+   * Runs [block], an RPC call, so that a 401 (Kilua's [SecurityException]) shows the sign-in dialog: it reaches
+   * `Security.withAuth`, which calls `Security.login()` and parks for good.
+   *
+   * Every other failure (a network error, a [ServiceException], a cancellation) goes around KVision and is thrown to
+   * the caller as itself, for its own handling ([orErrorToast]'s toast, [PAGE_NOT_LOADED] at start-up). Until a first
+   * call succeeds, `SecurityMgr.withAuth` takes any exception for "sign in needed", so a student who loaded the page
+   * during a dyno restart or a network blip would be asked to sign in again and left waiting. So the failure is
+   * carried past it in a [Result] rather than thrown.
+   */
+  suspend fun <T> withAuth(block: suspend () -> T): T =
+    Security
+      .withAuth {
+        try {
+          Result.success(block())
+        } catch (e: SecurityException) {
+          // "Not signed in": Security.afterError logs that
+          throw e
+        } catch (e: Throwable) {
+          if (e !is CancellationException) console.log("Request failed: $e")
+          Result.failure<T>(e)
+        }
+      }.getOrThrow()
 
   fun showErrorToast(message: String) =
     toastContainer.showToast(message, color = BsColor.DANGEREMPHASIS, bgColor = BsBgColor.DANGERSUBTLE)

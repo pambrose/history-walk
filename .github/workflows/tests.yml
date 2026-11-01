@@ -17,8 +17,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # The JVM specs, with coverage. The database specs start postgres:18 through Testcontainers, using the Docker the
-  # ubuntu runner already has.
+  # The JVM specs, with coverage, and the client specs. The database specs start postgres:18 through Testcontainers,
+  # using the Docker the ubuntu runner already has; the client specs (jsTest) run under Karma in the runner's Chrome,
+  # headless. Both are in this job, whose name is the required status check, so a failing client spec blocks a merge.
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -34,9 +35,10 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6.4.0
 
-      # --continue still produces the coverage reports when a spec fails; koverLog prints the total in the job log
+      # --continue runs the rest when a spec fails, so both suites report and the coverage reports are still produced;
+      # koverLog prints the JVM total in the job log (Kover measures the JVM code only)
       - name: Run tests with coverage
-        run: ./gradlew jvmTest koverXmlReport koverHtmlReport koverLog --continue
+        run: ./gradlew jvmTest jsTest koverXmlReport koverHtmlReport koverLog --continue
 
       - name: Upload test reports
         if: always()

@@ -5,6 +5,7 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import dev.kilua.rpc.gradle.KiluaRpcExtension
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.targets.js.testing.KotlinJsTest
 import org.jmailen.gradle.kotlinter.tasks.FormatTask
 import org.jmailen.gradle.kotlinter.tasks.LintTask
 import java.time.LocalDate
@@ -19,10 +20,12 @@ plugins {
     alias(libs.plugins.config)
     alias(libs.plugins.kotlinter)
     alias(libs.plugins.kover)
-//    alias(libs.plugins.kotest)
 //    alias(libs.plugins.diktat)
 //    alias(libs.plugins.detekt)
+    // KSP serves both Kilua RPC (the service plumbing) and Kotest, whose processor writes the client specs' JS entry
+    // point (kspTestKotlinJs). Kotest needs the KSP plugin applied before its own.
     alias(libs.plugins.ksp)
+    alias(libs.plugins.kotest)
     alias(libs.plugins.kiluaRpc)
 }
 
@@ -124,9 +127,12 @@ kotlin {
             implementation(libs.kvision.common.remote)
         }
 
+        // Kotest runs on both targets: on the JVM through JUnit Platform (kotest-runner-junit5 in jvmTest), and in the
+        // browser through the Kotest Gradle plugin, which generates the JS test entry point with KSP. A commonTest spec,
+        // such as ReasonRuleTest, runs on both.
         commonTest.dependencies {
-            implementation(kotlin("test-common"))
-            implementation(kotlin("test-annotations-common"))
+            implementation(libs.kotest.framework.engine)
+            implementation(libs.kotest.assertions)
         }
 
         jvmMain.dependencies {
@@ -202,7 +208,6 @@ kotlin {
         }
 
         jsTest.dependencies {
-            implementation(kotlin("test-js"))
             implementation(libs.kvision.testutils)
         }
     }
@@ -218,6 +223,25 @@ kotlin {
         // Gradle does not pass its own -D options or properties on to the test JVM, so this one is passed explicitly.
         if (providers.gradleProperty("updateSlidePaths").orNull.toBoolean()) systemProperty("updateSlidePaths", "true")
     }
+}
+
+// The client specs run in jsBrowserTest (which jsTest runs), and log as the JVM specs do, with a failure's full message.
+// The Kotlin plugin skips the task, and so passes it, when the test binary was not written, which is what happens when
+// the Kotest plugin's KSP processor generates no entry point (after a Kotest, KSP, or Kotlin upgrade, say): every spec
+// compiles and none runs. Replacing its condition makes such a run fail instead, on the missing file.
+tasks.withType<KotlinJsTest>().configureEach {
+    testLogging {
+        events = setOf(TestLogEvent.PASSED, TestLogEvent.SKIPPED, TestLogEvent.FAILED)
+        exceptionFormat = TestExceptionFormat.FULL
+    }
+    setOnlyIf("the client specs always run") { true }
+}
+
+// Gradle fails a test task that discovers no tests, so a JVM run whose specs were all lost cannot pass with nothing run.
+// The Kotest plugin switches that check off for every test task once the task graph is ready, and this listener,
+// registered after the plugin's, switches it back on. A run filtered with --tests is exempt.
+gradle.taskGraph.whenReady {
+    tasks.withType<AbstractTestTask>().configureEach { failOnNoDiscoveredTests.set(true) }
 }
 
 // Generated KSP and BuildConfig sources sit in source sets the lint tasks read, so those tasks must run after the

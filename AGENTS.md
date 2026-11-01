@@ -18,12 +18,13 @@ make db                 # Postgres 18 in Docker (container history-walk) with th
 make reset-jermain      # drop and recreate one database (reset-moses for the other); Flyway rebuilds the schema on next start
 make server             # Ktor on :8080, continuous rebuild (./gradlew jvmRun -t)
 make client             # webpack dev server on :3000 with hot reload, proxying server routes to :8080
-make tests              # ./gradlew jvmTest --rerun (needs Docker: the database specs use Testcontainers)
-make coverage           # the tests plus Kover reports (build/reports/kover/html/index.html)
-./gradlew jvmTest --tests 'com.pambrose.historywalk.auth.AuthRoutesTest'   # one spec
+make tests              # JVM and client specs: ./gradlew jvmTest --rerun jsBrowserTest --rerun (Docker and Chrome)
+make js-tests           # the client specs alone, Kotest in headless Chrome (./gradlew jsBrowserTest --rerun); no Docker
+make coverage           # the tests plus Kover reports of the JVM code (build/reports/kover/html/index.html)
+./gradlew jvmTest --tests 'com.pambrose.historywalk.auth.AuthRoutesTest'   # one JVM spec (a client run is always whole)
 make lint               # kotlinter (./gradlew lintKotlin); make format fixes what it can
 make zizmor             # audit .github (workflows, dependabot.yml) as the zizmor workflow does
-make ci                 # every CI gate: lint, zizmor, tests with coverage, docker-build, procfile-check, docker-smoke
+make ci                 # every CI gate: lint, zizmor, JVM and client tests, docker-build, procfile-check, docker-smoke
 make build              # clean + fat jar at build/libs/history-walk.jar (server + bundled JS client; no version)
 make procfile-check     # after a build: fails unless the jar the Procfile runs is in build/libs
 make docker-build       # fat jar, then image history-walk:<version>; make docker-run runs it with .env against make db
@@ -61,7 +62,10 @@ no longer cancels every later click. Clicks on choices and go-backs go through `
 - A `busy` flag disables those buttons until the request finishes.
 - A failure shows a toast (`ClientUtils.orErrorToast`), and a server refusal shows its own message and reloads the
   student's real slide.
-- A `SecurityException` (401) still goes to `Security.withAuth` and the sign-in dialog.
+- Only a `SecurityException` (401) goes to `Security.withAuth` and the sign-in dialog. Until a first call succeeds,
+  KVision's `SecurityMgr.withAuth` takes any exception for "sign in needed", so `ClientUtils.withAuth` carries every
+  other failure past it in a `Result` and rethrows it to the caller: a network error at start-up shows the
+  `PAGE_NOT_LOADED` toast, not the sign-in dialog.
 
 **Sign-in (Google OAuth, `jvmMain/auth/`).** Only `athenian.org` accounts (`SCHOOL_EMAIL_DOMAIN`) are admitted. The role
 rule (`Roles.kt`): an address in `TEACHER_EMAILS` is a teacher, else a local part starting with two digits is a student,
@@ -88,6 +92,8 @@ else refused. The role is recomputed from the live `TEACHER_EMAILS` on every req
   a sign-out on a shared computer Back cannot show class data from a cache and Cloudflare stores none of it.
 - On the client, Kilua turns only a 401 into `SecurityException`; KVision's `SecurityMgr.withAuth` then calls
   `Security.login()`, which shows `SignInDialog` once and parks forever (see the comment on `LoginPrompt` before changing it).
+- `App.start()` reloads a page the browser restores from its back/forward cache (`pageshow` with `persisted`), so Back
+  after a sign-out shows the sign-in dialog rather than the previous user's walk.
 
 An explicit anti-goal: a student must never see another student's data or progress. Teacher pages read the
 `history.user_*` views, which filter to `role = 'student'` so teachers' test walks never show up.
@@ -148,12 +154,23 @@ through `appRoutes`, and that the per-user routes (sign-in and sign-out, the res
 mismatch the page shows a dialog with a reload link, then, `CLIENT_RELOAD_WARNING_INTERVAL_SECS` (60) after the first
 warning, a countdown toast before it reloads itself. Increment `apiVersion` only when the RPC interfaces change, or when
 a release must replace pages already open; a release that leaves it alone reaches each page at its next load. The check
-goes around `withAuth`, so a signed-out page is left to the sign-in dialog.
+goes around `withAuth`, so a signed-out page is left to the sign-in dialog. The page's decisions are
+`VersionCheckState`'s (no DOM; `VersionCheckLoop` runs them with the RPC, the UI, and the flags passed in):
+- The warning time starts only when the dialog is really shown: the page sends back the server's warning stamp only
+  from the answer whose dialog it showed. The dialog is held back while another modal is open or the student is writing
+  a reason (`writingReason`, `MainPanel.kt`), and a due reload, its countdown included, is put off while a reason is
+  being written.
+- Before reloading itself, the page records its bundle's `apiVersion` in `sessionStorage`
+  (`history-walk.reloaded-for-api-version`). If the reload brings back the same bundle (Cloudflare still serving the old
+  `main.bundle.js`), the page sends no stamp, so it shows the dialog once and never reloads itself again for that bundle
+  in that tab; an up-to-date answer clears the record.
 
 ## Tests
 
-JVM tests only (`src/jvmTest`), Kotest `StringSpec` + MockK + Ktor test host. Route tests call `appRoutes(...)` with
-injected `findEmail`/`teacherEmails` lambdas instead of a database.
+Kotest `StringSpec` on both targets. A spec in `src/commonTest` (`ReasonRuleTest`) runs on both.
+
+**JVM** (`src/jvmTest`, run by `jvmTest`): Kotest on JUnit Platform + MockK + Ktor test host. Route tests call
+`appRoutes(...)` with injected `findEmail`/`teacherEmails` lambdas instead of a database.
 - The database specs (`UserRepositoryTest`, `DbmsTxsTest`, `ContentServiceTest`, `PagesTest`, `UserResetTest`,
   `SignOutTest`) each start their own `TestPostgres`, a Testcontainers `postgres:18` with the real Flyway migrations
   applied, and share the small deck and helpers in `TestWalk.kt`.
@@ -176,15 +193,45 @@ injected `findEmail`/`teacherEmails` lambdas instead of a database.
   slide shared between two parents, a go-back past the root, a missing image, or a success slide whose title differs
   from the deck's (the summary page counts successes by that title).
 
-**CI** (`.github/workflows`, all actions pinned to commit SHAs): `tests.yml` runs `jvmTest` with Kover on pushes and
-pull requests to master; `docker.yml` runs `make docker-build`, `make procfile-check` (the Procfile's jar exists), and
-`make docker-smoke`, which starts the image against a throwaway Postgres and checks `/ping`, `/version`, the page
-shell's `Cache-Control`, and a 401 for an unsigned RPC call;
-`zizmor.yml` audits `.github` changes; `lint.yml` runs `make lint`; `dependency-graph.yml` submits `jvmRuntimeClasspath`
-so Dependabot sees the JVM libraries; `cleanup-runs.yml` deletes runs older than 30 days every Monday, keeping the
-newest 10. `.gitignore` ignores dot-directories, so `.github/` is re-included explicitly. `make ci` runs the same gates
-locally. The lint and format tasks skip `build/generated` by path (see `build.gradle.kts`); the slide decks' text
-constants are SCREAMING_SNAKE_CASE, as ktlint's property-naming rule requires.
+**Client** (`src/jsTest`, run by `jsBrowserTest`, which `jsTest` runs): Kotest under Karma in headless Chrome. The
+Kotest Gradle plugin writes the JS entry point with KSP (`kspTestKotlinJs`), beside Kilua RPC's processor. MockK does
+not run on Kotlin/JS, so the specs use fakes and the units' injected functions (`LoginPrompt`'s `show`, `SignInDialog`'s
+`navigate`); the `MainPanel.kt` units they drive (`busy`, `onClickWhenIdle`, `reasonDialog`) are `internal`, not
+private.
+- `TestPage.kt`: `TestPage.root`, the one KVision `Root` for the run (KVision draws every modal and toast through the
+  page's first Root and forgets them when it is disposed), rendering synchronously; and the DOM helpers (`awaitUntil`,
+  `click`, `enter` for text that arrives by input event alone, `toastsShownBy`, `showModal`, `closeModals`, `texts`).
+- `FakeServer.kt` replaces the page's `fetch`, so a call takes the real path (`Rpc`, `withAuth`, Kilua's client):
+  `FakeServer.on(IContentService::makeChoice) { call -> returns(...) }` answers a route with a result,
+  `Reply.Refused` (a `ServiceException`), or `Reply.HttpError` (a 401 is a `SecurityException`), and `callsTo` lists
+  what the page sent, decoded with `call.param<T>(i)`. By default the user is `testStudent` on `testSlide()`. A 401
+  parks the call behind the sign-in dialog for good and leaves the singleton `Security` signed out for the rest of the
+  run, so only `WithAuthTest` sends one, and it runs last: Kotest runs the specs in name order.
+- `LoginPromptTest`, `SignInDialogTest`, `ErrorToastTest` (`orErrorToast`, `launchOrErrorToast`), `OnClickWhenIdleTest`
+  (the busy gate), `ReasonDialogTest` (the five-word gate), and `ChoiceFlowTest` (a click on a choice through
+  `MainPanel`: makeChoice, the reason dialog, provideReason, the next slide).
+- The version check: `VersionCheckStateTest` (the pure decisions: when the dialog is held back, when the server's
+  warning stamp is kept, the reload put off while a reason is written, the reload remembered in `sessionStorage`),
+  `VersionCheckLoopTest` (the loop with a fake server and UI, on Kotest's virtual clock, `coroutineTestScope`), and
+  `KVisionVersionCheckUiTest` (the real dialog, gone from the DOM and KVision's modal list once closed).
+- `WithAuthTest` (only a 401 reaches the sign-in dialog; a 503 or a refusal reaches the caller as itself, even while
+  the page counts as signed out) and `PageShowReloadTest` (a page restored from the back/forward cache reloads).
+- Kotest reports to Karma only once every spec has run, so each JS spec sets `timeout = CLIENT_TEST_TIMEOUT_MS`, and a
+  test that hangs fails by name; `karma.config.d/kotest.js` lets the whole run go two minutes without a word before
+  Karma gives up. The timeout is not in a Kotest `ProjectConfig`, which the KSP processor drops from the JS entry point
+  after an incremental run. `--tests` does not reach the browser, so a client run is always whole.
+- If the entry point is not generated, Kotlin skips `jsBrowserTest` as having no tests, which would pass with nothing
+  run; `build.gradle.kts` replaces that condition so the run fails instead.
+
+**CI** (`.github/workflows`, all actions pinned to commit SHAs): `tests.yml`'s `test` job runs `jvmTest` with Kover and
+`jsTest` (the client specs, in the runner's Chrome) on pushes and pull requests to master; `docker.yml` runs
+`make docker-build`, `make procfile-check` (the Procfile's jar exists), and `make docker-smoke`, which starts the image
+against a throwaway Postgres and checks `/ping`, `/version`, the page shell's `Cache-Control`, and a 401 for an unsigned
+RPC call; `zizmor.yml` audits `.github` changes; `lint.yml` runs `make lint`; `dependency-graph.yml` submits
+`jvmRuntimeClasspath` so Dependabot sees the JVM libraries; `cleanup-runs.yml` deletes runs older than 30 days every
+Monday, keeping the newest 10. `.gitignore` ignores dot-directories, so `.github/` is re-included explicitly. `make ci`
+runs the same gates locally. The lint and format tasks skip `build/generated` by path (see `build.gradle.kts`); the
+slide decks' text constants are SCREAMING_SNAKE_CASE, as ktlint's property-naming rule requires.
 
 ## Gotchas
 
