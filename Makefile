@@ -21,9 +21,14 @@ DOCKER_PORT  ?= 8080
 DOCKER_DB    ?= jermain
 ENV_FILE     ?= .env
 
+# The addresses `make served-version` compares: the app as Cloudflare serves it, and the Heroku app behind it, e.g.
+# make served-version PUBLIC_URL=https://walk.example.org ORIGIN_URL=https://<app>.herokuapp.com
+PUBLIC_URL   ?=
+ORIGIN_URL   ?=
+
 .DEFAULT_GOAL := help
 
-.PHONY: help db reset-jermain reset-moses stop-db server client build clean tests docker-build docker-run versions depends yarn-unlock upgrade-wrapper creds restart log
+.PHONY: help db reset-jermain reset-moses stop-db server client build clean tests docker-build docker-run versions depends yarn-unlock upgrade-wrapper creds restart log served-version
 
 ##@ General
 
@@ -128,3 +133,31 @@ restart: ## Restart the Heroku dynos
 
 log: ## Tail the Heroku logs
 	heroku logs --tail $(HEROKU_APP_FLAG)
+
+# Shows the client bundle's version as Heroku (ORIGIN_URL) serves it and as Cloudflare (PUBLIC_URL) serves it, with
+# Cloudflare's cf-cache-status. The version is the line App.start() logs, "History Walk version VERSION - release date".
+# It fails when Cloudflare serves another bundle than Heroku, or caches the bundle, which a deploy then does not
+# replace: purge PUBLIC_URL/main.bundle.js in Cloudflare (see AGENTS.md). It fetches with GET, not HEAD.
+BUNDLE_VERSION_RE = History Walk version [0-9]+\.[0-9]+\.[0-9]+ - [^"]+
+served-version: ## Show the bundle version Heroku and Cloudflare serve; fails if they differ or Cloudflare caches it
+	@[ -n "$(PUBLIC_URL)" ] || { echo "Set PUBLIC_URL (and ORIGIN_URL), e.g. make served-version PUBLIC_URL=https://walk.example.org ORIGIN_URL=https://<app>.herokuapp.com" >&2; exit 1; }
+	@problems=0; problem() { echo "  - $$1" >&2; problems=$$((problems + 1)); }; \
+	served() { curl -sS --compressed -m 30 -D - "$$1/main.bundle.js" \
+		| LC_ALL=C grep -aoiE '^cf-cache-status: [a-z]+|$(BUNDLE_VERSION_RE)'; }; \
+	version() { grep -iv '^cf-cache-status' | head -1; }; \
+	echo "This checkout:       $(VERSION)"; \
+	if [ -n "$(ORIGIN_URL)" ]; then \
+		origin=$$(served "$(ORIGIN_URL)" | version); \
+		echo "Heroku's bundle:     $${origin:-not found}"; \
+	else origin=; echo "Heroku's bundle:     (set ORIGIN_URL to compare)"; fi; \
+	fetched=$$(served "$(PUBLIC_URL)"); \
+	public=$$(echo "$$fetched" | version); \
+	cached=$$(echo "$$fetched" | sed -n 's/^[Cc][Ff]-[Cc][Aa][Cc][Hh][Ee]-[Ss][Tt][Aa][Tt][Uu][Ss]: //p'); \
+	echo "Cloudflare's bundle: $${public:-not found} (cf-cache-status: $${cached:-none})"; \
+	[ -n "$$public" ] || problem "found no version in $(PUBLIC_URL)/main.bundle.js"; \
+	[ -z "$$origin" ] || [ -z "$$public" ] || [ "$$origin" = "$$public" ] \
+		|| problem "Cloudflare serves another bundle than Heroku: purge $(PUBLIC_URL)/main.bundle.js in Cloudflare"; \
+	case "$$cached" in ""|BYPASS|DYNAMIC) ;; \
+		*) problem "Cloudflare caches the bundle ($$cached), so a deploy does not replace its copy: see AGENTS.md";; \
+	esac; \
+	[ $$problems -eq 0 ] || exit 1

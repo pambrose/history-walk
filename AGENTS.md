@@ -73,6 +73,24 @@ in `dbms/DbmsTxs.kt` and `User.kt`.
 The files in `webpack.config.d/` are concatenated into the generated webpack config; the app does not use jQuery (an old
 `ProvidePlugin` for it broke Bootstrap under jQuery 4 and was removed).
 
+**Cloudflare caching.** The apps sit behind Cloudflare, and `main.bundle.js` has the same name in every release, so a
+release reaches a browser at its next page load only because of these; do not drop any of them:
+- `Routes.staticContent` serves the page shell (`/`, the jar's `assets/index.html`), the bundle, and the `/static`
+  images with `Cache-Control: no-cache, private` and a SHA-256 ETag (`revalidatedEachTime`). Kilua's own static
+  handling is off (`initRpc(initStaticResources = false)`): it sent no Cache-Control, so Cloudflare kept the bundle for
+  hours and told browsers to keep it too, and it answered every unknown path with the page shell.
+- `ConditionalHeaders` (`Installs.installConditionalHeaders`) turns a matching `If-None-Match` into a 304 with no body.
+- `AutoHeadResponse` (`Installs.installAutoHeadResponse`) answers HEAD, which `curl -sI` sends, with a GET's headers;
+  without it every HEAD is a 404, which Cloudflare can pass on in place of the bundle's headers.
+
+Cloudflare keeps no copy of a response marked `private` (`cf-cache-status: BYPASS`) and passes the header on unchanged;
+a Cloudflare cache rule that ignores the origin's headers would bring stale bundles back. A change to these headers does
+not clear a copy Cloudflare already holds: after a deploy, run `make served-version PUBLIC_URL=... ORIGIN_URL=...`,
+which reads the version line `App.start()` logs from the bundle as Heroku and as Cloudflare serve it, and purge
+`main.bundle.js` in Cloudflare if they differ. `StaticContentCachingTest` builds its own routes from `staticContent()`,
+so it would not notice `appRoutes` dropping that call.
+
+
 ## Tests
 
 JVM tests only (`src/jvmTest`), Kotest `StringSpec` + MockK + Ktor test host. Route tests call `appRoutes(...)` with

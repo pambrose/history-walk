@@ -122,6 +122,19 @@ To determine the database URL:
 heroku pg:credentials:url DATABASE -a app-name
 ```
 
+### Behind Cloudflare
+
+The apps are served through Cloudflare. The page, `main.bundle.js`, and the images go out with
+`Cache-Control: no-cache, private` and an ETag, so Cloudflare keeps no copy and a browser checks with the server on each
+page load, getting a 304 until a release changes the file. After a deploy, check what each side serves:
+
+```bash
+make served-version PUBLIC_URL=https://<cloudflare-address> ORIGIN_URL=https://<app>.herokuapp.com
+```
+
+It fails if Cloudflare serves an older bundle than Heroku (purge `main.bundle.js` in Cloudflare) or caches the bundle.
+Do not add a Cloudflare cache rule that overrides the origin's `Cache-Control`.
+
 ### Pushing to Heroku from a branch
 
 ```bash

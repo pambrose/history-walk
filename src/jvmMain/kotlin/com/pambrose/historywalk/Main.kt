@@ -121,7 +121,8 @@ fun Application.main() {
 
   dbmsInit(environment.config)
 
-  initRpc {
+  // The client is served by Routes.staticContent, with caching headers Kilua's own static handling does not send
+  initRpc(initStaticResources = false) {
     registerService<IContentService> { call -> ContentService(call) }
   }
 }

@@ -1,5 +1,6 @@
 package com.pambrose.historywalk
 
+import com.pambrose.BuildConfig
 import com.pambrose.historywalk.MainPanel.refresh
 import com.pambrose.historywalk.Rpc.getCurrentSlide
 import io.kvision.*
@@ -24,6 +25,9 @@ class App : Application() {
   }
 
   override fun start() {
+    // Also the bundle's version marker: make served-version finds this string in main.bundle.js to tell which
+    // release Heroku and Cloudflare each serve
+    console.log("History Walk version ${BuildConfig.VERSION} - ${BuildConfig.RELEASE_DATE}")
     showRefusalFromUrl()
 
     root("kvapp") {
