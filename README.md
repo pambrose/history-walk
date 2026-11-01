@@ -29,8 +29,11 @@ The *history-walk-slides* repo is used to hold the core slide code. It is a depe
 * SLIDES_REPO_BRANCH
 * SLIDES_REPO_PATH
 * SLIDES_REPO_FILENAME
-* SLIDES_VARIABLE_NAME - The name of the slides variable.
+* SLIDES_VARIABLE_NAME - `jermain` for the Jermain Longuen walk; any other value (e.g. `moses`) selects the Moses walk.
 * DISPLAY_CONSECUTIVE_CORRECT_DECISIONS
+* CLIENT_VERSION_CHECK_INTERVAL_SECS - How often an open page asks whether its version is current (default 60).
+* CLIENT_RELOAD_WARNING_INTERVAL_SECS - How long an out-of-date page shows its reload dialog before it reloads itself
+  (default 60).
 
 ## Google sign-in
 
@@ -60,6 +63,7 @@ digits) and the teachers listed in `TEACHER_EMAILS` are admitted; anyone else is
 | `SESSION_SECRET` | Key for the session cookie and signed state; required in production |
 | `SCHOOL_EMAIL_DOMAIN` | Defaults to `athenian.org` |
 | `TEACHER_EMAILS` | Comma-separated teacher addresses; the only accounts with the teacher view. Empty means no teachers |
+| `LOGIN_GREETING` | Title of the sign-in dialog; defaults to `History Walk` |
 
 Generate `SESSION_SECRET` with:
 
@@ -91,6 +95,25 @@ with a logged warning. Any other host is production and requires `SESSION_SECRET
 * jar - Packages a "fat" jar with all backend sources and dependencies while also embedding frontend resources
   into `build/libs/*.jar`
 
+## Docker
+
+The image holds only a Java 25 JRE and the fat jar, which is built outside Docker:
+
+```bash
+make docker-build   # ./gradlew jar, then docker build -> history-walk:1.0.0 and history-walk:latest
+make db             # the local Postgres the container connects to
+make docker-run     # serves http://localhost:8080 using .env
+```
+
+`make docker-run` reads `.env` the way the shell does and passes each variable to the container, with two overrides:
+
+* `DBMS_URL` points at the `DOCKER_DB` database (default `jermain`) through `host.docker.internal`, since localhost inside
+  the container is the container itself.
+* `OAUTH_CALLBACK_URL` becomes `http://localhost:<DOCKER_PORT>/auth/callback`, which must be an authorized redirect URI.
+
+Use `DOCKER_PORT=8090` to run beside `make server`, and `DOCKER_DB=moses` (with
+`SLIDES_VARIABLE_NAME=moses` in `.env`) for the Moses walk. The container's health check probes `/ping`.
+
 ## Heroku Deployment
 
 * Add a Procfile
@@ -101,6 +124,19 @@ To determine the database URL:
 ```bash
 heroku pg:credentials:url DATABASE -a app-name
 ```
+
+### Behind Cloudflare
+
+The apps are served through Cloudflare. The page, `main.bundle.js`, and the images go out with
+`Cache-Control: no-cache, private` and an ETag, so Cloudflare keeps no copy and a browser checks with the server on each
+page load, getting a 304 until a release changes the file. After a deploy, check what each side serves:
+
+```bash
+make served-version PUBLIC_URL=https://<cloudflare-address> ORIGIN_URL=https://<app>.herokuapp.com
+```
+
+It fails if Cloudflare serves an older bundle than Heroku (purge `main.bundle.js` in Cloudflare) or caches the bundle.
+Do not add a Cloudflare cache rule that overrides the origin's `Cache-Control`.
 
 ### Pushing to Heroku from a branch
 
