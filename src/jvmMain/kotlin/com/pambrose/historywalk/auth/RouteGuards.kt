@@ -3,12 +3,14 @@ package com.pambrose.historywalk.auth
 import com.pambrose.historywalk.Role
 import com.pambrose.historywalk.User
 import com.pambrose.historywalk.Utils.toUuid
+import io.ktor.http.CacheControl
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.createRouteScopedPlugin
 import io.ktor.server.application.isHandled
 import io.ktor.server.auth.AuthenticationChecked
+import io.ktor.server.response.cacheControl
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.Route
@@ -85,6 +87,34 @@ fun Route.teachersOnly(
       this.findEmail = findEmail
       this.teacherEmails = teacherEmails
     }
+    build()
+  }
+
+/**
+ * What [noStore] sends. `no-store` keeps the browser from storing a copy in its HTTP cache, and from restoring one from
+ * its back/forward cache once sign-out has changed the session cookie, so Back after sign-out asks the server again
+ * rather than showing the class's data. `private` keeps a shared cache from storing it: Cloudflare keeps no copy, even
+ * under a "cache everything" rule, unless that rule is set to ignore the origin's Cache-Control.
+ */
+private val NOT_STORED = CacheControl.NoStore(CacheControl.Visibility.Private)
+
+/**
+ * Sends [NOT_STORED] on every response of the routes beneath it. It sets the header as the call starts, ahead of
+ * authentication and the guards, so the redirect to Google sign-in, a guard's refusal, and a handler's page or
+ * redirect all carry it: each of them only adds to the response's headers.
+ */
+private val NoStore =
+  createRouteScopedPlugin("NoStore") {
+    onCall { call -> call.response.cacheControl(NOT_STORED) }
+  }
+
+/**
+ * Adds the routes [build] creates beneath a path-less child route carrying [NoStore]: for the pages and redirects that
+ * belong to one signed-in user, which must not outlive that user's sign-out on a shared computer.
+ */
+fun Route.noStore(build: Route.() -> Unit): Route =
+  createChild(GuardSelector("no-store")).apply {
+    install(NoStore)
     build()
   }
 

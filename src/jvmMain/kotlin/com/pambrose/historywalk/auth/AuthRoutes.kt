@@ -10,13 +10,13 @@ import com.pambrose.historywalk.User
 import com.pambrose.historywalk.auth.OAuthState.consumeOAuthState
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.HttpClient
-import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.expectSuccess
+import io.ktor.client.request.accept
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
-import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.auth.OAuthAccessTokenResponse
 import io.ktor.server.auth.authenticate
@@ -26,8 +26,6 @@ import io.ktor.server.response.respondText
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
-import io.ktor.server.sessions.clear
-import io.ktor.server.sessions.sessions
 import kotlinx.coroutines.CancellationException
 import kotlinx.serialization.json.Json
 import java.util.UUID
@@ -38,14 +36,23 @@ private const val GOOGLE_USER_INFO_URL = "https://www.googleapis.com/oauth2/v2/u
 
 private val userInfoJson = Json { ignoreUnknownKeys = true }
 
-/** Google's details of the account [accessToken] was issued for. Throws if Google does not answer with them. */
-suspend fun fetchGoogleUserInfo(accessToken: String): GoogleUserInfo =
-  HttpClient(CIO) {
-    expectSuccess = true
-    install(ContentNegotiation) { json(userInfoJson) }
-  }.use { client ->
-    client.get(GOOGLE_USER_INFO_URL) { bearerAuth(accessToken) }.body<GoogleUserInfo>()
-  }
+/**
+ * Google's details of the account [accessToken] was issued for, asked through [client]. Throws if Google does not
+ * answer with them. The request asks for success and the answer is decoded here, so any client will do, whatever
+ * plugins it has: the server's, or a test's `MockEngine`.
+ */
+suspend fun fetchGoogleUserInfo(
+  accessToken: String,
+  client: HttpClient,
+): GoogleUserInfo {
+  val response =
+    client.get(GOOGLE_USER_INFO_URL) {
+      bearerAuth(accessToken)
+      accept(ContentType.Application.Json)
+      expectSuccess = true
+    }
+  return userInfoJson.decodeFromString<GoogleUserInfo>(response.bodyAsText())
+}
 
 /**
  * Finishes the sign-in of the Google account [userInfo] describes. An account [signInDecision] admits is provisioned,
@@ -78,9 +85,10 @@ internal fun loginGreeting(value: String? = EnvVar.LOGIN_GREETING.getEnvOrNull()
 
 /**
  * The sign-in and sign-out routes. They are page navigations, so a browser without a session is redirected to Google,
- * which it can follow; they stay outside the RPC guard ([signedInApi]).
+ * which it can follow; they stay outside the RPC guard ([signedInApi]). [userInfoClient] asks Google for the account's
+ * details once the code is redeemed ([fetchGoogleUserInfo]); a test passes one with a `MockEngine` in place of Google.
  */
-fun Route.signInRoutes() {
+fun Route.signInRoutes(userInfoClient: HttpClient = HttpClient(CIO)) {
   // The sign-in dialog's title. Open to all: the dialog is shown before anyone is signed in.
   get(AUTH_GREETING) { call.respondText(loginGreeting(), ContentType.Text.Plain) }
 
@@ -90,7 +98,9 @@ fun Route.signInRoutes() {
 
     get(AUTH_CALLBACK) {
       // The state says this server started a sign-in; the cookie says this browser did. Both, or the callback is not
-      // this browser's to complete.
+      // this browser's to complete. The provider's verifyState (googleOAuthSettings) has checked both before redeeming
+      // the code; the cookie is checked again here, so the refusal does not rest on the provider's settings alone, and
+      // cleared, so the state is good for one callback.
       if (!call.consumeOAuthState())
         return@get call.respondRedirect(signInFailedUrl)
 
@@ -100,7 +110,7 @@ fun Route.signInRoutes() {
 
       val userInfo =
         try {
-          fetchGoogleUserInfo(principal.accessToken)
+          fetchGoogleUserInfo(principal.accessToken, userInfoClient)
         } catch (e: CancellationException) {
           throw e
         } catch (e: Exception) {
@@ -112,8 +122,10 @@ fun Route.signInRoutes() {
     }
   }
 
+  // Ends the user's sessions in every browser, so a copied cookie, or the one a shared computer still holds, is no
+  // longer trusted
   post(LOGOUT) {
-    call.sessions.clear<UserSession>()
+    call.signOutEverywhere()
     call.respondRedirect("/")
   }
 

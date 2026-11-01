@@ -7,6 +7,7 @@ import com.pambrose.historywalk.FullName.Companion.EMPTY_FULLNAME
 import com.pambrose.historywalk.Utils.toUuid
 import com.pambrose.historywalk.auth.Roles.roleFor
 import com.pambrose.historywalk.auth.SchoolConfig
+import com.pambrose.historywalk.auth.SessionUser
 import com.pambrose.historywalk.dbms.UsersTable
 import com.pambrose.historywalk.slides.Slide
 import com.pambrose.historywalk.slides.SlideDeck
@@ -112,6 +113,7 @@ class User {
         with(UsersTable) {
           val existing = select(id).where { this@with.email eq address }.map { it[id].value }.firstOrNull()
           if (existing != null) {
+            // The session version is left alone: signing in on one computer does not sign the user out of another
             update({ id eq existing }) { row ->
               row[this.fullName] = fullName.maxLength(128)
               row[this.pictureUrl] = pictureUrl
@@ -144,6 +146,32 @@ class User {
           select(email).where { id eq uuid }.map { it[email] }.firstOrNull()
         }
       }
+
+    /**
+     * The address and session version of [uuid], or null when there is no such user. Session validation runs this on
+     * every request that carries a session, so the two are read together, in one query.
+     */
+    fun sessionUserFor(uuid: UUID): SessionUser? =
+      transaction {
+        with(UsersTable) {
+          select(email, sessionVersion)
+            .where { id eq uuid }
+            .map { SessionUser(it[email], it[sessionVersion]) }
+            .firstOrNull()
+        }
+      }
+
+    /**
+     * Moves [uuid]'s session version on, which ends every session the user holds, in any browser. The increment is
+     * done in SQL, so two sign-outs at once both count.
+     */
+    fun incrementSessionVersion(uuid: UUID) {
+      transaction {
+        with(UsersTable) {
+          update({ id eq uuid }) { row -> row[sessionVersion] = sessionVersion + 1 }
+        }
+      }
+    }
 
     /** The role is derived from [teacherEmails] now, as the route guards do, not the one stored at last sign-in. */
     fun userInfoFor(

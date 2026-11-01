@@ -66,12 +66,26 @@ no longer cancels every later click. Clicks on choices and go-backs go through `
 **Sign-in (Google OAuth, `jvmMain/auth/`).** Only `athenian.org` accounts (`SCHOOL_EMAIL_DOMAIN`) are admitted. The role
 rule (`Roles.kt`): an address in `TEACHER_EMAILS` is a teacher, else a local part starting with two digits is a student,
 else refused. The role is recomputed from the live `TEACHER_EMAILS` on every request, not taken from the stored row.
-- `AuthRoutes.kt` runs `/auth/login` and `/auth/callback` with a signed stateless `state` plus an `oauth_state` cookie and
-  PKCE; `SignInDecision.kt` decides admit/refuse; users are upserted into `history.users` (emails stored lowercase).
+- `AuthRoutes.kt` runs `/auth/login` and `/auth/callback` with a signed stateless `state` and PKCE, storing nothing on
+  the server. The `oauth_state` cookie (`OAuthState.kt`) holds a random secret plus an HMAC binding it to the state, and
+  the PKCE verifier is derived from that secret (`Pkce.kt`), so a stolen callback URL is useless without the browser's
+  cookie. The provider's `verifyState` hook (`ConfigureAuth.kt`) refuses a callback whose cookie is missing or not bound
+  to its state before the code is redeemed; `SignInDecision.kt` decides admit/refuse; users are upserted into
+  `history.users` (emails stored lowercase).
 - The session is an encrypted, signed cookie (`HistoryWalkAuth`, `__Host-` prefixed in production) validated against the
   users table on every request (`SessionValidation.kt`). `SESSION_SECRET` is required unless the callback host is local.
+- A sign-in lasts 12 hours (`UserSession.LIFETIME`, checked on the server as well as the cookie's max age). The cookie
+  carries the user's `users.session_version`; `POST /logout` increments it (`signOutEverywhere`), which ends the user's
+  sessions in every browser, copied cookies included. `SessionValidation` reads the address and the version in one
+  query (`User.sessionUserFor`). `installUserSessions` takes that lookup and the increment (`findUser`, `endSessions`),
+  so route tests can run without a database.
 - `Routes.appRoutes` is the access map: RPC inside `signedInApi` (no session → 401), teacher pages (`/summary`, `/reasons`,
   `/slides`, `/threaddump`) inside `teachersOnly` (→ 403 for students), `/ping`, `/version`, and `/static/*` open to all.
+- `/userreset` deletes the caller's own choices and is a POST, as `/logout` is (the client posts with
+  `ClientUtils.postTo`); a GET or HEAD of either only redirects to `/`, since any link, image, or prefetch can send one.
+- Sign-in, sign-out, `/userreset`, and the teacher pages sit inside `noStore` (`RouteGuards.kt`), which sends
+  `Cache-Control: no-store, private` on every response there, the Google redirect and the guards' 403 included, so after
+  a sign-out on a shared computer Back cannot show class data from a cache and Cloudflare stores none of it.
 - On the client, Kilua turns only a 401 into `SecurityException`; KVision's `SecurityMgr.withAuth` then calls
   `Security.login()`, which shows `SignInDialog` once and parks forever (see the comment on `LoginPrompt` before changing it).
 
@@ -100,9 +114,9 @@ restart, together with the snapshot rewritten and committed with the deck change
 `./gradlew jvmTest --tests 'com.pambrose.historywalk.content.SlidePathsTest' -PupdateSlidePaths=true`.
 
 **Database.** `Dbms.migrate` runs Flyway (`src/jvmMain/resources/db/migration`) before `Database.connect` on every
-startup, so each deploy migrates. Never edit an applied migration (Flyway checksums them); add `V002__...sql`. Note
-`V001` begins with `drop schema if exists history cascade`. Tables are Exposed objects in `dbms/DbmsTables.kt`; queries are
-in `dbms/DbmsTxs.kt` and `User.kt`.
+startup, so each deploy migrates. Never edit an applied migration (Flyway checksums them); add the next `V00N__...sql`
+(`V002` added `users.session_version`). Note `V001` begins with `drop schema if exists history cascade`. Tables are
+Exposed objects in `dbms/DbmsTables.kt`; queries are in `dbms/DbmsTxs.kt` and `User.kt`.
 
 **Dev proxy.** In `make client`, the browser talks to :3000; `webpack.config.d/proxy.js` forwards `/auth`, `/rpc*`,
 `/static`, and the teacher/reset pages to :8080. A new server route that the browser loads directly must be added there.
@@ -124,7 +138,9 @@ a Cloudflare cache rule that ignores the origin's headers would bring stale bund
 not clear a copy Cloudflare already holds: after a deploy, run `make served-version PUBLIC_URL=... ORIGIN_URL=...`,
 which reads the version line `App.start()` logs from the bundle as Heroku and as Cloudflare serve it, and purge
 `main.bundle.js` in Cloudflare if they differ. `StaticContentCachingTest` builds its own routes from `staticContent()`,
-so it would not notice `appRoutes` dropping that call.
+so it would not notice `appRoutes` dropping that call; `NoStoreCachingTest` checks the shell, the bundle, and an image
+through `appRoutes`, and that the per-user routes (sign-in and sign-out, the reset, the teacher pages) go out
+`no-store, private` instead (see `noStore` under Sign-in).
 
 **Version check.** A page left open across a release keeps its old bundle, so `ClientVersionCheck` (started from
 `App.start()`) sends its `BuildConfig` versions to `IContentService.versionCheck` every
@@ -137,15 +153,28 @@ goes around `withAuth`, so a signed-out page is left to the sign-in dialog.
 ## Tests
 
 JVM tests only (`src/jvmTest`), Kotest `StringSpec` + MockK + Ktor test host. Route tests call `appRoutes(...)` with
-injected `findEmail`/`teacherEmails` lambdas instead of a database. The database specs (`UserRepositoryTest`,
-`DbmsTxsTest`, `ContentServiceTest`, `PagesTest`) each start their own `TestPostgres`, a Testcontainers `postgres:18`
-with the real Flyway migration applied, and share the small deck and helpers in `TestWalk.kt`. `ContentServiceTest`
-mocks `ApplicationCall.userUuid` (a `mockkStatic` of `UserSessionKt`) to drive the RPC service as a signed-in user.
-`PagesTest` renders the teacher pages from Postgres, checking that a student's reason or name reaches the page as text,
-never markup, and drives `/summary`, `/reasons`, `/slides`, and the `/slide/{id}/{version}` jump as a signed-in teacher.
-`SlideContentTest` walks both real decks from the root and fails on a path name that does not find its slide, a slide
-shared between two parents, a go-back past the root, a missing image, or a success slide whose title differs from the
-deck's (the summary page counts successes by that title).
+injected `findEmail`/`teacherEmails` lambdas instead of a database.
+- The database specs (`UserRepositoryTest`, `DbmsTxsTest`, `ContentServiceTest`, `PagesTest`, `UserResetTest`,
+  `SignOutTest`) each start their own `TestPostgres`, a Testcontainers `postgres:18` with the real Flyway migrations
+  applied, and share the small deck and helpers in `TestWalk.kt`.
+- `ContentServiceTest` mocks `ApplicationCall.userUuid` (a `mockkStatic` of `UserSessionKt`) to drive the RPC service
+  as a signed-in user.
+- `SignOutTest` signs a student out and replays the old cookie, which must no longer sign anyone in.
+- `PagesTest` renders the teacher pages from Postgres, checking that a student's reason or name reaches the page as
+  text, never markup, and drives `/summary`, `/reasons`, `/slides`, and the `/slide/{id}/{version}` jump as a signed-in
+  teacher.
+- `AuthCallbackTest` runs a real `/auth/login` and then `/auth/callback`, with a Ktor `MockEngine` as Google's token
+  and userinfo endpoints (the `HttpClient` passed to `configureGoogleAuth` and `signInRoutes`) and
+  `User.upsertFromGoogle` mocked (`mockkObject`): a matching state cookie gets a session, a missing or another sign-in's
+  cookie gets none and provisions no one, and the token request's PKCE verifier must hash to the challenge. It takes
+  the state and the cookie from the login's response, except in the replays of a stolen callback URL (issue #7 of
+  `docs/code-review-2026-10-31.md`), which must be refused before any token request reaches Google.
+- `UserResetTest` checks that a POST to `/userreset` needs a session and deletes only the caller's rows, and that a
+  GET or HEAD deletes nothing. `NoStoreCachingTest` (no database: it stubs the two class pages with
+  `mockkObject(Pages)`) checks the `no-store` header on every per-user route.
+- `SlideContentTest` walks both real decks from the root and fails on a path name that does not find its slide, a
+  slide shared between two parents, a go-back past the root, a missing image, or a success slide whose title differs
+  from the deck's (the summary page counts successes by that title).
 
 **CI** (`.github/workflows`, all actions pinned to commit SHAs): `tests.yml` runs `jvmTest` with Kover on pushes and
 pull requests to master; `docker.yml` runs `make docker-build`, `make procfile-check` (the Procfile's jar exists), and
@@ -167,4 +196,5 @@ constants are SCREAMING_SNAKE_CASE, as ktlint's property-naming rule requires.
   RPC plugin's fat jar: Kotlin Multiplatform has no `jar` task. `build.gradle.kts` names it `history-walk.jar` with no
   version, so a version bump does not leave the Procfile and the Dockerfile pointing at a file the build no longer
   writes; `make procfile-check` (in `make ci` and `docker.yml`) guards the Procfile. Keep the three names in step.
-- `docs/superpowers/` holds the Google sign-in design spec and implementation plan; they predate folding `V002` into `V001`.
+- `docs/superpowers/` holds the Google sign-in design spec and implementation plan. They predate folding their own
+  `V002` into `V001`; today's `V002` is the session version, which came later.

@@ -14,6 +14,7 @@ import com.pambrose.historywalk.Pages.displayUserReasons
 import com.pambrose.historywalk.Pages.displayUserSummary
 import com.pambrose.historywalk.auth.GOOGLE_AUTH
 import com.pambrose.historywalk.auth.SchoolConfig
+import com.pambrose.historywalk.auth.noStore
 import com.pambrose.historywalk.auth.signInRoutes
 import com.pambrose.historywalk.auth.signedInApi
 import com.pambrose.historywalk.auth.teachersOnly
@@ -75,83 +76,95 @@ object Routes {
    * Every route, by who may reach it:
    * - sign-in and sign-out, open to all ([signInRoutes]);
    * - the RPC services, for any signed-in user, refusing a call without a session with 401 ([signedInApi]);
-   * - the user's own reset, for any signed-in user, sending a browser without a session to Google sign-in;
+   * - the user's own reset, a POST for any signed-in user, sending a browser without a session to Google sign-in;
    * - the class pages, slide tools, and thread dump, for teachers only, refusing anyone else with 403 ([teachersOnly]);
    * - health, version, and static content ([staticContent]), open to all.
+   *
+   * Sign-in, sign-out, the reset, and the teacher pages go out marked never to be stored ([noStore]), their redirects
+   * and refusals included, so none of them outlives a sign-out on a shared computer. The page shell, the bundle, and
+   * the images keep their own caching ([staticContent]).
    */
   fun Route.appRoutes(
     allowSlideAccess: Boolean = ALLOW_SLIDE_ACCESS.getEnv(false),
     findEmail: (UUID) -> String? = { User.emailForUuid(it) },
     teacherEmails: () -> Set<String> = { SchoolConfig.teacherEmails },
   ) {
-    signInRoutes()
+    noStore {
+      signInRoutes()
+
+      // A GET resets nothing: any page can make a browser send one, with an image, a link, or a prefetch, and a HEAD
+      // reaches the same route (AutoHeadResponse). A page loaded before the reset became a POST still navigates here,
+      // and lands on the app.
+      get(USER_RESET) { call.respondRedirect("/") }
+
+      authenticate(GOOGLE_AUTH) {
+        // Deletes the caller's own choices, and only theirs, and starts their walk again from the first slide
+        post(USER_RESET) {
+          transaction {
+            val uuid = call.userUuid
+            deleteChoices(uuid)
+            updateLastSlide(uuid, ROOT)
+          }
+          call.respondRedirect("/")
+        }
+
+        teachersOnly(findEmail, teacherEmails) {
+          get(SUMMARY) {
+            respondWith { displayUserSummary() }
+          }
+
+          get(REASONS) {
+            respondWith { displayUserReasons() }
+          }
+
+          // Every JVM thread's stack; taking it briefly pauses the JVM
+          get("threaddump") {
+            try {
+              ByteArrayOutputStream()
+                .apply {
+                  use { ThreadDumpInfo.threadDump.dump(true, true, it) }
+                }.let { baos ->
+                  String(baos.toByteArray(), UTF_8)
+                }
+            } catch (e: NoClassDefFoundError) {
+              "Sorry, your runtime environment does not allow dump threads."
+            }.also {
+              call.respondText(it, Plain)
+            }
+          }
+
+          if (allowSlideAccess) {
+            get("$SLIDE/{slideId}/{version?}") {
+              val slideId = call.parameters.getOrFail("slideId").toInt()
+              val version =
+                try {
+                  call.parameters.getOrFail("version").toInt()
+                } catch (e: Exception) {
+                  0
+                }
+              val slide = masterSlides.findSlideById(slideId, version)
+              if (slide != null) {
+                transaction {
+                  val uuid = call.userUuid
+                  updateLastSlide(uuid, slide.pathName)
+                }
+                call.respondRedirect("/")
+              } else {
+                call.respondText("Slide not found: $slideId/$version", Plain)
+              }
+            }
+
+            get("slides") {
+              respondWith { displayAllSlides() }
+            }
+          }
+        }
+      }
+    }
 
     signedInApi {
       authenticate(GOOGLE_AUTH) {
         applyRoutes(ContentServiceManager)
-      }
-    }
-
-    authenticate(GOOGLE_AUTH) {
-      get(USER_RESET) {
-        transaction {
-          val uuid = call.userUuid
-          deleteChoices(uuid)
-          updateLastSlide(uuid, ROOT)
-        }
-        call.respondRedirect("/")
-      }
-
-      teachersOnly(findEmail, teacherEmails) {
-        get(SUMMARY) {
-          respondWith { displayUserSummary() }
-        }
-
-        get(REASONS) {
-          respondWith { displayUserReasons() }
-        }
-
-        // Every JVM thread's stack; taking it briefly pauses the JVM
-        get("threaddump") {
-          try {
-            ByteArrayOutputStream()
-              .apply {
-                use { ThreadDumpInfo.threadDump.dump(true, true, it) }
-              }.let { baos ->
-                String(baos.toByteArray(), UTF_8)
-              }
-          } catch (e: NoClassDefFoundError) {
-            "Sorry, your runtime environment does not allow dump threads."
-          }.also {
-            call.respondText(it, Plain)
-          }
-        }
-
-        if (allowSlideAccess) {
-          get("$SLIDE/{slideId}/{version?}") {
-            val slideId = call.parameters.getOrFail("slideId").toInt()
-            val version =
-              try {
-                call.parameters.getOrFail("version").toInt()
-              } catch (e: Exception) {
-                0
-              }
-            val slide = masterSlides.findSlideById(slideId, version)
-            if (slide != null) {
-              transaction {
-                val uuid = call.userUuid
-                updateLastSlide(uuid, slide.pathName)
-              }
-              call.respondRedirect("/")
-            } else {
-              call.respondText("Slide not found: $slideId/$version", Plain)
-            }
-          }
-
-          get("slides") {
-            respondWith { displayAllSlides() }
-          }
-        }
       }
     }
 

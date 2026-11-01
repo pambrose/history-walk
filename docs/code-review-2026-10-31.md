@@ -28,15 +28,15 @@ session are not listed: the go-back offsets, the quotes in slide text, and lint.
 | [4](#issue-4)   | ✅ | Medium   | Server         | `/threaddump` is open to anyone                                                        |
 | [5](#issue-5)   | ✅ | Medium   | Server         | The RPC service trusts client-supplied choices, so a student can fake progress         |
 | [6](#issue-6)   | ✅ | Medium   | Client, server | A double-click records a choice twice or fails on the unique constraint                |
-| [7](#issue-7)   | ⬜ | Medium   | Auth           | A stolen callback URL can be completed by anyone (PKCE is derived from the state)      |
+| [7](#issue-7)   | ✅ | Medium   | Auth           | A stolen callback URL can be completed by anyone (PKCE is derived from the state)      |
 | [8](#issue-8)   | ✅ | Medium   | Client (a11y)  | The reason dialog's OK stays disabled for dictated or pasted text                      |
 | [9](#issue-9)   | ✅ | Medium   | Ops            | The Procfile pins `history-walk-1.0.0.jar`, so a version bump breaks Heroku            |
 | [10](#issue-10) | ✅ | Medium   | Content        | Renaming or moving a slide silently sends students back to the start                   |
 | [11](#issue-11) | ⬜ | Medium   | Privacy        | On a shared computer, class data and a student's page outlive sign-out                 |
 | [12](#issue-12) | ⬜ | Medium   | Tests          | The client has no tests                                                                |
-| [13](#issue-13) | ⬜ | Low      | Server         | `/userreset` is a GET that deletes all of the caller's choices, and is untested        |
-| [14](#issue-14) | ⬜ | Low      | Auth / tests   | The callback's cookie check is untested, because the HTTP clients cannot be injected   |
-| [15](#issue-15) | ⬜ | Low      | Auth           | Sessions last 14 days and cannot be revoked on the server                              |
+| [13](#issue-13) | ✅ | Low      | Server         | `/userreset` is a GET that deletes all of the caller's choices, and is untested        |
+| [14](#issue-14) | ✅ | Low      | Auth / tests   | The callback's cookie check is untested, because the HTTP clients cannot be injected   |
+| [15](#issue-15) | ✅ | Low      | Auth           | Sessions last 14 days and cannot be revoked on the server                              |
 | [16](#issue-16) | ⬜ | Low      | Client         | A forced reload can come without the update dialog ever shown, losing a typed reason   |
 | [17](#issue-17) | ⬜ | Low      | Client         | Nothing stops a reload loop while a stale bundle is still served                       |
 | [18](#issue-18) | ⬜ | Low      | Client         | Before the first successful call, any error shows the sign-in dialog                   |
@@ -189,8 +189,12 @@ Things checked and found sound:
   - Add a server test that calls `provideReason` twice for the same transition.
 
 <a id="issue-7"></a>
-### ⬜ 7. A stolen callback URL can be completed by anyone (PKCE is derived from the state)
+### ✅ 7. A stolen callback URL can be completed by anyone (PKCE is derived from the state)
 
+- **Status:** done in Wave 3: the state cookie holds a random secret bound to the state by an HMAC, the verifier is
+  derived from that secret, and the provider's `verifyState` hook refuses an unbound cookie before the code is
+  redeemed. `AuthCallbackTest` replays a stolen callback URL with the bare state and with a made-up cookie, and checks
+  that no token request reaches Google.
 - **Severity:** Medium (unlikely, but a stolen teacher sign-in exposes every student)
 - **Where:**
   - `auth/ConfigureAuth.kt:55-62`
@@ -258,6 +262,9 @@ Things checked and found sound:
 <a id="issue-11"></a>
 ### ⬜ 11. On a shared computer, class data and a student's page outlive sign-out
 
+- **Status:** the server part is done in Wave 3: the teacher pages, `/userreset`, and the sign-in and sign-out routes
+  send `Cache-Control: no-store, private` (`noStore` in `RouteGuards.kt`). The client's `pageshow` reload is still open
+  (Step 11).
 - **Severity:** Medium (the project's rule: no student sees another's data)
 - **Where:**
   - `Routes.kt:111-117` and `:150-152`, the teacher pages, sent with no `Cache-Control`
@@ -296,7 +303,7 @@ Things checked and found sound:
   - Run them in CI (`jsTest` in `tests.yml` and `make ci`).
 
 <a id="issue-13"></a>
-### ⬜ 13. `/userreset` is a GET that deletes all of the caller's choices, and is untested
+### ✅ 13. `/userreset` is a GET that deletes all of the caller's choices, and is untested
 
 - **Severity:** Low
 - **Where:** `Routes.kt:101-108`
@@ -309,7 +316,7 @@ Things checked and found sound:
 - **Fix:** Make it a POST, as `/logout` is, and add route tests for both properties.
 
 <a id="issue-14"></a>
-### ⬜ 14. The callback's cookie check is untested, because the HTTP clients cannot be injected
+### ✅ 14. The callback's cookie check is untested, because the HTTP clients cannot be injected
 
 - **Severity:** Low
 - **Where:**
@@ -327,8 +334,11 @@ Things checked and found sound:
     user, and the replay in [7](#issue-7).
 
 <a id="issue-15"></a>
-### ⬜ 15. Sessions last 14 days and cannot be revoked on the server
+### ✅ 15. Sessions last 14 days and cannot be revoked on the server
 
+- **Status:** done in Wave 3: a sign-in lasts 12 hours, and `POST /logout` increments `users.session_version` (`V002`),
+  which ends the user's sessions in every browser. Someone who leaves a shared computer without signing out still
+  leaves a session there, for up to 12 hours.
 - **Severity:** Low (a design choice)
 - **Where:** `auth/UserSession.kt:30` (`LIFETIME = 14.days`), `auth/SessionValidation.kt:82`
 - **Problem:**
@@ -488,10 +498,10 @@ Changing the RPC interface also needs an `apiVersion` bump, so pages already ope
 
 | Step | Status | Issues | Work | Files |
 |------|:------:|--------|------|-------|
-| 7  | ⬜ | [14](#issue-14) | Injectable `HttpClient`s and callback tests with a `MockEngine` | `ConfigureAuth.kt`, `AuthRoutes.kt`, `AuthRoutesTest.kt` |
-| 8  | ⬜ | [7](#issue-7) | Bind the state to a cookie secret and derive the verifier from it; check the cookie in `verifyState` | `OAuthState.kt`, `Pkce.kt`, `ConfigureAuth.kt`, `AuthRoutes.kt` |
-| 9  | ⬜ | [11](#issue-11) (server), [13](#issue-13) | `no-store` on the teacher, reset and auth routes; `/userreset` as a POST, with tests | `Routes.kt`, `RouteGuards.kt`, `MainPanel.kt` (the reset link) |
-| 10 | ⬜ | [15](#issue-15) | Decide the session lifetime; add the session version column if revocation is wanted | `UserSession.kt`, `SessionValidation.kt`, `V002__...sql` |
+| 7  | ✅ | [14](#issue-14) | Injectable `HttpClient`s and callback tests with a `MockEngine` | `ConfigureAuth.kt`, `AuthRoutes.kt`, `AuthRoutesTest.kt` |
+| 8  | ✅ | [7](#issue-7) | Bind the state to a cookie secret and derive the verifier from it; check the cookie in `verifyState` | `OAuthState.kt`, `Pkce.kt`, `ConfigureAuth.kt`, `AuthRoutes.kt` |
+| 9  | ✅ | [11](#issue-11) (server), [13](#issue-13) | `no-store` on the teacher, reset and auth routes; `/userreset` as a POST, with tests | `Routes.kt`, `RouteGuards.kt`, `MainPanel.kt` (the reset link) |
+| 10 | ✅ | [15](#issue-15) | Decide the session lifetime; add the session version column if revocation is wanted | `UserSession.kt`, `SessionValidation.kt`, `V002__...sql` |
 
 Step 8 needs Step 7, so its tests exist first. Step 9 is independent and can run alongside 7 and 8. Step 10 needs a
 decision from the teachers before any code changes; any schema change goes in a new `V002` migration.

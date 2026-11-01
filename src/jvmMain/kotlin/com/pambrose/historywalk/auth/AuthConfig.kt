@@ -27,9 +27,10 @@ object OAuthConfig {
 }
 
 /**
- * Keys for the encrypted session cookie and the OAuth state, all derived from `SESSION_SECRET` via SHA-256 with a
- * label for domain separation. A server whose callback is not on a loopback host (production) requires a secret of at
- * least [MIN_SECRET_LENGTH] chars; a local one falls back to a DEV-ONLY secret with a warning.
+ * Keys for the encrypted session cookie and for sign-in (the OAuth state, the state cookie's binding to it, and PKCE),
+ * all derived from `SESSION_SECRET` via SHA-256 with a label for domain separation. A server whose callback is not on a
+ * loopback host (production) requires a secret of at least [MIN_SECRET_LENGTH] chars; a local one falls back to a
+ * DEV-ONLY secret with a warning.
  */
 object SessionConfig {
   private val logger = KotlinLogging.logger {}
@@ -58,6 +59,7 @@ object SessionConfig {
   val encryptionKey: ByteArray by lazy { deriveKey(secret, "enc") }
   val signKey: ByteArray by lazy { deriveKey(secret, "mac") }
   val oauthStateKey: ByteArray by lazy { deriveKey(secret, "state") }
+  val stateCookieKey: ByteArray by lazy { deriveKey(secret, "state-cookie") }
   val pkceKey: ByteArray by lazy { deriveKey(secret, "pkce") }
 
   fun encryptTransformer(): SessionTransportTransformerEncrypt =

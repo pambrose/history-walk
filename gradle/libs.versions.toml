@@ -66,6 +66,7 @@ ktor-serialization-kotlinx-json = { group = "io.ktor", name = "ktor-serializatio
 # Ktor client
 ktor-client-cio = { group = "io.ktor", name = "ktor-client-cio-jvm" }
 ktor-client-content-negotiation = { group = "io.ktor", name = "ktor-client-content-negotiation-jvm" }
+ktor-client-mock = { group = "io.ktor", name = "ktor-client-mock-jvm", version.ref = "ktor" }
 
 # KVision framework
 kvision-core = { group = "io.kvision", name = "kvision", version.ref = "kvision" }

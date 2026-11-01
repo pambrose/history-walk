@@ -49,7 +49,13 @@ class AuthRoutesTest : StringSpec() {
   ) = GoogleUserInfo(id = "1", email = email, name = "N", picture = picture, verifiedEmail = verified, hd = hd)
 
   private fun Application.module(provision: (SignInDecision.Admitted) -> UUID) {
-    installUserSessions(secure = false, findEmail = emails::get, teacherEmails = { teachers })
+    // Every user at session version 0; signing out ends no other browser's session here (SignOutTest checks that)
+    installUserSessions(
+      secure = false,
+      findUser = { emails[it]?.let { email -> SessionUser(email) } },
+      teacherEmails = { teachers },
+      endSessions = {},
+    )
     install(Authentication) {
       configureGoogleAuth("http://localhost/auth/callback") {
         googleOAuthSettings(

@@ -15,6 +15,9 @@ object UsersTable : UUIDTable("history.users") {
   val role = text("role")
   val lastSignIn = datetime("last_sign_in").nullable()
   val lastPathName = text("last_path_name")
+
+  // Signing out increments it, ending every session cookie that carries the old value (V002)
+  val sessionVersion = integer("session_version").default(0)
 }
 
 object UserChoiceTable : IntIdTable("history.user_choices") {
