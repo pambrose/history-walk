@@ -16,6 +16,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
+import org.w3c.dom.PageTransitionEvent
+import org.w3c.dom.events.EventTarget
 import org.w3c.dom.url.URLSearchParams
 
 // A backstop only: the click handlers and start-up calls report their own failures (ClientUtils.orErrorToast)
@@ -39,6 +41,7 @@ class App : Application() {
     // Also the bundle's version marker: make served-version finds this string in main.bundle.js to tell which
     // release Heroku and Cloudflare each serve
     console.log("History Walk version ${BuildConfig.VERSION} - ${BuildConfig.RELEASE_DATE}")
+    reloadWhenRestoredFromCache()
     showRefusalFromUrl()
 
     root("kvapp") {
@@ -53,6 +56,21 @@ class App : Application() {
 
     versionCheckScope.launch { ClientVersionCheck.checkClientVersion() }
   }
+}
+
+/**
+ * Reloads the page when the browser restores it from its back/forward cache (a `pageshow` with `persisted` set), as
+ * Back can after signing out: the restored page would show the previous user's walk without asking the server, while
+ * the reload asks it, so a signed-out browser gets the sign-in dialog. An ordinary load's `pageshow` is not persisted.
+ * [target] and [reload] are the page's own unless a test passes others.
+ */
+internal fun reloadWhenRestoredFromCache(
+  target: EventTarget = window,
+  reload: () -> Unit = { window.location.reload() },
+) {
+  target.addEventListener("pageshow", { event ->
+    if (event.unsafeCast<PageTransitionEvent>().persisted) reload()
+  })
 }
 
 private fun showRefusalFromUrl() {

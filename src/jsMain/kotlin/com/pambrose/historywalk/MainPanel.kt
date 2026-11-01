@@ -192,7 +192,7 @@ private fun Container.addChoiceButtons(slide: SlideData) {
           } else {
             val choiceReason = makeChoice(slide.pathName, slide.title, choice, slide.choices.size == 1)
             if (choiceReason.reason.isEmpty()) {
-              promptUserForReason(slide.pathName, slide.title, choice)?.also { refresh(it) }
+              whileWritingReason { promptUserForReason(slide.pathName, slide.title, choice) }?.also { refresh(it) }
             } else {
               val newSlide = getCurrentSlide()
               refresh(newSlide)
@@ -201,6 +201,24 @@ private fun Container.addChoiceButtons(slide: SlideData) {
         }
       }
     }
+}
+
+/**
+ * True while the student is giving a reason: from the moment the reason dialog opens until the reason is saved or the
+ * student cancels, a failed save and the dialog's reopening included. The version check holds its update dialog and
+ * its reload back meanwhile (VersionCheckState), as a reload would throw away what the student typed.
+ */
+internal var writingReason = false
+  private set
+
+/** Runs [block], which asks for a reason and saves it, with [writingReason] set. */
+private suspend fun <T> whileWritingReason(block: suspend () -> T): T {
+  writingReason = true
+  try {
+    return block()
+  } finally {
+    writingReason = false
+  }
 }
 
 /**

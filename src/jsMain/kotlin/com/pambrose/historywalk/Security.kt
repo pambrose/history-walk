@@ -51,9 +51,8 @@ object Security : SecurityMgr() {
 
   override suspend fun login(): Boolean = loginPrompt.showOnceAndPark()
 
-  override suspend fun afterLogin() {
-    console.log("Signed in")
-  }
+  // No afterLogin: SecurityMgr calls it after the first call that returns, and ClientUtils.withAuth returns a failure
+  // too (in a Result), so a "Signed in" there could follow a failed call
 
   override suspend fun afterError() {
     console.log("Sign-in required: showing the sign-in dialog")
