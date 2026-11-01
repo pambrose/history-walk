@@ -50,10 +50,10 @@ object HistoryWalkServer {
               } else {
                 val repoType = SLIDES_REPO_TYPE.getEnv("User")
                 val gh = GitHubFile(
-                  GitHubRepo(
-                    if (repoType.equals("User", ignoreCase = true)) User else Organization,
-                    SLIDES_REPO_OWNER.getEnv("pambrose"),
-                    SLIDES_REPO_NAME.getEnv("history-walk-content"),
+                  repo = GitHubRepo(
+                    ownerType = if (repoType.equals("User", ignoreCase = true)) User else Organization,
+                    ownerName = SLIDES_REPO_OWNER.getEnv("pambrose"),
+                    repoName = SLIDES_REPO_NAME.getEnv("history-walk-content"),
                   ),
                   branchName = SLIDES_REPO_BRANCH.getEnv("master"),
                   srcPath = SLIDES_REPO_PATH.getEnv("src/main/kotlin"),
@@ -101,7 +101,7 @@ fun Application.main() {
   installs()
   assignRoutes()
 
-  val defaultSlides = "com.github.pambrose.content.jermainLonguenSlides"
+  val defaultSlides = "jermainLonguenSlides"
 
   val slideName = SLIDES_VARIABLE_NAME.getEnv(defaultSlides)
   masterSlides =
