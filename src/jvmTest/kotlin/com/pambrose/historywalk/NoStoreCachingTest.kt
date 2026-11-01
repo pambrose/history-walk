@@ -3,6 +3,7 @@ package com.pambrose.historywalk
 import com.pambrose.historywalk.Installs.installAutoHeadResponse
 import com.pambrose.historywalk.Installs.installConditionalHeaders
 import com.pambrose.historywalk.Routes.appRoutes
+import com.pambrose.historywalk.auth.SessionUser
 import com.pambrose.historywalk.auth.SignedNonceManager
 import com.pambrose.historywalk.auth.assignUserSession
 import com.pambrose.historywalk.auth.configureGoogleAuth
@@ -66,7 +67,13 @@ class NoStoreCachingTest : StringSpec() {
         install(Compression)
         installConditionalHeaders()
         installAutoHeadResponse()
-        installUserSessions(secure = false, findEmail = emails::get, teacherEmails = { teachers })
+        // Every user at session version 0, and signing out ends no other session (SignOutTest checks both)
+        installUserSessions(
+          secure = false,
+          findUser = { emails[it]?.let { email -> SessionUser(email) } },
+          teacherEmails = { teachers },
+          endSessions = {},
+        )
         install(Authentication) {
           configureGoogleAuth("http://localhost/auth/callback") {
             googleOAuthSettings(

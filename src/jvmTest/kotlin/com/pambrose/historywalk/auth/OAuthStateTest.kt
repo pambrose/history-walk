@@ -96,7 +96,7 @@ class OAuthStateTest : StringSpec() {
   private fun hooksTest(block: suspend (HttpClient) -> Unit) =
     testApplication {
       application {
-        installUserSessions(secure = false, findEmail = { null }, teacherEmails = { emptySet() })
+        installUserSessions(secure = false, findUser = { null }, teacherEmails = { emptySet() })
         install(Authentication) { configureGoogleAuth("http://localhost/auth/callback") { settings } }
         routing {
           signInRoutes()

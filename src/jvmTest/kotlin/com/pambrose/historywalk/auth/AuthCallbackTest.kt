@@ -125,7 +125,7 @@ class AuthCallbackTest : StringSpec() {
   private fun Application.module(google: HttpClient) {
     installUserSessions(
       secure = false,
-      findEmail = { if (it == student) studentEmail else null },
+      findUser = { if (it == student) SessionUser(studentEmail) else null },
       teacherEmails = { emptySet() },
     )
     install(Authentication) {

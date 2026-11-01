@@ -110,7 +110,7 @@ class UserResetTest : StringSpec() {
       application {
         installConditionalHeaders()
         installAutoHeadResponse()
-        installUserSessions(secure = false, findEmail = { User.emailForUuid(it) }, teacherEmails = teachers)
+        installUserSessions(secure = false, teacherEmails = teachers)
         install(Authentication) {
           configureGoogleAuth("http://localhost/auth/callback") {
             googleOAuthSettings(

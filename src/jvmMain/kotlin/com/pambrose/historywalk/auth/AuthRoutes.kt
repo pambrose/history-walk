@@ -26,8 +26,6 @@ import io.ktor.server.response.respondText
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
-import io.ktor.server.sessions.clear
-import io.ktor.server.sessions.sessions
 import kotlinx.coroutines.CancellationException
 import kotlinx.serialization.json.Json
 import java.util.UUID
@@ -124,8 +122,10 @@ fun Route.signInRoutes(userInfoClient: HttpClient = HttpClient(CIO)) {
     }
   }
 
+  // Ends the user's sessions in every browser, so a copied cookie, or the one a shared computer still holds, is no
+  // longer trusted
   post(LOGOUT) {
-    call.sessions.clear<UserSession>()
+    call.signOutEverywhere()
     call.respondRedirect("/")
   }
 

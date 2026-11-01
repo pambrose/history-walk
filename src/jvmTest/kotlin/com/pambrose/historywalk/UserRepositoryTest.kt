@@ -1,8 +1,11 @@
 package com.pambrose.historywalk
 
 import com.pambrose.historywalk.User.Companion.emailForUuid
+import com.pambrose.historywalk.User.Companion.incrementSessionVersion
+import com.pambrose.historywalk.User.Companion.sessionUserFor
 import com.pambrose.historywalk.User.Companion.upsertFromGoogle
 import com.pambrose.historywalk.User.Companion.userInfoFor
+import com.pambrose.historywalk.auth.SessionUser
 import com.pambrose.historywalk.dbms.UserChoiceTable
 import com.pambrose.historywalk.dbms.UserDecisionCountsView
 import com.pambrose.historywalk.dbms.UserReasonsView
@@ -51,7 +54,7 @@ class UserRepositoryTest : StringSpec() {
             .use { rs -> while (rs.next()) rows += rs.getString(1) to rs.getBoolean(2) }
         }
       }
-      rows.map { it.first }.shouldContainExactly("001")
+      rows.map { it.first }.shouldContainExactly("001", "002")
       rows.all { it.second } shouldBe true
     }
 
@@ -108,6 +111,29 @@ class UserRepositoryTest : StringSpec() {
       val id = upsertFromGoogle("27msmith@athenian.org", "Maya Smith", null, Role.STUDENT)
       emailForUuid(id) shouldBe "27msmith@athenian.org"
       emailForUuid(UUID.randomUUID()) shouldBe null
+    }
+
+    "a new user starts at session version 0" {
+      val id = upsertFromGoogle("27version@athenian.org", "Version", null, Role.STUDENT)
+      sessionUserFor(id) shouldBe SessionUser("27version@athenian.org", 0)
+      sessionUserFor(UUID.randomUUID()) shouldBe null
+    }
+
+    "signing out increments the session version, and only that user's" {
+      val id = upsertFromGoogle("27signout@athenian.org", "Signs Out", null, Role.STUDENT)
+      val other = upsertFromGoogle("27stays@athenian.org", "Stays", null, Role.STUDENT)
+      incrementSessionVersion(id)
+      sessionUserFor(id)!!.sessionVersion shouldBe 1
+      incrementSessionVersion(id)
+      sessionUserFor(id)!!.sessionVersion shouldBe 2
+      sessionUserFor(other)!!.sessionVersion shouldBe 0
+    }
+
+    "a repeat sign-in keeps the session version" {
+      val id = upsertFromGoogle("27again@athenian.org", "Again", null, Role.STUDENT)
+      incrementSessionVersion(id)
+      upsertFromGoogle("27again@athenian.org", "Again, Renamed", null, Role.STUDENT) shouldBe id
+      sessionUserFor(id) shouldBe SessionUser("27again@athenian.org", 1)
     }
 
     "progress views leave teachers out" {

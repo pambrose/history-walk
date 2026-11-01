@@ -47,6 +47,8 @@ openssl rand -hex 32
 
 Use a distinct `SESSION_SECRET` for each Heroku app. Rotating it signs everyone out.
 
+A sign-in lasts 12 hours. Signing out ends that account's sessions in every browser, not only the one used.
+
 `./gradlew jvmTest` needs Docker running: `UserRepositoryTest` uses a Testcontainers Postgres.
 
 Locally, `OAUTH_CALLBACK_URL` must match the port the browser uses: `http://localhost:3000/auth/callback` when
@@ -124,9 +126,10 @@ git push heroku Jan-2026:main
 
 The schema is managed by [Flyway](https://documentation.red-gate.com/flyway). Migrations live in
 `src/jvmMain/resources/db/migration` and are applied automatically when the server starts, so every
-Heroku deploy brings the database up to date. The initial schema is `V001__create_schema.sql`.
+Heroku deploy brings the database up to date. The initial schema is `V001__create_schema.sql`;
+`V002__session_version.sql` adds the per-user session version that signing out increments.
 
-To change the schema, add a new migration with the next version number, e.g. `V002__add_column.sql`.
+To change the schema, add a new migration with the next version number, e.g. `V003__add_column.sql`.
 Never edit a migration that has already been applied: Flyway checksums applied migrations and will
 refuse to start if one changes.
 
