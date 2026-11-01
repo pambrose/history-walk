@@ -81,9 +81,7 @@ object SessionConfig {
         "SESSION_SECRET is too weak (min $MIN_SECRET_LENGTH chars). Generate one with: openssl rand -hex 32"
       }
       trimmed
-    } else if (trimmed.isNotBlank()) {
-      trimmed
-    } else {
+    } else trimmed.ifBlank {
       logger.warn { "SESSION_SECRET is not set; using an insecure DEV-ONLY session secret. Never use in production." }
       DEV_ONLY_SECRET
     }

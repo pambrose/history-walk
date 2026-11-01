@@ -290,7 +290,7 @@ private fun Container.navLink(
 private fun Container.avatar(user: UserInfo) {
   val size = AVATAR_SIZE.px
   if (user.pictureUrl != null) {
-    image(user.pictureUrl!!, user.fullName) {
+    image(user.pictureUrl, user.fullName) {
       width = size
       height = size
       borderRadius = (AVATAR_SIZE / 2).px
