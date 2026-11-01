@@ -1,25 +1,7 @@
 # History Walk
 
-## Repos
-
-There are 3 repos involved in this project:
-
-* [history-walk](https://github.com/pambrose/history-walk)
-* [history-walk-content](https://github.com/pambrose/history-walk-content)
-* [history-walk-slides](https://github.com/pambrose/history-walk-slides)
-
-The *history-walk* repo is duplicated in the client in *history-walk* and *history-walk-moses*. Only the *history-walk*
-repo should be updated and the other should only pull from GitHub. Each is used to create
-a Heroku app with different env vars One is called *jermain-walk* and the other is *moses-walk*.
-
-The *history-walk-content* repo is used to hold the content for the slides. The content is edited there and then
-copied to the *history-walk* repos.
-
-The *history-walk-slides* repo is used to hold the core slide code. It is a dependancy of the other repos.
-
 ## Env Vars
 
-### Heroku
 * SLIDES_VARIABLE_NAME - `jermain` for the Jermain Longuen walk (the default when unset), or `moses` for the Moses walk,
   in any case. Any other value stops the server at startup with an error naming it.
 * DISPLAY_CONSECUTIVE_CORRECT_DECISIONS

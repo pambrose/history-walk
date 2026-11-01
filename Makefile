@@ -28,7 +28,9 @@ ORIGIN_URL   ?=
 
 .DEFAULT_GOAL := help
 
-.PHONY: help db reset-jermain reset-moses stop-db server client build clean tests coverage lint format zizmor ci procfile-check docker-build docker-run docker-smoke versions versions-all depends yarn-unlock upgrade-wrapper creds restart log served-version
+.PHONY: help db reset-jermain reset-moses stop-db server client build clean tests coverage lint \
+		format zizmor ci procfile-check docker-build docker-run docker-smoke versions versions-all \
+		depends yarn-unlock upgrade-wrapper creds restart log served-version
 
 ##@ General
 
