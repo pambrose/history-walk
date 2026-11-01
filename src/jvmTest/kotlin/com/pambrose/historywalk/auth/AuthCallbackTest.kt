@@ -18,6 +18,7 @@ import io.ktor.client.engine.mock.toByteArray
 import io.ktor.client.plugins.cookies.HttpCookies
 import io.ktor.client.request.HttpRequestData
 import io.ktor.client.request.get
+import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
@@ -115,10 +116,10 @@ private class FakeGoogle(
 }
 
 // The OAuth callback end to end: a real /auth/login, then Google's redirect back to /auth/callback, with a MockEngine
-// in place of Google's token and userinfo endpoints. The state, and the state cookie, always come from the login's
-// response and go back as a browser sends them; nothing here builds either, so the specs hold whatever the cookie
-// carries. Provisioning (User.upsertFromGoogle) is mocked, so no database is needed; whether a browser is signed in is
-// asked of the app.
+// in place of Google's token and userinfo endpoints. The state, and the state cookie, come from the login's response
+// and go back as a browser sends them; only the replay specs, which play someone without the browser, build a cookie.
+// Provisioning (User.upsertFromGoogle) is mocked, so no database is needed; whether a browser is signed in is asked of
+// the app.
 class AuthCallbackTest : StringSpec() {
   private val student = UUID.randomUUID()
 
@@ -177,6 +178,20 @@ class AuthCallbackTest : StringSpec() {
     get("/$AUTH_CALLBACK") {
       parameter("code", CODE)
       parameter("state", authorizeUrl.parameters["state"])
+    }
+
+  // Someone replaying a callback URL by hand: no cookie jar, so each request carries only the cookie it is given
+  private fun ApplicationTestBuilder.attacker() = createClient { followRedirects = false }
+
+  // A callback URL replayed with a state cookie the replayer chose
+  private suspend fun HttpClient.replay(
+    authorizeUrl: Url,
+    cookie: String,
+  ): HttpResponse =
+    get("/$AUTH_CALLBACK") {
+      parameter("code", CODE)
+      parameter("state", authorizeUrl.parameters["state"])
+      header(HttpHeaders.Cookie, "${OAuthState.stateCookieName(secure = false)}=$cookie")
     }
 
   private suspend fun HttpClient.signedInAs(): String = get("/test/whoami").bodyAsText()
@@ -254,22 +269,49 @@ class AuthCallbackTest : StringSpec() {
       }
     }
 
-    "a callback without the state cookie gets no session and provisions no one" {
-      callbackTest {
+    "a callback without the state cookie gets no session, provisions no one, and never reaches Google" {
+      callbackTest { google ->
         val authorizeUrl = browser().startSignIn()
         // The callback URL opened in a browser that started no sign-in, as a stolen or planted link would be
         val elsewhere = browser()
         shouldBeRefused(elsewhere.returnFromGoogle(authorizeUrl), elsewhere)
+        google.tokenRequests().shouldBeEmpty()
       }
     }
 
-    "a callback with another sign-in's state cookie gets no session and provisions no one" {
-      callbackTest {
+    "a callback with another sign-in's state cookie gets no session, provisions no one, and never reaches Google" {
+      callbackTest { google ->
         val authorizeUrl = browser().startSignIn()
         // The callback URL opened in a browser holding the cookie of a sign-in it started itself
         val other = browser()
         other.startSignIn()
         shouldBeRefused(other.returnFromGoogle(authorizeUrl), other)
+        google.tokenRequests().shouldBeEmpty()
+      }
+    }
+
+    // Issue #7: someone holding a victim's unused callback URL replays it with a state cookie of their own making.
+    // Before the cookie carried a secret, a cookie holding the bare state passed, and the server worked out the
+    // verifier from the state, so Google redeemed the code for them.
+    "a stolen callback replayed with a cookie holding its state is refused before the code reaches Google" {
+      callbackTest { google ->
+        val stolen = browser().startSignIn()
+        val attacker = attacker()
+        val r = attacker.replay(stolen, cookie = stolen.parameters["state"]!!)
+        shouldBeRefused(r, attacker)
+        google.tokenRequests().shouldBeEmpty()
+      }
+    }
+
+    "a stolen callback replayed with a cookie made up for its state is refused before the code reaches Google" {
+      callbackTest { google ->
+        val stolen = browser().startSignIn()
+        val attacker = attacker()
+        // The shape the server issues, with a secret of the attacker's choosing, bound under a key that is not the
+        // server's: without that key no one can bind a secret to a state
+        val forged = OAuthState.stateCookieValue(stolen.parameters["state"]!!, OAuthState.newSecret(), ByteArray(32))
+        shouldBeRefused(attacker.replay(stolen, cookie = forged), attacker)
+        google.tokenRequests().shouldBeEmpty()
       }
     }
 
