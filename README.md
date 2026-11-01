@@ -91,6 +91,25 @@ with a logged warning. Any other host is production and requires `SESSION_SECRET
 * jar - Packages a "fat" jar with all backend sources and dependencies while also embedding frontend resources
   into `build/libs/*.jar`
 
+## Docker
+
+The image holds only a Java 25 JRE and the fat jar, which is built outside Docker:
+
+```bash
+make docker-build   # ./gradlew jar, then docker build -> history-walk:1.0.0 and history-walk:latest
+make db             # the local Postgres the container connects to
+make docker-run     # serves http://localhost:8080 using .env
+```
+
+`make docker-run` reads `.env` the way the shell does and passes each variable to the container, with two overrides:
+
+* `DBMS_URL` points at the `DOCKER_DB` database (default `jermain`) through `host.docker.internal`, since localhost inside
+  the container is the container itself.
+* `OAUTH_CALLBACK_URL` becomes `http://localhost:<DOCKER_PORT>/auth/callback`, which must be an authorized redirect URI.
+
+Use `DOCKER_PORT=8090` to run beside `make server`, and `DOCKER_DB=moses` (with `SLIDES_VARIABLE_NAME` set to the Moses
+deck) for the Moses walk. The container's health check probes `/ping`.
+
 ## Heroku Deployment
 
 * Add a Procfile

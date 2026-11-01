@@ -1,0 +1,4 @@
+# The image copies only the fat jar (see Dockerfile), so the build context is that jar alone: .env, build/, node_modules/,
+# .gradle/ and the sources never reach the Docker builder.
+*
+!build/libs/history-walk-*.jar

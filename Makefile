@@ -14,9 +14,16 @@ DB_PASSWORD  ?= docker
 DB_PORT      ?= 5432
 DB_DATA_DIR  ?= $(HOME)/docker/volumes/$(DB_CONTAINER)
 
+# Docker image of the server; `make docker-run` serves it on DOCKER_PORT against the DOCKER_DB database from `make db`.
+VERSION      := $(shell sed -n 's/^version[[:space:]]*=[[:space:]]*//p' gradle.properties)
+DOCKER_IMAGE ?= history-walk
+DOCKER_PORT  ?= 8080
+DOCKER_DB    ?= jermain
+ENV_FILE     ?= .env
+
 .DEFAULT_GOAL := help
 
-.PHONY: help db reset-jermain reset-moses stop-db server client build clean tests versions depends yarn-unlock upgrade-wrapper creds restart log
+.PHONY: help db reset-jermain reset-moses stop-db server client build clean tests docker-build docker-run versions depends yarn-unlock upgrade-wrapper creds restart log
 
 ##@ General
 
@@ -69,7 +76,7 @@ client: ## Run the webpack dev server on port 3000 (proxies the API to 8080)
 
 ##@ Build and test
 
-build: clean ## Clean, then build the fat jar (build/libs/history-walk-1.0.0.jar)
+build: clean ## Clean, then build the fat jar (build/libs/history-walk-VERSION.jar)
 	$(GRADLE) jar
 
 clean: ## Remove build outputs
@@ -77,6 +84,25 @@ clean: ## Remove build outputs
 
 tests: ## Run the JVM tests every time (needs Docker for Testcontainers)
 	$(GRADLE) jvmTest --rerun
+
+##@ Docker
+
+docker-build: ## Build the fat jar, then an image holding it (history-walk:VERSION and :latest)
+	$(GRADLE) jar
+	docker build --build-arg APP_VERSION=$(VERSION) -t $(DOCKER_IMAGE):$(VERSION) -t $(DOCKER_IMAGE):latest .
+
+# ENV_FILE is read as the shell reads it (so quoted values lose their quotes), then each of its variables is passed to the
+# container. Inside the container localhost is the container itself, so the database is reached through
+# host.docker.internal, and Google must send the browser back to the container's port. Start the database with make db.
+docker-run: docker-build ## Run the image on DOCKER_PORT with ENV_FILE (.env), against the DOCKER_DB database (jermain)
+	@[ -f "$(ENV_FILE)" ] || { echo "$(ENV_FILE) not found: it supplies GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, and the rest"; exit 1; }
+	@set -a && . "$(abspath $(ENV_FILE))" && set +a && \
+		export DBMS_URL="jdbc:pgsql://host.docker.internal:$(DB_PORT)/$(DOCKER_DB)" && \
+		export OAUTH_CALLBACK_URL="http://localhost:$(DOCKER_PORT)/auth/callback" && \
+		docker run --rm --name $(DOCKER_IMAGE)-server -p 127.0.0.1:$(DOCKER_PORT):8080 \
+			--add-host=host.docker.internal:host-gateway \
+			$$(sed -n 's/^\([A-Za-z_][A-Za-z0-9_]*\)=.*/-e \1/p' "$(ENV_FILE)") -e DBMS_URL -e OAUTH_CALLBACK_URL \
+			$(DOCKER_IMAGE):$(VERSION)
 
 ##@ Dependencies
 
