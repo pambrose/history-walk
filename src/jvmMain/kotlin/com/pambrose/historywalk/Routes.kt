@@ -3,13 +3,11 @@ package com.pambrose.historywalk
 import com.codahale.metrics.jvm.ThreadDump
 import com.pambrose.common.response.respondWith
 import com.pambrose.common.util.Version.Companion.versionDesc
-import com.pambrose.historywalk.EndPoints.CONTENT_RESET
 import com.pambrose.historywalk.EndPoints.REASONS
 import com.pambrose.historywalk.EndPoints.SLIDE
 import com.pambrose.historywalk.EndPoints.SUMMARY
 import com.pambrose.historywalk.EndPoints.USER_RESET
 import com.pambrose.historywalk.EnvVar.ALLOW_SLIDE_ACCESS
-import com.pambrose.historywalk.HistoryWalkServer.loadSlides
 import com.pambrose.historywalk.HistoryWalkServer.masterSlides
 import com.pambrose.historywalk.Pages.displayAllSlides
 import com.pambrose.historywalk.Pages.displayUserReasons
@@ -24,7 +22,6 @@ import com.pambrose.historywalk.dbms.DbmsTxs.deleteChoices
 import com.pambrose.historywalk.dbms.DbmsTxs.updateLastSlide
 import com.pambrose.historywalk.slides.SlideDeck.Companion.ROOT
 import dev.kilua.rpc.applyRoutes
-import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.http.CacheControl
 import io.ktor.http.ContentType.Text.Plain
 import io.ktor.server.application.*
@@ -41,8 +38,6 @@ import java.util.UUID
 import kotlin.text.Charsets.UTF_8
 
 object Routes {
-  private val logger = KotlinLogging.logger {}
-
   /**
    * The browser checks with the server each time it uses what carries this, and a shared cache such as Cloudflare keeps
    * no copy. `main.bundle.js` has the same name in every release, so without it a cache would go on serving an old
@@ -81,7 +76,7 @@ object Routes {
    * - sign-in and sign-out, open to all ([signInRoutes]);
    * - the RPC services, for any signed-in user, refusing a call without a session with 401 ([signedInApi]);
    * - the user's own reset, for any signed-in user, sending a browser without a session to Google sign-in;
-   * - the class pages and slide tools, for teachers only, refusing anyone else with 403 ([teachersOnly]);
+   * - the class pages, slide tools, and thread dump, for teachers only, refusing anyone else with 403 ([teachersOnly]);
    * - health, version, and static content ([staticContent]), open to all.
    */
   fun Route.appRoutes(
@@ -116,13 +111,19 @@ object Routes {
           respondWith { displayUserReasons() }
         }
 
-        get(CONTENT_RESET) {
+        // Every JVM thread's stack; taking it briefly pauses the JVM
+        get("threaddump") {
           try {
-            masterSlides = loadSlides()
-            call.respondRedirect("/")
-          } catch (e: Exception) {
-            logger.error(e) { "Error resetting slides" }
-            call.respondText(e.stackTraceToString(), Plain)
+            ByteArrayOutputStream()
+              .apply {
+                use { ThreadDumpInfo.threadDump.dump(true, true, it) }
+              }.let { baos ->
+                String(baos.toByteArray(), UTF_8)
+              }
+          } catch (e: NoClassDefFoundError) {
+            "Sorry, your runtime environment does not allow dump threads."
+          }.also {
+            call.respondText(it, Plain)
           }
         }
 
@@ -160,21 +161,6 @@ object Routes {
 
     get("version") {
       call.respondText(HistoryWalkServer::class.versionDesc(), Plain)
-    }
-
-    get("threaddump") {
-      try {
-        ByteArrayOutputStream()
-          .apply {
-            use { ThreadDumpInfo.threadDump.dump(true, true, it) }
-          }.let { baos ->
-            String(baos.toByteArray(), UTF_8)
-          }
-      } catch (e: NoClassDefFoundError) {
-        "Sorry, your runtime environment does not allow dump threads."
-      }.also {
-        call.respondText(it, Plain)
-      }
     }
 
     staticContent()

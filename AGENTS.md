@@ -49,7 +49,7 @@ else refused. The role is recomputed from the live `TEACHER_EMAILS` on every req
 - The session is an encrypted, signed cookie (`HistoryWalkAuth`, `__Host-` prefixed in production) validated against the
   users table on every request (`SessionValidation.kt`). `SESSION_SECRET` is required unless the callback host is local.
 - `Routes.appRoutes` is the access map: RPC inside `signedInApi` (no session → 401), teacher pages (`/summary`, `/reasons`,
-  `/slides`) inside `teachersOnly` (→ 403 for students), `/ping`, `/version`, and `/static/*` open to all.
+  `/slides`, `/threaddump`) inside `teachersOnly` (→ 403 for students), `/ping`, `/version`, and `/static/*` open to all.
 - On the client, Kilua turns only a 401 into `SecurityException`; KVision's `SecurityMgr.withAuth` then calls
   `Security.login()`, which shows `SignInDialog` once and parks forever (see the comment on `LoginPrompt` before changing it).
 
@@ -59,9 +59,9 @@ An explicit anti-goal: a student must never see another student's data or progre
 **Slides.** Decks are Kotlin DSL values in `jvmMain/content/` (`jermainLonguenSlides`, `mosesSlides`) built with
 `slides/SlideDeck.slideDeck { slide(...) { choice(...) } }`; content is HTML/markdown in raw strings, rendered through
 `MarkdownParser`. `Main.kt` picks the deck: `SLIDES_VARIABLE_NAME == "jermain"` selects Jermain, anything else
-Moses. (`HistoryWalkServer.loadSlides()` and the `SLIDES_REPO_*` / `SLIDES_LOCAL_FILENAME` vars are from when decks were
-fetched from the history-walk-content repo at runtime; that call is commented out.) Slide images are jar resources under
-`src/jvmMain/resources/static/images`, referenced as `/static/images/<name>`.
+Moses. The decks are compiled into the jar: nothing fetches or evaluates slide code at runtime, so a content change
+ships with a release. Slide images are jar resources under `src/jvmMain/resources/static/images`, referenced as
+`/static/images/<name>`.
 
 A go-back choice, `goBack(-n)`, returns the student to the slide's n-th ancestor (-1 is its parent);
 `SlideData.goBackTarget` (commonMain) works it out for the client, and `SlideContentTest` checks that every Jermain

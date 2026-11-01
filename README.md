@@ -19,16 +19,7 @@ The *history-walk-slides* repo is used to hold the core slide code. It is a depe
 
 ## Env Vars
 
-### Local only
-* SLIDES_LOCAL_FILENAME - The name of the local file to be used for the slides.
-
 ### Heroku
-* SLIDES_REPO_TYPE
-* SLIDES_REPO_OWNER
-* SLIDES_REPO_NAME
-* SLIDES_REPO_BRANCH
-* SLIDES_REPO_PATH
-* SLIDES_REPO_FILENAME
 * SLIDES_VARIABLE_NAME - `jermain` for the Jermain Longuen walk; any other value (e.g. `moses`) selects the Moses walk.
 * DISPLAY_CONSECUTIVE_CORRECT_DECISIONS
 * CLIENT_VERSION_CHECK_INTERVAL_SECS - How often an open page asks whether its version is current (default 60).
@@ -156,7 +147,6 @@ refuse to start if one changes.
 
 ### Debug Deployment
 
-* SLIDES_LOCAL_FILENAME=src/jvmMain/kotlin/Slides.kt
 * SHOW_RESET_BUTTON=true
 * ALLOW_SLIDE_ACCESS=true
 
@@ -167,3 +157,7 @@ There are two endpoints for see the student progress:
 
 An overview of the slides for debugging/reviewing is at /slides
 (requires ALLOW_SLIDE_ACCESS=true)
+
+A dump of every server thread's stack is at /threaddump. It pauses the JVM while it runs.
+
+All of these are for teachers only.

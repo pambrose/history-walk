@@ -170,10 +170,6 @@ kotlin {
             
             implementation(libs.flexmark)
 
-            implementation(libs.common.utils.script.common)
-            implementation(libs.common.utils.script.kotlin)
-            runtimeOnly(libs.kotlin.scripting.jsr223)
-
             implementation(libs.logback.classic)
         }
 

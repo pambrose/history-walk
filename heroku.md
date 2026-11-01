@@ -6,7 +6,6 @@ DATABASE_URL (assigned)
 PAPERTRAIL_API_TOKEN (assigned)
 ALLOW_SLIDE_ACCESS = true
 GRADLE_TASK = -Pprod=true jar
-SLIDES_REPO_FILENAME = JermainLonguen.kt
 SLIDES_VARIABLE_NAME = jermain
 GOOGLE_CLIENT_ID = (from Google Cloud)
 GOOGLE_CLIENT_SECRET = (from Google Cloud)
@@ -21,7 +20,6 @@ DATABASE_URL (assigned)
 PAPERTRAIL_API_TOKEN (assigned)
 ALLOW_SLIDE_ACCESS = true
 GRADLE_TASK = -Pprod=true jar
-SLIDES_REPO_FILENAME = Moses.kt
 SLIDES_VARIABLE_NAME = moses
 GOOGLE_CLIENT_ID = (from Google Cloud)
 GOOGLE_CLIENT_SECRET = (from Google Cloud)
