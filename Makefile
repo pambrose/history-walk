@@ -28,7 +28,7 @@ ORIGIN_URL   ?=
 
 .DEFAULT_GOAL := help
 
-.PHONY: help db reset-jermain reset-moses stop-db server client build clean tests coverage lint format zizmor ci docker-build docker-run docker-smoke versions depends yarn-unlock upgrade-wrapper creds restart log served-version
+.PHONY: help db reset-jermain reset-moses stop-db server client build clean tests coverage lint format zizmor ci docker-build docker-run docker-smoke versions versions-all depends yarn-unlock upgrade-wrapper creds restart log served-version
 
 ##@ General
 
@@ -178,8 +178,15 @@ docker-smoke: ## Start the image (make docker-build first) against a throwaway P
 
 ##@ Dependencies
 
-versions: ## Report dependencies with newer versions
-	$(GRADLE) dependencyUpdates
+# dependencyUpdates is marked incompatible with the configuration cache (build.gradle.kts), so a run with the cache on
+# builds an entry only to discard it, and says so. --no-configuration-cache skips the cache for this run instead.
+# build.gradle.kts gives the task a formatter that lists only what is behind; versions-all names the plugin's own plain
+# report, which also lists everything up to date.
+versions: ## List the dependencies with newer versions, and any that could not be checked
+	$(GRADLE) dependencyUpdates --no-configuration-cache --no-parallel
+
+versions-all: ## The plugin's full dependency report, up-to-date dependencies included
+	$(GRADLE) dependencyUpdates --no-configuration-cache --no-parallel --output-formatter=plain
 
 depends: ## Print the dependency tree
 	$(GRADLE) dependencies

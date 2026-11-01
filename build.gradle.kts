@@ -2,6 +2,7 @@
 
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
+import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jmailen.gradle.kotlinter.tasks.FormatTask
 import org.jmailen.gradle.kotlinter.tasks.LintTask
@@ -230,6 +231,35 @@ tasks.matching { it.name == "lintKotlinCommonMain" || it.name == "formatKotlinCo
 
 kotlinter {
     reporters = arrayOf("checkstyle", "plain")
+}
+
+tasks.withType<DependencyUpdatesTask>().configureEach {
+    // dependencyUpdates reads Task.project while it runs, which the configuration cache does not support once the
+    // Kotlin Multiplatform plugin is applied, so the task opts out of the cache
+    notCompatibleWithConfigurationCache("dependencyUpdates is not configuration-cache compatible with Kotlin MPP")
+
+    // A dependency on a release is offered releases only, so Kotlin's betas and Gradle's release candidates are not
+    // listed. One already on a pre-release would be offered pre-releases too, since its next step is usually another.
+    // A release is digits, dots and dashes.
+    fun isRelease(version: String) = Regex("""^v?[0-9.-]+$""").matches(version)
+    rejectVersionIf { !isRelease(candidate.version) && isRelease(currentVersion) }
+
+    // Prints only what is behind, and what could not be checked. The plugin's own report, which `make versions-all`
+    // asks for with --output-formatter=plain, first lists every dependency already up to date.
+    outputFormatter {
+        val behind = outdated.dependencies.sortedBy { "${it.group}:${it.name}" }
+        if (behind.isEmpty()) println("All dependencies are up to date")
+        behind.forEach { d ->
+            val latest = with(d.available) { release ?: milestone ?: integration }
+            println(" - ${d.group}:${d.name} ${d.version} -> $latest")
+        }
+        unresolved.dependencies.sortedBy { "${it.group}:${it.name}" }.forEach {
+            println(" ? ${it.group}:${it.name}:${it.version} could not be checked")
+        }
+        if (gradle.current.isUpdateAvailable) {
+            println(" - Gradle ${gradle.running.version} -> ${gradle.current.version}")
+        }
+    }
 }
 
 // make coverage writes the reports; the KSP-generated Kilua RPC plumbing is left out of them
