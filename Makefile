@@ -28,7 +28,7 @@ ORIGIN_URL   ?=
 
 .DEFAULT_GOAL := help
 
-.PHONY: help db reset-jermain reset-moses stop-db server client build clean tests coverage lint \
+.PHONY: help db reset-jermain reset-moses stop-db server client build clean tests js-tests coverage lint \
 		format zizmor ci procfile-check docker-build docker-run docker-smoke versions versions-all \
 		depends yarn-unlock upgrade-wrapper creds restart log served-version
 
@@ -89,11 +89,16 @@ build: clean ## Clean, then build the fat jar (build/libs/history-walk.jar, the 
 clean: ## Remove build outputs
 	$(GRADLE) clean
 
-tests: ## Run the JVM tests every time (needs Docker for Testcontainers)
-	$(GRADLE) jvmTest --rerun
+# The client specs (src/jsTest, plus src/commonTest, whose specs run on both targets) run in jsBrowserTest: Kotest under
+# Karma, in headless Chrome, which must be installed. jsTest runs the same task, then collects its report.
+tests: ## Run the JVM and client tests every time (the JVM tests need Docker for Testcontainers)
+	$(GRADLE) jvmTest --rerun jsBrowserTest --rerun
 
-coverage: ## Run the JVM tests and write the Kover reports (build/reports/kover/html/index.html)
-	$(GRADLE) jvmTest --rerun koverHtmlReport koverXmlReport koverLog
+js-tests: ## Run only the client tests every time (Kotest in headless Chrome; no Docker needed)
+	$(GRADLE) jsBrowserTest --rerun
+
+coverage: ## Run the JVM and client tests, then write the JVM code's Kover reports (build/reports/kover/html/index.html)
+	$(GRADLE) jvmTest --rerun jsBrowserTest --rerun koverHtmlReport koverXmlReport koverLog
 
 lint: ## Check the Kotlin sources with kotlinter (generated sources are skipped)
 	$(GRADLE) lintKotlin
@@ -108,13 +113,13 @@ zizmor: ## Audit the GitHub Actions workflows and dependabot.yml with zizmor, as
 	if [ -n "$$GH_TOKEN" ]; then export GH_TOKEN; else unset GH_TOKEN; fi; \
 	zizmor .
 
-# Every gate CI runs, in one command, so this is the check before merging: lint, the zizmor audit, the tests with
-# coverage (their results not taken from the build cache), the Docker image build, the Procfile check against the jar
-# that build wrote, and the image started against Postgres. Needs Docker and zizmor.
-ci: ## Run every CI gate locally: lint, zizmor, the tests with coverage, the image build, procfile-check, the smoke test
+# Every gate CI runs, in one command, so this is the check before merging: lint, the zizmor audit, the JVM tests with
+# coverage and the client tests (their results not taken from the build cache), the Docker image build, the Procfile
+# check against the jar that build wrote, and the image started against Postgres. Needs Docker, Chrome, and zizmor.
+ci: ## Run every CI gate locally: lint, zizmor, the JVM and client tests, the image build, procfile-check, the smoke test
 	$(MAKE) lint
 	$(MAKE) zizmor
-	$(GRADLE) --no-build-cache cleanJvmTest jvmTest koverXmlReport koverHtmlReport koverLog
+	$(GRADLE) --no-build-cache cleanJvmTest cleanJsBrowserTest jvmTest jsBrowserTest koverXmlReport koverHtmlReport koverLog
 	$(MAKE) docker-build
 	$(MAKE) procfile-check
 	$(MAKE) docker-smoke

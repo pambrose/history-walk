@@ -18,12 +18,13 @@ make db                 # Postgres 18 in Docker (container history-walk) with th
 make reset-jermain      # drop and recreate one database (reset-moses for the other); Flyway rebuilds the schema on next start
 make server             # Ktor on :8080, continuous rebuild (./gradlew jvmRun -t)
 make client             # webpack dev server on :3000 with hot reload, proxying server routes to :8080
-make tests              # ./gradlew jvmTest --rerun (needs Docker: the database specs use Testcontainers)
-make coverage           # the tests plus Kover reports (build/reports/kover/html/index.html)
-./gradlew jvmTest --tests 'com.pambrose.historywalk.auth.AuthRoutesTest'   # one spec
+make tests              # JVM and client specs: ./gradlew jvmTest --rerun jsBrowserTest --rerun (Docker and Chrome)
+make js-tests           # the client specs alone, Kotest in headless Chrome (./gradlew jsBrowserTest --rerun); no Docker
+make coverage           # the tests plus Kover reports of the JVM code (build/reports/kover/html/index.html)
+./gradlew jvmTest --tests 'com.pambrose.historywalk.auth.AuthRoutesTest'   # one JVM spec (a client run is always whole)
 make lint               # kotlinter (./gradlew lintKotlin); make format fixes what it can
 make zizmor             # audit .github (workflows, dependabot.yml) as the zizmor workflow does
-make ci                 # every CI gate: lint, zizmor, tests with coverage, docker-build, procfile-check, docker-smoke
+make ci                 # every CI gate: lint, zizmor, JVM and client tests, docker-build, procfile-check, docker-smoke
 make build              # clean + fat jar at build/libs/history-walk.jar (server + bundled JS client; no version)
 make procfile-check     # after a build: fails unless the jar the Procfile runs is in build/libs
 make docker-build       # fat jar, then image history-walk:<version>; make docker-run runs it with .env against make db
@@ -166,8 +167,10 @@ goes around `withAuth`, so a signed-out page is left to the sign-in dialog. The 
 
 ## Tests
 
-JVM tests only (`src/jvmTest`), Kotest `StringSpec` + MockK + Ktor test host. Route tests call `appRoutes(...)` with
-injected `findEmail`/`teacherEmails` lambdas instead of a database.
+Kotest `StringSpec` on both targets. A spec in `src/commonTest` (`ReasonRuleTest`) runs on both.
+
+**JVM** (`src/jvmTest`, run by `jvmTest`): Kotest on JUnit Platform + MockK + Ktor test host. Route tests call
+`appRoutes(...)` with injected `findEmail`/`teacherEmails` lambdas instead of a database.
 - The database specs (`UserRepositoryTest`, `DbmsTxsTest`, `ContentServiceTest`, `PagesTest`, `UserResetTest`,
   `SignOutTest`) each start their own `TestPostgres`, a Testcontainers `postgres:18` with the real Flyway migrations
   applied, and share the small deck and helpers in `TestWalk.kt`.
@@ -190,15 +193,39 @@ injected `findEmail`/`teacherEmails` lambdas instead of a database.
   slide shared between two parents, a go-back past the root, a missing image, or a success slide whose title differs
   from the deck's (the summary page counts successes by that title).
 
-**CI** (`.github/workflows`, all actions pinned to commit SHAs): `tests.yml` runs `jvmTest` with Kover on pushes and
-pull requests to master; `docker.yml` runs `make docker-build`, `make procfile-check` (the Procfile's jar exists), and
-`make docker-smoke`, which starts the image against a throwaway Postgres and checks `/ping`, `/version`, the page
-shell's `Cache-Control`, and a 401 for an unsigned RPC call;
-`zizmor.yml` audits `.github` changes; `lint.yml` runs `make lint`; `dependency-graph.yml` submits `jvmRuntimeClasspath`
-so Dependabot sees the JVM libraries; `cleanup-runs.yml` deletes runs older than 30 days every Monday, keeping the
-newest 10. `.gitignore` ignores dot-directories, so `.github/` is re-included explicitly. `make ci` runs the same gates
-locally. The lint and format tasks skip `build/generated` by path (see `build.gradle.kts`); the slide decks' text
-constants are SCREAMING_SNAKE_CASE, as ktlint's property-naming rule requires.
+**Client** (`src/jsTest`, run by `jsBrowserTest`, which `jsTest` runs): Kotest under Karma in headless Chrome. The
+Kotest Gradle plugin writes the JS entry point with KSP (`kspTestKotlinJs`), beside Kilua RPC's processor. MockK does
+not run on Kotlin/JS, so the specs use fakes and the units' injected functions (`LoginPrompt`'s `show`, `SignInDialog`'s
+`navigate`); the `MainPanel.kt` units they drive (`busy`, `onClickWhenIdle`, `reasonDialog`) are `internal`, not
+private.
+- `TestPage.kt`: `TestPage.root`, the one KVision `Root` for the run (KVision draws every modal and toast through the
+  page's first Root and forgets them when it is disposed), rendering synchronously; and the DOM helpers (`awaitUntil`,
+  `click`, `enter` for text that arrives by input event alone, `toastsShownBy`, `showModal`, `closeModals`, `texts`).
+- `FakeServer.kt` replaces the page's `fetch`, so a call takes the real path (`Rpc`, `withAuth`, Kilua's client):
+  `FakeServer.on(IContentService::makeChoice) { call -> returns(...) }` answers a route with a result,
+  `Reply.Refused` (a `ServiceException`), or `Reply.HttpError` (a 401 is a `SecurityException`), and `callsTo` lists
+  what the page sent, decoded with `call.param<T>(i)`. By default the user is `testStudent` on `testSlide()`. Until a
+  first call succeeds, KVision's `SecurityMgr.withAuth` takes any failure for a signed-out user and parks the call
+  behind the sign-in dialog for good, so a spec must not let the page's first call fail.
+- `LoginPromptTest`, `SignInDialogTest`, `ErrorToastTest` (`orErrorToast`, `launchOrErrorToast`), `OnClickWhenIdleTest`
+  (the busy gate), `ReasonDialogTest` (the five-word gate), and `ChoiceFlowTest` (a click on a choice through
+  `MainPanel`: makeChoice, the reason dialog, provideReason, the next slide).
+- Kotest reports to Karma only once every spec has run, so each JS spec sets `timeout = CLIENT_TEST_TIMEOUT_MS`, and a
+  test that hangs fails by name; `karma.config.d/kotest.js` lets the whole run go two minutes without a word before
+  Karma gives up. The timeout is not in a Kotest `ProjectConfig`, which the KSP processor drops from the JS entry point
+  after an incremental run. `--tests` does not reach the browser, so a client run is always whole.
+- If the entry point is not generated, Kotlin skips `jsBrowserTest` as having no tests, which would pass with nothing
+  run; `build.gradle.kts` replaces that condition so the run fails instead.
+
+**CI** (`.github/workflows`, all actions pinned to commit SHAs): `tests.yml`'s `test` job runs `jvmTest` with Kover and
+`jsTest` (the client specs, in the runner's Chrome) on pushes and pull requests to master; `docker.yml` runs
+`make docker-build`, `make procfile-check` (the Procfile's jar exists), and `make docker-smoke`, which starts the image
+against a throwaway Postgres and checks `/ping`, `/version`, the page shell's `Cache-Control`, and a 401 for an unsigned
+RPC call; `zizmor.yml` audits `.github` changes; `lint.yml` runs `make lint`; `dependency-graph.yml` submits
+`jvmRuntimeClasspath` so Dependabot sees the JVM libraries; `cleanup-runs.yml` deletes runs older than 30 days every
+Monday, keeping the newest 10. `.gitignore` ignores dot-directories, so `.github/` is re-included explicitly. `make ci`
+runs the same gates locally. The lint and format tasks skip `build/generated` by path (see `build.gradle.kts`); the
+slide decks' text constants are SCREAMING_SNAKE_CASE, as ktlint's property-naming rule requires.
 
 ## Gotchas
 

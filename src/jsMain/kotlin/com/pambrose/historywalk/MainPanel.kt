@@ -77,10 +77,10 @@ object MainPanel : SimplePanel() {
  * cancelled, or the request fails. Those buttons are disabled meanwhile, so a double-click cannot record a choice twice
  * or open two reason dialogs.
  */
-private val busy = ObservableValue(false)
+internal val busy = ObservableValue(false)
 
 /** Runs [action] on a click unless another click's action is still running (see [busy]); a failure shows a toast. */
-private fun Button.onClickWhenIdle(action: suspend () -> Unit) {
+internal fun Button.onClickWhenIdle(action: suspend () -> Unit) {
   // Disposing the button (displaySlide's disposeAll) ends the subscription
   addBeforeDisposeHook(busy.subscribe { disabled = it })
   onClick {
@@ -247,7 +247,7 @@ private suspend fun promptUserForReason(
   }
 }
 
-private fun reasonDialog(
+internal fun reasonDialog(
   slideChoice: SlideChoice,
   draft: String?,
 ): Dialog<String> {
