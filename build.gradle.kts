@@ -186,6 +186,7 @@ kotlin {
         jvmTest.dependencies {
             implementation(project.dependencies.platform(libs.ktor.bom))
             implementation(libs.ktor.server.test.host)
+            implementation(libs.ktor.client.mock)
             implementation(libs.kotest.runner)
             implementation(libs.kotest.assertions)
             implementation(libs.mockk)

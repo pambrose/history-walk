@@ -65,16 +65,18 @@ fun googleOAuthSettings(
 /**
  * Google sign-in for the routes under `authenticate(GOOGLE_AUTH)`. A browser without a session is sent to Google; one
  * with a session passes through untouched. A callback that fails -- a stale or forged state, a code Google refuses, an
- * error from Google -- goes back to the sign-in prompt.
+ * error from Google -- goes back to the sign-in prompt. [client] redeems the code at Google's token endpoint; a test
+ * passes one with a `MockEngine` in place of Google.
  */
 fun AuthenticationConfig.configureGoogleAuth(
   callbackUrl: String = OAuthConfig.callbackUrl,
+  client: HttpClient = HttpClient(CIO),
   settings: () -> OAuthServerSettings.OAuth2ServerSettings = { googleOAuthSettings() },
 ) {
   oauth(GOOGLE_AUTH) {
     urlProvider = { callbackUrl }
     providerLookup = { settings() }
-    client = HttpClient(CIO)
+    this.client = client
 
     fallback = { cause ->
       // The fallback answers the callback, so the route's handler, which clears the state cookie, never runs: clear
