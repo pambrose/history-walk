@@ -1,4 +1,6 @@
 .*/
+# The dot-directories are ignored, except the GitHub workflows and Dependabot config
+!.github/
 build/
 out/
 *.imp

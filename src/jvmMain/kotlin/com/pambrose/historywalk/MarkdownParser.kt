@@ -12,7 +12,8 @@ object MarkdownParser {
 
   fun toHtml(markdown: String) =
     synchronized(this) {
-      parser.parse(markdown.trimIndent())
+      parser
+        .parse(markdown.trimIndent())
         .let {
           renderer.render(it)
         }

@@ -6,6 +6,7 @@ jvm = "25"
 config = "6.1.2"
 kiluaRpc = "0.0.46"
 kotlinter = "5.7.0"
+kover = "0.9.11"
 # Required by kilua
 ksp = "2.3.12"
 kvision = "9.7.0"
@@ -13,7 +14,6 @@ versions = "0.67.0"
 exposed = "1.6.0"
 flexmark = "0.64.8"
 flyway = "13.12.0"
-h2Version = "1.4.200"
 hikari = "7.1.0"
 ktor = "3.6.1"
 logback = "1.6.6"
@@ -23,8 +23,6 @@ testcontainers = "2.0.5"
 logging = "8.0.4"
 pgsql = "42.7.14"
 pgjdbc = "0.8.9"
-#slide-content = "1.2.0"
-#slides = "1.8.5"
 utils = "5.2.0"
 
 [plugins]
@@ -35,6 +33,7 @@ kiluaRpc = { id = "dev.kilua.rpc", version.ref = "kiluaRpc" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kotlinter = { id = "org.jmailen.kotlinter", version.ref = "kotlinter" }
+kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kvision = { id = "io.kvision", version.ref = "kvision" }
 versions = { id = "io.github.ben-manes.versions", version.ref = "versions" }

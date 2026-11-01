@@ -5,6 +5,7 @@ package com.pambrose.historywalk
 import io.kvision.types.LocalDateTime
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseContextualSerialization
+import kotlin.math.abs
 
 @Serializable
 data class UserInfo(
@@ -38,10 +39,22 @@ data class SlideData(
 
   val hasOneParent: Boolean
     get() = parentTitles.size == 1
+
+  /** The ancestor a go-back [choice] returns to: an offset of -1 is this slide's parent, -2 its grandparent, and so on. */
+  fun goBackTarget(choice: SlideChoice): ParentTitle {
+    val steps = abs(choice.offset)
+    require(steps in 1..parentTitles.size) {
+      "Cannot go back $steps from $pathName with ${parentTitles.size} ancestors"
+    }
+    return parentTitles[parentTitles.size - steps]
+  }
 }
 
 @Serializable
-data class ParentTitle(val pathName: String, val title: String)
+data class ParentTitle(
+  val pathName: String,
+  val title: String,
+)
 
 @Serializable
 data class SlideChoice(

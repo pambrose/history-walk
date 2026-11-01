@@ -1,10 +1,10 @@
 package com.pambrose.historywalk
 
+import com.pambrose.common.util.isNotNull
+import com.pambrose.common.util.obfuscate
 import com.pambrose.historywalk.PropertyNames.DBMS
 import com.pambrose.historywalk.PropertyNames.HISTORYWALK
 import com.pambrose.historywalk.PropertyNames.SITE
-import com.pambrose.common.util.isNotNull
-import com.pambrose.common.util.obfuscate
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.server.application.*
 import io.ktor.server.config.*
@@ -76,20 +76,17 @@ enum class Property(
   ): String =
     (
       System.getProperty(propertyValue) ?: default
-      )
-      .also { if (errorOnNonInit && !initialized.load()) error(notInitialized(this)) }
+      ).also { if (errorOnNonInit && !initialized.load()) error(notInitialized(this)) }
 
   fun getProperty(default: Boolean) =
     (
       System.getProperty(propertyValue)?.toBoolean() ?: default
-      )
-      .also { if (!initialized.load()) error(notInitialized(this)) }
+      ).also { if (!initialized.load()) error(notInitialized(this)) }
 
   fun getProperty(default: Int) =
     (
       System.getProperty(propertyValue)?.toIntOrNull() ?: default
-      )
-      .also { if (!initialized.load()) error(notInitialized(this)) }
+      ).also { if (!initialized.load()) error(notInitialized(this)) }
 
   fun getPropertyOrNull(errorOnNonInit: Boolean = true): String? =
     System.getProperty(propertyValue).also { if (errorOnNonInit && !initialized.load()) error(notInitialized(this)) }
@@ -97,8 +94,7 @@ enum class Property(
   fun getRequiredProperty() =
     (
       getPropertyOrNull() ?: error("Missing $propertyValue value")
-      )
-      .also { if (!initialized.load()) error(notInitialized(this)) }
+      ).also { if (!initialized.load()) error(notInitialized(this)) }
 
   fun setProperty(value: String) {
     System.setProperty(

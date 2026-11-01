@@ -10,7 +10,12 @@ import java.security.SecureRandom
 
 /** The school whose Google accounts may sign in, and its teachers. */
 object SchoolConfig {
-  val emailDomain: String by lazy { EnvVar.SCHOOL_EMAIL_DOMAIN.getEnv(School.DEFAULT_DOMAIN).trim().lowercase() }
+  val emailDomain: String by lazy {
+    EnvVar.SCHOOL_EMAIL_DOMAIN
+    .getEnv(School.DEFAULT_DOMAIN)
+    .trim()
+    .lowercase()
+  }
   val teacherEmails: Set<String> by lazy { Roles.parseTeacherEmails(EnvVar.TEACHER_EMAILS.getEnvOrNull()) }
 }
 
@@ -81,9 +86,11 @@ object SessionConfig {
         "SESSION_SECRET is too weak (min $MIN_SECRET_LENGTH chars). Generate one with: openssl rand -hex 32"
       }
       trimmed
-    } else trimmed.ifBlank {
+    } else {
+      trimmed.ifBlank {
       logger.warn { "SESSION_SECRET is not set; using an insecure DEV-ONLY session secret. Never use in production." }
       DEV_ONLY_SECRET
+    }
     }
   }
 

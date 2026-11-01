@@ -1,13 +1,5 @@
 package com.pambrose.historywalk
 
-import com.pambrose.historywalk.dbms.Dbms.dbmsInit
-import com.pambrose.historywalk.EnvVar.*
-import com.pambrose.historywalk.HistoryWalkServer.masterSlides
-import com.pambrose.historywalk.Installs.installs
-import com.pambrose.historywalk.Property.Companion.assignProperties
-import com.pambrose.historywalk.Routes.assignRoutes
-import com.pambrose.historywalk.auth.verifyAuthConfig
-import com.pambrose.historywalk.slides.SlideDeck
 import com.pambrose.BuildConfig
 import com.pambrose.common.script.KotlinScript
 import com.pambrose.common.util.GitHubFile
@@ -17,13 +9,21 @@ import com.pambrose.common.util.OwnerType.User
 import com.pambrose.common.util.Version
 import com.pambrose.common.util.Version.Companion.versionDesc
 import com.pambrose.common.util.getBanner
+import com.pambrose.historywalk.EnvVar.*
+import com.pambrose.historywalk.HistoryWalkServer.masterSlides
+import com.pambrose.historywalk.Installs.installs
+import com.pambrose.historywalk.Property.Companion.assignProperties
+import com.pambrose.historywalk.Routes.assignRoutes
+import com.pambrose.historywalk.auth.verifyAuthConfig
+import com.pambrose.historywalk.content.jermainLonguenSlides
+import com.pambrose.historywalk.content.mosesSlides
+import com.pambrose.historywalk.dbms.Dbms.dbmsInit
+import com.pambrose.historywalk.slides.SlideDeck
 import dev.kilua.rpc.initRpc
 import dev.kilua.rpc.registerService
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.server.application.*
-import com.pambrose.historywalk.content.jermainLonguenSlides
 import kotlinx.coroutines.runBlocking
-import com.pambrose.historywalk.content.mosesSlides
 import java.io.File
 import java.util.concurrent.atomic.AtomicReference
 
@@ -46,7 +46,8 @@ object HistoryWalkServer {
     try {
       runBlocking {
         val src =
-          SLIDES_LOCAL_FILENAME.getEnv("")
+          SLIDES_LOCAL_FILENAME
+            .getEnv("")
             .let { localFilename ->
               if (localFilename.isNotEmpty()) {
                 logger.info { "Loading slides from local file: $localFilename" }

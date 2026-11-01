@@ -21,7 +21,14 @@ import kotlinx.coroutines.await
 suspend fun fetchLoginGreeting(): String? =
   try {
     val response = window.fetch("/$AUTH_GREETING").await()
-    if (response.ok) response.text().await().trim().takeIf { it.isNotEmpty() } else null
+    if (response.ok)
+      response
+      .text()
+      .await()
+      .trim()
+      .takeIf { it.isNotEmpty() }
+      else
+      null
   } catch (e: Throwable) {
     console.log("Could not fetch the sign-in greeting: $e")
     null

@@ -45,8 +45,7 @@ class ContentService(
             (userUuidRef eq uuid.toUuid()) and
               (fromPathName eq fromPathNameStr) and
               (toPathName eq slideChoice.toPathName)
-          }
-          .map { row ->
+          }.map { row ->
             UserChoice(
               row[fromPathName],
               row[fromTitle],
@@ -60,8 +59,7 @@ class ContentService(
               ),
               row[reason],
             )
-          }
-          .firstOrNull() ?: UserChoice(fromPathNameStr, fromTitleStr, slideChoice, if (advance) "Advance" else "")
+          }.firstOrNull() ?: UserChoice(fromPathNameStr, fromTitleStr, slideChoice, if (advance) "Advance" else "")
       }.also { userChoice ->
         if (userChoice.reason.isNotBlank()) {
           updateLastSlide(uuid, slideChoice.toPathName)

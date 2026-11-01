@@ -29,7 +29,10 @@ class Slide(
     slideDeck.addSlideToIdMap(this)
   }
 
-  fun copyOf(title: String = this.title, displayTitle: Boolean = this.displayTitle): Slide =
+  fun copyOf(
+    title: String = this.title,
+    displayTitle: Boolean = this.displayTitle,
+  ): Slide =
     Slide(id, title, content, root, success, slideDeck, offset, displayTitle)
       .also { copy ->
         copy.verticalChoices = verticalChoices
@@ -45,7 +48,10 @@ class Slide(
     verticalChoices = false
   }
 
-  fun choice(text: String, slide: Slide) {
+  fun choice(
+    text: String,
+    slide: Slide,
+  ) {
     require(text.isNotEmpty()) { "Choice text cannot be empty for ${slide.title}" }
     choices[text] = slide
     slide.parentSlide = this
@@ -54,14 +60,18 @@ class Slide(
   fun validateSlide() {
     fun <T> Collection<T>.dups() = groupingBy { it }.eachCount().filter { it.value > 1 }.map { it.key }
 
-    choices.map { it.key }.dups()
+    choices
+      .map { it.key }
+      .dups()
       .also { dups ->
         if (dups.isNotEmpty())
           error("""Slide "$title" has duplicate choice titles: $dups""")
       }
 
     // Ignore children that are dead ends, e.g., "Incorrect Choice" slide
-    choices.map { it.value.title }.dups()
+    choices
+      .map { it.value.title }
+      .dups()
       .also { dups ->
         if (dups.isNotEmpty())
           error("""Slide "$title" has duplicate choice slide titles: $dups""")

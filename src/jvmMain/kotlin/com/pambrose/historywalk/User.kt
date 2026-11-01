@@ -1,5 +1,7 @@
 package com.pambrose.historywalk
 
+import com.pambrose.common.exposed.get
+import com.pambrose.common.util.*
 import com.pambrose.historywalk.Email.Companion.EMPTY_EMAIL
 import com.pambrose.historywalk.FullName.Companion.EMPTY_FULLNAME
 import com.pambrose.historywalk.Utils.toUuid
@@ -9,15 +11,13 @@ import com.pambrose.historywalk.dbms.UsersTable
 import com.pambrose.historywalk.slides.Slide
 import com.pambrose.historywalk.slides.SlideDeck
 import com.pambrose.historywalk.slides.SlideDeck.Companion.ROOT
-import com.pambrose.common.exposed.get
-import com.pambrose.common.util.*
 import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.datetime.toKotlinLocalDateTime
 import org.jetbrains.exposed.v1.core.*
 import org.jetbrains.exposed.v1.jdbc.*
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.*
 import kotlin.time.measureTime
-import kotlinx.datetime.toKotlinLocalDateTime
 
 class User {
   constructor(uuid: UUID, initFields: Boolean) {
@@ -52,6 +52,7 @@ class User {
   var userUuid: String = "-1"
   var email: Email = EMPTY_EMAIL
   var fullName: FullName = EMPTY_FULLNAME
+
   private fun assignRowVals(row: ResultRow) {
     userUuid = row[UsersTable.id].toString()
     email = Email(row[UsersTable.email])
@@ -104,7 +105,9 @@ class User {
       role: Role,
     ): UUID {
       val address = email.lowercase()
-      val now = java.time.LocalDateTime.now().toKotlinLocalDateTime()
+      val now = java.time.LocalDateTime
+        .now()
+        .toKotlinLocalDateTime()
       return transaction {
         with(UsersTable) {
           val existing = select(id).where { this@with.email eq address }.map { it[id].value }.firstOrNull()
@@ -151,8 +154,14 @@ class User {
         with(UsersTable) {
           selectAll()
             .where { id eq uuid }
-            .map { UserInfo(it[fullName], it[email], it[pictureUrl], roleFor(it[email], teacherEmails) ?: Role.STUDENT) }
-            .firstOrNull()
+            .map {
+              UserInfo(
+              it[fullName],
+              it[email],
+              it[pictureUrl],
+              roleFor(it[email], teacherEmails) ?: Role.STUDENT,
+            )
+            }.firstOrNull()
         }
       }
 
@@ -172,7 +181,9 @@ class User {
 }
 
 @JvmInline
-value class FullName(val value: String) {
+value class FullName(
+  val value: String,
+) {
   fun isBlank() = value.isBlank()
 
   override fun toString() = value
@@ -183,7 +194,9 @@ value class FullName(val value: String) {
 }
 
 @JvmInline
-value class Email(val value: String) {
+value class Email(
+  val value: String,
+) {
   fun isBlank() = value.isBlank()
 
   fun isNotBlank() = value.isNotBlank()

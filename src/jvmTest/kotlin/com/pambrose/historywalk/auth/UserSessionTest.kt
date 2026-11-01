@@ -29,8 +29,10 @@ class UserSessionTest : StringSpec() {
   private val teachers = setOf("pambrose@athenian.org")
   private val now: Instant = Clock.System.now()
 
-  private fun session(uuid: UUID, createdAt: Instant = now) =
-    UserSession(uuid.toString(), createdAt.toEpochMilliseconds())
+  private fun session(
+    uuid: UUID,
+    createdAt: Instant = now,
+  ) = UserSession(uuid.toString(), createdAt.toEpochMilliseconds())
 
   private fun Application.module(secure: Boolean = false) {
     installUserSessions(secure = secure, findEmail = emails::get, teacherEmails = { teachers })
@@ -58,7 +60,10 @@ class UserSessionTest : StringSpec() {
     }
     "a session past 14 days is signed out" {
       untrustedBecause(
-        session(student, createdAt = now - 14.days - 1.milliseconds), now, emails::get, teachers,
+        session(student, createdAt = now - 14.days - 1.milliseconds),
+        now,
+        emails::get,
+        teachers,
       ).shouldNotBeNull()
     }
     "a non-UUID id is signed out" {
@@ -77,8 +82,11 @@ class UserSessionTest : StringSpec() {
     "a tampered cookie is ignored" {
       testApplication {
         application { module() }
-        val value = client.get("/set/$student").headers[HttpHeaders.SetCookie]!!
-          .substringAfter("HistoryWalkAuth=").substringBefore(";")
+        val value = client
+          .get("/set/$student")
+          .headers[HttpHeaders.SetCookie]!!
+          .substringAfter("HistoryWalkAuth=")
+          .substringBefore(";")
         val i = value.length / 2
         val tampered = value.substring(0, i) + (if (value[i] == 'a') 'b' else 'a') + value.substring(i + 1)
         val response = client.get("/who") { header(HttpHeaders.Cookie, "HistoryWalkAuth=$tampered") }

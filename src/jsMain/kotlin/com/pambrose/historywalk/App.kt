@@ -17,11 +17,11 @@ import org.w3c.dom.url.URLSearchParams
 val AppScope = CoroutineScope(window.asCoroutineDispatcher())
 
 @JsModule("/kotlin/modules/css/kvapp.css")
-external object kvappCss
+external object KvappCss
 
 class App : Application() {
   init {
-    useModule(kvappCss)
+    useModule(KvappCss)
   }
 
   override fun start() {
@@ -54,5 +54,11 @@ private fun showRefusalFromUrl() {
 
 fun main() {
   registerRemoteTypes()
-  startApplication(::App, js("import.meta.webpackHot").unsafeCast<Hot?>(), BootstrapModule, FontAwesomeModule, CoreModule)
+  startApplication(
+    ::App,
+    js("import.meta.webpackHot").unsafeCast<Hot?>(),
+    BootstrapModule,
+    FontAwesomeModule,
+    CoreModule,
+  )
 }

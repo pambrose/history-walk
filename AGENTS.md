@@ -18,11 +18,15 @@ make db                 # Postgres 18 in Docker (container history-walk) with th
 make reset-jermain      # drop and recreate one database (reset-moses for the other); Flyway rebuilds the schema on next start
 make server             # Ktor on :8080, continuous rebuild (./gradlew jvmRun -t)
 make client             # webpack dev server on :3000 with hot reload, proxying server routes to :8080
-make tests              # ./gradlew jvmTest --rerun (needs Docker: UserRepositoryTest uses Testcontainers)
+make tests              # ./gradlew jvmTest --rerun (needs Docker: the database specs use Testcontainers)
+make coverage           # the tests plus Kover reports (build/reports/kover/html/index.html)
 ./gradlew jvmTest --tests 'com.pambrose.historywalk.auth.AuthRoutesTest'   # one spec
-./gradlew lintKotlin    # kotlinter; formatKotlin to fix
+make lint               # kotlinter (./gradlew lintKotlin); make format fixes what it can
+make zizmor             # audit .github (workflows, dependabot.yml) as the zizmor workflow does
+make ci                 # every CI gate: lint, zizmor, tests with coverage, docker-build, then docker-smoke
 make build              # clean + fat jar at build/libs/history-walk-<version>.jar (server + bundled JS client)
 make docker-build       # fat jar, then image history-walk:<version>; make docker-run runs it with .env against make db
+make docker-smoke       # start the image against a throwaway Postgres and check /ping, /version, headers, the 401
 ```
 
 Local settings and secrets live in `.env` (gitignored, loaded by the IntelliJ run configs and `make docker-run`). The
@@ -58,6 +62,10 @@ An explicit anti-goal: a student must never see another student's data or progre
 Moses. (`HistoryWalkServer.loadSlides()` and the `SLIDES_REPO_*` / `SLIDES_LOCAL_FILENAME` vars are from when decks were
 fetched from the history-walk-content repo at runtime; that call is commented out.) Slide images are jar resources under
 `src/jvmMain/resources/static/images`, referenced as `/static/images/<name>`.
+
+A go-back choice, `goBack(-n)`, returns the student to the slide's n-th ancestor (-1 is its parent);
+`SlideData.goBackTarget` (commonMain) works it out for the client, and `SlideContentTest` checks that every Jermain
+go-back, each offered as trying another building, lands on the town the student is in.
 
 A slide's identity is its `pathName`, the chain of titles from the root (`/Title/Sub title`). Progress is stored by
 path name (`users.last_path_name`, `user_choices.from_path_name`/`to_path_name`), so renaming a slide title or moving a
@@ -101,8 +109,22 @@ goes around `withAuth`, so a signed-out page is left to the sign-in dialog.
 ## Tests
 
 JVM tests only (`src/jvmTest`), Kotest `StringSpec` + MockK + Ktor test host. Route tests call `appRoutes(...)` with
-injected `findEmail`/`teacherEmails` lambdas instead of a database; `UserRepositoryTest` runs the real Flyway migration
-against a Testcontainers `postgres:18`.
+injected `findEmail`/`teacherEmails` lambdas instead of a database. The database specs (`UserRepositoryTest`,
+`DbmsTxsTest`, `ContentServiceTest`) each start their own `TestPostgres`, a Testcontainers `postgres:18` with the real
+Flyway migration applied, and share the small deck and helpers in `TestWalk.kt`. `ContentServiceTest` mocks
+`ApplicationCall.userUuid` (a `mockkStatic` of `UserSessionKt`) to drive the RPC service as a signed-in user.
+`SlideContentTest` walks both real decks from the root and fails on a path name that does not find its slide, a slide
+shared between two parents, a go-back past the root, a missing image, or a success slide whose title differs from the
+deck's (the summary page counts successes by that title).
+
+**CI** (`.github/workflows`, all actions pinned to commit SHAs): `tests.yml` runs `jvmTest` with Kover on pushes and
+pull requests to master; `docker.yml` runs `make docker-build` and `make docker-smoke`, which starts the image against a
+throwaway Postgres and checks `/ping`, `/version`, the page shell's `Cache-Control`, and a 401 for an unsigned RPC call;
+`zizmor.yml` audits `.github` changes; `lint.yml` runs `make lint`; `dependency-graph.yml` submits `jvmRuntimeClasspath`
+so Dependabot sees the JVM libraries; `cleanup-runs.yml` deletes runs older than 30 days every Monday, keeping the
+newest 10. `.gitignore` ignores dot-directories, so `.github/` is re-included explicitly. `make ci` runs the same gates
+locally. The lint and format tasks skip `build/generated` by path (see `build.gradle.kts`); the slide decks' text
+constants are SCREAMING_SNAKE_CASE, as ktlint's property-naming rule requires.
 
 ## Gotchas
 

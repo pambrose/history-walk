@@ -1,6 +1,9 @@
 @file:OptIn(ExperimentalKotlinGradlePluginApi::class)
 
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jmailen.gradle.kotlinter.tasks.FormatTask
 import org.jmailen.gradle.kotlinter.tasks.LintTask
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -13,6 +16,7 @@ plugins {
     alias(libs.plugins.versions)
     alias(libs.plugins.config)
     alias(libs.plugins.kotlinter)
+    alias(libs.plugins.kover)
 //    alias(libs.plugins.kotest)
 //    alias(libs.plugins.diktat)
 //    alias(libs.plugins.detekt)
@@ -162,11 +166,7 @@ kotlin {
             implementation(libs.exposed.kotlin.datetime)
             implementation(libs.flyway.core)
             runtimeOnly(libs.flyway.database.postgresql)
-
-            //implementation("commons-codec:commons-codec:$commonsCodecVersion")
-            //implementation("com.axiomalaska:jdbc-named-parameters:$jdbcNamedParametersVersion")
-            //implementation("com.github.andrewoma.kwery:core:$kweryVersion")
-
+            
             implementation(libs.flexmark)
 
             implementation(libs.common.utils.script.common)
@@ -201,20 +201,44 @@ kotlin {
 
     tasks.withType<Test>().configureEach {
         useJUnitPlatform()
+        testLogging {
+            events = setOf(TestLogEvent.PASSED, TestLogEvent.SKIPPED, TestLogEvent.FAILED)
+            exceptionFormat = TestExceptionFormat.FULL
+            showStandardStreams = false
+        }
     }
 }
 
 // Generated KSP and BuildConfig sources sit in source sets the lint tasks read, so those tasks must run after the
 // generators; otherwise Gradle fails them for using another task's output without declaring a dependency.
+// Their files are left out of linting and formatting by path: a FileTree subtracted from the sources is resolved when the
+// configuration cache is stored, before the generators have run, so it removed nothing.
+// The path is a local of each block: an exclude spec that read a script-level value could not be stored in the cache.
 tasks.withType<LintTask>().configureEach {
     dependsOn("generateBuildConfigClasses")
-    // Exclude all generated files from lint checks (covers KSP and BuildConfig output under build/generated/**)
-    source = source.minus(fileTree("build/generated")).asFileTree
+    val generated = "${File.separator}build${File.separator}generated${File.separator}"
+    exclude { it.file.path.contains(generated) }
 }
-tasks.matching { it.name == "lintKotlinCommonMain" }.configureEach {
+tasks.withType<FormatTask>().configureEach {
+    dependsOn("generateBuildConfigClasses")
+    val generated = "${File.separator}build${File.separator}generated${File.separator}"
+    exclude { it.file.path.contains(generated) }
+}
+tasks.matching { it.name == "lintKotlinCommonMain" || it.name == "formatKotlinCommonMain" }.configureEach {
     dependsOn("kspCommonMainKotlinMetadata")
 }
 
 kotlinter {
     reporters = arrayOf("checkstyle", "plain")
+}
+
+// make coverage writes the reports; the KSP-generated Kilua RPC plumbing is left out of them
+kover {
+    reports {
+        filters {
+            excludes {
+                packages("dev.kilua.rpc")
+            }
+        }
+    }
 }

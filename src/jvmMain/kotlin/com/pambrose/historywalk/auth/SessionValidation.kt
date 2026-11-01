@@ -47,8 +47,14 @@ fun untrustedBecause(
   teacherEmails: Set<String>,
 ): String? =
   when {
-    session == null -> "there is no user session"
-    session.isExpiredAt(now) -> "signed in more than ${UserSession.LIFETIME} ago"
+    session == null -> {
+      "there is no user session"
+    }
+
+    session.isExpiredAt(now) -> {
+      "signed in more than ${UserSession.LIFETIME} ago"
+    }
+
     else -> {
       val uuid = runCatching { UUID.fromString(session.uuid) }.getOrNull()
       val email = uuid?.let(findEmail)

@@ -1,5 +1,6 @@
 package com.pambrose.historywalk.dbms
 
+import com.pambrose.common.exposed.get
 import com.pambrose.historywalk.EnvVar.DISPLAY_CONSECUTIVE_CORRECT_DECISIONS
 import com.pambrose.historywalk.EnvVar.SHOW_RESET_BUTTON
 import com.pambrose.historywalk.ParentTitle
@@ -8,7 +9,6 @@ import com.pambrose.historywalk.SlideData
 import com.pambrose.historywalk.Utils.toUuid
 import com.pambrose.historywalk.Utils.transformText
 import com.pambrose.historywalk.slides.Slide
-import com.pambrose.common.exposed.get
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.datetime.LocalDateTime
 import org.jetbrains.exposed.v1.core.*
@@ -57,8 +57,7 @@ object DbmsTxs {
             parentTitles += ParentTitle(currSlide.pathName, currSlide.title)
             currSlide = currSlide.parentSlide
           }
-        }
-        .reversed()
+        }.reversed()
 
     return slide
       .run {

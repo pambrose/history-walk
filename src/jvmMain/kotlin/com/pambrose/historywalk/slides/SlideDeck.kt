@@ -17,8 +17,7 @@ class SlideDeck {
     success: Boolean = false,
     displayTitle: Boolean = true,
     block: Slide.() -> Unit = { },
-  ) =
-    Slide(id, title, content, root, success, this, displayTitle = displayTitle)
+  ) = Slide(id, title, content, root, success, this, displayTitle = displayTitle)
       .apply { block() }
       .also { slide -> addSlideToDeck(slide) }
 
