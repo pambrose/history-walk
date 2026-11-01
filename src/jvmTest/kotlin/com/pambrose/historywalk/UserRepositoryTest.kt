@@ -3,14 +3,11 @@ package com.pambrose.historywalk
 import com.pambrose.historywalk.User.Companion.emailForUuid
 import com.pambrose.historywalk.User.Companion.upsertFromGoogle
 import com.pambrose.historywalk.User.Companion.userInfoFor
-import com.pambrose.historywalk.dbms.Dbms
 import com.pambrose.historywalk.dbms.UserChoiceTable
 import com.pambrose.historywalk.dbms.UserDecisionCountsView
 import com.pambrose.historywalk.dbms.UserReasonsView
 import com.pambrose.historywalk.dbms.UserVisitsView
 import com.pambrose.historywalk.dbms.UsersTable
-import com.zaxxer.hikari.HikariConfig
-import com.zaxxer.hikari.HikariDataSource
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
@@ -18,17 +15,14 @@ import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import org.jetbrains.exposed.v1.core.eq
-import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
-import org.testcontainers.postgresql.PostgreSQLContainer
 import java.sql.SQLException
 import java.util.*
 
 class UserRepositoryTest : StringSpec() {
-  private lateinit var container: PostgreSQLContainer
-  private lateinit var ds: HikariDataSource
+  private lateinit var db: TestPostgres
 
   private fun addChoice(userId: UUID) =
     transaction {
@@ -45,30 +39,12 @@ class UserRepositoryTest : StringSpec() {
     }
 
   init {
-    beforeSpec {
-      container = PostgreSQLContainer("postgres:18").also { it.start() }
-      ds =
-        HikariDataSource(
-          HikariConfig().apply {
-            jdbcUrl = container.jdbcUrl
-            username = container.username
-            password = container.password
-            driverClassName = "org.postgresql.Driver"
-            maximumPoolSize = 4
-          },
-        )
-      Dbms.migrate(ds)
-      Database.connect(ds)
-    }
-
-    afterSpec {
-      ds.close()
-      container.stop()
-    }
+    beforeSpec { db = TestPostgres() }
+    afterSpec { db.close() }
 
     "the schema migration is applied" {
       val rows = mutableListOf<Pair<String, Boolean>>()
-      ds.connection.use { c ->
+      db.dataSource.connection.use { c ->
         c.createStatement().use { st ->
           st
             .executeQuery("select version, success from public.flyway_schema_history order by installed_rank")
@@ -110,7 +86,7 @@ class UserRepositoryTest : StringSpec() {
 
     "a mixed-case email cannot be inserted directly" {
       fun insertUser(email: String) =
-        ds.connection.use { c ->
+        db.dataSource.connection.use { c ->
           c
             .prepareStatement(
             "insert into history.users (id, email, full_name, role, last_path_name) values (?, ?, 'X', 'student', 'root')",

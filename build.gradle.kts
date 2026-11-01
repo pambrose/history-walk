@@ -14,6 +14,7 @@ plugins {
     alias(libs.plugins.versions)
     alias(libs.plugins.config)
     alias(libs.plugins.kotlinter)
+    alias(libs.plugins.kover)
 //    alias(libs.plugins.kotest)
 //    alias(libs.plugins.diktat)
 //    alias(libs.plugins.detekt)
@@ -222,4 +223,15 @@ tasks.matching { it.name == "lintKotlinCommonMain" || it.name == "formatKotlinCo
 
 kotlinter {
     reporters = arrayOf("checkstyle", "plain")
+}
+
+// make coverage writes the reports; the KSP-generated Kilua RPC plumbing is left out of them
+kover {
+    reports {
+        filters {
+            excludes {
+                packages("dev.kilua.rpc")
+            }
+        }
+    }
 }

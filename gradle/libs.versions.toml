@@ -6,6 +6,7 @@ jvm = "25"
 config = "6.1.2"
 kiluaRpc = "0.0.46"
 kotlinter = "5.7.0"
+kover = "0.9.11"
 # Required by kilua
 ksp = "2.3.12"
 kvision = "9.7.0"
@@ -32,6 +33,7 @@ kiluaRpc = { id = "dev.kilua.rpc", version.ref = "kiluaRpc" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kotlinter = { id = "org.jmailen.kotlinter", version.ref = "kotlinter" }
+kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kvision = { id = "io.kvision", version.ref = "kvision" }
 versions = { id = "io.github.ben-manes.versions", version.ref = "versions" }
