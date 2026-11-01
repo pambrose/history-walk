@@ -1,8 +1,10 @@
+package com.github.pambrose.content
+
 import com.github.pambrose.slides.SlideDeck.Companion.slideDeck
 
-val titlePage = """
+const val titlePage = """
     <div style="text-align:center;">
-    <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/jermain-longuen.jpg" alt="Pic" style="width:334px;height:518px;border:2px solid grey;float:right;margin-left:10px;"/>
+    <img src="/static/images/jermain-longuen.jpg" alt="Pic" style="width:334px;height:518px;border:2px solid grey;float:right;margin-left:10px;"/>
     <div style="padding-top:130px;padding-bottom:20px;">
     <font size="+3">
     UGRR Scenario:
@@ -19,7 +21,7 @@ val titlePage = """
     </div>
 """
 
-val majorDecision = """
+const val majorDecision = """
     You suffer a horrific and vicious beating, worse than others in
     the past from your drunken, enraged owner that maims your face
     (a mangled and broken jaw). While you once thought of him as
@@ -32,10 +34,10 @@ val majorDecision = """
     slaves on the neighboring plantation?
 """
 
-val companionDecision = """
+const val companionDecision = """
     <div>
-    <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/pistol.jpg" alt="Pic" style="width:130px;height:61px;border:1px solid white;float:left"/>
-    <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/salami.jpg" alt="Pic" style="width:123px;height:76px;border:1px solid white;float:right"/>
+    <img src="/static/images/pistol.jpg" alt="Pic" style="width:130px;height:61px;border:1px solid white;float:left"/>
+    <img src="/static/images/salami.jpg" alt="Pic" style="width:123px;height:76px;border:1px solid white;float:right"/>
 
     <p style="padding-top:80px;">
     Eager to join you, your friend John Farney asks around and says that
@@ -52,14 +54,14 @@ val companionDecision = """
     </div>
 """
 
-val decisionWhenToGo = """
+const val decisionWhenToGo = """
     * Will you leave in the summer, when the weather is warmest and you can easily sleep outdoors?
     * Will you leave in the autumn, hoping to slip away in the business and hub-bub of harvest time?
     * Will you leave in the spring, when love is in the air?
     * Will you leave in the winter, right at Christmas, when it is coldest and darkest?
 """
 
-val oldBenViaRoss = """
+const val oldBenViaRoss = """
     Old Ben, who has been on the plantation next door some time and is trusted by your partner,
     relays to him the advice that your chances to escape will be best at Christmas time.
     He argues that there are four good reasons:
@@ -78,7 +80,7 @@ val oldBenViaRoss = """
     Hmm... sounds good, but then again, if he knew so much, why is he still here?
 """
 
-val oldBenWhenToGo = """
+const val oldBenWhenToGo = """
     Old Ben, who has been on the plantation next door some time and is
     trusted by your partner, relays to him the advice that your chances
     to escape will be best at Christmas time. He argues that there are
@@ -97,14 +99,14 @@ val oldBenWhenToGo = """
     When will you leave?
 """
 
-val summerDeparture = """
+const val summerDeparture = """
     The summer heat offers the appeal of warm nights that will make it easier
     to sleep outdoors. Potentially, cross-country travel might be easier.
 
     Will you...
 """
 
-val summerCrossCountry = """
+const val summerCrossCountry = """
     At first your flight is nearly pleasant, a stroll through the fields.
     But soon the terrain gets rougher, with thicker brush that blocks sight,
     rough ground that bruises the feet, and an increasing number of trees start
@@ -116,9 +118,9 @@ val summerCrossCountry = """
     Where do you go?
 """
 
-val fleeIntoDeepForestEnd = """
+const val fleeIntoDeepForestEnd = """
     <div>
-    <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/deep-forest.jpg" alt="Pic" style="width:233px;height:217px;border:2px solid gray;float:right;margin-left:10px;"/>
+    <img src="/static/images/deep-forest.jpg" alt="Pic" style="width:233px;height:217px;border:2px solid gray;float:right;margin-left:10px;"/>
     <div style="padding-top:20px;padding-bottom:20px;">
     You dash into the deep forest, gasping for air, as the sound of hounds follow you.
     You begin to panic as the sounds get louder and closer.
@@ -131,7 +133,7 @@ val fleeIntoDeepForestEnd = """
     </div>
 """
 
-val autumnDeparture = """
+const val autumnDeparture = """
     As harvest time come along, you decide to make your move, hoping to take advantage
     the heightened activity and slip away in the mix. Initially, it seems that you are
     successful, making your way off the plantation and down the road into the countryside.
@@ -139,7 +141,7 @@ val autumnDeparture = """
     sound precedes...
 """
 
-val springDeparture = """
+const val springDeparture = """
     In springtime, it is said that thoughts turn romance and courting, distracting one from
     ordinary, difficult, or boring tasks. That is your hope, anyway, as you seek to escape
     while adversaries are hopefully off their guard. However, such is not the case. It seem
@@ -147,9 +149,9 @@ val springDeparture = """
     blindly into the brush, emerging to...
 """
 
-val paddyRollersEnd = """
+const val paddyRollersEnd = """
     <p>
-    <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/paddyrollers.jpg" alt="Pic" style="width:301px;height:159px;border:2px solid gray;float:right;margin-left:10px;margin-top:10px;"/>
+    <img src="/static/images/paddyrollers.jpg" alt="Pic" style="width:301px;height:159px;border:2px solid gray;float:right;margin-left:10px;margin-top:10px;"/>
     You are surprised by the sudden appearance of four ‘paddy rollers,’ as slave-catchers
     were sometimes called, who were waiting to ambush you. Speedily they seize you up,
     bind you, and, after torturing you for information, return you to your owner for a reward.
@@ -159,18 +161,18 @@ val paddyRollersEnd = """
     </p>
 """
 
-val winterDepartureAlone = """
+const val winterDepartureAlone = """
     <p>
-    <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/winterdeparture.jpg" alt="Pic" style="width:187px;height:258px;border:2px solid gray;float:right;margin-left:10px;"/>
+    <img src="/static/images/winterdeparture.jpg" alt="Pic" style="width:187px;height:258px;border:2px solid gray;float:right;margin-left:10px;"/>
     <p style="padding-top:100px;padding-bottom:90px;">
     Will you try to steal an overcoat in order to survive the elements as you hopefully head... North?
     </p>
     </p>
 """
 
-val stealOvercoat = """
+const val stealOvercoat = """
     <div>
-    <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/winterdeparture.jpg" alt="Pic" style="width:187px;height:258px;border:2px solid gray;float:right;margin-left:10px;"/>
+    <img src="/static/images/winterdeparture.jpg" alt="Pic" style="width:187px;height:258px;border:2px solid gray;float:right;margin-left:10px;"/>
     <div style="padding-top:60px;margin-bottom:45px;">
     <p>
     That evening, you creep into the main household, enter the coat room, and grab
@@ -186,7 +188,7 @@ val stealOvercoat = """
     </div>
 """
 
-val winterCrossCountry = """
+const val winterCrossCountry = """
     The winter is harsh, and as the freezing wind blows your toes begin to go numb,
     but fear of the slave-catchers and their dogs drives you deeper into the wilderness.
     But soon the terrain gets rougher, the snow drifts get deeper, the brush blocks your sight,
@@ -197,9 +199,9 @@ val winterCrossCountry = """
     Where do you go?
 """
 
-val rossEncounter = """
+const val rossEncounter = """
     <div>
-    <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/ross.jpg" alt="Pic" style="width:164;height:383px;border:2px solid gray;float:right;margin-left:10px;margin-top:15px;"/>
+    <img src="/static/images/ross.jpg" alt="Pic" style="width:164;height:383px;border:2px solid gray;float:right;margin-left:10px;margin-top:15px;"/>
     Having risked severe punishment, you have managed to steal some bacon,
     flour, bread, fruit preserves, and 12 dollars (two of which you will keep).
     In the past, you would not have dared to even think of stealing from your
@@ -218,7 +220,7 @@ val rossEncounter = """
     </div>
 """
 
-val rossAdvice = """
+const val rossAdvice = """
     Ross says the following:
 
     <b><i>If you act shy, avoid eye contact, and slink about furtively, you will draw the wrong
@@ -239,15 +241,15 @@ val rossAdvice = """
 """
 
 // TODO This slide is not used
-val winterTravelEnd = """
+const val winterTravelEnd = """
     ...Without a coat, you freeze to death in the wilderness.
 
     THE END.
 """
 
-val stealOvercoatViaRoss = """
+const val stealOvercoatViaRoss = """
     <div>
-    <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/winterdeparture.jpg" alt="Pic" style="width:187px;height:258px;border:2px solid gray;float:right;margin-left:10px;"/>
+    <img src="/static/images/winterdeparture.jpg" alt="Pic" style="width:187px;height:258px;border:2px solid gray;float:right;margin-left:10px;"/>
     <div style="padding-top:55px;padding-bottom:20px;">
     <p>
     That evening, you creep into the main household, enter the coat room, and grab
@@ -263,9 +265,9 @@ val stealOvercoatViaRoss = """
     </div>
 """
 
-val majorEncounterPatrol = """
+const val majorEncounterPatrol = """
     <div>
-    <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/patrol.jpg" alt="Pic" style="width:196px;height:379px;border:2px solid gray;float:right;margin-left:10px;"/>
+    <img src="/static/images/patrol.jpg" alt="Pic" style="width:196px;height:379px;border:2px solid gray;float:right;margin-left:10px;"/>
     <p style="padding-top:90px;">
     Rounding the bend on the main road that you have been following, you come to a crossroads
     just as two men ride up from the side, one with a rifle slung across back. They quickly
@@ -279,9 +281,9 @@ val majorEncounterPatrol = """
     </div>
 """
 
-val majorEncounterViaRoss1stPatrol = """
+const val majorEncounterViaRoss1stPatrol = """
     <div>
-    <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/patrol.jpg" alt="Pic" style="width:196px;height:379px;border:2px solid gray;float:right;margin-left:10px;"/>
+    <img src="/static/images/patrol.jpg" alt="Pic" style="width:196px;height:379px;border:2px solid gray;float:right;margin-left:10px;"/>
     <p style="padding-top:90px;">
     Rounding the bend on the main road that you have been following, you come to a crossroads
     just as two men ride up from the side, one with a rifle slung across back. They quickly
@@ -295,9 +297,9 @@ val majorEncounterViaRoss1stPatrol = """
     </div>
 """
 
-val majorEncounterFleePatrolEnd = """
+const val majorEncounterFleePatrolEnd = """
     <div>
-    <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/fleepatrol.jpg" alt="Pic" style="width:200px;height:300px;border:2px solid gray;float:right;margin-left:10px;"/>
+    <img src="/static/images/fleepatrol.jpg" alt="Pic" style="width:200px;height:300px;border:2px solid gray;float:right;margin-left:10px;"/>
     <p style="padding-top:60px;">
     As you turn to run, you hear the loud blast of a pistol, following by an hot, stabbing
     pain in your thigh. Stumbling and and falling, you fumble futilely for some weapon.
@@ -310,7 +312,7 @@ val majorEncounterFleePatrolEnd = """
     </div>
 """
 
-val majorEncounterFight1stPatrolEnd = """
+const val majorEncounterFight1stPatrolEnd = """
     You and your companion boldly respond by trying to throw the men from their horses.
 
     Melee ensues, and you find yourself beaten to a pulp, shortly to be bound, strapped
@@ -319,7 +321,7 @@ val majorEncounterFight1stPatrolEnd = """
     THE END.
 """
 
-val majorEncounterViaRossFight1stPatrol = """
+const val majorEncounterViaRossFight1stPatrol = """
     You and your companion boldly respond by drawing your pistols and firing at the men.
     Hitting one and causing the horses to panic, the other ride flees in terror as the
     wounded rider drops to the ground, unconscious.
@@ -330,7 +332,7 @@ val majorEncounterViaRossFight1stPatrol = """
     Do you decide...
 """
 
-val majorEncounterBluffPatrol = """
+const val majorEncounterBluffPatrol = """
     You try to explain that you have been sent on a mission by your master, which was
     not an uncommon occurrence. However, the man with a rifle demands to see your
     travel papers. You have none.
@@ -338,7 +340,7 @@ val majorEncounterBluffPatrol = """
     Having failed at bluffing, will you...
 """
 
-val majorEncounterViaRossBluff1stPatrol = """
+const val majorEncounterViaRossBluff1stPatrol = """
     You try to explain that you have been sent on a mission by your master, which was
     not an uncommon occurrence. However, the man with a rifle demands to see your travel
     papers. You show the man the travel papers that Ross gave you.
@@ -346,34 +348,34 @@ val majorEncounterViaRossBluff1stPatrol = """
     Do you...
 """
 
-val politeAndSubmissiveBluff = """
+const val politeAndSubmissiveBluff = """
     Your polite and submissive tone arouses their suspicions. One man says, “Those papers
     look fake!” and the men begin to raise their rifles.
 
     Having failed at bluffing, will you...
 """
 
-val confidentAndArrogantBluff = """
+const val confidentAndArrogantBluff = """
     Your confident and arrogant tone convince the men that you are purpose is legitimate.
     Ross’ advice was useful this time.
 
     The armed patrol allows you to continue down the main road into town.
 """
 
-val firstTown = """
+const val firstTown = """
     Having ridden the main road into town, exhausted and famished, unable to continue,
     which building should you approach?
 """
 
-val majorEncounterBaronialMansion = """
-    <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/mansion.jpg" alt="Pic" style="width:596px;height:249px;border:3px solid gray;display: block;margin-left: auto;margin-right: auto;margin-bottom: 30px;"/>
+const val majorEncounterBaronialMansion = """
+    <img src="/static/images/mansion.jpg" alt="Pic" style="width:596px;height:249px;border:3px solid gray;display: block;margin-left: auto;margin-right: auto;margin-bottom: 30px;"/>
 
     A regally dressed servant opens the door and asks your business.
 
     Do you...
 """
 
-val text31PoliteAndSubmissiveBluff = """
+const val text31PoliteAndSubmissiveBluff = """
     Your polite and submissive tone arouses the servant’s suspicions. An old,
     well-dressed woman, brusquely yells from somewhere inside, “Thomas, send
     that riff raff away!”
@@ -381,7 +383,7 @@ val text31PoliteAndSubmissiveBluff = """
     Will you...
 """
 
-val text32ConfidentAndArrogantBluff = """
+const val text32ConfidentAndArrogantBluff = """
     Your confident and arrogant tone convinces the servant that you are some men
     of importance. He yells to someone inside, “Madam, these fine gentlemen seek your
     hospitality. I judge them to be of upright character.”
@@ -394,7 +396,7 @@ val text32ConfidentAndArrogantBluff = """
     Do you...
 """
 
-val majorEncounterRamshackleHut = """
+const val majorEncounterRamshackleHut = """
     A gnarled old face peers from behind a dirty window when you knock. The door opens...
     a nearly toothless smile greets you, and a wrinkled hand beckons you in.
 
@@ -404,7 +406,7 @@ val majorEncounterRamshackleHut = """
     Do you...
 """
 
-val majorEncounterRamshackleHutContd = """
+const val majorEncounterRamshackleHutContd = """
     You find yourself resting comfortably, recuperating from a hard journey, enjoying
     the warm fire and a delicious rustic stew. Unbeknownst to you, the old man, eager
     to enrich himself with some anticipated reward, has sent his son to fetch the
@@ -413,7 +415,7 @@ val majorEncounterRamshackleHutContd = """
     After spending the night comfortably, you exit the building to be surprised by...
 """
 
-val majorEncounterPostOffice = """
+const val majorEncounterPostOffice = """
     You enter the post office. Several heads turn your way, with sneering expressions
     upon seeing you. A postal official says: “You DO NOT belong here, get out before I
     call the authorities!”
@@ -421,16 +423,16 @@ val majorEncounterPostOffice = """
     Will you...
 """
 
-val mainRoadOutOfTown = """
+const val mainRoadOutOfTown = """
     Do you...
 """
 
-val secondTown = """
+const val secondTown = """
     Having ridden the main road into town, exhausted and famished, unable to continue,
     which building should you approach?
 """
 
-val majorEncounterOrdinaryTavern = """
+const val majorEncounterOrdinaryTavern = """
     The sounds of merriment, the clinking of glasses, and the smell of tobacco smoke
     greet you upon entering the fairly busy establishment. A burly barkeep sporting
     bright red lamb chop sideburns, sleeves rolled up past his elbow, and wearing a
@@ -439,14 +441,14 @@ val majorEncounterOrdinaryTavern = """
     Do you...
 """
 
-val text39PoliteAndSubmissiveBluff = """
+const val text39PoliteAndSubmissiveBluff = """
     Your polite and submissive tone arouses the barkeep’s suspicions, “Johnny, we got
     some runaways, call the patrol!”
 
     As patrons scramble to pursue you (hoping for a reward), which way will you flee?
 """
 
-val text40ConfidentAndArrogantBluff = """
+const val text40ConfidentAndArrogantBluff = """
     Your confident and arrogant tone may have convinced the barkeep that you are men
     of importance. After grimacing, shaking his head, and looking around twice, he
     says, “Harry, get these men two mugs of red ale, a plate, and set them up in room 11!”
@@ -454,7 +456,7 @@ val text40ConfidentAndArrogantBluff = """
     After filling your bellies, spending a dollar, and resting for the night, do you...
 """
 
-val text41MajorEncounterRamshackleHut = """
+const val text41MajorEncounterRamshackleHut = """
     A gnarled old face peers from behind a dirty window when you knock. The door opens
     and a nearly toothless smile greets you, and a wrinkled hand beckons you in.
 
@@ -463,7 +465,7 @@ val text41MajorEncounterRamshackleHut = """
     Do you...
 """
 
-val text42MajorEncounterRamshackleHutContd = """
+const val text42MajorEncounterRamshackleHutContd = """
     You find yourself resting comfortably, recuperating from a hard journey, enjoying
     the warm fire and a delicious rustic stew. Unbeknownst to you, the old man has
     sent his son to fetch the slave-catchers posted in town...
@@ -471,7 +473,7 @@ val text42MajorEncounterRamshackleHutContd = """
     After spending the night comfortably, you exit the building to be surprised by...
 """
 
-val majorEncounterBordello = """
+const val majorEncounterBordello = """
     You enter the bordello. Several heads turn your way, with sneering expressions
     upon seeing you. A garishly dressed women says: “You DO NOT belong here, get
     out before I call the authorities!”
@@ -479,41 +481,41 @@ val majorEncounterBordello = """
     Will you...
 """
 
-val mainRoadOutOfSecondTown = """
+const val mainRoadOutOfSecondTown = """
     Do you...
 """
 
-val thirdTown = """
+const val thirdTown = """
     Having ridden the main road into town, exhausted and famished, unable to continue,
     which building should you approach?
 """
 
-val majorEncounterModestMansion = """
+const val majorEncounterModestMansion = """
     The door opens, after you knock, and a middle-aged man in a worn suit stares out at
     you blankly and says, in a somewhat harsh tone, “What is it you wish? Why are you here?”
 
     Do you...
 """
 
-val politeAndSubmisseBluff = """
+const val politeAndSubmisseBluff = """
     Your polite and submissive tone arouses the man’s suspicions. He slams the door,
     and you hear the loud ringing of a bell from the rooftop.
 
     Do you...
 """
 
-val text48ConfidentAndArrogantBluff = """
+const val text48ConfidentAndArrogantBluff = """
     Your confident and arrogant tone may have convinced the man that you are men of
     some importance. However, he will not extend his hospitality freely.
 """
 
-val text49ConfidentAndArrogantBluffContd = """
+const val text49ConfidentAndArrogantBluffContd = """
     You spend the night comfortably, and the next morning you set off.
 
     Do you...
 """
 
-val text50MajorEncounterRamshackleHut = """
+const val text50MajorEncounterRamshackleHut = """
     A gnarled old face peers from behind a dirty window when you knock. The door
     opens and a nearly toothless smile greets you, and a wrinkled hand beckons you in.
 
@@ -522,7 +524,7 @@ val text50MajorEncounterRamshackleHut = """
     Do you...
 """
 
-val text51MajorEncounterRamshackleHutContd = """
+const val text51MajorEncounterRamshackleHutContd = """
     You find yourself resting comfortably, recuperating from a hard journey, enjoying
     the warm fire and a delicious rustic stew. Unbeknownst to you, the old man has sent
     his son to fetch the slave-catchers posted in town...
@@ -530,16 +532,16 @@ val text51MajorEncounterRamshackleHutContd = """
     After spending the night comfortably, you exit the building to be surprised by...
 """
 
-val majorEncounterPharmacy = """
+const val majorEncounterPharmacy = """
     A bell rings as you enter the pharmacy. A bespeckled clerk peers at you over his
     glasses, and coolly declares, “You do not belong here!”
 
     Will you...
 """
 
-val majorEncounter2ndPatrol = """
+const val majorEncounter2ndPatrol = """
     <div>
-    <img src="https://readingbat-static.sfo2.cdn.digitaloceanspaces.com/history-walk/2ndpatrol.jpg" alt="Pic" style="width:178px;height:417px;border:2px solid gray;float:right;margin-left:10px;"/>
+    <img src="/static/images/2ndpatrol.jpg" alt="Pic" style="width:178px;height:417px;border:2px solid gray;float:right;margin-left:10px;"/>
     <p style="padding-top:110px;">
     After riding for some hours, you enter into a brushy area with low visibility.
     Suddenly, a rider moves out from the cover of the foliage to block your path forward.
@@ -553,7 +555,7 @@ val majorEncounter2ndPatrol = """
     </div>
 """
 
-val majorEncounterFight2ndPatrol = """
+const val majorEncounterFight2ndPatrol = """
     You and your companion boldly respond by drawing your pistols and firing at the men.
     Hitting one and causing the horses to panic, the other ride flees in terror as the
     wounded rider drops to the ground, unconscious.
@@ -566,7 +568,7 @@ val majorEncounterFight2ndPatrol = """
 """
 
 // TODO This slide is not used
-val text55MajorEncounterBluff2ndPatrol = """
+const val text55MajorEncounterBluff2ndPatrol = """
     You try to explain that you have been sent on a mission by your master, which was
     not an uncommon occurrence. However, the man with a rifle demands to see your travel
     papers. You have none.
@@ -574,7 +576,7 @@ val text55MajorEncounterBluff2ndPatrol = """
     Having failed at bluffing, will you...
 """
 
-val backroads = """
+const val backroads = """
     After travelling undetected for days, you are slowly starving.
 
     Finally, you come to a clearing and see a lone log cabin.
@@ -582,7 +584,7 @@ val backroads = """
     Do you...
 """
 
-val riverCrossing = """
+const val riverCrossing = """
     As you approach, you see a white man chopping logs. He looks you up and down and,
     in a tone that strikes as sympathetic rather than hostile, he warns you of patrols
     in the area and tells you to follow horse tracks across frozen Ohio.
@@ -590,7 +592,7 @@ val riverCrossing = """
     Do you...
 """
 
-val woodmensAdvice = """
+const val woodmensAdvice = """
     A loud yell alerts you to the fact that you have been spotted. Anxiously, you turn
     to see an elderly black man emerge from the brush who says that he has surmised
     that you must be runaway slaves. While you hesitate to respond, he tells you that

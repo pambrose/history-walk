@@ -1,6 +1,8 @@
+package com.github.pambrose.content
+
 import com.github.pambrose.slides.SlideDeck.Companion.slideDeck
 
-val introductionPage = """
+const val introductionPage = """
     <div style="text-align:center;">
     <div style="padding-top:10px;">
     <font size="+3">
@@ -23,9 +25,9 @@ val introductionPage = """
     </div>
 """
 
-val errorText = "Incorrect. Try again."
+const val errorText = "Incorrect. Try again."
 
-val decision1Text = """
+const val decision1Text = """
   You are on the way home from a exhausting day of harvesting rice, when a
   friend motions for you to come over and chat. He has heard that you are
   in line to be punished for not taking proper care of tools. You cannot
@@ -35,7 +37,7 @@ val decision1Text = """
   Options:
 """
 
-val decision2Text = """
+const val decision2Text = """
   As you and your fellow Enslaved Africans head back to the plantation you lag behind
   and quietly sneak into the woods. You now realize you have little provisions and
   no real plan of escape.
@@ -43,7 +45,7 @@ val decision2Text = """
   Options:
 """
 
-val decision3Text = """
+const val decision3Text = """
   You travel close the road by night. After a week of travel you are awoken abruptly
   during the day as you sleep by a very surly man. He accuses you of being a fugitive
   and marches you off to the local jail. Eventually you are collected by Mr. Gooch.
@@ -53,7 +55,7 @@ val decision3Text = """
   Options:
 """
 
-val decision4Text = """
+const val decision4Text = """
   It takes a few hours and is very painful, but you manage to slip the irons off.
   You head into the woods fearful of what might follow you and after a few hours
   you come to river that is 50 yards across.
@@ -61,7 +63,7 @@ val decision4Text = """
   Options:
 """
 
-val decision5Text = """
+const val decision5Text = """
   You travel upriver looking for a shallow or narrow place to cross.
   Luck is with you today and you find a canoe of Native American origin.
   You set the canoe out into the river and paddle across to the other side.
@@ -73,7 +75,7 @@ val decision5Text = """
   Options:
 """
 
-val decision6Text = """
+const val decision6Text = """
   You rummage around the barn and find some food.
   Exhausted, you fall asleep in a pile of hay.
   You are not sure how long you sleep for, but you are awoken by an
@@ -82,7 +84,7 @@ val decision6Text = """
   Options:
 """
 
-val decision7Text = """
+const val decision7Text = """
   You tell him you are free. He asks for your papers proving you are free.
   Which you do not have. He tells you to get out of here before you get
   him in trouble. It is the middle of the day and you amble down the road.
@@ -91,7 +93,7 @@ val decision7Text = """
   Options:
 """
 
-val decision8Text = """
+const val decision8Text = """
   You approach the group and tell them you are on an errand for your master.
   They offer to accompany you to your destination.
   As you travel with them you realize you recognize the country you are
@@ -101,14 +103,14 @@ val decision8Text = """
   Options:
 """
 
-val decision9Text = """
+const val decision9Text = """
   You make your way to the plantation where you spent the first ten years
   of your live. Along the way you encounter a young African American girl.
 
   Options:
 """
 
-val decision10Text = """
+const val decision10Text = """
   You ignore the girl and keep walking past her.
   You walk into the night and as you near the plantation of your youth you are
   ambushed by a patrol out looking for fugitives.
@@ -124,14 +126,14 @@ val decision10Text = """
   Options:
 """
 
-val decision11Text = """
+const val decision11Text = """
   The object is made out of iron and it is about ten inches long.
   It has a sharp point, but is otherwise flat and rough on both sides.
 
   Options:
 """
 
-val decision12Text = """
+const val decision12Text = """
   You discreetly break a link on the chains and now your hands are free.
   Your captors have stopped by an inn to have lunch.
   They could be out any moment.
@@ -139,7 +141,7 @@ val decision12Text = """
   Options:
 """
 
-val decision13Text = """
+const val decision13Text = """
   You grab a switch a whack your horse in the hindquarters.
   And like that your horse is sprinting down the street and heading out of town.
   You hang on for dear life, never having travelled this fast in your life.
@@ -148,7 +150,7 @@ val decision13Text = """
   Options:
 """
 
-val decision14Text = """
+const val decision14Text = """
   You pull on the reins and bring your horse to a halt.
   You are quickly surrounded by your pursuers.
   You are hit in the side of the head by a rifle but and knocked unconscious.
@@ -162,7 +164,7 @@ val decision14Text = """
   Options:
 """
 
-val decision15Text = """
+const val decision15Text = """
   The two of you quietly slip away from the crude camp.
   Although you are heavily encumbered you eventually make it 50 yards
   away and then you pick up the pace.
@@ -170,7 +172,7 @@ val decision15Text = """
   Options:
 """
 
-val decision16Text = """
+const val decision16Text = """
   You find a suitable rock to try and break a link in the chains binding you together.
   You bring the rock up and drive it down onto a link near your co-captive’s neck.
   It works and you are untethered. As you travel a heavy rain sets in.
@@ -179,7 +181,7 @@ val decision16Text = """
   Options:
 """
 
-val decision17Text = """
+const val decision17Text = """
   You move upstream looking for a safe crossing.
   Amazingly you find another canoe and jump in.
   There is no paddle so the two of you use your hands to navigate across the
@@ -194,14 +196,14 @@ val decision17Text = """
   Options:
 """
 
-val decision18Text = """
+const val decision18Text = """
   You make it to his plantation and he leads you inside his quarters and offers you
   some food. All of a sudden he is startled by the noise of some approaching.
 
   Options:
 """
 
-val decision19Text = """
+const val decision19Text = """
   The two of you hide under blankets and you go unnoticed as the master of the
   plantation enters to inquire about the harvest.
   You cannot believe that you are not discovered.
@@ -211,7 +213,7 @@ val decision19Text = """
   Options:
 """
 
-val decision20Text = """
+const val decision20Text = """
   You enter the plantation as the sun goes down and attempt to find you friend.
   However, a pair of dogs sniffs you out and alerts others to your presence.
   You are apprehended and marched off to the local gaols to await your repatriation
@@ -230,7 +232,7 @@ val decision20Text = """
   Options:
 """
 
-val decision21Text = """
+const val decision21Text = """
   For the time being you give up your dream of freedom.
   After a few months have passed a strange thing happens.
   An unfamiliar man arrives and speaks with Mr. Gooch.
@@ -245,7 +247,7 @@ val decision21Text = """
   Options:
 """
 
-val decision22Text = """
+const val decision22Text = """
   You stay with Mr. Cowpens and work as a domestic servant.
   This life is much more bearable from life with Mr. Gooch.
   You put on some weight and you have moments of joy.
@@ -258,7 +260,7 @@ val decision22Text = """
   Options:
 """
 
-val decision23Text = """
+const val decision23Text = """
   You are successful in your attempt to steal the keys.
   That night you quietly unlock your bonds and slip into the night.
   After your stay with Mr. Cowpens you look much more respectable and
@@ -270,7 +272,7 @@ val decision23Text = """
   Options:
 """
 
-val decision24Text = """
+const val decision24Text = """
   You make your way down the road to Savannah.
   You travel by night and sleep in the woods during the day.
   One night as you travel you encounter a minister walking along the road.
@@ -278,14 +280,14 @@ val decision24Text = """
   Options:
 """
 
-val decision25Text = """
+const val decision25Text = """
   The minister offers to walk with you to Savannah and help you find your master.
   You are now with in five miles of the city.
 
   Options:
 """
 
-val decision26Text = """
+const val decision26Text = """
   You ditch the minister and after a few hours you encounter some African American
   men driving cattle.
   The greet you and ask you where you are headed.
@@ -297,7 +299,7 @@ val decision26Text = """
   Options:
 """
 
-val decision27Text = """
+const val decision27Text = """
   The boy writes you a pass saying you are free to travel to Savannah unaccompanied.
   Even though you cannot read, you are concerned the kid’s writing will look childish
   or something will give it away.
@@ -305,7 +307,7 @@ val decision27Text = """
   Options:
 """
 
-val decision28Text = """
+const val decision28Text = """
   As you enter the city you are stopped by a sheriff.
   Being a port city, they are always on the lookout for runaways.
   He takes your pass which has been smudged by water.
@@ -318,7 +320,7 @@ val decision28Text = """
   Options:
 """
 
-val decision29Text = """
+const val decision29Text = """
   You ask around for a ship captain.
   Eventually you are directed to a man who is the captain of the SS Fox.
   You approach him and ask if he is in need of your services.
@@ -332,7 +334,7 @@ val decision29Text = """
   Options:
 """
 
-val successText = """
+const val successText = """
   You decide to stay with the SS Fox.
   Each day you nervously attempt to keep busy and hope you will not be
   discovered by authorities.

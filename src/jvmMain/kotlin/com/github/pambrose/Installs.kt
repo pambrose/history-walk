@@ -1,8 +1,8 @@
 package com.github.pambrose
 
-import com.github.pambrose.ConfigureFormAuth.configureFormAuth
-import com.github.pambrose.Cookies.assignCookies
-import com.github.pambrose.common.util.simpleClassName
+import com.github.pambrose.auth.configureGoogleAuth
+import com.github.pambrose.auth.installUserSessions
+import com.pambrose.common.util.simpleClassName
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.http.*
 import io.ktor.http.content.*
@@ -12,8 +12,8 @@ import io.ktor.server.plugins.calllogging.*
 import io.ktor.server.plugins.compression.*
 import io.ktor.server.plugins.defaultheaders.*
 import io.ktor.server.plugins.statuspages.*
+import io.ktor.server.request.*
 import io.ktor.server.response.*
-import io.ktor.server.sessions.*
 import org.slf4j.event.Level
 
 object Installs {
@@ -24,11 +24,12 @@ object Installs {
     install(DefaultHeaders)
     install(CallLogging) {
       level = Level.INFO
+      // Log status, method, and path only: the default format appends a redirect's Location, which for /auth/login is
+      // the Google URL with the OAuth state
+      format { call -> "${call.response.status()}: ${call.request.httpMethod.value} ${call.request.path()}" }
     }
 
-    install(Sessions) {
-      assignCookies()
-    }
+    installUserSessions()
 
 //  install(KHealth) {
 //    readyCheckEnabled = false
@@ -38,9 +39,7 @@ object Installs {
 //    }
 //  }
 
-    install(Authentication) {
-      configureFormAuth()
-    }
+    install(Authentication) { configureGoogleAuth() }
 
     install(StatusPages) {
       // Catch all

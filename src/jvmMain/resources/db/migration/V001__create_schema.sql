@@ -2,15 +2,18 @@ drop schema if exists history cascade;
 
 create schema history;
 
+-- Users sign in with Google; emails are stored lowercased.
 CREATE TABLE history.users
 (
     id             UUID UNIQUE PRIMARY KEY,
     created        TIMESTAMPTZ DEFAULT NOW(),
     updated        TIMESTAMPTZ DEFAULT NOW(),
-    email          TEXT NOT NULL UNIQUE,
+    email          TEXT NOT NULL UNIQUE
+        CONSTRAINT users_email_lowercase CHECK (email = lower(email)),
     full_name      TEXT NOT NULL,
-    salt           TEXT NOT NULL,
-    digest         TEXT NOT NULL,
+    picture_url    TEXT,
+    role           TEXT NOT NULL CHECK (role IN ('student', 'teacher')),
+    last_sign_in   TIMESTAMPTZ,
     last_path_name TEXT NOT NULL
 );
 
@@ -31,11 +34,13 @@ CREATE TABLE history.user_choices
     CONSTRAINT user_choices_unique unique (user_uuid_ref, from_path_name, to_path_name)
 );
 
+-- Progress views report students only, so teachers' test walks never appear.
 CREATE VIEW history.user_visits AS
 SELECT users.id, to_title
 FROM history.users,
      history.user_choices
-WHERE history.user_choices.user_uuid_ref = users.id;
+WHERE history.user_choices.user_uuid_ref = users.id
+  AND users.role = 'student';
 
 
 CREATE VIEW history.user_decision_counts AS
@@ -43,6 +48,7 @@ SELECT users.id, full_name, email, last_path_name, count(user_uuid_ref) as decis
 FROM history.users
          LEFT OUTER JOIN history.user_choices
                          ON history.user_choices.user_uuid_ref = users.id
+WHERE users.role = 'student'
 GROUP BY users.id, users.full_name
 ORDER BY users.id, users.full_name;
 
@@ -58,4 +64,5 @@ SELECT users.id,
 FROM history.users
          JOIN history.user_choices
               ON history.user_choices.user_uuid_ref = users.id
+WHERE users.role = 'student'
 ORDER BY users.email, user_choices.created;

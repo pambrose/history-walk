@@ -8,9 +8,9 @@ import com.github.pambrose.slides.Slide
 import com.pambrose.common.exposed.get
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.datetime.LocalDateTime
-import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.v1.core.*
+import org.jetbrains.exposed.v1.jdbc.*
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
 object DbmsTxs {
   private val logger = KotlinLogging.logger {}
@@ -22,9 +22,8 @@ object DbmsTxs {
     val content =
       slide.content
         .splitToSequence("\n")
-        .map { line -> line.trim() }  // Get rid of leading/trailing whitespace
-        .joinToString("\n")
-        .transformText()                     // Transform markdown to html
+        .joinToString("\n") { line -> line.trim() }
+        .transformText()
 
     val alreadyVisited =
       transaction {
@@ -38,12 +37,12 @@ object DbmsTxs {
     val choices =
       slide.choices.map { (choice, slide) ->
         SlideChoice(
-          choice,
-          slide.pathName,
-          slide.title,
-          !slide.hasChoices && !slide.success,
-          slide.offset,
-          slide.title in alreadyVisited,
+          choiceText = choice,
+          toPathName = slide.pathName,
+          toTitle = slide.title,
+          deadEnd = !slide.hasChoices && !slide.success,
+          offset = slide.offset,
+          alreadyVisited = slide.title in alreadyVisited,
         )
       }
 
@@ -52,10 +51,7 @@ object DbmsTxs {
         .also { parentTitles ->
           var currSlide = slide.parentSlide
           while (currSlide != null) {
-            parentTitles += ParentTitle(
-              currSlide.pathName,
-              currSlide.title,
-            )
+            parentTitles += ParentTitle(currSlide.pathName, currSlide.title)
             currSlide = currSlide.parentSlide
           }
         }
@@ -157,14 +153,14 @@ object DbmsTxs {
         selectAll()
           .map { row ->
             UserReason(
-              row[id].toString(),
-              row[fullName],
-              row[email],
-              row[fromPathName],
-              row[toPathName],
-              row[fromTitle],
-              row[toTitle],
-              row[reason],
+              id = row[id].toString(),
+              fullName = row[fullName],
+              email = row[email],
+              fromPathName = row[fromPathName],
+              toPathName = row[toPathName],
+              fromTitle = row[fromTitle],
+              toTitle = row[toTitle],
+              reason = row[reason],
             )
           }
       }
@@ -176,11 +172,11 @@ object DbmsTxs {
         selectAll()
           .map { row ->
             UserSummary(
-              row[id].toString(),
-              row[fullName],
-              row[email],
-              row[lastPathName],
-              row[decisionCount],
+              id = row[id].toString(),
+              fullName = row[fullName],
+              email = row[email],
+              lastPathName = row[lastPathName],
+              decisionCount = row[decisionCount],
             )
           }
       }
@@ -193,8 +189,8 @@ object DbmsTxs {
           .where { toTitle eq successSlideTitle }
           .map { row ->
             UserVisits(
-              row[id].toString(),
-              row[toTitle],
+              id = row[id].toString(),
+              toSlide = row[toTitle],
             )
           }
       }

@@ -6,19 +6,22 @@ import com.github.pambrose.HistoryWalkServer.masterSlides
 import com.github.pambrose.Installs.installs
 import com.github.pambrose.Property.Companion.assignProperties
 import com.github.pambrose.Routes.assignRoutes
-import com.github.pambrose.common.script.KotlinScript
-import com.github.pambrose.common.util.GitHubFile
-import com.github.pambrose.common.util.GitHubRepo
-import com.github.pambrose.common.util.OwnerType.Organization
-import com.github.pambrose.common.util.OwnerType.User
-import com.github.pambrose.common.util.Version.Companion.versionDesc
-import com.github.pambrose.common.util.getBanner
+import com.github.pambrose.auth.verifyAuthConfig
 import com.github.pambrose.slides.SlideDeck
+import com.pambrose.common.script.KotlinScript
+import com.pambrose.common.util.GitHubFile
+import com.pambrose.common.util.GitHubRepo
+import com.pambrose.common.util.OwnerType.Organization
+import com.pambrose.common.util.OwnerType.User
+import com.pambrose.common.util.Version.Companion.versionDesc
+import com.pambrose.common.util.getBanner
+import dev.kilua.rpc.initRpc
+import dev.kilua.rpc.registerService
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.server.application.*
-import jermainLonguenSlides
+import com.github.pambrose.content.jermainLonguenSlides
 import kotlinx.coroutines.runBlocking
-import mosesSlides
+import com.github.pambrose.content.mosesSlides
 import java.io.File
 import java.util.concurrent.atomic.AtomicReference
 
@@ -47,10 +50,10 @@ object HistoryWalkServer {
               } else {
                 val repoType = SLIDES_REPO_TYPE.getEnv("User")
                 val gh = GitHubFile(
-                  GitHubRepo(
-                    if (repoType.equals("User", ignoreCase = true)) User else Organization,
-                    SLIDES_REPO_OWNER.getEnv("pambrose"),
-                    SLIDES_REPO_NAME.getEnv("history-walk-content"),
+                  repo = GitHubRepo(
+                    ownerType = if (repoType.equals("User", ignoreCase = true)) User else Organization,
+                    ownerName = SLIDES_REPO_OWNER.getEnv("pambrose"),
+                    repoName = SLIDES_REPO_NAME.getEnv("history-walk-content"),
                   ),
                   branchName = SLIDES_REPO_BRANCH.getEnv("master"),
                   srcPath = SLIDES_REPO_PATH.getEnv("src/main/kotlin"),
@@ -92,12 +95,17 @@ fun Application.main() {
 
   assignProperties()
 
+  // Fails startup before anything is installed if a required sign-in setting is missing
+  verifyAuthConfig()
+
   installs()
   assignRoutes()
 
-  val slideName = SLIDES_VARIABLE_NAME.getEnv("jermainLonguenSlides")
+  val defaultSlides = "jermainLonguenSlides"
+
+  val slideName = SLIDES_VARIABLE_NAME.getEnv(defaultSlides)
   masterSlides =
-    if (slideName == "jermainLonguenSlides")
+    if (slideName == defaultSlides)
       jermainLonguenSlides
     else
       mosesSlides
@@ -105,5 +113,7 @@ fun Application.main() {
 
   dbmsInit(environment.config)
 
-  // kvisionInit()
+  initRpc {
+    registerService<IContentService> { call -> ContentService(call) }
+  }
 }

@@ -4,16 +4,7 @@ import com.github.pambrose.ClientUtils.withAuth
 import dev.kilua.rpc.getService
 
 object Rpc {
-  private val registerUserService = getService<IRegisterUserService>()
   private val contentService = getService<IContentService>()
-
-  suspend fun registerUser(registerData: RegisterData) =
-    try {
-      registerUserService.registerUser(registerData)
-    } catch (e: Exception) {
-      console.log(e)
-      false
-    }
 
   suspend fun getUserInfo() =
     withAuth {

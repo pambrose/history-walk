@@ -1,7 +1,7 @@
 package com.github.pambrose
 
-import com.github.pambrose.common.util.isNotNull
-import com.github.pambrose.common.util.obfuscate
+import com.pambrose.common.util.isNotNull
+import com.pambrose.common.util.obfuscate
 
 enum class EnvVar(val maskFunc: EnvVar.() -> String = { getEnv(UNASSIGNED) }) {
   SHOW_RESET_BUTTON,
@@ -19,6 +19,12 @@ enum class EnvVar(val maskFunc: EnvVar.() -> String = { getEnv(UNASSIGNED) }) {
   DBMS_URL({ getEnvOrNull()?.obfuscate(4) ?: UNASSIGNED }),
   DBMS_USERNAME,
   DBMS_PASSWORD({ getEnvOrNull()?.obfuscate(1) ?: UNASSIGNED }),
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET({ getEnvOrNull()?.obfuscate(1) ?: UNASSIGNED }),
+  OAUTH_CALLBACK_URL,
+  SESSION_SECRET({ getEnvOrNull()?.obfuscate(1) ?: UNASSIGNED }),
+  SCHOOL_EMAIL_DOMAIN,
+  TEACHER_EMAILS,
   ;
 
   fun isDefined(): Boolean = getEnvOrNull().isNotNull()

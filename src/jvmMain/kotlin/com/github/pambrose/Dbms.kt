@@ -6,16 +6,37 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.server.config.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.Transaction
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.flywaydb.core.Flyway
+import org.jetbrains.exposed.v1.jdbc.Database
+import org.jetbrains.exposed.v1.jdbc.JdbcTransaction
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+import javax.sql.DataSource
 import kotlin.time.Duration.Companion.minutes
 
 object Dbms {
   private val logger = KotlinLogging.logger {}
 
   fun dbmsInit(config: ApplicationConfig) {
-    Database.connect(hikari(config))
+    val dataSource = hikari(config)
+    migrate(dataSource)
+    Database.connect(dataSource)
+  }
+
+  // Applies any pending migrations in src/jvmMain/resources/db/migration before the app touches the database.
+  // Flyway keeps its schema history table in the connection's default schema (public), outside the history schema.
+  internal fun migrate(dataSource: DataSource) {
+    Flyway
+      .configure()
+      .dataSource(dataSource)
+      .locations("classpath:db/migration")
+      .load()
+      .migrate()
+      .also { result ->
+        logger.info {
+          "Flyway applied ${result.migrationsExecuted} migration(s); " +
+            "schema version ${result.initialSchemaVersion ?: "none"} -> ${result.targetSchemaVersion ?: "unchanged"}"
+        }
+      }
   }
 
   private fun hikari(config: ApplicationConfig) =
@@ -48,7 +69,7 @@ object Dbms {
         validate()
       }.let { HikariDataSource(it) }
 
-  suspend fun <T> dbQuery(block: Transaction.() -> T): T =
+  suspend fun <T> dbQuery(block: JdbcTransaction.() -> T): T =
     withContext(Dispatchers.IO) {
       transaction {
         block()

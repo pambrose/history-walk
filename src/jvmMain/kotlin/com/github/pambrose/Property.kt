@@ -3,8 +3,8 @@ package com.github.pambrose
 import com.github.pambrose.PropertyNames.DBMS
 import com.github.pambrose.PropertyNames.HISTORYWALK
 import com.github.pambrose.PropertyNames.SITE
-import com.github.pambrose.common.util.isNotNull
-import com.github.pambrose.common.util.obfuscate
+import com.pambrose.common.util.isNotNull
+import com.pambrose.common.util.obfuscate
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.server.application.*
 import io.ktor.server.config.*

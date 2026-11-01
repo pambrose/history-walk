@@ -1,9 +1,12 @@
 package com.github.pambrose
 
 import com.github.pambrose.ClientUtils.lowercase
+import com.github.pambrose.ClientUtils.postTo
 import com.github.pambrose.ClientUtils.verticalPadding
 import com.github.pambrose.EndPoints.CONTENT_RESET
 import com.github.pambrose.EndPoints.LOGOUT
+import com.github.pambrose.EndPoints.REASONS
+import com.github.pambrose.EndPoints.SUMMARY
 import com.github.pambrose.MainPanel.buttonPadding
 import com.github.pambrose.MainPanel.refresh
 import com.github.pambrose.MainPanel.userInfo
@@ -19,20 +22,27 @@ import io.kvision.core.BorderStyle
 import io.kvision.core.Col
 import io.kvision.core.Color
 import io.kvision.core.Container
+import io.kvision.core.Display
 import io.kvision.core.FlexDirection
 import io.kvision.core.FlexWrap
+import io.kvision.core.FontStyle
+import io.kvision.core.FontWeight
 import io.kvision.core.JustifyContent
 import io.kvision.core.PosFloat
 import io.kvision.core.TextAlign
 import io.kvision.form.text.Text
 import io.kvision.form.text.TextArea
+import io.kvision.html.Align
 import io.kvision.html.Button
 import io.kvision.html.ButtonStyle.*
 import io.kvision.html.P
 import io.kvision.html.Span
 import io.kvision.html.button
+import io.kvision.html.div
 import io.kvision.html.h1
 import io.kvision.html.icon
+import io.kvision.html.image
+import io.kvision.html.span
 import io.kvision.modal.Dialog
 import io.kvision.panel.*
 import io.kvision.state.ObservableValue
@@ -69,26 +79,7 @@ private fun Container.displaySlide(slide: SlideData) {
       flexPanel(FlexDirection.ROW, FlexWrap.WRAP, JustifyContent.SPACEBETWEEN, AlignItems.CENTER, spacing = 5) {
         paddingBottom = 10.px
 
-        vPanel {
-          hPanel().bind(userInfo) { +it.email }
-          hPanel { +"Total Decisions: ${slide.decisionCount}" }
-          if (slide.displayConsecutiveCorrectDecisions)
-            hPanel { +"Consecutive Correct Decisions: ${slide.consecutiveCorrectDecisions}" }
-        }
-        button("Logout", "fas fa-sign-out-alt", style = LINK) {
-          lowercase()
-          onClick {
-            document.location?.href = "/$LOGOUT"
-          }
-        }
-
-        if (slide.showResetButton)
-          button("Reset", "fas fa-sync-alt", style = LINK) {
-            lowercase()
-            onClick {
-              document.location?.href = "/$CONTENT_RESET"
-            }
-          }
+        bind(userInfo, removeChildren = true) { user -> header(user, slide) }
       }
     }
 
@@ -241,6 +232,81 @@ private fun promptUserForReason(
         val newSlide = provideReason(fromPathName, fromTitle, slideChoice, response)
         refresh(newSlide)
       }
+    }
+  }
+}
+
+private const val AVATAR_SIZE = 40
+
+private fun Container.header(
+  user: UserInfo,
+  slide: SlideData,
+) {
+  val isTeacher = user.role == Role.TEACHER
+
+  hPanel(alignItems = AlignItems.CENTER, spacing = 10) {
+    avatar(user)
+    vPanel {
+      hPanel(spacing = 5) {
+        span(user.fullName.ifBlank { user.email }) { fontWeight = FontWeight.BOLD }
+        if (user.fullName.isNotBlank()) span(" · ${user.email}")
+        if (isTeacher)
+          span("teacher") {
+            color = Color.name(Col.GRAY)
+            fontStyle = FontStyle.ITALIC
+          }
+      }
+      hPanel(spacing = 5) {
+        +"Total Decisions: ${slide.decisionCount}"
+        if (isTeacher) span("(your test walk, not counted in class progress)") { color = Color.name(Col.GRAY) }
+      }
+      if (slide.displayConsecutiveCorrectDecisions)
+        hPanel { +"Consecutive Correct Decisions: ${slide.consecutiveCorrectDecisions}" }
+    }
+  }
+
+  hPanel(alignItems = AlignItems.CENTER) {
+    if (isTeacher) {
+      navLink("class summary", "fas fa-chart-bar") { document.location?.href = "/$SUMMARY" }
+      navLink("student reasons", "fas fa-comments") { document.location?.href = "/$REASONS" }
+    }
+    navLink("logout", "fas fa-sign-out-alt") { postTo("/$LOGOUT") }
+    if (isTeacher && slide.showResetButton)
+      navLink("reset", "fas fa-sync-alt") { document.location?.href = "/$CONTENT_RESET" }
+  }
+}
+
+private fun Container.navLink(
+  label: String,
+  icon: String,
+  action: () -> Unit,
+) {
+  button(label, icon, style = LINK) {
+    lowercase()
+    onClick { action() }
+  }
+}
+
+private fun Container.avatar(user: UserInfo) {
+  val size = AVATAR_SIZE.px
+  if (user.pictureUrl != null) {
+    image(user.pictureUrl, user.fullName) {
+      width = size
+      height = size
+      borderRadius = (AVATAR_SIZE / 2).px
+      setAttribute("referrerpolicy", "no-referrer")
+    }
+  } else {
+    div(initialsOf(user.fullName, user.email), align = Align.CENTER) {
+      width = size
+      height = size
+      borderRadius = (AVATAR_SIZE / 2).px
+      background = Background(Color.rgb(53, 121, 246))
+      color = Color.name(Col.WHITE)
+      fontWeight = FontWeight.BOLD
+      display = Display.FLEX
+      alignItems = AlignItems.CENTER
+      justifyContent = JustifyContent.CENTER
     }
   }
 }
