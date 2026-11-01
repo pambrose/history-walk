@@ -146,10 +146,6 @@ object Routes {
       }
     }
 
-    // Allow for static content to be served from the /static/ directory
-//    static("static") {
-//      resources("static")
-//    }
     staticResources("/static", "static")
   }
 

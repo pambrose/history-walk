@@ -44,7 +44,7 @@ object HistoryWalkServer {
                 logger.info { "Loading slides from local file: $localFilename" }
                 // find out the current working directory
                 val currentWorkingDir = System.getProperty("user.dir")
-                println(currentWorkingDir)
+                logger.info {"currentWorkingDir: $currentWorkingDir"}
                 val file = File(localFilename)
                 file.readText()
               } else {
