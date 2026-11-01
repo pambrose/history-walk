@@ -17,7 +17,6 @@ object EndPoints {
   const val AUTH_CALLBACK = "auth/callback"
   const val AUTH_GREETING = "auth/greeting"
   const val USER_RESET = "userreset"
-  const val CONTENT_RESET = "contentreset"
   const val SUMMARY = "summary"
   const val REASONS = "reasons"
   const val SLIDE = "slide"

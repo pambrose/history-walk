@@ -7,10 +7,12 @@ ENV APPLICATION_USER=historywalk
 RUN adduser --disabled-password --gecos '' $APPLICATION_USER && mkdir /app && chown -R $APPLICATION_USER /app
 USER $APPLICATION_USER
 
-# The version comes from gradle.properties; make docker-build passes it.
+# The version comes from gradle.properties (make docker-build passes it) and only labels the image: the jar's file name
+# leaves the version out (build.gradle.kts), so this COPY and the Procfile name the same file in every release.
 ARG APP_VERSION
+LABEL org.opencontainers.image.version=$APP_VERSION
 # The jar carries the compiled JS client, logback.xml, the Flyway migrations, and the slide images, so nothing else is copied.
-COPY --chown=$APPLICATION_USER ./build/libs/history-walk-${APP_VERSION}.jar /app/history-walk.jar
+COPY --chown=$APPLICATION_USER ./build/libs/history-walk.jar /app/history-walk.jar
 
 WORKDIR /app
 

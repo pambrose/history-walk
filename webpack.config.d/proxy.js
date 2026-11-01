@@ -2,7 +2,7 @@ if (config.devServer) {
   const target = 'http://localhost:8080';
   config.devServer.proxy = [
     {
-      context: ["/auth", "/logout", "/summary", "/reasons", "/slides", "/slide", "/contentreset", "/userreset", "/static"],
+      context: ["/auth", "/logout", "/summary", "/reasons", "/slides", "/slide", "/threaddump", "/userreset", "/static"],
       target: target
     },
     {

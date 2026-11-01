@@ -3,6 +3,7 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
+import dev.kilua.rpc.gradle.KiluaRpcExtension
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jmailen.gradle.kotlinter.tasks.FormatTask
 import org.jmailen.gradle.kotlinter.tasks.LintTask
@@ -67,6 +68,15 @@ buildConfig {
 }
 
 val mainClassName = "io.ktor.server.cio.EngineMain"
+
+// `./gradlew jar` runs jarWithJs, the Kilua RPC plugin's fat jar of the server and the webpacked client: Kotlin
+// Multiplatform has no task named jar, and Gradle runs the one task whose name starts with it. The fat jar's name
+// leaves out the version, so the Procfile (Heroku) and the Dockerfile name the same file in every release, and
+// `make procfile-check` fails if the Procfile names a file the build did not write. The jvmJar and jsArchive jars it
+// is assembled from keep their versioned names.
+configure<KiluaRpcExtension> {
+    jarArchiveFileName = "history-walk.jar"
+}
 
 kotlin {
     jvmToolchain(libs.versions.jvm.get().toInt())
@@ -169,10 +179,6 @@ kotlin {
             runtimeOnly(libs.flyway.database.postgresql)
             
             implementation(libs.flexmark)
-
-            implementation(libs.common.utils.script.common)
-            implementation(libs.common.utils.script.kotlin)
-            runtimeOnly(libs.kotlin.scripting.jsr223)
 
             implementation(libs.logback.classic)
         }

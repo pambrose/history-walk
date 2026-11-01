@@ -3,10 +3,10 @@ package com.pambrose.historywalk
 import com.pambrose.historywalk.ClientUtils.lowercase
 import com.pambrose.historywalk.ClientUtils.postTo
 import com.pambrose.historywalk.ClientUtils.verticalPadding
-import com.pambrose.historywalk.EndPoints.CONTENT_RESET
 import com.pambrose.historywalk.EndPoints.LOGOUT
 import com.pambrose.historywalk.EndPoints.REASONS
 import com.pambrose.historywalk.EndPoints.SUMMARY
+import com.pambrose.historywalk.EndPoints.USER_RESET
 import com.pambrose.historywalk.MainPanel.buttonPadding
 import com.pambrose.historywalk.MainPanel.refresh
 import com.pambrose.historywalk.MainPanel.userInfo
@@ -275,8 +275,9 @@ private fun Container.header(
       navLink("student reasons", "fas fa-comments") { document.location?.href = "/$REASONS" }
     }
     navLink("logout", "fas fa-sign-out-alt") { postTo("/$LOGOUT") }
+    // Clears the teacher's own test walk and starts it again from the first slide
     if (isTeacher && slide.showResetButton)
-      navLink("reset", "fas fa-sync-alt") { document.location?.href = "/$CONTENT_RESET" }
+      navLink("reset", "fas fa-sync-alt") { document.location?.href = "/$USER_RESET" }
   }
 }
 

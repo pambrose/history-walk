@@ -43,7 +43,6 @@ versions = { id = "io.github.ben-manes.versions", version.ref = "versions" }
 # Kotlin standard libraries
 kotlin-bom = { module = "org.jetbrains.kotlin:kotlin-bom", version.ref = "kotlin" }
 kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect" }
-kotlin-scripting-jsr223 = { group = "org.jetbrains.kotlin", name = "kotlin-scripting-jsr223", version.ref = "kotlin" }
 
 # Ktor server
 ktor-bom = { group = "io.ktor", name = "ktor-bom", version.ref = "ktor" }
@@ -85,8 +84,6 @@ utils-bom = { module = "com.pambrose.common-utils:common-utils-bom", version.ref
 common-utils-core = { group = "com.pambrose.common-utils", name = "core-utils" }
 common-utils-ktor = { group = "com.pambrose.common-utils", name = "ktor-server-utils" }
 common-utils-exposed ={ group = "com.pambrose.common-utils", name = "exposed-utils" }
-common-utils-script-common = { group = "com.pambrose.common-utils", name = "script-utils-common" }
-common-utils-script-kotlin = { group = "com.pambrose.common-utils", name = "script-utils-kotlin"}
 
 #history-walk-content = { group = "com.github.pambrose", name = "history-walk-content", version.ref = "slide-content" }
 #history-walk-slides = { group = "com.github.pambrose", name = "history-walk-slides", version.ref = "slides" }

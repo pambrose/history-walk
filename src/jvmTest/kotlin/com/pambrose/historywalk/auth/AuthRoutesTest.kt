@@ -5,6 +5,7 @@ import com.pambrose.historywalk.Routes.appRoutes
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.cookies.HttpCookies
 import io.ktor.client.request.get
@@ -15,6 +16,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders.Location
 import io.ktor.http.HttpStatusCode.Companion.Forbidden
 import io.ktor.http.HttpStatusCode.Companion.Found
+import io.ktor.http.HttpStatusCode.Companion.NotFound
 import io.ktor.http.HttpStatusCode.Companion.OK
 import io.ktor.http.HttpStatusCode.Companion.Unauthorized
 import io.ktor.http.Url
@@ -173,7 +175,7 @@ class AuthRoutesTest : StringSpec() {
     "students are refused every teacher page" {
       signInTest { client ->
         client.get("/test/sign-in/$student")
-        listOf("/summary", "/reasons", "/contentreset", "/slides", "/slide/1").forEach { path ->
+        listOf("/summary", "/reasons", "/threaddump", "/slides", "/slide/1").forEach { path ->
           client.get(path).apply {
             status shouldBe Forbidden
             bodyAsText() shouldBe "Teachers only"
@@ -186,6 +188,39 @@ class AuthRoutesTest : StringSpec() {
         val r = client.get("/summary")
         r.status shouldBe Found
         Url(r.headers[Location]!!).host shouldBe "accounts.google.com"
+      }
+    }
+    "a signed-out visitor to the thread dump is sent to Google sign-in" {
+      signInTest { client ->
+        val r = client.get("/threaddump")
+        r.status shouldBe Found
+        Url(r.headers[Location]!!).host shouldBe "accounts.google.com"
+      }
+    }
+    "a student is refused the thread dump" {
+      signInTest { client ->
+        client.get("/test/sign-in/$student")
+        client.get("/threaddump").apply {
+          status shouldBe Forbidden
+          bodyAsText() shouldBe "Teachers only"
+        }
+      }
+    }
+    "a teacher gets the thread dump" {
+      signInTest { client ->
+        client.get("/test/sign-in/$teacher")
+        client.get("/threaddump").apply {
+          status shouldBe OK
+          contentType()?.withoutParameters() shouldBe ContentType.Text.Plain
+          // Each thread opens with `"name" id=N state=STATE`, and the thread taking the dump is running
+          bodyAsText() shouldContain Regex("\"[^\"]+\" id=\\d+ state=RUNNABLE")
+        }
+      }
+    }
+    "the slide reload at /contentreset is gone, even for a teacher" {
+      signInTest { client ->
+        client.get("/test/sign-in/$teacher")
+        client.get("/contentreset").status shouldBe NotFound
       }
     }
     "a listed teacher passes the teacher guard" {
