@@ -11,12 +11,14 @@ import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders.Location
 import io.ktor.http.HttpStatusCode.Companion.Forbidden
 import io.ktor.http.HttpStatusCode.Companion.Found
 import io.ktor.http.HttpStatusCode.Companion.OK
 import io.ktor.http.HttpStatusCode.Companion.Unauthorized
 import io.ktor.http.Url
+import io.ktor.http.contentType
 import io.ktor.http.setCookie
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
@@ -58,7 +60,7 @@ class AuthRoutesTest : StringSpec() {
       }
     }
     routing {
-      appRoutes(allowSlideAccess = true, emails::get, { teachers })
+      appRoutes(allowSlideAccess = true, emails::get) { teachers }
       get("/test/sign-in/{id}") {
         call.assignUserSession(UUID.fromString(call.parameters["id"]!!))
         call.respondText("ok")
@@ -147,6 +149,13 @@ class AuthRoutesTest : StringSpec() {
     "an RPC without a session is 401" {
       signInTest { client ->
         client.post("/rpc/routeContentServiceManager0").status shouldBe Unauthorized
+      }
+    }
+    "slide images are served without a session" {
+      signInTest { client ->
+        val r = client.get("/static/images/jermain-longuen.jpg")
+        r.status shouldBe OK
+        r.contentType()?.withoutParameters() shouldBe ContentType.Image.JPEG
       }
     }
     "students are refused every teacher page" {
