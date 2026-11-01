@@ -43,21 +43,13 @@ object DbmsTxs {
           choiceText = choice,
           toPathName = slide.pathName,
           toTitle = slide.title,
-          deadEnd = !slide.hasChoices && !slide.success,
+          deadEnd = slide.isDeadEnd,
           offset = slide.offset,
           alreadyVisited = slide.title in alreadyVisited,
         )
       }
 
-    val parentTitles =
-      mutableListOf<ParentTitle>()
-        .also { parentTitles ->
-          var currSlide = slide.parentSlide
-          while (currSlide != null) {
-            parentTitles += ParentTitle(currSlide.pathName, currSlide.title)
-            currSlide = currSlide.parentSlide
-          }
-        }.reversed()
+    val parentTitles = slide.ancestors.map { ParentTitle(it.pathName, it.title) }
 
     return slide
       .run {

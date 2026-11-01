@@ -5,13 +5,11 @@ import com.pambrose.historywalk.SlideChoice
 import com.pambrose.historywalk.SlideData
 import com.pambrose.historywalk.Utils.transformText
 import com.pambrose.historywalk.slides.Slide
-import com.pambrose.historywalk.slides.SlideDeck
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
-import java.util.IdentityHashMap
 
-// Checks the real decks the way a student walks them: from the root slide, through every choice
+// Checks the real decks the way a student walks them: from the root slide, through every choice (DeckWalk.kt)
 class SlideContentTest : StringSpec() {
   private val decks = listOf("Jermain Longuen" to jermainLonguenSlides, "Moses" to mosesSlides)
 
@@ -78,8 +76,6 @@ class SlideContentTest : StringSpec() {
   companion object {
     private val imagePattern = Regex("""/static/images/([^"'\s)]+)""")
 
-    private fun Slide.forwardChoices() = choices.values.filter { it.offset == 0 }
-
     // The slide as the client gets it, with only what a go-back reads: its ancestors, root first, and its choices
     private fun Slide.toSlideData() =
       SlideData(
@@ -102,16 +98,5 @@ class SlideContentTest : StringSpec() {
 
     private fun Slide.goBacks() =
       toSlideData().let { data -> data.choices.filter { it.offset != 0 }.map { data to it } }
-
-    // Visits each slide object once, so a slide shared between two parents cannot loop the walk
-    private fun SlideDeck.reachableSlides(): List<Slide> {
-      val seen = IdentityHashMap<Slide, Unit>()
-      val queue = ArrayDeque(listOf(rootSlide))
-      while (queue.isNotEmpty()) {
-        val slide = queue.removeFirst()
-        if (seen.put(slide, Unit) == null) queue += slide.forwardChoices()
-      }
-      return seen.keys.toList()
-    }
   }
 }

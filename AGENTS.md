@@ -42,6 +42,27 @@ generates `ContentServiceManager`; `Main.kt` registers `ContentService(call)` pe
 the signed-in user from the `ApplicationCall` (`call.userUuid`), never from a client-supplied id. DTOs are in
 `commonMain/Dao.kt`. The client calls go through `jsMain/Rpc.kt`, which wraps each in `withAuth`.
 
+**Moves are checked on the server.** `ContentService` takes the deck (`masterSlides`) and the user's stored slide as the
+truth, not what the client sends:
+- `makeChoice` and `provideReason` must start from the user's current slide and name one of its forward choices. The
+  stored title, choice text, and `deadEnd` come from the deck, and `advance` is derived as the client does
+  (`choices.size == 1`, go-backs counted).
+- `goBackInTime` must name an ancestor, the current slide, or `/` (the client's "back to the start").
+- A reason must pass `ReasonRule` (`commonMain`, at least 5 words, at most 2000 characters); the reason dialog uses the
+  same rule.
+- A repeat of a move just made (a double-click, a second dialog, a retried transaction) is accepted and changes nothing:
+  `provideReason` inserts with `ON CONFLICT DO NOTHING`, so the first reason wins.
+- Anything else is refused with a Kilua `ServiceException`, whose message reaches the browser.
+
+The RPC signatures still carry the fields the server now ignores, so changing them needs an `apiVersion` bump.
+
+**Client errors.** `AppScope` has a `SupervisorJob`, and the version check runs in a scope of its own, so a failed call
+no longer cancels every later click. Clicks on choices and go-backs go through `onClickWhenIdle` (`MainPanel.kt`):
+- A `busy` flag disables those buttons until the request finishes.
+- A failure shows a toast (`ClientUtils.orErrorToast`), and a server refusal shows its own message and reloads the
+  student's real slide.
+- A `SecurityException` (401) still goes to `Security.withAuth` and the sign-in dialog.
+
 **Sign-in (Google OAuth, `jvmMain/auth/`).** Only `athenian.org` accounts (`SCHOOL_EMAIL_DOMAIN`) are admitted. The role
 rule (`Roles.kt`): an address in `TEACHER_EMAILS` is a teacher, else a local part starting with two digits is a student,
 else refused. The role is recomputed from the live `TEACHER_EMAILS` on every request, not taken from the stored row.
@@ -71,7 +92,12 @@ go-back, each offered as trying another building, lands on the town the student 
 
 A slide's identity is its `pathName`, the chain of titles from the root (`/Title/Sub title`). Progress is stored by
 path name (`users.last_path_name`, `user_choices.from_path_name`/`to_path_name`), so renaming a slide title or moving a
-slide orphans saved progress, and `findSlideByPathName` silently falls back to the root slide.
+slide orphans saved progress, and `findSlideByPathName` silently falls back to the root slide. `SlidePathsTest` pins
+every path name a student can reach in each deck to a snapshot, `src/jvmTest/resources/slide-paths/<deck>.txt`, so such
+an edit fails CI, listing the paths that disappeared (each orphans the students saved there) and those that appeared. A
+deliberate rename needs either a migration that moves the stored path names or acceptance that the affected students
+restart, together with the snapshot rewritten and committed with the deck change:
+`./gradlew jvmTest --tests 'com.pambrose.historywalk.content.SlidePathsTest' -PupdateSlidePaths=true`.
 
 **Database.** `Dbms.migrate` runs Flyway (`src/jvmMain/resources/db/migration`) before `Database.connect` on every
 startup, so each deploy migrates. Never edit an applied migration (Flyway checksums them); add `V002__...sql`. Note

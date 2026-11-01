@@ -22,16 +22,16 @@ session are not listed: the go-back offsets, the quotes in slide text, and lint.
 
 | #             | Status | Severity | Area           | Issue                                                                                  |
 |---------------|:------:|----------|----------------|----------------------------------------------------------------------------------------|
-| [1](#issue-1)   | ⬜ | High     | Client         | One failed RPC call freezes the whole page, the version check included                 |
+| [1](#issue-1)   | ✅ | High     | Client         | One failed RPC call freezes the whole page, the version check included                 |
 | [2](#issue-2)   | ⬜ | High     | Server / ops   | The database password is written to the logs                                           |
 | [3](#issue-3)   | ✅ | High     | Server         | `/contentreset` runs Kotlin fetched from GitHub, now always fails, and bloats the jar  |
 | [4](#issue-4)   | ✅ | Medium   | Server         | `/threaddump` is open to anyone                                                        |
-| [5](#issue-5)   | ⬜ | Medium   | Server         | The RPC service trusts client-supplied choices, so a student can fake progress         |
-| [6](#issue-6)   | ⬜ | Medium   | Client, server | A double-click records a choice twice or fails on the unique constraint                |
+| [5](#issue-5)   | ✅ | Medium   | Server         | The RPC service trusts client-supplied choices, so a student can fake progress         |
+| [6](#issue-6)   | ✅ | Medium   | Client, server | A double-click records a choice twice or fails on the unique constraint                |
 | [7](#issue-7)   | ⬜ | Medium   | Auth           | A stolen callback URL can be completed by anyone (PKCE is derived from the state)      |
-| [8](#issue-8)   | ⬜ | Medium   | Client (a11y)  | The reason dialog's OK stays disabled for dictated or pasted text                      |
+| [8](#issue-8)   | ✅ | Medium   | Client (a11y)  | The reason dialog's OK stays disabled for dictated or pasted text                      |
 | [9](#issue-9)   | ✅ | Medium   | Ops            | The Procfile pins `history-walk-1.0.0.jar`, so a version bump breaks Heroku            |
-| [10](#issue-10) | ⬜ | Medium   | Content        | Renaming or moving a slide silently sends students back to the start                   |
+| [10](#issue-10) | ✅ | Medium   | Content        | Renaming or moving a slide silently sends students back to the start                   |
 | [11](#issue-11) | ⬜ | Medium   | Privacy        | On a shared computer, class data and a student's page outlive sign-out                 |
 | [12](#issue-12) | ⬜ | Medium   | Tests          | The client has no tests                                                                |
 | [13](#issue-13) | ⬜ | Low      | Server         | `/userreset` is a GET that deletes all of the caller's choices, and is untested        |
@@ -60,7 +60,7 @@ Things checked and found sound:
 ## Issues
 
 <a id="issue-1"></a>
-### ⬜ 1. One failed RPC call freezes the whole page, the version check included
+### ✅ 1. One failed RPC call freezes the whole page, the version check included
 
 - **Severity:** High
 - **Where:**
@@ -144,7 +144,7 @@ Things checked and found sound:
 - **Fix:** Delete the route, or move it inside `teachersOnly`. Add a test that an anonymous request is refused.
 
 <a id="issue-5"></a>
-### ⬜ 5. The RPC service trusts client-supplied choices, so a student can fake progress
+### ✅ 5. The RPC service trusts client-supplied choices, so a student can fake progress
 
 - **Severity:** Medium (data integrity, not privacy)
 - **Where:**
@@ -168,7 +168,7 @@ Things checked and found sound:
   - Add a test for each rejection.
 
 <a id="issue-6"></a>
-### ⬜ 6. A double-click records a choice twice or fails on the unique constraint
+### ✅ 6. A double-click records a choice twice or fails on the unique constraint
 
 - **Severity:** Medium
 - **Where:**
@@ -216,7 +216,7 @@ Things checked and found sound:
   - Do [14](#issue-14) first, so the change has tests.
 
 <a id="issue-8"></a>
-### ⬜ 8. The reason dialog's OK stays disabled for dictated or pasted text
+### ✅ 8. The reason dialog's OK stays disabled for dictated or pasted text
 
 - **Severity:** Medium (accessibility)
 - **Where:** `MainPanel.kt:186-205`
@@ -238,8 +238,10 @@ Things checked and found sound:
   the Dockerfile, or use a shell glob in the Procfile. Have `make ci` run the Procfile's jar path.
 
 <a id="issue-10"></a>
-### ⬜ 10. Renaming or moving a slide silently sends students back to the start
+### ✅ 10. Renaming or moving a slide silently sends students back to the start
 
+- **Status:** done in Wave 2: `SlidePathsTest` pins both decks' path names, so a rename fails CI and lists the
+  paths that disappeared. No alias map was built; a rename that is needed still takes a migration of the stored paths.
 - **Severity:** Medium
 - **Where:**
   - `slides/SlideDeck.kt:68-77`, `findSlideByPathName`
@@ -401,6 +403,8 @@ Things checked and found sound:
 <a id="issue-21"></a>
 ### ⬜ 21. Panels and dialogs are never disposed, so each slide leaks a little
 
+- **Status:** partly done in Wave 2: `displaySlide` disposes its panels and each reason dialog is disposed. The
+  `Alert.show` in `ClientVersionCheck.kt` is still never disposed; it belongs with Step 11.
 - **Severity:** Low
 - **Where:**
   - `MainPanel.kt:71`, `removeAll()` in `displaySlide`
@@ -467,9 +471,9 @@ finishes second on top of the first, or have one person do both.
 
 | Step | Status | Issues | Work | Files |
 |------|:------:|--------|------|-------|
-| 4  | ⬜ | [1](#issue-1), [6](#issue-6) (client), [8](#issue-8), [21](#issue-21) | `SupervisorJob` plus an error toast; a busy flag that disables the buttons; the `input`-event word count with a hint; `disposeAll()` | `App.kt`, `MainPanel.kt`, `ClientUtils.kt` |
-| 5  | ⬜ | [5](#issue-5), [6](#issue-6) (server) | Look transitions up in the deck on the server; idempotent `provideReason`; reason rules and a cap; tests for each | `ServiceImpl.kt`, `Services.kt`, `DbmsTxs.kt`, tests |
-| 6  | ⬜ | [10](#issue-10) | A path-name snapshot test for both decks | `SlideContentTest.kt` |
+| 4  | ✅ | [1](#issue-1), [6](#issue-6) (client), [8](#issue-8), [21](#issue-21) | `SupervisorJob` plus an error toast; a busy flag that disables the buttons; the `input`-event word count with a hint; `disposeAll()` | `App.kt`, `MainPanel.kt`, `ClientUtils.kt` |
+| 5  | ✅ | [5](#issue-5), [6](#issue-6) (server) | Look transitions up in the deck on the server; idempotent `provideReason`; reason rules and a cap; tests for each | `ServiceImpl.kt`, `Services.kt`, `DbmsTxs.kt`, tests |
+| 6  | ✅ | [10](#issue-10) | A path-name snapshot test for both decks | `SlideContentTest.kt` |
 
 Steps 4 and 6 are independent of everything else in the wave.
 
