@@ -1,0 +1,35 @@
+name: Clean Up Workflow Runs
+
+# Every Monday, deletes each workflow's completed runs, and their logs, that are more than 30 days old, keeping the
+# newest 10 of those, so a workflow that has not run for a month still has a history to compare its next failure
+# against. A run still in progress is never deleted. Runs of a workflow whose file has been removed are deleted whatever
+# their age. Run it by hand with dry_run to list what it would delete.
+on:
+  schedule:
+    - cron: '0 10 * * 1'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: List the runs that would be deleted, and delete none
+        type: boolean
+        default: false
+
+permissions: {}
+
+concurrency:
+  # A manual run and the weekly one never overlap.
+  group: cleanup-runs
+  cancel-in-progress: false
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      actions: write # to delete workflow runs
+    steps:
+      - uses: Mattraks/delete-workflow-runs@b3018382ca039b53d238908238bd35d1fb14f8ee # v2.1.0
+        with:
+          retain_days: 30
+          keep_minimum_runs: 10
+          dry_run: ${{ inputs.dry_run == true }}

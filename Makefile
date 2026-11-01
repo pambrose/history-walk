@@ -28,7 +28,7 @@ ORIGIN_URL   ?=
 
 .DEFAULT_GOAL := help
 
-.PHONY: help db reset-jermain reset-moses stop-db server client build clean tests coverage lint format docker-build docker-run versions depends yarn-unlock upgrade-wrapper creds restart log served-version
+.PHONY: help db reset-jermain reset-moses stop-db server client build clean tests coverage lint format zizmor ci docker-build docker-run docker-smoke versions depends yarn-unlock upgrade-wrapper creds restart log served-version
 
 ##@ General
 
@@ -99,6 +99,23 @@ lint: ## Check the Kotlin sources with kotlinter (generated sources are skipped)
 format: ## Reformat the Kotlin sources with kotlinter, fixing what lint can fix by itself
 	$(GRADLE) formatKotlin
 
+# The online audits (a pinned SHA that is not a commit of its action, known-vulnerable actions) need a GitHub token,
+# taken from GH_TOKEN or the gh CLI; without one zizmor runs only its offline audits.
+zizmor: ## Audit the GitHub Actions workflows and dependabot.yml with zizmor, as the zizmor workflow does
+	@GH_TOKEN="$${GH_TOKEN:-$$(gh auth token 2>/dev/null)}"; \
+	if [ -n "$$GH_TOKEN" ]; then export GH_TOKEN; else unset GH_TOKEN; fi; \
+	zizmor .
+
+# Every gate CI runs, in one command, so this is the check before merging: lint, the zizmor audit, the tests with
+# coverage (their results not taken from the build cache), and the Docker image, built and then started against
+# Postgres. Needs Docker and zizmor.
+ci: ## Run every CI gate locally: lint, zizmor, the tests with coverage, and the Docker image build and smoke test
+	$(MAKE) lint
+	$(MAKE) zizmor
+	$(GRADLE) --no-build-cache cleanJvmTest jvmTest koverXmlReport koverHtmlReport koverLog
+	$(MAKE) docker-build
+	$(MAKE) docker-smoke
+
 ##@ Docker
 
 docker-build: ## Build the fat jar, then an image holding it (history-walk:VERSION and :latest)
@@ -117,6 +134,47 @@ docker-run: docker-build ## Run the image on DOCKER_PORT with ENV_FILE (.env), a
 			--add-host=host.docker.internal:host-gateway \
 			$$(sed -n 's/^\([A-Za-z_][A-Za-z0-9_]*\)=.*/-e \1/p' "$(ENV_FILE)") -e DBMS_URL -e OAUTH_CALLBACK_URL \
 			$(DOCKER_IMAGE):$(VERSION)
+
+# Starts the image against a throwaway Postgres on a Docker network of its own and checks that it migrates the empty
+# database and answers: /ping, /version, the page shell's Cache-Control, the bundle, and a 401 for an RPC call without
+# a session. Sign-in needs real Google credentials only when someone signs in, so placeholders let the server start, and
+# a loopback callback URL means no SESSION_SECRET is required. Everything it starts is removed, pass or fail; on a
+# failure it prints the end of the server's log. The Docker Image workflow runs it too.
+SMOKE_NAME ?= history-walk-smoke
+SMOKE_PORT ?= 18080
+docker-smoke: ## Start the image (make docker-build first) against a throwaway Postgres and check that it answers
+	@set -e; \
+	cleanup() { docker rm -f $(SMOKE_NAME)-app $(SMOKE_NAME)-db >/dev/null 2>&1 || true; \
+		docker network rm $(SMOKE_NAME) >/dev/null 2>&1 || true; }; \
+	fail() { echo "docker-smoke: $$1" >&2; docker logs $(SMOKE_NAME)-app 2>&1 | tail -40 >&2 || true; cleanup; exit 1; }; \
+	cleanup; \
+	docker network create $(SMOKE_NAME) >/dev/null; \
+	docker run -d --name $(SMOKE_NAME)-db --network $(SMOKE_NAME) \
+		-e POSTGRES_PASSWORD=smoke -e POSTGRES_DB=historywalk $(DB_IMAGE) >/dev/null; \
+	ready=; for _ in $$(seq 1 60); do \
+		if docker exec $(SMOKE_NAME)-db pg_isready -q -h 127.0.0.1 -U postgres; then ready=1; break; fi; sleep 1; \
+	done; \
+	[ -n "$$ready" ] || fail "Postgres did not start"; \
+	docker run -d --name $(SMOKE_NAME)-app --network $(SMOKE_NAME) -p 127.0.0.1:$(SMOKE_PORT):8080 \
+		-e DBMS_URL=jdbc:pgsql://$(SMOKE_NAME)-db:5432/historywalk -e DBMS_USERNAME=postgres -e DBMS_PASSWORD=smoke \
+		-e GOOGLE_CLIENT_ID=smoke -e GOOGLE_CLIENT_SECRET=smoke \
+		-e OAUTH_CALLBACK_URL=http://localhost:8080/auth/callback \
+		$(DOCKER_IMAGE):$(VERSION) >/dev/null; \
+	url=http://127.0.0.1:$(SMOKE_PORT); up=; \
+	for _ in $$(seq 1 60); do \
+		if curl -fsS -o /dev/null $$url/ping 2>/dev/null; then up=1; break; fi; \
+		[ "$$(docker inspect -f '{{.State.Running}}' $(SMOKE_NAME)-app)" = true ] || break; \
+		sleep 2; \
+	done; \
+	[ -n "$$up" ] || fail "the server did not answer /ping"; \
+	curl -fsS $$url/version | grep -q "$(VERSION)" || fail "/version does not report $(VERSION)"; \
+	curl -fsS -D - -o /dev/null $$url/ | grep -qi '^cache-control: no-cache, private' \
+		|| fail "the page shell is not sent with Cache-Control: no-cache, private"; \
+	curl -fsS -o /dev/null $$url/main.bundle.js || fail "main.bundle.js is not served"; \
+	status=$$(curl -s -o /dev/null -w '%{http_code}' -X POST $$url/rpc/routeContentServiceManager0); \
+	[ "$$status" = 401 ] || fail "an RPC call without a session got $$status, not 401"; \
+	cleanup; \
+	echo "docker-smoke: $(DOCKER_IMAGE):$(VERSION) migrated an empty database and answered every check"
 
 ##@ Dependencies
 

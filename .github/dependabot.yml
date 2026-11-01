@@ -1,0 +1,18 @@
+# Weekly version-update pull requests for the actions used in .github/workflows. Security updates also need
+# Dependabot alerts turned on in the repository's settings.
+#
+# A release waits 7 days (`cooldown`) before it is proposed, so one that is pulled, or found to be compromised, in its
+# first week never arrives as a pull request. Security updates are not held back.
+version: 2
+updates:
+  # Pin each action to a commit SHA with a "# vX.Y.Z" comment; Dependabot moves both together, so a tag that is later
+  # moved cannot change what CI runs. All action updates arrive together in one grouped pull request.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      github-actions:
+        patterns: [ "*" ]
