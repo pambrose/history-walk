@@ -41,6 +41,7 @@ object Security : SecurityMgr() {
   private val loginPrompt =
     LoginPrompt {
       Modal.getAllModals().filter { it.visible && it !== signInDialog }.forEach { it.hide() }
+      SignInBackground.show()
       // NonCancellable, so cancelling the call that triggered sign-in cannot stop the dialog from opening; the timeout
       // keeps a slow server from holding it back, in which case the default title stays.
       withContext(NonCancellable) { withTimeoutOrNull(3.seconds) { fetchLoginGreeting() } }
