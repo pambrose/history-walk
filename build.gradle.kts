@@ -1,5 +1,7 @@
 @file:OptIn(ExperimentalKotlinGradlePluginApi::class)
 
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jmailen.gradle.kotlinter.tasks.FormatTask
 import org.jmailen.gradle.kotlinter.tasks.LintTask
@@ -199,6 +201,11 @@ kotlin {
 
     tasks.withType<Test>().configureEach {
         useJUnitPlatform()
+        testLogging {
+            events = setOf(TestLogEvent.PASSED, TestLogEvent.SKIPPED, TestLogEvent.FAILED)
+            exceptionFormat = TestExceptionFormat.FULL
+            showStandardStreams = false
+        }
     }
 }
 
