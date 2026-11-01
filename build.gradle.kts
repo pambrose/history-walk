@@ -23,10 +23,6 @@ group = "com.github.pambrose"
 
 repositories {
     mavenCentral()
-    // history-walk-slides is only published on JitPack
-    maven(url = "https://jitpack.io") {
-        content { includeGroup("com.github.pambrose") }
-    }
     // mavenLocal()
 }
 
@@ -44,12 +40,10 @@ kotlin {
     jvmToolchain(libs.versions.jvm.get().toInt())
     jvm {
 //        withJava()
-        @OptIn(ExperimentalKotlinGradlePluginApi::class)
         compilerOptions {
             freeCompilerArgs.add("-Xjsr305=strict")
         }
 
-        @OptIn(ExperimentalKotlinGradlePluginApi::class)
         mainRun {
             mainClass = mainClassName
         }
@@ -57,15 +51,15 @@ kotlin {
 
     js {
         browser {
-            commonWebpackConfig(Action {
+            commonWebpackConfig {
                 outputFileName = "main.bundle.js"
                 sourceMaps = false
-            })
-            testTask(Action {
+            }
+            testTask {
                 useKarma {
                     useChromeHeadless()
                 }
-            })
+            }
         }
         binaries.executable()
         compilerOptions {
@@ -129,9 +123,6 @@ kotlin {
 
             implementation(libs.common.utils.ktor)
             implementation(libs.common.utils.exposed)
-
-            implementation(libs.history.walk.content)
-            implementation(libs.history.walk.slides)
 
             //implementation("dev.hayden:khealth:$khealthVersion")
 

@@ -19,9 +19,9 @@ import dev.kilua.rpc.initRpc
 import dev.kilua.rpc.registerService
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.server.application.*
-import jermainLonguenSlides
+import com.github.pambrose.content.jermainLonguenSlides
 import kotlinx.coroutines.runBlocking
-import mosesSlides
+import com.github.pambrose.content.mosesSlides
 import java.io.File
 import java.util.concurrent.atomic.AtomicReference
 
@@ -101,7 +101,7 @@ fun Application.main() {
   installs()
   assignRoutes()
 
-  val defaultSlides = "jermainLonguenSlides"
+  val defaultSlides = "com.github.pambrose.content.jermainLonguenSlides"
 
   val slideName = SLIDES_VARIABLE_NAME.getEnv(defaultSlides)
   masterSlides =
