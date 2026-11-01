@@ -255,7 +255,14 @@ private fun Container.header(
       }
       hPanel(spacing = 5) {
         +"Total Decisions: ${slide.decisionCount}"
-        if (isTeacher) span("(your test walk, not counted in class progress)") { color = Color.name(Col.GRAY) }
+        // The count is a bare text node, which the panel's spacing does not separate from the span, so the span keeps
+        // its own distance
+        if (isTeacher) {
+          span("(your test walk, not counted in class progress)") {
+            color = Color.name(Col.GRAY)
+            marginLeft = 6.px
+          }
+        }
       }
       if (slide.displayConsecutiveCorrectDecisions)
         hPanel { +"Consecutive Correct Decisions: ${slide.consecutiveCorrectDecisions}" }
