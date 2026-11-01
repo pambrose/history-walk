@@ -45,10 +45,10 @@ object Security : SecurityMgr() {
   override suspend fun login(): Boolean = loginPrompt.showOnceAndPark()
 
   override suspend fun afterLogin() {
-    console.log("Successful login")
+    console.log("Signed in")
   }
 
   override suspend fun afterError() {
-    console.log("Error on login")
+    console.log("Sign-in required: showing the sign-in dialog")
   }
 }

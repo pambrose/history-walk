@@ -1,5 +1,6 @@
 package com.github.pambrose
 
+import dev.kilua.rpc.SecurityException
 import io.kvision.core.CssSize
 import io.kvision.core.StyledComponent
 import io.kvision.core.TextTransform
@@ -22,8 +23,8 @@ object ClientUtils {
       try {
         block()
       } catch (e: Exception) {
-        console.log("This is the exception: $e ${e.message}")
-        // Alert.show(text = I18n.tr(e.toString()))
+        // A SecurityException just means "not signed in"; Security.afterError logs that.
+        if (e !is SecurityException) console.log("Request failed: $e")
         throw e
       }
     }
