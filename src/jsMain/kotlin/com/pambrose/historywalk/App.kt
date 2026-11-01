@@ -1,6 +1,8 @@
 package com.pambrose.historywalk
 
 import com.pambrose.BuildConfig
+import com.pambrose.historywalk.ClientUtils.PAGE_NOT_LOADED
+import com.pambrose.historywalk.ClientUtils.launchOrErrorToast
 import com.pambrose.historywalk.MainPanel.refresh
 import com.pambrose.historywalk.Rpc.getCurrentSlide
 import io.kvision.*
@@ -9,12 +11,21 @@ import io.kvision.panel.root
 import io.kvision.remote.registerRemoteTypes
 import io.kvision.utils.useModule
 import kotlinx.browser.window
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
 import org.w3c.dom.url.URLSearchParams
 
-val AppScope = CoroutineScope(window.asCoroutineDispatcher())
+// A backstop only: the click handlers and start-up calls report their own failures (ClientUtils.orErrorToast)
+private val logUncaught = CoroutineExceptionHandler { _, e -> console.log("Uncaught error: $e") }
+
+// A SupervisorJob, so one failed call cannot cancel the scope and with it every later click
+val AppScope = CoroutineScope(window.asCoroutineDispatcher() + SupervisorJob() + logUncaught)
+
+// The version check's own scope, so nothing that goes wrong in the walk can stop it
+private val versionCheckScope = CoroutineScope(window.asCoroutineDispatcher() + SupervisorJob() + logUncaught)
 
 @JsModule("/kotlin/modules/css/kvapp.css")
 external object KvappCss
@@ -35,12 +46,12 @@ class App : Application() {
       add(MainPanel)
     }
 
-    AppScope.launch {
+    launchOrErrorToast(PAGE_NOT_LOADED) {
       val newSlide = getCurrentSlide()
       refresh(newSlide)
     }
 
-    AppScope.launch { ClientVersionCheck.checkClientVersion() }
+    versionCheckScope.launch { ClientVersionCheck.checkClientVersion() }
   }
 }
 

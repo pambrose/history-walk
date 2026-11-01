@@ -1,6 +1,11 @@
 package com.pambrose.historywalk
 
+import com.pambrose.historywalk.ClientUtils.CLICK_FAILED
+import com.pambrose.historywalk.ClientUtils.PAGE_NOT_LOADED
+import com.pambrose.historywalk.ClientUtils.REASON_NOT_SAVED
+import com.pambrose.historywalk.ClientUtils.launchOrErrorToast
 import com.pambrose.historywalk.ClientUtils.lowercase
+import com.pambrose.historywalk.ClientUtils.orErrorToast
 import com.pambrose.historywalk.ClientUtils.postTo
 import com.pambrose.historywalk.ClientUtils.verticalPadding
 import com.pambrose.historywalk.EndPoints.LOGOUT
@@ -30,7 +35,6 @@ import io.kvision.core.FontWeight
 import io.kvision.core.JustifyContent
 import io.kvision.core.PosFloat
 import io.kvision.core.TextAlign
-import io.kvision.form.text.Text
 import io.kvision.form.text.TextArea
 import io.kvision.html.Align
 import io.kvision.html.Button
@@ -49,7 +53,6 @@ import io.kvision.state.ObservableValue
 import io.kvision.state.bind
 import io.kvision.utils.px
 import kotlinx.browser.document
-import kotlinx.coroutines.launch
 
 object MainPanel : SimplePanel() {
   val buttonPadding = 5.px
@@ -59,7 +62,7 @@ object MainPanel : SimplePanel() {
   init {
     add(panel)
 
-    AppScope.launch {
+    launchOrErrorToast(PAGE_NOT_LOADED) {
       userInfo.value = getUserInfo()
     }
   }
@@ -67,8 +70,35 @@ object MainPanel : SimplePanel() {
   fun refresh(slide: SlideData) = panel.displaySlide(slide)
 }
 
+/**
+ * True while a click on a choice or a go-back is being handled: until the next slide is shown, the reason dialog is
+ * cancelled, or the request fails. Those buttons are disabled meanwhile, so a double-click cannot record a choice twice
+ * or open two reason dialogs.
+ */
+private val busy = ObservableValue(false)
+
+/** Runs [action] on a click unless another click's action is still running (see [busy]); a failure shows a toast. */
+private fun Button.onClickWhenIdle(action: suspend () -> Unit) {
+  // Disposing the button (displaySlide's disposeAll) ends the subscription
+  addBeforeDisposeHook(busy.subscribe { disabled = it })
+  onClick {
+    if (!busy.value) {
+      busy.value = true
+      launchOrErrorToast(CLICK_FAILED) {
+        try {
+          action()
+        } finally {
+          busy.value = false
+        }
+      }
+    }
+  }
+}
+
 private fun Container.displaySlide(slide: SlideData) {
-  removeAll()
+  // disposeAll, not removeAll: disposing ends the old widgets' subscriptions (bind(userInfo), the busy flag), which
+  // would otherwise keep every earlier slide's panels alive
+  disposeAll()
 
   simplePanel {
     margin = 20.px
@@ -88,11 +118,7 @@ private fun Container.displaySlide(slide: SlideData) {
           button(parentTitle.title, style = SUCCESS) {
             paddingTop = 5.px
             paddingBottom = 5.px
-            onClick {
-              AppScope.launch {
-                goBackInTime(parentTitle).also { refresh(it) }
-              }
-            }
+            onClickWhenIdle { refresh(goBackInTime(parentTitle)) }
           }
           hPanel(justify = JustifyContent.CENTER) {
             paddingTop = 4.px
@@ -130,11 +156,7 @@ private fun Container.displaySlide(slide: SlideData) {
       flexPanel(FlexDirection.ROW, FlexWrap.WRAP, JustifyContent.FLEXEND, AlignItems.CENTER, spacing = 5) {
         button("Go Home", "fas fa-arrow-alt-circle-up", style = LINK) {
           lowercase()
-          onClick {
-            AppScope.launch {
-              goBackInTime(ParentTitle("/", "/")).also { refresh(it) }
-            }
-          }
+          onClickWhenIdle { refresh(goBackInTime(ParentTitle("/", "/"))) }
         }
       }
     } else {
@@ -157,18 +179,16 @@ private fun Container.addChoiceButtons(slide: SlideData) {
       val icon = if (choice.alreadyVisited) "fas fa-bookmark" else "fas fa-angle-double-right"
       button(choice.choiceText, icon = icon, style = PRIMARY) {
         lowercase()
-        onClick {
-          AppScope.launch {
-            if (choice.offset != 0) {
-              goBackInTime(slide.goBackTarget(choice)).also { refresh(it) }
+        onClickWhenIdle {
+          if (choice.offset != 0) {
+            refresh(goBackInTime(slide.goBackTarget(choice)))
+          } else {
+            val choiceReason = makeChoice(slide.pathName, slide.title, choice, slide.choices.size == 1)
+            if (choiceReason.reason.isEmpty()) {
+              promptUserForReason(slide.pathName, slide.title, choice)?.also { refresh(it) }
             } else {
-              val choiceReason = makeChoice(slide.pathName, slide.title, choice, slide.choices.size == 1)
-              if (choiceReason.reason.isEmpty()) {
-                promptUserForReason(slide.pathName, slide.title, choice)
-              } else {
-                val newSlide = getCurrentSlide()
-                refresh(newSlide)
-              }
+              val newSlide = getCurrentSlide()
+              refresh(newSlide)
             }
           }
         }
@@ -178,58 +198,75 @@ private fun Container.addChoiceButtons(slide: SlideData) {
 
 private fun String?.wordCount(): Int = this?.split(" ", "\n")?.filter { it.isNotEmpty() }?.size ?: 0
 
-private fun promptUserForReason(
+private const val MIN_REASON_WORDS = 5
+
+/**
+ * Asks why the student made [slideChoice] and records it, returning the next slide, or null if the student cancels.
+ * If saving fails, a toast says so and the dialog opens again with the reason in it, so nothing typed is lost.
+ */
+private suspend fun promptUserForReason(
   fromPathName: String,
   fromTitle: String,
   slideChoice: SlideChoice,
-) {
+): SlideData? {
+  var draft: String? = null
+  while (true) {
+    // A new dialog each time: Bootstrap finishes hiding the last one ~0.5s later and its hidden event would close a
+    // reopened one. Disposed once answered, or KVision's list of modals keeps every reason dialog for good.
+    val reasonDialog = reasonDialog(slideChoice, draft)
+    val reason =
+      try {
+        reasonDialog.getResult()
+      } finally {
+        reasonDialog.dispose()
+      }
+    if (reason.isNullOrBlank()) return null
+    orErrorToast(REASON_NOT_SAVED) { provideReason(fromPathName, fromTitle, slideChoice, reason) }?.also { return it }
+    draft = reason
+  }
+}
+
+private fun reasonDialog(
+  slideChoice: SlideChoice,
+  draft: String?,
+): Dialog<String> {
   val submit = Button("OK", disabled = true).apply {
     lowercase()
     verticalPadding(buttonPadding)
   }
-  val wordCount = Span(content = "0 words") { float = PosFloat.RIGHT }
-  val reasonDialog =
-    Dialog("Reasoning") {
-      val input =
-        TextArea(rows = 3, label = """Reason for your "${slideChoice.choiceText}" decision:""") {
-          placeholder = """ I chose "${slideChoice.choiceText}" because..."""
-          autofocus = true
-          setEventListener<Text> {
-            keyup = { _ ->
-              // Make sure the user has typed something.
-              value.wordCount().also { wc ->
-                submit.disabled = wc < 5
-                wordCount.content = "$wc words"
-              }
-            }
-          }
-        }
-      add(input)
-      add(wordCount)
-      addButton(
-        Button("Cancel", style = OUTLINESECONDARY).apply {
-          lowercase()
-          verticalPadding(buttonPadding)
-          onClick { setResult("") }
-        },
-      )
-      addButton(submit.apply { onClick { setResult(input.value) } })
-//      onEvent {
-//        keydown = {
-//          if (it.keyCode == ENTER_KEY && input.value?.isNotEmpty() ?: false) {
-//            setResult(input.value)
-//          }
+  val wordCount = Span { float = PosFloat.RIGHT }
+  return Dialog("Reasoning") {
+    val input =
+      TextArea(rows = 3, value = draft, label = """Reason for your "${slideChoice.choiceText}" decision:""") {
+        placeholder = """ I chose "${slideChoice.choiceText}" because..."""
+        autofocus = true
+      }
+    // The value follows the textarea's input event, so typing, pasting, dictation, and drag-and-drop all count
+    addBeforeDisposeHook(
+      input.subscribe { text ->
+        val count = text.wordCount()
+        submit.disabled = count < MIN_REASON_WORDS
+        wordCount.content = if (count == 1) "1 word" else "$count words"
+      },
+    )
+    add(input)
+    add(wordCount)
+    add(Span("Use at least $MIN_REASON_WORDS words.") { color = Color.name(Col.GRAY) })
+    addButton(
+      Button("Cancel", style = OUTLINESECONDARY).apply {
+        lowercase()
+        verticalPadding(buttonPadding)
+        onClick { setResult("") }
+      },
+    )
+    addButton(submit.apply { onClick { setResult(input.value) } })
+//    onEvent {
+//      keydown = {
+//        if (it.keyCode == ENTER_KEY && input.value?.isNotEmpty() ?: false) {
+//          setResult(input.value)
 //        }
 //      }
-    }
-
-  AppScope.launch {
-    reasonDialog.getResult()?.also { response ->
-      if (response.isNotBlank()) {
-        val newSlide = provideReason(fromPathName, fromTitle, slideChoice, response)
-        refresh(newSlide)
-      }
-    }
+//    }
   }
 }
 

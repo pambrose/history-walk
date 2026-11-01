@@ -4,6 +4,7 @@ import com.pambrose.BuildConfig
 import com.pambrose.historywalk.AlertLevel.DIALOG
 import com.pambrose.historywalk.AlertLevel.NONE
 import com.pambrose.historywalk.AlertLevel.RELOAD
+import com.pambrose.historywalk.ClientUtils.toastContainer
 import dev.kilua.rpc.SecurityException
 import dev.kilua.rpc.getService
 import io.kvision.core.BsBgColor
@@ -11,8 +12,6 @@ import io.kvision.core.BsColor
 import io.kvision.modal.Alert
 import io.kvision.modal.Modal
 import io.kvision.modal.ModalSize
-import io.kvision.toast.ToastContainer
-import io.kvision.toast.ToastContainerPosition.BOTTOMRIGHT
 import kotlinx.browser.window
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
@@ -27,7 +26,6 @@ import kotlin.time.Instant
  */
 object ClientVersionCheck {
   private val contentService = getService<IContentService>()
-  private val toastContainer by lazy { ToastContainer(BOTTOMRIGHT) }
 
   // The server's answers set these: the next wait, and the first warning's time, which goes back with the next check
   private var versionCheckInterval: Duration = 60.seconds
