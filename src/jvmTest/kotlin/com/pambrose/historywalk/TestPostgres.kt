@@ -14,10 +14,17 @@ import org.testcontainers.postgresql.PostgreSQLContainer
 class TestPostgres : AutoCloseable {
   private val container = PostgreSQLContainer("postgres:18").also { it.start() }
 
-  val dataSource =
+  val dataSource = hikari(container.jdbcUrl)
+
+  init {
+    Dbms.migrate(dataSource)
+    TransactionManager.defaultDatabase = Database.connect(dataSource)
+  }
+
+  private fun hikari(url: String) =
     HikariDataSource(
       HikariConfig().apply {
-        jdbcUrl = container.jdbcUrl
+        jdbcUrl = url
         username = container.username
         password = container.password
         driverClassName = "org.postgresql.Driver"
@@ -25,9 +32,13 @@ class TestPostgres : AutoCloseable {
       },
     )
 
-  init {
-    Dbms.migrate(dataSource)
-    TransactionManager.defaultDatabase = Database.connect(dataSource)
+  /**
+   * Creates a new, empty database in the same container, with no migration applied, for specs that run the migration
+   * themselves. The caller closes the returned data source.
+   */
+  fun emptyDatabase(name: String): HikariDataSource {
+    dataSource.connection.use { c -> c.createStatement().use { st -> st.execute("create database $name") } }
+    return hikari("jdbc:postgresql://${container.host}:${container.getMappedPort(5432)}/$name")
   }
 
   /** Empties the tables, for specs whose tests read every row through the progress views. */
