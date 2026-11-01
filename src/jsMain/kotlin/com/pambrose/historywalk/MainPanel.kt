@@ -317,9 +317,10 @@ private fun Container.header(
       navLink("student reasons", "fas fa-comments") { document.location?.href = "/$REASONS" }
     }
     navLink("logout", "fas fa-sign-out-alt") { postTo("/$LOGOUT") }
-    // Clears the teacher's own test walk and starts it again from the first slide
+    // Clears the teacher's own test walk and starts it again from the first slide. A POST, as logout is: the server
+    // resets nothing on a GET, which any link, image, or prefetch can send
     if (isTeacher && slide.showResetButton)
-      navLink("reset", "fas fa-sync-alt") { document.location?.href = "/$USER_RESET" }
+      navLink("reset", "fas fa-sync-alt") { postTo("/$USER_RESET") }
   }
 }
 

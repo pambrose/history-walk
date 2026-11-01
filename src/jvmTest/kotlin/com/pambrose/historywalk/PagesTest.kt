@@ -23,6 +23,7 @@ import io.ktor.client.plugins.cookies.HttpCookies
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders.CacheControl
 import io.ktor.http.HttpHeaders.Location
 import io.ktor.http.HttpStatusCode.Companion.Found
 import io.ktor.http.HttpStatusCode.Companion.NotFound
@@ -190,11 +191,13 @@ class PagesTest : StringSpec() {
         client.get("/summary").run {
           status shouldBe OK
           contentType()?.withoutParameters() shouldBe ContentType.Text.Html
+          headers[CacheControl] shouldBe "no-store, private"
           bodyAsText() shouldContain "Routed Student"
         }
         client.get("/reasons").run {
           status shouldBe OK
           contentType()?.withoutParameters() shouldBe ContentType.Text.Html
+          headers[CacheControl] shouldBe "no-store, private"
           bodyAsText() shouldContain "through the route"
         }
       }
@@ -224,6 +227,7 @@ class PagesTest : StringSpec() {
         client.get("/slide/2/1").run {
           status shouldBe Found
           headers[Location] shouldBe "/"
+          headers[CacheControl] shouldBe "no-store, private"
         }
         findCurrentSlideForUser(teacher, pagesDeck).pathName shouldBe HUT_AGAIN
 
