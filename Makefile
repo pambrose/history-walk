@@ -97,8 +97,9 @@ tests: ## Run the JVM and client tests every time (the JVM tests need Docker for
 js-tests: ## Run only the client tests every time (Kotest in headless Chrome; no Docker needed)
 	$(GRADLE) jsBrowserTest --rerun
 
-coverage: ## Run the JVM and client tests, then write the JVM code's Kover reports (build/reports/kover/html/index.html)
-	$(GRADLE) jvmTest --rerun jsBrowserTest --rerun koverHtmlReport koverXmlReport koverLog
+# koverVerify comes last, so the reports are written even when the coverage is under the floor (build.gradle.kts).
+coverage: ## Run the JVM and client tests, write the JVM code's Kover reports, and check the coverage floor
+	$(GRADLE) jvmTest --rerun jsBrowserTest --rerun koverHtmlReport koverXmlReport koverLog koverVerify
 
 lint: ## Check the Kotlin sources with kotlinter (generated sources are skipped)
 	$(GRADLE) lintKotlin
@@ -114,12 +115,14 @@ zizmor: ## Audit the GitHub Actions workflows and dependabot.yml with zizmor, as
 	zizmor .
 
 # Every gate CI runs, in one command, so this is the check before merging: lint, the zizmor audit, the JVM tests with
-# coverage and the client tests (their results not taken from the build cache), the Docker image build, the Procfile
-# check against the jar that build wrote, and the image started against Postgres. Needs Docker, Chrome, and zizmor.
+# coverage (checked against the floor in build.gradle.kts) and the client tests (their results not taken from the build
+# cache), the Docker image build, the Procfile check against the jar that build wrote, and the image started against
+# Postgres. Needs Docker, Chrome, and zizmor.
 ci: ## Run every CI gate locally: lint, zizmor, the JVM and client tests, the image build, procfile-check, the smoke test
 	$(MAKE) lint
 	$(MAKE) zizmor
-	$(GRADLE) --no-build-cache cleanJvmTest cleanJsBrowserTest jvmTest jsBrowserTest koverXmlReport koverHtmlReport koverLog
+	$(GRADLE) --no-build-cache cleanJvmTest cleanJsBrowserTest jvmTest jsBrowserTest koverXmlReport koverHtmlReport koverLog \
+		koverVerify
 	$(MAKE) docker-build
 	$(MAKE) procfile-check
 	$(MAKE) docker-smoke

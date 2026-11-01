@@ -20,7 +20,7 @@ make server             # Ktor on :8080, continuous rebuild (./gradlew jvmRun -t
 make client             # webpack dev server on :3000 with hot reload, proxying server routes to :8080
 make tests              # JVM and client specs: ./gradlew jvmTest --rerun jsBrowserTest --rerun (Docker and Chrome)
 make js-tests           # the client specs alone, Kotest in headless Chrome (./gradlew jsBrowserTest --rerun); no Docker
-make coverage           # the tests plus Kover reports of the JVM code (build/reports/kover/html/index.html)
+make coverage           # the tests plus Kover reports of the JVM code (build/reports/kover/html/index.html), then koverVerify
 ./gradlew jvmTest --tests 'com.pambrose.historywalk.auth.AuthRoutesTest'   # one JVM spec (a client run is always whole)
 make lint               # kotlinter (./gradlew lintKotlin); make format fixes what it can
 make zizmor             # audit .github (workflows, dependabot.yml) as the zizmor workflow does
@@ -232,9 +232,11 @@ RPC call; `zizmor.yml` audits `.github` changes; `lint.yml` runs `make lint`; `d
 Monday, keeping the newest 10. `dependabot.yml` proposes action updates and new digests for the Dockerfile's base image
 (pinned by digest, tag kept) weekly, 7 days after each release, but for the JVM libraries only security updates
 (`open-pull-requests-limit: 0`; `make versions` lists the rest). `.gitignore` ignores dot-directories, so `.github/` is
-re-included explicitly. `make ci` runs the same gates locally. The lint and format tasks skip `build/generated` by path
-(see `build.gradle.kts`); the slide decks' text constants are SCREAMING_SNAKE_CASE, as ktlint's property-naming rule
-requires.
+re-included explicitly. `make ci` runs the same gates locally. `koverVerify` (in `tests.yml`, `make ci`, and
+`make coverage`) fails when the JVM line coverage that `koverLog` prints falls under the floor in `build.gradle.kts`'s
+`kover` block (90%, about 91.5% today): a ratchet, so raise it as coverage grows and never lower it to let a change
+through. The lint and format tasks skip `build/generated` by path (see `build.gradle.kts`); the slide decks' text
+constants are SCREAMING_SNAKE_CASE, as ktlint's property-naming rule requires.
 
 ## Gotchas
 
