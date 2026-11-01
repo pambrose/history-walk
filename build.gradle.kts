@@ -213,6 +213,9 @@ kotlin {
             exceptionFormat = TestExceptionFormat.FULL
             showStandardStreams = false
         }
+        // -PupdateSlidePaths=true makes SlidePathsTest rewrite the slide path-name snapshots instead of checking them.
+        // Gradle does not pass its own -D options or properties on to the test JVM, so this one is passed explicitly.
+        if (providers.gradleProperty("updateSlidePaths").orNull.toBoolean()) systemProperty("updateSlidePaths", "true")
     }
 }
 

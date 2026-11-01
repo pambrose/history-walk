@@ -71,7 +71,12 @@ go-back, each offered as trying another building, lands on the town the student 
 
 A slide's identity is its `pathName`, the chain of titles from the root (`/Title/Sub title`). Progress is stored by
 path name (`users.last_path_name`, `user_choices.from_path_name`/`to_path_name`), so renaming a slide title or moving a
-slide orphans saved progress, and `findSlideByPathName` silently falls back to the root slide.
+slide orphans saved progress, and `findSlideByPathName` silently falls back to the root slide. `SlidePathsTest` pins
+every path name a student can reach in each deck to a snapshot, `src/jvmTest/resources/slide-paths/<deck>.txt`, so such
+an edit fails CI, listing the paths that disappeared (each orphans the students saved there) and those that appeared. A
+deliberate rename needs either a migration that moves the stored path names or acceptance that the affected students
+restart, together with the snapshot rewritten and committed with the deck change:
+`./gradlew jvmTest --tests 'com.pambrose.historywalk.content.SlidePathsTest' -PupdateSlidePaths=true`.
 
 **Database.** `Dbms.migrate` runs Flyway (`src/jvmMain/resources/db/migration`) before `Database.connect` on every
 startup, so each deploy migrates. Never edit an applied migration (Flyway checksums them); add `V002__...sql`. Note
