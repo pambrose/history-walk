@@ -50,7 +50,6 @@ import io.kvision.state.bind
 import io.kvision.utils.px
 import kotlinx.browser.document
 import kotlinx.coroutines.launch
-import kotlin.math.abs
 
 object MainPanel : SimplePanel() {
   val buttonPadding = 5.px
@@ -161,9 +160,7 @@ private fun Container.addChoiceButtons(slide: SlideData) {
         onClick {
           AppScope.launch {
             if (choice.offset != 0) {
-              val pos = slide.parentTitles.size - abs(slide.offset) - 1
-              val parentTitle = slide.parentTitles[pos]
-              goBackInTime(parentTitle).also { refresh(it) }
+              goBackInTime(slide.goBackTarget(choice)).also { refresh(it) }
             } else {
               val choiceReason = makeChoice(slide.pathName, slide.title, choice, slide.choices.size == 1)
               if (choiceReason.reason.isEmpty()) {

@@ -1047,7 +1047,7 @@ val jermainLonguenSlides =
           ) {
             choice(
               text = "Try another building in town?",
-              slide = goBack(-2),
+              slide = goBack(-1),
             )
             choice(
               text = "Push on, desperately hungry and tired, onto the main road out of town?",
@@ -1092,9 +1092,10 @@ val jermainLonguenSlides =
         title = "Polite & Submissive Bluff",
         content = TEXT31_POLITE_AND_SUBMISSIVE_BLUFF,
       ) {
+        // Reached from the Baronial Mansion in First Town, so the town is two steps back
         choice(
           text = "Try another building in town?",
-          slide = goBack(-1),
+          slide = goBack(-2),
         )
         choice(
           text = "Ride on, taking main road out of town?",

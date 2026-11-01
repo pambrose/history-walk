@@ -59,6 +59,9 @@ Moses. (`HistoryWalkServer.loadSlides()` and the `SLIDES_REPO_*` / `SLIDES_LOCAL
 fetched from the history-walk-content repo at runtime; that call is commented out.) Slide images are jar resources under
 `src/jvmMain/resources/static/images`, referenced as `/static/images/<name>`.
 
+A go-back choice, `goBack(-n)`, returns the student to the slide's n-th ancestor (-1 is its parent);
+`SlideData.goBackTarget` (commonMain) works it out for the client.
+
 A slide's identity is its `pathName`, the chain of titles from the root (`/Title/Sub title`). Progress is stored by
 path name (`users.last_path_name`, `user_choices.from_path_name`/`to_path_name`), so renaming a slide title or moving a
 slide orphans saved progress, and `findSlideByPathName` silently falls back to the root slide.
