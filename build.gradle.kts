@@ -163,11 +163,7 @@ kotlin {
             implementation(libs.exposed.kotlin.datetime)
             implementation(libs.flyway.core)
             runtimeOnly(libs.flyway.database.postgresql)
-
-            //implementation("commons-codec:commons-codec:$commonsCodecVersion")
-            //implementation("com.axiomalaska:jdbc-named-parameters:$jdbcNamedParametersVersion")
-            //implementation("com.github.andrewoma.kwery:core:$kweryVersion")
-
+            
             implementation(libs.flexmark)
 
             implementation(libs.common.utils.script.common)
