@@ -26,6 +26,8 @@ enum class EnvVar(val maskFunc: EnvVar.() -> String = { getEnv(UNASSIGNED) }) {
   SCHOOL_EMAIL_DOMAIN,
   TEACHER_EMAILS,
   LOGIN_GREETING,
+  CLIENT_VERSION_CHECK_INTERVAL_SECS,
+  CLIENT_RELOAD_WARNING_INTERVAL_SECS,
   ;
 
   fun isDefined(): Boolean = getEnvOrNull().isNotNull()

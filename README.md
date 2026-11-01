@@ -31,6 +31,9 @@ The *history-walk-slides* repo is used to hold the core slide code. It is a depe
 * SLIDES_REPO_FILENAME
 * SLIDES_VARIABLE_NAME - `jermain` for the Jermain Longuen walk; any other value (e.g. `moses`) selects the Moses walk.
 * DISPLAY_CONSECUTIVE_CORRECT_DECISIONS
+* CLIENT_VERSION_CHECK_INTERVAL_SECS - How often an open page asks whether its version is current (default 60).
+* CLIENT_RELOAD_WARNING_INTERVAL_SECS - How long an out-of-date page shows its reload dialog before it reloads itself
+  (default 60).
 
 ## Google sign-in
 

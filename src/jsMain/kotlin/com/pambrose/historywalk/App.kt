@@ -39,6 +39,8 @@ class App : Application() {
       val newSlide = getCurrentSlide()
       refresh(newSlide)
     }
+
+    AppScope.launch { ClientVersionCheck.checkClientVersion() }
   }
 }
 

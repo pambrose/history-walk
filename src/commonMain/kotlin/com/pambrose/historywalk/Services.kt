@@ -23,4 +23,7 @@ interface IContentService {
   ): SlideData
 
   suspend fun goBackInTime(parentTitle: ParentTitle): SlideData
+
+  /** Whether the calling page's bundle still matches the server (ServerVersionCheck), polled by ClientVersionCheck. */
+  suspend fun versionCheck(versionCheckInfo: VersionCheckInfo): VersionCheckResponse
 }

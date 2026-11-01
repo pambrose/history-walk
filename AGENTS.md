@@ -90,6 +90,13 @@ which reads the version line `App.start()` logs from the bundle as Heroku and as
 `main.bundle.js` in Cloudflare if they differ. `StaticContentCachingTest` builds its own routes from `staticContent()`,
 so it would not notice `appRoutes` dropping that call.
 
+**Version check.** A page left open across a release keeps its old bundle, so `ClientVersionCheck` (started from
+`App.start()`) sends its `BuildConfig` versions to `IContentService.versionCheck` every
+`CLIENT_VERSION_CHECK_INTERVAL_SECS` (60). `ServerVersionCheck` compares only `apiVersion` (gradle.properties): on a
+mismatch the page shows a dialog with a reload link, then, `CLIENT_RELOAD_WARNING_INTERVAL_SECS` (60) after the first
+warning, a countdown toast before it reloads itself. Increment `apiVersion` only when the RPC interfaces change, or when
+a release must replace pages already open; a release that leaves it alone reaches each page at its next load. The check
+goes around `withAuth`, so a signed-out page is left to the sign-in dialog.
 
 ## Tests
 

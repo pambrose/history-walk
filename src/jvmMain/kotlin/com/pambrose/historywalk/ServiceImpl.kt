@@ -105,6 +105,9 @@ class ContentService(
       slideData(uuid, slide)
     }
 
+  override suspend fun versionCheck(versionCheckInfo: VersionCheckInfo): VersionCheckResponse =
+    ServerVersionCheck.checkServerVersion(versionCheckInfo)
+
   companion object {
     private val logger = KotlinLogging.logger {}
   }
