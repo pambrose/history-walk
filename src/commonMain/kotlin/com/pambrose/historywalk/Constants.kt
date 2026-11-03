@@ -20,4 +20,7 @@ object EndPoints {
   const val SUMMARY = "summary"
   const val REASONS = "reasons"
   const val SLIDE = "slide"
+  const val ADMIN = "admin"
+  const val ADMIN_VIEW = "admin/view"
+  const val ADMIN_CLEAR = "admin/clear"
 }

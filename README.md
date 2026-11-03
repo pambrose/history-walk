@@ -148,4 +148,9 @@ An overview of the slides for debugging/reviewing is at /slides
 
 A dump of every server thread's stack is at /threaddump. It pauses the JVM while it runs.
 
+The admin page, /admin, switches every teacher to the student view and back, so teachers can walk as their class will
+before giving it the app. While teachers see the student view, their moves count in /summary and /reasons like a
+student's, and they stay there after switching back until the admin page's "Clear teachers' trial walks" button deletes
+every teacher's walk.
+
 All of these are for teachers only.

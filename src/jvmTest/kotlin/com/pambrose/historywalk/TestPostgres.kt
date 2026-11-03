@@ -30,10 +30,18 @@ class TestPostgres : AutoCloseable {
     TransactionManager.defaultDatabase = Database.connect(dataSource)
   }
 
-  /** Empties the tables, for specs whose tests read every row through the progress views. */
+  /**
+   * Empties the tables, for specs whose tests read every row through the progress views, and puts teachers back in the
+   * teacher view.
+   */
   fun deleteAll() {
     dataSource.connection.use { c ->
-      c.createStatement().use { st -> st.execute("delete from history.user_choices; delete from history.users") }
+      c.createStatement().use { st ->
+        st.execute(
+          "delete from history.user_choices; delete from history.users; " +
+            "update history.settings set teachers_see_student_view = false",
+        )
+      }
     }
   }
 

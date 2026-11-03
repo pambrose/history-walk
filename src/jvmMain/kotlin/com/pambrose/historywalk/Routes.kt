@@ -3,12 +3,19 @@ package com.pambrose.historywalk
 import com.codahale.metrics.jvm.ThreadDump
 import com.pambrose.common.response.respondWith
 import com.pambrose.common.util.Version.Companion.versionDesc
+import com.pambrose.historywalk.EndPoints.ADMIN
+import com.pambrose.historywalk.EndPoints.ADMIN_CLEAR
+import com.pambrose.historywalk.EndPoints.ADMIN_VIEW
 import com.pambrose.historywalk.EndPoints.REASONS
 import com.pambrose.historywalk.EndPoints.SLIDE
 import com.pambrose.historywalk.EndPoints.SUMMARY
 import com.pambrose.historywalk.EndPoints.USER_RESET
 import com.pambrose.historywalk.EnvVar.ALLOW_SLIDE_ACCESS
 import com.pambrose.historywalk.HistoryWalkServer.masterSlides
+import com.pambrose.historywalk.Pages.STUDENT_VIEW
+import com.pambrose.historywalk.Pages.TEACHER_VIEW
+import com.pambrose.historywalk.Pages.VIEW_FIELD
+import com.pambrose.historywalk.Pages.displayAdmin
 import com.pambrose.historywalk.Pages.displayAllSlides
 import com.pambrose.historywalk.Pages.displayUserReasons
 import com.pambrose.historywalk.Pages.displayUserSummary
@@ -19,15 +26,19 @@ import com.pambrose.historywalk.auth.signInRoutes
 import com.pambrose.historywalk.auth.signedInApi
 import com.pambrose.historywalk.auth.teachersOnly
 import com.pambrose.historywalk.auth.userUuid
+import com.pambrose.historywalk.dbms.AdminTxs.clearTeacherWalks
+import com.pambrose.historywalk.dbms.AdminTxs.setTeachersSeeStudentView
 import com.pambrose.historywalk.dbms.DbmsTxs.deleteChoices
 import com.pambrose.historywalk.dbms.DbmsTxs.updateLastSlide
 import com.pambrose.historywalk.slides.SlideDeck.Companion.ROOT
 import dev.kilua.rpc.applyRoutes
 import io.ktor.http.CacheControl
 import io.ktor.http.ContentType.Text.Plain
+import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.http.content.*
+import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.util.*
@@ -77,7 +88,8 @@ object Routes {
    * - sign-in and sign-out, open to all ([signInRoutes]);
    * - the RPC services, for any signed-in user, refusing a call without a session with 401 ([signedInApi]);
    * - the user's own reset, a POST for any signed-in user, sending a browser without a session to Google sign-in;
-   * - the class pages, slide tools, and thread dump, for teachers only, refusing anyone else with 403 ([teachersOnly]);
+   * - the class pages, the admin page and its buttons, slide tools, and thread dump, for teachers only, refusing anyone
+   *   else with 403 ([teachersOnly]);
    * - health, version, and static content ([staticContent]), open to all.
    *
    * Sign-in, sign-out, the reset, and the teacher pages go out marked never to be stored ([noStore]), their redirects
@@ -115,6 +127,29 @@ object Routes {
 
           get(REASONS) {
             respondWith { displayUserReasons() }
+          }
+
+          get(ADMIN) {
+            respondWith { displayAdmin() }
+          }
+
+          // Sets the view the button names, rather than flipping the switch, so a second press of a page left open
+          // sets the same view again
+          post(ADMIN_VIEW) {
+            val studentView =
+              when (call.receiveParameters()[VIEW_FIELD]) {
+                STUDENT_VIEW -> true
+                TEACHER_VIEW -> false
+                else -> return@post call.respondText("Unknown view", Plain, HttpStatusCode.BadRequest)
+              }
+            setTeachersSeeStudentView(studentView)
+            call.respondRedirect("/$ADMIN")
+          }
+
+          // Deletes every teacher's walk, in either view, and sends each teacher back to the first slide
+          post(ADMIN_CLEAR) {
+            clearTeacherWalks(teacherEmails())
+            call.respondRedirect("/$ADMIN")
           }
 
           // Every JVM thread's stack; taking it briefly pauses the JVM

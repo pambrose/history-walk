@@ -9,6 +9,7 @@ import com.pambrose.historywalk.ClientUtils.orErrorToast
 import com.pambrose.historywalk.ClientUtils.postTo
 import com.pambrose.historywalk.ClientUtils.showErrorToast
 import com.pambrose.historywalk.ClientUtils.verticalPadding
+import com.pambrose.historywalk.EndPoints.ADMIN
 import com.pambrose.historywalk.EndPoints.LOGOUT
 import com.pambrose.historywalk.EndPoints.REASONS
 import com.pambrose.historywalk.EndPoints.SUMMARY
@@ -333,6 +334,9 @@ private fun Container.header(
     if (isTeacher) {
       navLink("class summary", "fas fa-chart-bar") { document.location?.href = "/$SUMMARY" }
       navLink("student reasons", "fas fa-comments") { document.location?.href = "/$REASONS" }
+      // The switch to the student view, and back. In the student view the server reports a teacher as a student, so
+      // this link is not shown and the admin page says to come back to /admin
+      navLink("admin", "fas fa-cog") { document.location?.href = "/$ADMIN" }
     }
     navLink("logout", "fas fa-sign-out-alt") { postTo("/$LOGOUT") }
     // Clears the teacher's own test walk and starts it again from the first slide. A POST, as logout is: the server

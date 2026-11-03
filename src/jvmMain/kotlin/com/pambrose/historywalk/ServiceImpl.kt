@@ -5,8 +5,10 @@ import com.pambrose.historywalk.ReasonRule.wordCount
 import com.pambrose.historywalk.User.Companion.findCurrentSlideForUser
 import com.pambrose.historywalk.User.Companion.userInfoFor
 import com.pambrose.historywalk.Utils.toUuid
+import com.pambrose.historywalk.auth.Roles.roleFor
 import com.pambrose.historywalk.auth.SchoolConfig
 import com.pambrose.historywalk.auth.userUuid
+import com.pambrose.historywalk.dbms.AdminTxs.teachersSeeStudentView
 import com.pambrose.historywalk.dbms.DbmsTxs.slideData
 import com.pambrose.historywalk.dbms.DbmsTxs.updateLastSlide
 import com.pambrose.historywalk.dbms.UserChoiceTable
@@ -27,12 +29,19 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
  * title, choice text and dead end come from the deck, and so does whether a choice advances without a reason. The
  * client's copies of those values are ignored. A refused call throws a [ServiceException], which Kilua passes to the
  * browser as a short message without logging it, so each refusal is logged here.
+ *
+ * While teachers see the student view (the admin page's switch, [teachersSeeStudentView]), a teacher is told they are
+ * a student, so their page is a student's, and each move a teacher records is counted in the class pages. The switch
+ * is read at each call, so a page already open counts its moves by the switch as it is now.
  */
 class ContentService(
   private val call: ApplicationCall,
+  private val teacherEmails: () -> Set<String> = { SchoolConfig.teacherEmails },
 ) : IContentService {
-  override suspend fun getUserInfo() =
-    userInfoFor(call.userUuid.toUuid(), SchoolConfig.teacherEmails) ?: UserInfo("Unknown", "Unknown")
+  override suspend fun getUserInfo(): UserInfo {
+    val info = userInfoFor(call.userUuid.toUuid(), teacherEmails()) ?: return UserInfo("Unknown", "Unknown")
+    return if (info.role == Role.TEACHER && teachersSeeStudentView()) info.copy(role = Role.STUDENT) else info
+  }
 
   override suspend fun getCurrentSlide(): SlideData {
     logger.debug { "userUuid=${call.userUuid}" }
@@ -88,6 +97,7 @@ class ContentService(
       } else {
         // Postgres INSERT ... ON CONFLICT DO NOTHING: user_choices_unique decides, so a second call for a recorded
         // move keeps the first reason instead of failing, even when two calls race
+        val counted = countsAsStudent(uuid)
         val inserted =
           with(UserChoiceTable) {
             insertIgnore { row ->
@@ -99,6 +109,7 @@ class ContentService(
               row[deadEnd] = move.to.isDeadEnd
               row[choiceText] = move.choiceText
               row[reason] = reasonText
+              row[countedAsStudent] = counted
             }.insertedCount
           }
         if (inserted > 0) {
@@ -169,6 +180,11 @@ class ContentService(
         ?: refuse(uuid, NOT_A_CHOICE, "from ${from.pathName} to $toPathName")
     return Move(from, choiceText, to, repeat)
   }
+
+  // A teacher's move made while teachers see the student view. A student's moves count by the student's role.
+  private fun countsAsStudent(uuid: String) =
+    teachersSeeStudentView() &&
+      User.emailForUuid(uuid.toUuid())?.let { roleFor(it, teacherEmails()) } == Role.TEACHER
 
   // The reason recorded for [move], or null if the user has not made it. Runs inside the caller's transaction.
   private fun recordedReason(
