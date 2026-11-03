@@ -84,7 +84,8 @@ else refused. The role is recomputed from the live `TEACHER_EMAILS` on every req
   query (`User.sessionUserFor`). `installUserSessions` takes that lookup and the increment (`findUser`, `endSessions`),
   so route tests can run without a database.
 - `Routes.appRoutes` is the access map: RPC inside `signedInApi` (no session → 401), teacher pages (`/summary`, `/reasons`,
-  `/slides`, `/threaddump`) inside `teachersOnly` (→ 403 for students), `/ping`, `/version`, and `/static/*` open to all.
+  `/admin` and its POSTs `/admin/view` and `/admin/clear`, `/slides`, `/threaddump`) inside `teachersOnly` (→ 403 for
+  students), `/ping`, `/version`, and `/static/*` open to all.
 - `/userreset` deletes the caller's own choices and is a POST, as `/logout` is (the client posts with
   `ClientUtils.postTo`); a GET or HEAD of either only redirects to `/`, since any link, image, or prefetch can send one.
 - Sign-in, sign-out, `/userreset`, and the teacher pages sit inside `noStore` (`RouteGuards.kt`), which sends
@@ -96,7 +97,27 @@ else refused. The role is recomputed from the live `TEACHER_EMAILS` on every req
   after a sign-out shows the sign-in dialog rather than the previous user's walk.
 
 An explicit anti-goal: a student must never see another student's data or progress. Teacher pages read the
-`history.user_*` views, which filter to `role = 'student'` so teachers' test walks never show up.
+`history.user_*` views, which count students' moves and leave teachers' test walks out, except the moves a teacher made
+in the student view (below).
+
+**Teachers see the student view.** The admin page (`/admin`, `Pages.displayAdmin`) has one app-wide switch, the single
+row of `history.settings` (`AdminTxs.teachersSeeStudentView`), so teachers can walk as their class will before the app
+is given to it. It starts at the teacher view.
+- The button names what pressing it does ("Teachers see student view" while teachers see the teacher view), so the page
+  also says which view is on. It posts the view it names (`view=student` or `view=teacher`), not a toggle, so a second
+  press of a page left open sets the same view again.
+- In the student view `ContentService.getUserInfo` reports a teacher as a student, so the page draws a student's header:
+  no teacher links, no "not counted" note, no reset. Nothing on the client knows about the switch, and the RPC
+  signatures did not change. The teacher pages still answer a teacher by address, so the admin page says to come back
+  to `/admin`.
+- `provideReason` marks the move `counted_as_student` when the user is a teacher (by the live `TEACHER_EMAILS`) and the
+  switch is on, read at each call. The progress views count those moves as a student's, and a teacher with one appears
+  in the summary, counting only those moves. A student's move never sets the mark; the views count it by the role.
+  A move the teacher already made in the teacher view is not counted when made again: `makeChoice` returns its stored
+  reason without asking, and `provideReason` keeps the first row. So the page says to clear before a trial run.
+- Counted moves stay counted when the switch goes back. The admin page's clear (`AdminTxs.clearTeacherWalks`) deletes
+  every move of each address in `TEACHER_EMAILS`, in either view, sends each of them back to the first slide, and
+  deletes any counted move left by someone taken off the list since. The form asks the browser to confirm first.
 
 **Slides.** Decks are Kotlin DSL values in `jvmMain/content/` (`jermainLonguenSlides`, `mosesSlides`) built with
 `slides/SlideDeck.slideDeck { slide(...) { choice(...) } }`; content is HTML/markdown in raw strings, rendered through
@@ -121,8 +142,9 @@ restart, together with the snapshot rewritten and committed with the deck change
 
 **Database.** `Dbms.migrate` runs Flyway (`src/jvmMain/resources/db/migration`) before `Database.connect` on every
 startup, so each deploy migrates. Never edit an applied migration (Flyway checksums them); add the next `V00N__...sql`
-(`V002` added `users.session_version`). Note `V001` begins with `drop schema if exists history cascade`. Tables are
-Exposed objects in `dbms/DbmsTables.kt`; queries are in `dbms/DbmsTxs.kt` and `User.kt`.
+(`V002` added `users.session_version`, `V003` the `history.settings` row and `user_choices.counted_as_student`, and
+rebuilt the progress views). Note `V001` begins with `drop schema if exists history cascade`. Tables are Exposed
+objects in `dbms/DbmsTables.kt`; queries are in `dbms/DbmsTxs.kt`, `dbms/AdminTxs.kt`, and `User.kt`.
 
 **Dev proxy.** In `make client`, the browser talks to :3000; `webpack.config.d/proxy.js` forwards `/auth`, `/rpc*`,
 `/static`, and the teacher/reset pages to :8080. A new server route that the browser loads directly must be added there.
@@ -171,11 +193,15 @@ Kotest `StringSpec` on both targets. A spec in `src/commonTest` (`ReasonRuleTest
 
 **JVM** (`src/jvmTest`, run by `jvmTest`): Kotest on JUnit Platform + MockK + Ktor test host. Route tests call
 `appRoutes(...)` with injected `findEmail`/`teacherEmails` lambdas instead of a database.
-- The database specs (`UserRepositoryTest`, `DbmsTxsTest`, `ContentServiceTest`, `PagesTest`, `UserResetTest`,
-  `SignOutTest`) each start their own `TestPostgres`, a Testcontainers `postgres:18` with the real Flyway migrations
+- The database specs (`UserRepositoryTest`, `DbmsTxsTest`, `ContentServiceTest`, `PagesTest`, `AdminTest`,
+  `UserResetTest`, `SignOutTest`) each start their own `TestPostgres`, a Testcontainers `postgres:18` with the real Flyway migrations
   applied, and share the small deck and helpers in `TestWalk.kt`.
 - `ContentServiceTest` mocks `ApplicationCall.userUuid` (a `mockkStatic` of `UserSessionKt`) to drive the RPC service
-  as a signed-in user.
+  as a signed-in user, with the teacher addresses passed to `ContentService`. In the student view a teacher is reported
+  as a student and their moves are counted; a student's never are.
+- `AdminTest` drives the switch and the clear through `AdminTxs` and the `/admin` routes: a teacher's counted moves in
+  the class pages and their other moves out of them, the button setting the view it names, an unknown view refused, the
+  clear leaving students' walks alone, and a student or a signed-out visitor refused the page and both buttons.
 - `SignOutTest` signs a student out and replays the old cookie, which must no longer sign anyone in.
 - `PagesTest` renders the teacher pages from Postgres, checking that a student's reason or name reaches the page as
   text, never markup, and drives `/summary`, `/reasons`, `/slides`, and the `/slide/{id}/{version}` jump as a signed-in
@@ -187,7 +213,7 @@ Kotest `StringSpec` on both targets. A spec in `src/commonTest` (`ReasonRuleTest
   the state and the cookie from the login's response, except in the replays of a stolen callback URL (issue #7 of
   `docs/code-review-2026-10-31.md`), which must be refused before any token request reaches Google.
 - `UserResetTest` checks that a POST to `/userreset` needs a session and deletes only the caller's rows, and that a
-  GET or HEAD deletes nothing. `NoStoreCachingTest` (no database: it stubs the two class pages with
+  GET or HEAD deletes nothing. `NoStoreCachingTest` (no database: it stubs the class pages and the admin page with
   `mockkObject(Pages)`) checks the `no-store` header on every per-user route.
 - `SlideContentTest` walks both real decks from the root and fails on a path name that does not find its slide, a
   slide shared between two parents, a go-back past the root, a missing image, or a success slide whose title differs
@@ -208,8 +234,9 @@ private.
   parks the call behind the sign-in dialog for good and leaves the singleton `Security` signed out for the rest of the
   run, so only `WithAuthTest` sends one, and it runs last: Kotest runs the specs in name order.
 - `LoginPromptTest`, `SignInDialogTest`, `ErrorToastTest` (`orErrorToast`, `launchOrErrorToast`), `OnClickWhenIdleTest`
-  (the busy gate), `ReasonDialogTest` (the five-word gate), and `ChoiceFlowTest` (a click on a choice through
-  `MainPanel`: makeChoice, the reason dialog, provideReason, the next slide).
+  (the busy gate), `ReasonDialogTest` (the five-word gate), `ChoiceFlowTest` (a click on a choice through
+  `MainPanel`: makeChoice, the reason dialog, provideReason, the next slide), and `HeaderTest` (a teacher's header
+  links to the class pages and the admin page, a student's to none of them).
 - The version check: `VersionCheckStateTest` (the pure decisions: when the dialog is held back, when the server's
   warning stamp is kept, the reload put off while a reason is written, the reload remembered in `sessionStorage`),
   `VersionCheckLoopTest` (the loop with a fake server and UI, on Kotest's virtual clock, `coroutineTestScope`), and

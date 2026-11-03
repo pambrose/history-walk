@@ -31,6 +31,21 @@ object UserChoiceTable : IntIdTable("history.user_choices") {
   val deadEnd = bool("dead_end")
   val choiceText = text("choice_text")
   val reason = text("reason")
+
+  // A teacher's move made while teachers saw the student view, which the progress views count as a student's (V003)
+  val countedAsStudent = bool("counted_as_student").default(false)
+}
+
+// The app's settings, one row (V003)
+object SettingsTable : Table("history.settings") {
+  val id = integer("id")
+  val teachersSeeStudentView = bool("teachers_see_student_view")
+  val updated = datetime("updated")
+
+  override val primaryKey = PrimaryKey(id)
+
+  /** The id of the one row. */
+  const val ROW = 1
 }
 
 object UserVisitsView : Table("history.user_visits") {

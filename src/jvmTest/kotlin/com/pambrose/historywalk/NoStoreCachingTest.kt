@@ -43,15 +43,15 @@ import java.util.UUID
  * Sign-in, sign-out, the reset, and the teacher pages belong to one signed-in user, so neither the browser (Back after
  * a sign-out on a shared computer) nor Cloudflare may keep a copy: each goes out `no-store, private`, redirects and
  * refusals included. The server is set up as `Installs.installs` sets it up, with compression, conditional headers,
- * and HEAD answered like GET, so a test fails if one of them drops the header. The summary and reasons pages are
- * stubbed, as they read the database; PagesTest renders them from Postgres.
+ * and HEAD answered like GET, so a test fails if one of them drops the header. The summary, reasons, and admin pages
+ * are stubbed, as they read the database; PagesTest and AdminTest render them from Postgres.
  */
 class NoStoreCachingTest : StringSpec() {
   private val student = UUID.randomUUID()
   private val teacher = UUID.randomUUID()
   private val emails = mapOf(student to "27msmith@athenian.org", teacher to "pambrose@athenian.org")
   private val teachers = setOf("pambrose@athenian.org")
-  private val teacherPages = listOf("/summary", "/reasons", "/threaddump", "/slides", "/slide/9")
+  private val teacherPages = listOf("/summary", "/reasons", "/admin", "/threaddump", "/slides", "/slide/9")
 
   // Exactly one Cache-Control, and the no-store one: with two, which one a cache obeys is up to the cache
   private fun HttpResponse.shouldNotBeStored() {
@@ -106,6 +106,7 @@ class NoStoreCachingTest : StringSpec() {
       mockkObject(Pages)
       every { Pages.displayUserSummary() } returns "<p>the class summary</p>"
       every { Pages.displayUserReasons() } returns "<p>the class's reasons</p>"
+      every { Pages.displayAdmin() } returns "<p>the admin page</p>"
     }
 
     afterSpec { unmockkObject(Pages) }

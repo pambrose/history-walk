@@ -48,6 +48,7 @@ fun addChoice(
   deadEnd: Boolean = false,
   reason: String = "because",
   at: LocalDateTime? = null,
+  countedAsStudent: Boolean = false,
 ) = transaction {
   UserChoiceTable.insert { row ->
     row[userUuidRef] = UUID.fromString(user)
@@ -59,5 +60,6 @@ fun addChoice(
     row[choiceText] = "choose ${to.substringAfterLast('/')}"
     row[this.reason] = reason
     if (at != null) row[created] = at
+    row[this.countedAsStudent] = countedAsStudent
   }
 }

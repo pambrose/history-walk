@@ -8,6 +8,7 @@ import com.pambrose.historywalk.ContentService.Companion.NO_REASON_NEEDED
 import com.pambrose.historywalk.ReasonRule.MAX_LENGTH
 import com.pambrose.historywalk.ReasonRule.MIN_WORDS
 import com.pambrose.historywalk.auth.userUuid
+import com.pambrose.historywalk.dbms.AdminTxs.setTeachersSeeStudentView
 import com.pambrose.historywalk.dbms.DbmsTxs.allSuccessUsers
 import com.pambrose.historywalk.dbms.DbmsTxs.correctDecisionStreak
 import com.pambrose.historywalk.dbms.DbmsTxs.decisionCount
@@ -59,10 +60,32 @@ class ContentServiceTest : StringSpec() {
     }
   private val openDoor = SlideChoice("open the door", "/Hall/Door", "Door", false, offset = 0, alreadyVisited = false)
 
-  private fun serviceFor(uuid: String): ContentService {
+  private fun serviceFor(
+    uuid: String,
+    teachers: Set<String> = emptySet(),
+  ): ContentService {
     val call = mockk<ApplicationCall>()
     every { call.userUuid } returns uuid
-    return ContentService(call)
+    return ContentService(call) { teachers }
+  }
+
+  // Each of the user's stored moves, by the title it leads to, and whether the class pages count it as a teacher's
+  private fun storedCounted(uuid: String) =
+    transaction {
+      UserChoiceTable
+        .selectAll()
+        .where { UserChoiceTable.userUuidRef eq UUID.fromString(uuid) }
+        .orderBy(UserChoiceTable.id)
+        .map { it[UserChoiceTable.toTitle] to it[UserChoiceTable.countedAsStudent] }
+    }
+
+  private suspend fun <T> inStudentView(block: suspend () -> T): T {
+    setTeachersSeeStudentView(true)
+    return try {
+      block()
+    } finally {
+      setTeachersSeeStudentView(false)
+    }
   }
 
   private fun storedReasons(uuid: String) =
@@ -418,6 +441,35 @@ class ContentServiceTest : StringSpec() {
     "user info comes from the signed-in user's row" {
       val id = student("27info", "Info Person")
       serviceFor(id).getUserInfo() shouldBe UserInfo("Info Person", "27info@athenian.org", null, Role.STUDENT)
+    }
+
+    "while teachers see the student view, a teacher's page is told the user is a student" {
+      val id = teacher("mrviewer")
+      val service = serviceFor(id, teachers = setOf("mrviewer@athenian.org"))
+
+      service.getUserInfo().role shouldBe Role.TEACHER
+      inStudentView { service.getUserInfo() } shouldBe UserInfo("Teacher", "mrviewer@athenian.org", null, Role.STUDENT)
+      service.getUserInfo().role shouldBe Role.TEACHER
+    }
+
+    "a teacher's move counts in the class pages only while teachers see the student view" {
+      val id = teacher("msmover")
+      val service = serviceFor(id, teachers = setOf("msmover@athenian.org"))
+
+      inStudentView { service.provideReason(START, "Start", goOn, reason) }
+      service.provideReason(MIDDLE, "Middle", finish, otherReason)
+
+      storedCounted(id) shouldBe listOf("Middle" to true, "Win" to false)
+    }
+
+    "a student's move is never marked as a teacher's, in either view" {
+      val id = student("27either")
+      val service = serviceFor(id)
+
+      inStudentView { service.provideReason(START, "Start", goOn, reason) }
+      service.provideReason(MIDDLE, "Middle", finish, otherReason)
+
+      storedCounted(id) shouldBe listOf("Middle" to false, "Win" to false)
     }
 
     "user info for an id with no row is Unknown" {
