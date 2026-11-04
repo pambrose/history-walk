@@ -64,20 +64,23 @@ the original classroom app; [History](#history) at the end tells the story in or
 - `/ping` and `/version` for health checks, and `/threaddump` for teachers.
 - A single `DATABASE_URL` for the database, such as Railway's `${{Postgres.DATABASE_URL}}`, parsed safely (an `@`, `:`,
   or `+` in the password, a bad URL refused without echoing it), with `DBMS_NAME` to use another database on the same
-  server.
+  server. Its connection is not encrypted, as suits a platform's private network.
 - A Docker image: Java 25 on Alpine, non-root, with a `/ping` health check, built with `make docker-build`, run with
   `make docker-run`, smoke-tested with `make docker-smoke`, and pushed for `linux/amd64` and `linux/arm64` with
   `make docker-push`.
 - Makefile targets for the local database (`db`, `reset-jermain`, `reset-moses`, `stop-db`), development (`server`,
   `client`), checks (`tests`, `js-tests`, `coverage`, `lint`, `format`, `zizmor`, `ci`),
-  dependencies (`versions`, `versions-all`), deploys (`served-version`), and the docs
-  (`website-serve`, `website-build`, `website-clean`, `upgrade-site`). `make` alone prints them.
+  dependencies (`versions`, `versions-all`), deploys (`served-version`), releases (`release-check`, `release`), and the
+  docs (`website-serve`, `website-build`, `website-clean`, `upgrade-site`). `make` alone prints them.
+- `make release-check`, which lists every reason a checkout can't be released, and `make release`, which runs every
+  CI gate, pushes the image to Docker Hub, and creates the GitHub release from `RELEASE_NOTES.md`.
 - `make served-version`, which checks that Cloudflare serves the bundle the deployment does.
 
 #### Documentation
 
 - A documentation site, built with Zensical in `website/history-walk` and published to GitHub Pages at
   <https://pambrose.github.io/history-walk/>: a guide for teachers (8 pages) and one for administrators (11 pages).
+  The site also serves `llms.txt`.
 - `AGENTS.md`, a guide to the code for people and coding agents; `CHANGELOG.md`, `RELEASE_NOTES.md`, and `llms.txt`.
 
 #### Quality
