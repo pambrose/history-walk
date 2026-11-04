@@ -30,11 +30,19 @@ DOCKER_PLATFORMS ?= linux/amd64,linux/arm64
 PUBLIC_URL   ?=
 ORIGIN_URL   ?=
 
+# The documentation site, a Zensical project in WEBSITE_DIR. Zensical is a dependency of the Python project in website/,
+# which each website target first syncs into website/.venv with uv. WEBSITE_ADDR=0.0.0.0:8000 serves it to the network.
+WEBSITE_DIR  := website/history-walk
+WEBSITE_ADDR ?= localhost:8000
+ZENSICAL     := $(abspath website/.venv/bin/zensical)
+
 .DEFAULT_GOAL := help
 
 .PHONY: help db reset-jermain reset-moses stop-db server client build clean tests js-tests coverage lint \
-		format zizmor ci procfile-check docker-build docker-push docker-run docker-smoke versions versions-all \
-		depends yarn-unlock upgrade-wrapper creds restart log served-version
+		format zizmor ci procfile-check docker-build docker-push docker-run docker-smoke website-env website-serve \
+		website-build website-clean upgrade-site versions versions-all depends yarn-unlock upgrade-wrapper creds \
+		restart log \
+		served-version
 
 ##@ General
 
@@ -221,6 +229,31 @@ docker-smoke: ## Start the image (make docker-build first) against a throwaway P
 	[ "$$status" = 401 ] || fail "an RPC call without a session got $$status, not 401"; \
 	cleanup; \
 	echo "docker-smoke: $(DOCKER_IMAGE):$(VERSION) migrated an empty database and answered every check"
+
+##@ Website
+
+# Installs Zensical, at the version uv.lock pins, into website/.venv. Only the dependencies: website/ is not a package
+# the docs need built.
+website-env:
+	@uv sync --project website --no-install-project --quiet
+
+website-serve: website-env ## Serve the documentation site at WEBSITE_ADDR (localhost:8000), rebuilding it on every save
+	cd $(WEBSITE_DIR) && $(ZENSICAL) serve --dev-addr $(WEBSITE_ADDR)
+
+# --strict stops the build at the first warning, such as a link to a page that does not exist
+website-build: website-env ## Build the documentation site into website/history-walk/site, failing on any warning
+	cd $(WEBSITE_DIR) && $(ZENSICAL) build --clean --strict
+
+website-clean: ## Remove the built documentation site and Zensical's cache
+	rm -rf $(WEBSITE_DIR)/site $(WEBSITE_DIR)/.cache
+
+# Moves every package in website/uv.lock (Zensical and what it depends on) to its latest release that pyproject.toml
+# allows, then installs them. Run make website-build afterwards to check that the site still builds cleanly.
+upgrade-site: ## Upgrade Zensical and its dependencies in website/uv.lock to their latest releases, and install them
+	@before=$$($(ZENSICAL) --version 2>/dev/null || echo "not installed"); \
+	uv lock --project website --upgrade && \
+	uv sync --project website --no-install-project --quiet && \
+	echo "Zensical: $$before -> $$($(ZENSICAL) --version)"
 
 ##@ Dependencies
 

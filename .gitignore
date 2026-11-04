@@ -13,3 +13,8 @@ kotlin-js-store
 logs/
 secrets/
 .env
+
+# The docs site: its build output is not kept, but website/uv.lock is, so the Website workflow builds with the Zensical
+# it pins, even for someone whose global gitignore drops *.lock
+website/history-walk/site/
+!website/uv.lock
