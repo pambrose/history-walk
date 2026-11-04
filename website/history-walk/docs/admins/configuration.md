@@ -65,8 +65,8 @@ An open page asks the server every minute whether a newer version has been relea
 
 ## The port
 
-The server listens on the port given with `-port=` on its command line; the Procfile passes the host's `$PORT`
-(`java -jar build/libs/history-walk.jar -port=$PORT`). The Docker image listens on 8080.
+The server listens on the port given with `-port=` on its command line, so a deployment's start command passes the
+host's `$PORT`: `java -jar build/libs/history-walk.jar -port=$PORT`. The Docker image listens on 8080.
 
 ## A complete example
 

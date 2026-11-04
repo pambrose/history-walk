@@ -86,9 +86,8 @@ with a logged warning. Any other host is production and requires `SESSION_SECRET
 * jsJar - Packages a standalone "web" frontend jar with all required files into `build/libs/*.jar`
 * jvmJar - Packages a backend jar with compiled source files into `build/libs/*.jar`
 * jar - Packages a "fat" jar with all backend sources and dependencies while also embedding frontend resources
-  into `build/libs/history-walk.jar`. The name has no version, so the Procfile and the Dockerfile name the same file in
-  every release; `make procfile-check`, run after a build, fails if the Procfile names a file the build did not write.
-  (`jar` is Gradle's prefix match for the Kilua RPC plugin's `jarWithJs` task.)
+  into `build/libs/history-walk.jar`. The name has no version, so the Dockerfile and a deployment's start command name
+  the same file in every release. (`jar` is Gradle's prefix match for the Kilua RPC plugin's `jarWithJs` task.)
 
 ## Docker
 
@@ -116,10 +115,11 @@ Use `DOCKER_PORT=8090` to run beside `make server`, and `DOCKER_DB=moses` (with
 ## Deployment
 
 Each walk is its own deployment of the fat jar, on Java 25, with its own Postgres database and environment variables.
-A host that builds from the repository runs `./gradlew jar` and starts the jar as the Procfile does:
+A host that builds from the repository runs `./gradlew jar` and starts the jar with this start command (on Railway,
+the service's custom start command):
 
-```text
-web: java -jar build/libs/history-walk.jar -port=$PORT
+```bash
+java -jar build/libs/history-walk.jar -port=$PORT
 ```
 
 A host that runs containers can run the image `make docker-push` publishes. The

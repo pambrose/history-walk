@@ -31,7 +31,7 @@ updates:
     open-pull-requests-limit: 0
 
   # The Dockerfile's base image, pinned to a digest so each move of its tag arrives as a PR. Major updates are ignored:
-  # the Java major version moves by hand, with `jvm` in gradle/libs.versions.toml and system.properties (Heroku).
+  # the Java major version moves by hand, with `jvm` in gradle/libs.versions.toml.
   - package-ecosystem: docker
     directory: /
     schedule:

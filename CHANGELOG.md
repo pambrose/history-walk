@@ -67,7 +67,7 @@ the original classroom app; [History](#history) at the end tells the story in or
   `make docker-run`, smoke-tested with `make docker-smoke`, and pushed for `linux/amd64` and `linux/arm64` with
   `make docker-push`.
 - Makefile targets for the local database (`db`, `reset-jermain`, `reset-moses`, `stop-db`), development (`server`,
-  `client`), checks (`tests`, `js-tests`, `coverage`, `lint`, `format`, `zizmor`, `ci`, `procfile-check`),
+  `client`), checks (`tests`, `js-tests`, `coverage`, `lint`, `format`, `zizmor`, `ci`),
   dependencies (`versions`, `versions-all`), deploys (`served-version`), and the docs
   (`website-serve`, `website-build`, `website-clean`, `upgrade-site`). `make` alone prints them.
 - `make served-version`, which checks that Cloudflare serves the bundle the deployment does.
@@ -102,8 +102,8 @@ the original classroom app; [History](#history) at the end tells the story in or
   a double-click, is accepted once and changes nothing.
 - The page stays usable after a failed request: it shows a message instead of freezing, buttons are disabled while a
   request is in flight, and a refused move reloads the slide the user is really on.
-- The fat jar is `build/libs/history-walk.jar`, with no version in its name, so a version bump can't leave the
-  Procfile pointing at a missing file. It shrank from 96 MB to 35 MB.
+- The fat jar is `build/libs/history-walk.jar`, with no version in its name, so a version bump can't leave a
+  deployment's start command pointing at a missing file. It shrank from 96 MB to 35 MB.
 - Built with Java 25, Kotlin 2.4.21, Ktor 3.6, KVision 9.7 with Kilua RPC 0.0.46 (in place of KVision's remote
   services), Exposed 1.6, Flyway 13, and Gradle 9.8 with a version catalog. Before the rebuild it used Kotlin 2.1 and
   KVision 8.2.
@@ -117,6 +117,8 @@ the original classroom app; [History](#history) at the end tells the story in or
 - `/contentreset`, which fetched Kotlin from GitHub and evaluated it, along with the `SLIDES_REPO_*` settings and the
   Kotlin scripting dependencies.
 - The JitPack repository and the separate content and slides libraries.
+- The `Procfile` and `system.properties`: each deployment sets its own start command,
+  `java -jar build/libs/history-walk.jar -port=$PORT`.
 
 ### Fixed
 

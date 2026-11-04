@@ -53,7 +53,7 @@ The dev server forwards `/auth`, the API, `/static`, and the teacher pages to th
 | `./gradlew jvmTest --tests 'com.pambrose.historywalk.AdminTest'` | One server spec. The page's tests always run whole. |
 | `make coverage` | The tests, then Kover's coverage reports (`build/reports/kover/html/index.html`), and the coverage floor. |
 | `make lint` / `make format` | Checks, or fixes, the Kotlin style. |
-| `make ci` | Every CI gate: lint, the workflow audit, all tests, the Docker build, the Procfile check, and the image's smoke test. |
+| `make ci` | Every CI gate: lint, the workflow audit, all tests, the Docker build, and the image's smoke test. |
 
 The JVM line coverage must stay at or above the floor in `build.gradle.kts` (90%); CI fails under it. Raise the floor
 as coverage grows; never lower it to let a change through.
@@ -66,7 +66,7 @@ GitHub Actions runs on every push to `master` and every pull request:
 |---|---|
 | Tests | The server's tests with coverage and the floor, and the page's tests in Chrome. |
 | Lint | `make lint`. |
-| Docker Image | Builds the jar and the image, checks the Procfile, and runs the smoke test. |
+| Docker Image | Builds the jar and the image, and runs the smoke test. |
 | zizmor | Audits the workflow files, when they change. |
 
 All actions are pinned to commit hashes, and Dependabot proposes their updates.

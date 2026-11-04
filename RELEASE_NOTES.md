@@ -56,10 +56,12 @@ See the [administrator guide](https://pambrose.github.io/history-walk/admins/).
    the required ones.
 3. **Set `SLIDES_VARIABLE_NAME`** to `jermain` or `moses`. The old values, such as `jermainLonguenSlides`, now stop the
    server at startup. Unset the old `SLIDES_REPO_*` variables.
-4. **Deploy**, then check `/version` and sign in as a teacher.
-5. **Behind Cloudflare**, run `make served-version PUBLIC_URL=… ORIGIN_URL=…` and purge `main.bundle.js` if it
+4. **Set the start command** on a host that builds from the repository:
+   `java -jar build/libs/history-walk.jar -port=$PORT`. The repository no longer has a Procfile or `system.properties`.
+5. **Deploy**, then check `/version` and sign in as a teacher.
+6. **Behind Cloudflare**, run `make served-version PUBLIC_URL=… ORIGIN_URL=…` and purge `main.bundle.js` if it
    reports a stale copy.
-6. **Rotate the credentials of any database the old version used**: the old version wrote the database
+7. **Rotate the credentials of any database the old version used**: the old version wrote the database
    password to the logs.
 
 ### Known issues

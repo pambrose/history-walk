@@ -16,14 +16,17 @@ Whatever the host, a new deployment needs:
 ## Building from the repository
 
 A host that builds from the repository needs Java 25. It runs `./gradlew jar`, which writes
-`build/libs/history-walk.jar`, and starts it as the `Procfile` does:
+`build/libs/history-walk.jar`, and starts it with this command (on Railway, the service's **Settings → Deploy →
+Custom Start Command**):
 
-```text
-web: java -jar build/libs/history-walk.jar -port=$PORT
+```bash
+java -jar build/libs/history-walk.jar -port=$PORT
 ```
 
-The jar's name has no version in it, so a release never leaves the Procfile pointing at a file the build no longer
-writes; `make procfile-check` (in CI) checks the two agree.
+`-port=$PORT` makes the server listen on the port the host assigns; without it, the server listens on 8080. The
+repository has no Procfile, so the start command must be set on the host. `build/libs` also holds two smaller jars, so
+name `history-walk.jar` exactly rather than letting the host pick one. Its name has no version in it, so a release
+never leaves the start command pointing at a file the build no longer writes.
 
 A deployment behind Cloudflare needs one more check after each deploy, that Cloudflare serves the new release; see
 [Releases and updates](releases.md#after-a-deploy).

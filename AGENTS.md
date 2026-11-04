@@ -10,7 +10,7 @@ Flyway. The same repo is deployed as two Heroku apps (jermain-walk and moses-wal
 
 ## Commands
 
-The build needs JDK 25 (`gradle/gradle-daemon-jvm.properties` pins the daemon toolchain; Heroku reads `system.properties`).
+The build needs JDK 25 (`gradle/gradle-daemon-jvm.properties` pins the daemon toolchain).
 `make` with no target prints the help. The project `group` and `version` live in `gradle.properties`.
 
 ```bash
@@ -24,9 +24,8 @@ make coverage           # the tests plus Kover reports of the JVM code (build/re
 ./gradlew jvmTest --tests 'com.pambrose.historywalk.auth.AuthRoutesTest'   # one JVM spec (a client run is always whole)
 make lint               # kotlinter (./gradlew lintKotlin); make format fixes what it can
 make zizmor             # audit .github (workflows, dependabot.yml) as the zizmor workflow does
-make ci                 # every CI gate: lint, zizmor, JVM and client tests, docker-build, procfile-check, docker-smoke
+make ci                 # every CI gate: lint, zizmor, JVM and client tests, docker-build, docker-smoke
 make build              # clean + fat jar at build/libs/history-walk.jar (server + bundled JS client; no version)
-make procfile-check     # after a build: fails unless the jar the Procfile runs is in build/libs
 make docker-build       # fat jar, then image history-walk:<version>; make docker-run runs it with .env against make db
 make docker-push        # fat jar, then buildx pushes pambrose/history-walk:<version> and :latest (amd64, arm64) to Docker Hub
 make docker-smoke       # start the image against a throwaway Postgres and check /ping, /version, headers, the 401
@@ -272,7 +271,7 @@ private.
 
 **CI** (`.github/workflows`, all actions pinned to commit SHAs): `tests.yml`'s `test` job runs `jvmTest` with Kover and
 `jsTest` (the client specs, in the runner's Chrome) on pushes and pull requests to master; `docker.yml` runs
-`make docker-build`, `make procfile-check` (the Procfile's jar exists), and `make docker-smoke`, which starts the image
+`make docker-build` and `make docker-smoke`, which starts the image
 against a throwaway Postgres and checks `/ping`, `/version`, the page shell's `Cache-Control`, and a 401 for an unsigned
 RPC call; `zizmor.yml` audits `.github` changes; `lint.yml` runs `make lint`; `dependency-graph.yml` submits
 `jvmRuntimeClasspath` so Dependabot sees the JVM libraries; `cleanup-runs.yml` deletes runs older than 30 days every
@@ -291,12 +290,12 @@ constants are SCREAMING_SNAKE_CASE, as ktlint's property-naming rule requires.
 
 - IntelliJ has twice auto-imported JDK-internal classes (`sun.jvmstat...`, `sun.jvm.hotspot.HelloWorld.e`) into Kotlin
   files, which breaks the build; delete such imports.
-- Heroku: each app's env vars are listed in `heroku.md` and the README's "Google sign-in" section; the Procfile runs
-  `java -jar build/libs/history-walk.jar -port=$PORT`, so the Docker image and Heroku both run the same fat jar.
-- `./gradlew jar` (what Heroku's `GRADLE_TASK` and the Makefile run) is Gradle's prefix match for `jarWithJs`, the Kilua
-  RPC plugin's fat jar: Kotlin Multiplatform has no `jar` task. `build.gradle.kts` names it `history-walk.jar` with no
-  version, so a version bump does not leave the Procfile and the Dockerfile pointing at a file the build no longer
-  writes; `make procfile-check` (in `make ci` and `docker.yml`) guards the Procfile. Keep the three names in step.
+- There is no Procfile: a deployment starts the fat jar with its own start command (Railway's service settings),
+  `java -jar build/libs/history-walk.jar -port=$PORT`, and the Docker image runs the same jar.
+- `./gradlew jar` (what the Makefile runs) is Gradle's prefix match for `jarWithJs`, the Kilua RPC plugin's fat jar:
+  Kotlin Multiplatform has no `jar` task. `build.gradle.kts` names it `history-walk.jar` with no version, so a version
+  bump does not leave the Dockerfile or a deployment's start command pointing at a file the build no longer writes.
+  Keep the names in step.
 - `docs/superpowers/` holds the Google sign-in design spec and implementation plan. They predate folding their own
   `V002` into `V001`; today's `V002` is the session version, which came later.
 - `website/history-walk/docs/` is the guide for teachers and administrators (a Zensical site; `make website-serve`).

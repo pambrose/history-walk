@@ -39,7 +39,7 @@ ZENSICAL     := $(abspath website/.venv/bin/zensical)
 .DEFAULT_GOAL := help
 
 .PHONY: help db reset-jermain reset-moses stop-db server client build clean tests js-tests coverage lint \
-		format zizmor ci procfile-check docker-build docker-push docker-run docker-smoke website-env website-serve \
+		format zizmor ci docker-build docker-push docker-run docker-smoke website-env website-serve \
 		website-build website-clean upgrade-site versions versions-all depends yarn-unlock upgrade-wrapper creds \
 		restart log \
 		served-version
@@ -95,7 +95,7 @@ client: ## Run the webpack dev server on port 3000 (proxies the API to 8080)
 
 ##@ Build and test
 
-build: clean ## Clean, then build the fat jar (build/libs/history-walk.jar, the file the Procfile runs)
+build: clean ## Clean, then build the fat jar (build/libs/history-walk.jar, the file deployments run)
 	$(GRADLE) jar
 
 clean: ## Remove build outputs
@@ -128,31 +128,14 @@ zizmor: ## Audit the GitHub Actions workflows and dependabot.yml with zizmor, as
 
 # Every gate CI runs, in one command, so this is the check before merging: lint, the zizmor audit, the JVM tests with
 # coverage (checked against the floor in build.gradle.kts) and the client tests (their results not taken from the build
-# cache), the Docker image build, the Procfile check against the jar that build wrote, and the image started against
-# Postgres. Needs Docker, Chrome, and zizmor.
-ci: ## Run every CI gate locally: lint, zizmor, the JVM and client tests, the image build, procfile-check, the smoke test
+# cache), the Docker image build, and the image started against Postgres. Needs Docker, Chrome, and zizmor.
+ci: ## Run every CI gate locally: lint, zizmor, the JVM and client tests, the image build, the smoke test
 	$(MAKE) lint
 	$(MAKE) zizmor
 	$(GRADLE) --no-build-cache cleanJvmTest cleanJsBrowserTest jvmTest jsBrowserTest koverXmlReport koverHtmlReport koverLog \
 		koverVerify
 	$(MAKE) docker-build
-	$(MAKE) procfile-check
 	$(MAKE) docker-smoke
-
-# Heroku starts the dyno with the Procfile's command, so a Procfile naming a jar the build did not write leaves the app
-# down after a deploy. The fat jar's name leaves out the version (build.gradle.kts) for that reason, and this check
-# keeps the two in step. It reads the jar path from the Procfile's web line and fails if there is no such file, so build
-# the jar first (make build, make docker-build, or ./gradlew jar): make ci and the Docker Image workflow run it right
-# after docker-build. A jar left by an earlier build also passes, so run it after a clean build to be sure.
-procfile-check: ## Check that the jar the Procfile runs is in build/libs (build the jar first)
-	@jar=$$(sed -n 's/^web:.*[[:space:]]-jar[[:space:]]\{1,\}\([^[:space:]]\{1,\}\).*/\1/p' Procfile); \
-	[ -n "$$jar" ] || { echo "procfile-check: found no 'web: ... -jar <path>' line in the Procfile" >&2; exit 1; }; \
-	if [ ! -f "$$jar" ]; then \
-		echo "procfile-check: the Procfile runs $$jar, which the build did not write. build/libs holds:" >&2; \
-		ls -1 build/libs >&2 2>/dev/null || echo "  (nothing: build the jar first)" >&2; \
-		exit 1; \
-	fi; \
-	echo "procfile-check: the Procfile runs $$jar, which the build wrote"
 
 ##@ Docker
 

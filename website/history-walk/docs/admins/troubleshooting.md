@@ -70,4 +70,3 @@ See [Google sign-in](google-sign-in.md#other-sign-in-problems). The most common:
 | *The 'expect' declaration 'getService' has no 'actual' declaration* in `compileKotlinJvm` | KSP lost the RPC service while generating code. KSP is held at 2.3.12 for this ([Releases](releases.md#dependencies)); if it still happens, run `./gradlew clean` and build again. |
 | An import of `sun.…` classes in a Kotlin file | IntelliJ sometimes auto-imports JDK-internal classes. Delete the import. |
 | `jsBrowserTest` fails with nothing run | The Kotest entry point wasn't generated; run `./gradlew clean` and the tests again. |
-| `make procfile-check` fails | The Procfile names a jar the build didn't write. The jar is `build/libs/history-walk.jar`; keep the Procfile, the Dockerfile, and `build.gradle.kts` in step. |
