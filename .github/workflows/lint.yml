@@ -40,4 +40,4 @@ jobs:
         with:
           name: lint-reports
           path: build/reports/ktlint/
-          retention-days: 14
+          retention-days: 30
