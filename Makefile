@@ -25,6 +25,16 @@ ENV_FILE     ?= .env
 DOCKER_REPO      ?= pambrose/history-walk
 DOCKER_PLATFORMS ?= linux/amd64,linux/arm64
 
+# `make release` publishes only from a clean checkout of this branch that matches origin, and whose CI on GitHub passed:
+# each of the RELEASE_CHECKS jobs (the Tests, Lint, and Docker Image workflows) must have run and passed, so a release
+# started before CI has queued them all stops rather than passing on the ones that ran.
+RELEASE_BRANCH ?= master
+RELEASE_CHECKS := test lint docker-image
+# VERSION as a regular expression, for finding its sections in CHANGELOG.md and RELEASE_NOTES.md
+VERSION_RE   = $(subst .,\.,$(VERSION))
+# Where make release writes VERSION's section of RELEASE_NOTES.md, the GitHub release's notes
+RELEASE_NOTES_FILE = build/release-notes-$(VERSION).md
+
 # The addresses `make served-version` compares: the app as Cloudflare serves it, and the Heroku app behind it, e.g.
 # make served-version PUBLIC_URL=https://walk.example.org ORIGIN_URL=https://<app>.herokuapp.com
 PUBLIC_URL   ?=
@@ -39,7 +49,8 @@ ZENSICAL     := $(abspath website/.venv/bin/zensical)
 .DEFAULT_GOAL := help
 
 .PHONY: help db reset-jermain reset-moses stop-db server client build clean tests js-tests coverage lint \
-		format zizmor ci docker-build docker-push docker-run docker-smoke website-env website-serve \
+		format zizmor ci docker-build docker-push _docker-push docker-run docker-smoke release-check release \
+		_confirm-release website-env website-serve \
 		website-build website-clean upgrade-site versions versions-all depends yarn-unlock upgrade-wrapper creds \
 		restart log \
 		served-version
@@ -155,6 +166,10 @@ docker-push: ## Build the fat jar, then build and push a multi-arch image to Doc
 	@echo "  $(DOCKER_REPO):$(VERSION)"
 	@echo "  $(DOCKER_REPO):latest"
 	@printf 'Continue? [y/N] ' && read ans && [ "$$ans" = "y" ]
+	@$(MAKE) --no-print-directory _docker-push
+
+# The push itself, with no prompt: docker-push asks first, and make release asks once for the whole release.
+_docker-push:
 	$(GRADLE) jar
 	docker buildx build --build-arg APP_VERSION=$(VERSION) --platform $(DOCKER_PLATFORMS) \
 		-t $(DOCKER_REPO):$(VERSION) -t $(DOCKER_REPO):latest --push .
@@ -212,6 +227,87 @@ docker-smoke: ## Start the image (make docker-build first) against a throwaway P
 	[ "$$status" = 401 ] || fail "an RPC call without a session got $$status, not 401"; \
 	cleanup; \
 	echo "docker-smoke: $(DOCKER_IMAGE):$(VERSION) migrated an empty database and answered every check"
+
+##@ Release
+
+# Publishes nothing. It fails unless this checkout is fit to release VERSION, and lists every reason rather than stopping
+# at the first, so one run shows all that is left to do: the local checks first, then those that ask GitHub and Docker
+# Hub. RELEASE_NOTES.md's "## History Walk VERSION" section becomes the GitHub release's notes, so it must be there and
+# end with the **Full Changelog** link. A tag on Docker Hub can be pushed over, so a VERSION already there is refused.
+release-check: ## Fail, listing every reason, unless this checkout is fit to release VERSION
+	@problems=0; problem() { echo "  - $$1" >&2; problems=$$((problems + 1)); }; \
+	echo "Checking whether $(VERSION) can be released from $$(git rev-parse --short HEAD)"; \
+	[ -n "$(VERSION)" ] || problem "found no version in gradle.properties"; \
+	case "$(VERSION)" in *SNAPSHOT*|*-rc*|*-beta*|*-alpha*) \
+		problem "$(VERSION) is a pre-release, and make release pushes it as :latest";; esac; \
+	[ -z "$$(git status --porcelain)" ] || problem "the working tree is dirty: commit or stash first"; \
+	branch=$$(git rev-parse --abbrev-ref HEAD); \
+	[ "$$branch" = "$(RELEASE_BRANCH)" ] || problem "releases are cut from $(RELEASE_BRANCH), not $$branch"; \
+	if git fetch -q origin $(RELEASE_BRANCH); then \
+		[ "$$(git rev-parse HEAD)" = "$$(git rev-parse origin/$(RELEASE_BRANCH))" ] \
+			|| problem "HEAD is not origin/$(RELEASE_BRANCH): pull or push first"; \
+	else problem "could not fetch origin/$(RELEASE_BRANCH)"; fi; \
+	grep -q '^## \[$(VERSION_RE)\]' CHANGELOG.md || problem "CHANGELOG.md has no [$(VERSION)] section"; \
+	notes=$$(awk '/^## History Walk $(VERSION_RE)( |$$)/ { f = 1; next } /^## / { f = 0 } f' RELEASE_NOTES.md); \
+	if [ -z "$$notes" ]; then problem "RELEASE_NOTES.md has no \"## History Walk $(VERSION)\" section"; \
+	else echo "$$notes" | grep -q '\*\*Full Changelog\*\*' \
+		|| problem "RELEASE_NOTES.md's $(VERSION) section has no **Full Changelog** link"; fi; \
+	if tags=$$(git ls-remote origin "refs/tags/$(VERSION)" "refs/tags/$(VERSION)^{}"); then \
+		tagged=$$(echo "$$tags" | sort -k2 | tail -1 | cut -f1); \
+		[ -z "$$tagged" ] || [ "$$tagged" = "$$(git rev-parse HEAD)" ] \
+			|| problem "tag $(VERSION) on origin points at another commit"; \
+	else problem "could not read the tags on origin"; fi; \
+	! gh release view "$(VERSION)" >/dev/null 2>&1 || problem "GitHub already has a release $(VERSION)"; \
+	docker info >/dev/null 2>&1 || problem "Docker is not running: make ci and the push need it"; \
+	if runs=$$(gh api "repos/{owner}/{repo}/commits/$$(git rev-parse HEAD)/check-runs" --paginate \
+			--jq '.check_runs[] | "\(.status) \(.conclusion) \(.name)"' 2>/dev/null); then \
+		failing=$$(echo "$$runs" | grep -Ev '^completed (success|skipped|neutral) ' | grep . | tr '\n' ';'); \
+		[ -z "$$failing" ] || problem "CI checks have not passed for HEAD: $$failing"; \
+		! echo "$$runs" | grep -q '^completed neutral GitGuardian' \
+			|| problem "GitGuardian found secrets in HEAD (its neutral result): read its check run"; \
+		for c in $(RELEASE_CHECKS); do \
+			echo "$$runs" | cut -d' ' -f3- | grep -qxF "$$c" || problem "CI has not run $$c for HEAD"; \
+		done; \
+	else problem "could not read HEAD's CI checks from GitHub: is HEAD pushed, and gh signed in?"; fi; \
+	if out=$$(docker buildx imagetools inspect $(DOCKER_REPO):$(VERSION) 2>&1); then \
+		problem "$(DOCKER_REPO):$(VERSION) is already on Docker Hub: bump the version"; \
+	elif ! echo "$$out" | grep -q 'not found'; then \
+		problem "could not ask Docker Hub for $(DOCKER_REPO):$(VERSION): $$(echo "$$out" | tail -1)"; \
+	fi; \
+	if [ $$problems -gt 0 ]; then echo "ERROR: $(VERSION) is not ready to release" >&2; exit 1; fi; \
+	echo "Ready to release $(VERSION) from $$(git rev-parse --short HEAD)"
+
+# The last word before anything is published. It refuses if the checkout changed while make ci ran, since an edit or a
+# commit made then would be released untested: RELEASE_SHA is the commit make release started from.
+_confirm-release:
+	@[ -n "$(RELEASE_SHA)" ] || { echo "ERROR: make release runs this, setting RELEASE_SHA" >&2; exit 1; }
+	@[ "$$(git rev-parse HEAD)" = "$(RELEASE_SHA)" ] && [ -z "$$(git status --porcelain)" ] \
+		|| { echo "ERROR: the checkout changed while the release ran; nothing	 published" >&2; exit 1; }
+	@echo "About to release $(VERSION) from $$(git rev-parse --short HEAD):"
+	@echo "  - push $(DOCKER_REPO):$(VERSION) and :latest to Docker Hub, for $(DOCKER_PLATFORMS)"
+	@echo "  - create the GitHub release v$(VERSION), tagged $(VERSION), with RELEASE_NOTES.md's $(VERSION) section"
+	@printf 'Continue? [y/N] '; read -r answer || answer=; \
+	case "$$answer" in [yY]|[yY][eE][sS]) ;; *) echo "Nothing published."; exit 1 ;; esac
+
+# Each step runs only if the one before it passed, so nothing is published until the checkout passes release-check,
+# every CI gate (make ci, after a clean build) and the prompt. The image goes first: if its push fails, no release or tag
+# is created. The GitHub release follows the house rules: tag VERSION, title vVERSION, and RELEASE_NOTES.md's section
+# for VERSION as its notes. What stays by hand is printed at the end.
+release: RELEASE_SHA := $(shell git rev-parse HEAD 2>/dev/null)
+release: ## Check, run every CI gate, then push VERSION's image and create its GitHub release (asks first)
+	$(MAKE) release-check
+	$(MAKE) clean
+	$(MAKE) ci
+	@$(MAKE) --no-print-directory _confirm-release RELEASE_SHA=$(RELEASE_SHA)
+	$(MAKE) _docker-push
+	@mkdir -p $(dir $(RELEASE_NOTES_FILE))
+	@awk '/^## History Walk $(VERSION_RE)( |$$)/ { f = 1; next } /^## / { f = 0 } f' RELEASE_NOTES.md \
+		> $(RELEASE_NOTES_FILE)
+	gh release create $(VERSION) --target $(RELEASE_SHA) --title v$(VERSION) --notes-file $(RELEASE_NOTES_FILE)
+	@echo; echo "Released $(VERSION): https://github.com/pambrose/history-walk/releases/tag/$(VERSION)"; \
+	echo "Still by hand:"; \
+	echo "  1. Redeploy each walk from $(RELEASE_BRANCH), then check /version on each."; \
+	echo "  2. Behind Cloudflare: make served-version PUBLIC_URL=... ORIGIN_URL=..."
 
 ##@ Website
 

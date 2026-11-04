@@ -16,12 +16,18 @@ Two numbers in `gradle.properties` describe a release:
 
 ## Shipping a release
 
-1. Merge the changes to `master`, with CI green.
-2. Bump `version` in `gradle.properties` (and `apiVersion`, if the interface changed). For a GitHub release, tag
-   without a `v` (`1.1.0`) and title it with one (`v1.1.0`).
-3. Deploy each walk: a host that builds from the repository builds `master`; on a host that runs the image,
-   `make docker-push` and redeploy it.
-4. Each deployment migrates its database as it starts. Check `/version` on each.
+1. Bump `version` in `gradle.properties` (and `apiVersion`, if the interface changed), and add the version's sections
+   to `CHANGELOG.md` (`## [1.2.0] - <date>`) and `RELEASE_NOTES.md` (`## History Walk 1.2.0 — <date>`, ending with a
+   `**Full Changelog**:` link). Merge it all to `master`, with CI green.
+2. On an up-to-date `master`, run `make release-check`. It publishes nothing; it lists every reason the checkout
+   can't be released yet: a dirty tree, another branch, a commit not on GitHub, a missing changelog or release-notes
+   section, a tag or GitHub release that already exists, CI that hasn't passed for the commit, Docker not running, or
+   the version already on Docker Hub.
+3. Run `make release`. It runs `release-check` again, a clean build and every CI gate (`make ci`), then asks once.
+   Then it pushes the image to Docker Hub (`pambrose/history-walk:<version>` and `:latest`, amd64 and arm64) and
+   creates the GitHub release: tag `1.2.0`, title `v1.2.0`, and the version's section of `RELEASE_NOTES.md` as its
+   notes. If the checkout changes while `make ci` runs, it publishes nothing.
+4. Deploy each walk from `master`. Each deployment migrates its database as it starts. Check `/version` on each.
 5. Behind Cloudflare, check that Cloudflare serves the new page bundle ([below](#after-a-deploy)).
 
 ## What open pages do
