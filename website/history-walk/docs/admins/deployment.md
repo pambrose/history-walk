@@ -35,10 +35,12 @@ A deployment behind Cloudflare needs one more check after each deploy, that Clou
 
 A Railway service runs the same jar or image with the same variables:
 
-- Set the variables in the service's **Variables**. Give the server its database with `DBMS_URL`
-  (`jdbc:pgsql://<host>:<port>/<database>`, note `pgsql`), `DBMS_USERNAME`, and `DBMS_PASSWORD`. A `DATABASE_URL`
-  variable, if the service has one, takes precedence over those three, and the server connects to it with SSL
-  required; leave it off unless the database accepts SSL.
+- Set the variables in the service's **Variables**. Give the server its database either with
+  `DATABASE_URL = ${{Postgres.DATABASE_URL}}`, a reference to the Postgres service, which stays on Railway's private
+  network, plus `DBMS_NAME` (`jermain` or `moses`) when the walk's database is not the one the URL names; or with
+  `DBMS_URL` (`jdbc:pgsql://<host>:<port>/<database>`, note `pgsql`), `DBMS_USERNAME`, and `DBMS_PASSWORD`. When both
+  are set, `DATABASE_URL` wins. Its connection is not encrypted, so don't point it at a database reached over the
+  internet.
 - Set `OAUTH_CALLBACK_URL` to `https://<service>.up.railway.app/auth/callback`, or the custom domain's, and add the
   same URI to the Google client. It must start with `https://`.
 - Keep a copy of the service's variables outside the repository. `secrets/` is gitignored for this, such as

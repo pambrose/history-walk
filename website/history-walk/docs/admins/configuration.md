@@ -45,7 +45,8 @@ server then uses it in place of the `DBMS_*` variables.
 
 | Variable | Default | Value |
 |---|---|---|
-| `DATABASE_URL` | none | `postgres://user:password@host:port/database`. When present, it wins over the three below, and the server connects with SSL required. A password containing `@` must be percent-encoded. |
+| `DATABASE_URL` | none | `postgres://user:password@host:port/database`, such as Railway's `${{Postgres.DATABASE_URL}}`. When present, it wins over the three below. The connection is not encrypted (any `sslmode` in the URL is ignored), as suits a platform's private network. A password containing `@` must be percent-encoded. |
+| `DBMS_NAME` | none | With `DATABASE_URL`: the database to use in place of the URL's, on the same server with the same user, such as `jermain` when the URL names Railway's default database. Spaces around it are dropped. |
 | `DBMS_URL` | `jdbc:pgsql://localhost:5432/historywalk` | A JDBC URL for the [pgjdbc-ng](https://impossibl.github.io/pgjdbc-ng/) driver: note **`jdbc:pgsql:`**, not `jdbc:postgresql:`. |
 | `DBMS_USERNAME` | `postgres` | The database user. |
 | `DBMS_PASSWORD` | `docker` | That user's password. |

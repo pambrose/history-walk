@@ -62,7 +62,9 @@ the original classroom app; [History](#history) at the end tells the story in or
   and then reloads itself after a countdown, never while a reason is being written
   (`CLIENT_VERSION_CHECK_INTERVAL_SECS`, `CLIENT_RELOAD_WARNING_INTERVAL_SECS`).
 - `/ping` and `/version` for health checks, and `/threaddump` for teachers.
-- A single `DATABASE_URL` for the database, parsed safely (an `@`, `:`, or `+` in the password, a bad URL refused without echoing it).
+- A single `DATABASE_URL` for the database, such as Railway's `${{Postgres.DATABASE_URL}}`, parsed safely (an `@`, `:`,
+  or `+` in the password, a bad URL refused without echoing it), with `DBMS_NAME` to use another database on the same
+  server.
 - A Docker image: Java 25 on Alpine, non-root, with a `/ping` health check, built with `make docker-build`, run with
   `make docker-run`, smoke-tested with `make docker-smoke`, and pushed for `linux/amd64` and `linux/arm64` with
   `make docker-push`.

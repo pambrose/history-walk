@@ -4,10 +4,11 @@ import io.ktor.http.decodeURLPart
 import java.net.URI
 import java.net.URISyntaxException
 
-// The connection settings Heroku hands the app as DATABASE_URL, postgres://user:password@host:port/dbname.
-// Both apps ship their logs to Papertrail, so nothing built from the URL may carry the password into a log line:
-// description names the database and the user only, and toString returns it in case the whole value gets logged.
-internal class HerokuDatabaseUrl(
+// The connection settings a container platform hands the app as DATABASE_URL,
+// postgres://user:password@host:port/dbname (Railway's ${{Postgres.DATABASE_URL}}, for one). Logs may be shipped and
+// kept elsewhere, so nothing built from the URL may carry the password into a log line: description names the database
+// and the user only, and toString returns it in case the whole value gets logged.
+internal class ContainerDatabaseUrl(
   val jdbcUrl: String,
   val username: String,
   val password: String,
@@ -18,7 +19,12 @@ internal class HerokuDatabaseUrl(
   companion object {
     private const val DEFAULT_PORT = 5432
 
-    fun parse(databaseUrl: String): HerokuDatabaseUrl {
+    // dbNameOverride (DBMS_NAME), when not blank, names the database in place of the URL's, on the same server with the
+    // same user: Railway's ${{Postgres.DATABASE_URL}} names its default database, and each walk keeps its own.
+    fun parse(
+      databaseUrl: String,
+      dbNameOverride: String = "",
+    ): ContainerDatabaseUrl {
       // A URISyntaxException's message repeats the whole input, password included, so only its reason is passed
       // on, and the exception is not kept as the cause.
       val uri =
@@ -32,8 +38,9 @@ internal class HerokuDatabaseUrl(
       // password was not percent-encoded.
       val host = requireNotNull(uri.host) { "DATABASE_URL has no host; an @ in the password must be percent-encoded" }
       val port = if (uri.port == -1) DEFAULT_PORT else uri.port
-      // Any query string is dropped: its parameters are libpq's, and the pgjdbc-ng URL below sets its own SSL mode.
-      val dbName = uri.rawPath.orEmpty().removePrefix("/")
+      // Any query string is dropped, sslmode included: its parameters are libpq's, and the pgjdbc-ng URL below sets no
+      // SSL mode, so the connection is unencrypted (pgjdbc-ng's default), as suits a platform's private network.
+      val dbName = dbNameOverride.trim().ifEmpty { uri.rawPath.orEmpty().removePrefix("/") }
       require(dbName.isNotEmpty()) { "DATABASE_URL has no database name" }
       val userInfo = requireNotNull(uri.rawUserInfo) { "DATABASE_URL has no user name or password" }
 
@@ -42,8 +49,8 @@ internal class HerokuDatabaseUrl(
       val username = userInfo.substringBefore(":").decodeURLPart()
       val password = userInfo.substringAfter(":", "").decodeURLPart()
 
-      return HerokuDatabaseUrl(
-        jdbcUrl = "jdbc:pgsql://$host:$port/$dbName?ssl.mode=require",
+      return ContainerDatabaseUrl(
+        jdbcUrl = "jdbc:pgsql://$host:$port/$dbName",
         username = username,
         password = password,
         description = "$host:$port/$dbName as $username",
