@@ -24,6 +24,7 @@ administrators at <https://pambrose.github.io/history-walk/>.
   records one decision; when the app is updated during class, the page offers to reload and never does while a
   student is typing.
 - **Go-back choices work.** *Try another building in town?* now returns to the town, wherever it is offered.
+- **Help is one click away.** The **help** link at the top of your page opens the teacher guide in a new tab.
 
 See the [teacher guide](https://pambrose.github.io/history-walk/teachers/).
 

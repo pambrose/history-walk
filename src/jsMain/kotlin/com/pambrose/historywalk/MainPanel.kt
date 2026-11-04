@@ -9,6 +9,7 @@ import com.pambrose.historywalk.ClientUtils.orErrorToast
 import com.pambrose.historywalk.ClientUtils.postTo
 import com.pambrose.historywalk.ClientUtils.showErrorToast
 import com.pambrose.historywalk.ClientUtils.verticalPadding
+import com.pambrose.historywalk.Docs.TEACHER_GUIDE
 import com.pambrose.historywalk.EndPoints.ADMIN
 import com.pambrose.historywalk.EndPoints.LOGOUT
 import com.pambrose.historywalk.EndPoints.REASONS
@@ -56,6 +57,7 @@ import io.kvision.state.ObservableValue
 import io.kvision.state.bind
 import io.kvision.utils.px
 import kotlinx.browser.document
+import kotlinx.browser.window
 
 object MainPanel : SimplePanel() {
   val buttonPadding = 5.px
@@ -337,22 +339,34 @@ private fun Container.header(
       // The switch to the student view, and back. In the student view the server reports a teacher as a student, so
       // this link is not shown and the admin page says to come back to /admin
       navLink("admin", "fas fa-cog") { document.location?.href = "/$ADMIN" }
+      // The teacher guide, in a new tab so the walk stays open; noopener keeps the guide's page from reaching this one
+      navLink("help", "fas fa-question-circle") { window.open(TEACHER_GUIDE, "_blank", "noopener") }
     }
-    navLink("logout", "fas fa-sign-out-alt") { postTo("/$LOGOUT") }
     // Clears the teacher's own test walk and starts it again from the first slide. A POST, as logout is: the server
     // resets nothing on a GET, which any link, image, or prefetch can send
     if (isTeacher && slide.showResetButton)
-      navLink("reset", "fas fa-sync-alt") { postTo("/$USER_RESET") }
+      navLink("reset", "fas fa-sync-alt", tooltip = RESET_TOOLTIP) { postTo("/$USER_RESET") }
+    // Last, for everyone
+    navLink("logout", "fas fa-sign-out-alt") { postTo("/$LOGOUT") }
   }
 }
 
+// What the reset link does, shown on mouse-over: it takes effect at once, with no dialog to explain it
+internal const val RESET_TOOLTIP =
+  "Start your own walk over: deletes every move and reason you have made, including any made in the student view, " +
+    "and sends you back to the first slide. Students' walks and other teachers' walks are not touched. " +
+    "It doesn't ask first."
+
+// A header link: a link-styled button, with an optional tooltip (the title attribute, shown on mouse-over)
 private fun Container.navLink(
   label: String,
   icon: String,
+  tooltip: String? = null,
   action: () -> Unit,
 ) {
   button(label, icon, style = LINK) {
     lowercase()
+    title = tooltip
     onClick { action() }
   }
 }

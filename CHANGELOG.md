@@ -40,7 +40,8 @@ the original classroom app; [History](#history) at the end tells the story in or
   class pages.
 - **Slide list** (`/slides`) and slide jump (`/slide/<id>/<instance>`), with `ALLOW_SLIDE_ACCESS=true`.
 - A **reset** link that deletes the teacher's own walk, with `SHOW_RESET_BUTTON=true`.
-- Header links to the class summary, the student reasons, the admin page, and sign-out.
+- Header links to the class summary, the student reasons, the admin page, **help** (the teacher guide, in a new tab),
+  and sign-out, last.
 
 #### Sign-in
 
