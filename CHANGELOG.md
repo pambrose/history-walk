@@ -11,8 +11,8 @@ All notable changes to History Walk are recorded here. The format follows
 ### Added
 
 - The Apache License, Version 2.0 (`LICENSE`).
-- `make log`, which prints the last 100 lines of each walk's Railway log (`SERVICE=`, `LOG_LINES=`), or streams one
-  walk's log (`FOLLOW=1`).
+- `make log`, which prints the last 100 lines of each walk's Railway log (`SERVICE=`, `LOG_LINES=`), and
+  `make log-jermain` and `make log-moses`, which follow one walk's log like `tail -f` until Ctrl-C.
 
 ### Changed
 

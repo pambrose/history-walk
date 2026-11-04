@@ -171,7 +171,8 @@ version's section of `RELEASE_NOTES.md`. Then `make railway-redeploy` deploys bo
 and waits until each reports the new version.
 
 `make log` prints the last 100 lines of each walk's Railway log (`SERVICE=Moses` for one walk, `LOG_LINES=500` for
-more, `FOLLOW=1 SERVICE=Jermain` to stream one).
+more). `make log-jermain` and `make log-moses` follow one walk's log like `tail -f`: its last 10 lines, then each new
+line within a few seconds, until Ctrl-C.
 
 ### Behind Cloudflare
 

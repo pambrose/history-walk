@@ -31,7 +31,8 @@ make docker-push        # fat jar, then buildx pushes pambrose/history-walk:<ver
 make docker-smoke       # start the image against a throwaway Postgres and check /ping, /version, headers, the 401
 make railway-restart    # restart the Jermain and Moses services on Railway (railway CLI), then check /ping and /version
 make railway-redeploy   # redeploy both from the newest Docker Hub image (after a release), then wait for its version
-make log                # the last LOG_LINES (100) lines of each walk's Railway log; SERVICE=Moses, FOLLOW=1 to stream
+make log                # the last LOG_LINES (100) lines of each walk's Railway log; SERVICE=Moses for one walk
+make log-jermain        # follow one walk's Railway log like tail -f (make log-moses for the other); Ctrl-C stops
 make release-check     # list every reason this checkout can't be released as VERSION (publishes nothing)
 make release           # release-check, clean + ci, ask, push the image, create the GitHub release (tag X, title vX)
 make website-serve      # the Zensical docs site (website/history-walk) at localhost:8000, rebuilt on every save

@@ -42,11 +42,11 @@ RAILWAY_PROJECT     ?= a0c8cc4e-4057-4ddc-a7a8-881ccfa721e6
 RAILWAY_ENVIRONMENT ?= production
 RAILWAY_SERVICES    ?= Jermain Moses
 RAILWAY_URLS        ?= https://jermain.up.railway.app https://moses.up.railway.app
-# make log: how many recent lines of each walk's log it shows; SERVICE=Jermain or SERVICE=Moses shows one walk, and
-# FOLLOW=1 streams that one's log as it is written
+# make log: how many recent lines of each walk's log it shows, and SERVICE=Jermain or SERVICE=Moses for one walk;
+# make log-jermain and make log-moses: how many lines they show before following the log
 LOG_LINES           ?= 100
 SERVICE             ?=
-FOLLOW              ?=
+TAIL_LINES          ?= 10
 
 # The documentation site, a Zensical project in WEBSITE_DIR. Zensical is a dependency of the Python project in website/,
 # which each website target first syncs into website/.venv with uv. WEBSITE_ADDR=0.0.0.0:8000 serves it to the network.
@@ -58,7 +58,7 @@ ZENSICAL     := $(abspath website/.venv/bin/zensical)
 
 .PHONY: help db reset-jermain reset-moses stop-db server client build clean tests js-tests coverage lint \
 		format zizmor ci docker-build docker-push _docker-push docker-run docker-smoke release-check release \
-		_confirm-release railway-restart railway-redeploy log website-env website-serve \
+		_confirm-release railway-restart railway-redeploy log log-jermain log-moses _follow-log website-env website-serve \
 		website-build website-clean upgrade-site versions versions-all depends yarn-unlock upgrade-wrapper \
 		served-version
 
@@ -415,22 +415,48 @@ railway-redeploy: ## Redeploy Jermain and Moses on Railway from the newest Docke
 	done
 
 # Fetches the most recent LOG_LINES lines of each walk's deployment log, the server's own output: its startup lines (the
-# deck it serves, the database, the migrations), sign-ins, and errors. FOLLOW=1 streams one walk's log instead, until
-# Ctrl-C; Railway streams one service at a time, so it needs SERVICE.
-log: ## Show the last LOG_LINES (100) lines of each walk's Railway log; SERVICE=Moses for one, FOLLOW=1 to stream it
+# deck it serves, the database, the migrations), sign-ins, and errors. make log-jermain and make log-moses follow one.
+log: ## Show the last LOG_LINES (100) lines of each walk's Railway log; SERVICE=Moses for one walk
 	@command -v railway >/dev/null || { echo "log: the Railway CLI is not installed" >&2; exit 1; }
 	@services="$(or $(SERVICE),$(RAILWAY_SERVICES))"; \
-	if [ -n "$(FOLLOW)" ]; then \
-		set -- $$services; \
-		[ $$# -eq 1 ] || { echo "log: FOLLOW=1 streams one walk's log: add SERVICE=Jermain or SERVICE=Moses" >&2; \
-			exit 1; }; \
-		echo "=== $$1 (streaming; Ctrl-C stops)"; \
-		exec railway logs --project $(RAILWAY_PROJECT) --environment $(RAILWAY_ENVIRONMENT) --service "$$1"; \
-	fi; \
 	for s in $$services; do \
 		echo "=== $$s (last $(LOG_LINES) lines)"; \
 		railway logs --project $(RAILWAY_PROJECT) --environment $(RAILWAY_ENVIRONMENT) --service "$$s" \
 			--lines $(LOG_LINES) || { echo "log: could not read $$s's log" >&2; exit 1; }; \
+	done
+
+log-jermain: ## Follow the Jermain walk's Railway log like tail -f (its last TAIL_LINES lines, then each new one)
+	@$(MAKE) --no-print-directory _follow-log FOLLOW_SERVICE=Jermain
+
+log-moses: ## Follow the Moses walk's Railway log like tail -f (its last TAIL_LINES lines, then each new one)
+	@$(MAKE) --no-print-directory _follow-log FOLLOW_SERVICE=Moses
+
+# A walk's Railway log, followed like tail -f until Ctrl-C: its last TAIL_LINES lines, then, every FOLLOW_EVERY seconds,
+# the lines written since. It polls rather than streams: railway logs follows a stream only when it writes straight to a
+# terminal, and holds the new lines back when its output goes to a pipe, as it must here to be filtered. Each poll asks
+# for the lines since the last one shown (--since, which works to the second, so it repeats a few), and drops those no
+# newer than that line, comparing timestamps with their fractions padded to nanoseconds (they vary in length). The
+# timestamps are Railway's, when it received each line, so they only move forward. Needs the Railway CLI and jq.
+FOLLOW_EVERY ?= 3
+FOLLOW_JQ_NORM = def norm: sub("Z$$"; "") | split(".") | .[0] + "." + (((.[1] // "") + "000000000")[0:9]);
+_follow-log:
+	@command -v railway >/dev/null || { echo "the Railway CLI is not installed" >&2; exit 1; }
+	@command -v jq >/dev/null || { echo "jq is not installed (brew install jq)" >&2; exit 1; }
+	@[ -n "$(FOLLOW_SERVICE)" ] || { echo "make log-jermain or make log-moses runs this" >&2; exit 1; }
+	@args="--project $(RAILWAY_PROJECT) --environment $(RAILWAY_ENVIRONMENT) --service $(FOLLOW_SERVICE)"; \
+	show() { jq -R -r --arg since "$$1" \
+		'$(FOLLOW_JQ_NORM) fromjson? | select(((.timestamp // "") | norm) > ($$since | norm)) | .message // empty'; }; \
+	latest() { jq -R -s -r --arg since "$$1" \
+		'$(FOLLOW_JQ_NORM) [split("\n")[] | fromjson? | .timestamp // empty] | max_by(norm) // $$since'; }; \
+	batch=$$(railway logs $$args --lines $(TAIL_LINES) --json) \
+		|| { echo "could not read $(FOLLOW_SERVICE)'s log" >&2; exit 1; }; \
+	echo "=== $(FOLLOW_SERVICE) (following every $(FOLLOW_EVERY)s; Ctrl-C stops)"; \
+	printf '%s\n' "$$batch" | show ""; \
+	since=$$(printf '%s\n' "$$batch" | latest "$$(date -u +%Y-%m-%dT%H:%M:%SZ)"); \
+	while sleep $(FOLLOW_EVERY); do \
+		batch=$$(railway logs $$args --since "$$since" --json 2>/dev/null) || continue; \
+		printf '%s\n' "$$batch" | show "$$since"; \
+		since=$$(printf '%s\n' "$$batch" | latest "$$since"); \
 	done
 
 ##@ Cloudflare

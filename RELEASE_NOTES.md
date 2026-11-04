@@ -7,7 +7,7 @@ A release for administrators and contributors; nothing changes for teachers or s
 ### For administrators
 
 - **`make log`** prints the last 100 lines of each walk's Railway log (`SERVICE=Moses` for one walk, `LOG_LINES=500`
-  for more), or streams one walk's log with `FOLLOW=1 SERVICE=Jermain`.
+  for more). **`make log-jermain`** and **`make log-moses`** follow one walk's log like `tail -f` until Ctrl-C.
 - **The Heroku make targets are gone** (`log`, `restart`, `creds`, and their `APP=` setting): the walks run on
   Railway, where `make log`, `make railway-restart`, and `make railway-redeploy` cover them. `make served-version`
   still compares the bundle the deployment serves with Cloudflare's.

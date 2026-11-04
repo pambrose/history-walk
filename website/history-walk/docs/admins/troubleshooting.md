@@ -16,7 +16,9 @@ curl -s https://<deployment>/version
 ## Logs
 
 - **Railway**: `make log` prints the last 100 lines of each walk's log (`LOG_LINES=500` for more, `SERVICE=Moses` for
-  one walk); `make log FOLLOW=1 SERVICE=Jermain` streams one walk's log until Ctrl-C. Or the service's **Logs** tab.
+  one walk). `make log-jermain` and `make log-moses` follow one walk's log like `tail -f`: its last 10 lines
+  (`TAIL_LINES=` for more), then each new line within a few seconds (`FOLLOW_EVERY=` sets how often it checks), until
+  Ctrl-C. Or the service's **Logs** tab.
 - **Docker**: `docker logs <container>`.
 
 Worth knowing in the log:
