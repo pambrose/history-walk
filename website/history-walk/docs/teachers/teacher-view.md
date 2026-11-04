@@ -15,14 +15,15 @@ At the top right
 
 | Link | Opens |
 |---|---|
-| **class summary** | Every student's progress. See [Class summary](class-summary.md). |
-| **student reasons** | Every reason every student gave. See [Student reasons](student-reasons.md). |
+| **class summary** | Every student's progress, in a new tab. See [Class summary](class-summary.md). |
+| **student reasons** | Every reason every student gave, in a new tab. See [Student reasons](student-reasons.md). |
 | **admin** | The switch between the teacher and student views, and the clear for teachers' walks. See [Trying the walk as a student](student-view.md). |
 | **help** | This guide, in a new tab, so your walk stays open. |
-| **reset** | Only if your administrator turned it on: deletes *your own* walk and sends you back to the first slide, without asking. Hover over it for a reminder. |
+| **reset** | Only if your administrator turned it on: deletes *your own* walk and sends you back to the first slide, once you confirm. Hover over it for a reminder. |
 | **logout** | Signs you out, in every browser. |
 
-The class pages open in the same tab; use Back, or the link on the admin page, to return to the walk.
+The class summary and student reasons open in new tabs, so your walk stays open beside them; refresh them to see new
+moves. The admin page opens in the same tab; its first link, **Back to the walk**, returns you.
 
 ## Your walk is a test walk
 

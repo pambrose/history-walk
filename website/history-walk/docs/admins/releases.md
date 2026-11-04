@@ -5,7 +5,7 @@
 Two numbers in `gradle.properties` describe a release:
 
 `version`
-:   The release, such as `1.1.0`. `/version` reports it, the page logs it in the browser's console, and it tags the
+:   The release, such as `1.1.1`. `/version` reports it, the page logs it in the browser's console, and it tags the
     Docker image. Bump it for every release.
 
 `apiVersion`
@@ -27,7 +27,8 @@ Two numbers in `gradle.properties` describe a release:
    Then it pushes the image to Docker Hub (`pambrose/history-walk:<version>` and `:latest`, amd64 and arm64) and
    creates the GitHub release: tag `1.2.0`, title `v1.2.0`, and the version's section of `RELEASE_NOTES.md` as its
    notes. If the checkout changes while `make ci` runs, it publishes nothing.
-4. Deploy each walk from `master`. Each deployment migrates its database as it starts. Check `/version` on each.
+4. Deploy each walk: on Railway, `make railway-redeploy` pulls the new image and waits until each walk reports the new
+   version. Each deployment migrates its database as it starts.
 5. Behind Cloudflare, check that Cloudflare serves the new page bundle ([below](#after-a-deploy)).
 
 ## What open pages do

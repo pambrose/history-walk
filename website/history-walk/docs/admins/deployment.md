@@ -45,6 +45,16 @@ A Railway service runs the same jar or image with the same variables:
   same URI to the Google client. It must start with `https://`.
 - Keep a copy of the service's variables outside the repository. `secrets/` is gitignored for this, such as
   `secrets/railway.env`.
+- `make railway-restart` restarts the **Jermain** and **Moses** services with the
+  [Railway CLI](https://docs.railway.com/guides/cli) (`railway login` once), then waits for each walk to answer `/ping`
+  and shows its `/version`. It restarts the deployment as it is, rebuilding and pulling nothing, and each walk is down
+  for the few seconds it takes to start. `RAILWAY_PROJECT`, `RAILWAY_SERVICES`, and `RAILWAY_URLS` override the
+  project and services.
+- `make railway-redeploy` deploys both services again from their source, pulling the newest `pambrose/history-walk`
+  image from Docker Hub (`railway redeploy --from-source`; a plain `railway redeploy`, like a restart, reuses the image
+  it has). Run it after `make release`. It first reads the version of the image it will pull (the version label on
+  `pambrose/history-walk:latest`), and notes when that isn't the version in `gradle.properties` (a release not yet
+  published). It then waits, up to five minutes each, until each walk's `/version` reports that version.
 
 !!! note "Building on the host"
 

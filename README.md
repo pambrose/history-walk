@@ -94,7 +94,7 @@ with a logged warning. Any other host is production and requires `SESSION_SECRET
 The image holds only a Java 25 JRE and the fat jar, which is built outside Docker:
 
 ```bash
-make docker-build   # ./gradlew jar, then docker build -> history-walk:1.1.0 and history-walk:latest
+make docker-build   # ./gradlew jar, then docker build -> history-walk:<version> and history-walk:latest
 make db             # the local Postgres the container connects to
 make docker-run     # serves http://localhost:8080 using .env
 ```
@@ -108,7 +108,7 @@ make docker-run     # serves http://localhost:8080 using .env
 Use `DOCKER_PORT=8090` to run beside `make server`, and `DOCKER_DB=moses` (with
 `SLIDES_VARIABLE_NAME=moses` in `.env`) for the Moses walk. The container's health check probes `/ping`.
 
-`make docker-push` publishes the image to Docker Hub as `pambrose/history-walk:1.1.0` and `:latest`, built for
+`make docker-push` publishes the image to Docker Hub as `pambrose/history-walk:<version>` and `:latest`, built for
 `linux/amd64` and `linux/arm64` with `docker buildx`. Run `docker login` once first. It asks before pushing, and
 `DOCKER_REPO` and `DOCKER_PLATFORMS` override the repository and the platforms.
 
@@ -142,8 +142,9 @@ make release-check   # lists every reason this checkout can't be released yet; p
 make release         # every CI gate, then asks once, pushes the image to Docker Hub, creates the GitHub release
 ```
 
-The GitHub release is tagged with the version (`1.1.0`), titled with a `v` (`v1.1.0`), and takes its notes from the
-version's section of `RELEASE_NOTES.md`. Then redeploy each walk.
+The GitHub release is tagged with the version (`X.Y.Z`), titled with a `v` (`vX.Y.Z`), and takes its notes from the
+version's section of `RELEASE_NOTES.md`. Then `make railway-redeploy` deploys both walks on Railway from the new image,
+and waits until each reports the new version.
 
 ### Behind Cloudflare
 
