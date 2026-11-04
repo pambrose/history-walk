@@ -78,7 +78,7 @@ with a logged warning. Any other host is production and requires `SESSION_SECRET
 The image holds only a Java 25 JRE and the fat jar, which is built outside Docker:
 
 ```bash
-make docker-build   # ./gradlew jar, then docker build -> history-walk:1.0.0 and history-walk:latest
+make docker-build   # ./gradlew jar, then docker build -> history-walk:1.1.0 and history-walk:latest
 make db             # the local Postgres the container connects to
 make docker-run     # serves http://localhost:8080 using .env
 ```
