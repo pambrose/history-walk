@@ -78,7 +78,7 @@ with a logged warning. Any other host is production and requires `SESSION_SECRET
 The image holds only a Java 25 JRE and the fat jar, which is built outside Docker:
 
 ```bash
-make docker-build   # ./gradlew jar, then docker build -> history-walk:1.0.0 and history-walk:latest
+make docker-build   # ./gradlew jar, then docker build -> history-walk:1.1.0 and history-walk:latest
 make db             # the local Postgres the container connects to
 make docker-run     # serves http://localhost:8080 using .env
 ```
@@ -91,6 +91,10 @@ make docker-run     # serves http://localhost:8080 using .env
 
 Use `DOCKER_PORT=8090` to run beside `make server`, and `DOCKER_DB=moses` (with
 `SLIDES_VARIABLE_NAME=moses` in `.env`) for the Moses walk. The container's health check probes `/ping`.
+
+`make docker-push` publishes the image to Docker Hub as `pambrose/history-walk:1.1.0` and `:latest`, built for
+`linux/amd64` and `linux/arm64` with `docker buildx`. Run `docker login` once first. It asks before pushing, and
+`DOCKER_REPO` and `DOCKER_PLATFORMS` override the repository and the platforms.
 
 ## Heroku Deployment
 

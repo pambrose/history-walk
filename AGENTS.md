@@ -28,6 +28,7 @@ make ci                 # every CI gate: lint, zizmor, JVM and client tests, doc
 make build              # clean + fat jar at build/libs/history-walk.jar (server + bundled JS client; no version)
 make procfile-check     # after a build: fails unless the jar the Procfile runs is in build/libs
 make docker-build       # fat jar, then image history-walk:<version>; make docker-run runs it with .env against make db
+make docker-push        # fat jar, then buildx pushes pambrose/history-walk:<version> and :latest (amd64, arm64) to Docker Hub
 make docker-smoke       # start the image against a throwaway Postgres and check /ping, /version, headers, the 401
 ```
 
