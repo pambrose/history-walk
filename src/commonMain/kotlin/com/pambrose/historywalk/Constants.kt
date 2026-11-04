@@ -11,6 +11,12 @@ object School {
   const val DEFAULT_DOMAIN = "athenian.org"
 }
 
+/** The documentation site (website/history-walk, published to GitHub Pages). */
+object Docs {
+  /** The teacher guide, which a teacher's help link opens. */
+  const val TEACHER_GUIDE = "https://pambrose.github.io/history-walk/teachers/"
+}
+
 object EndPoints {
   const val LOGOUT = "logout"
   const val AUTH_LOGIN = "auth/login"

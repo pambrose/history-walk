@@ -257,7 +257,9 @@ private.
 - `LoginPromptTest`, `SignInDialogTest`, `ErrorToastTest` (`orErrorToast`, `launchOrErrorToast`), `OnClickWhenIdleTest`
   (the busy gate), `ReasonDialogTest` (the five-word gate), `ChoiceFlowTest` (a click on a choice through
   `MainPanel`: makeChoice, the reason dialog, provideReason, the next slide), and `HeaderTest` (a teacher's header
-  links to the class pages and the admin page, a student's to none of them).
+  links to the class pages, the admin page, and help (the teacher guide, `Docs.TEACHER_GUIDE`, in a new tab), then the
+  reset when it is on, whose tooltip (`RESET_TOOLTIP`) says what it deletes, and logout last; a student's to none of
+  them).
 - The version check: `VersionCheckStateTest` (the pure decisions: when the dialog is held back, when the server's
   warning stamp is kept, the reload put off while a reason is written, the reload remembered in `sessionStorage`),
   `VersionCheckLoopTest` (the loop with a fake server and UI, on Kotest's virtual clock, `coroutineTestScope`), and
