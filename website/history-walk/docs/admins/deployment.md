@@ -52,8 +52,9 @@ A Railway service runs the same jar or image with the same variables:
   project and services.
 - `make railway-redeploy` deploys both services again from their source, pulling the newest `pambrose/history-walk`
   image from Docker Hub (`railway redeploy --from-source`; a plain `railway redeploy`, like a restart, reuses the image
-  it has). Run it after `make release`. It waits, up to five minutes each, until each walk's `/version` reports the
-  version in `gradle.properties`.
+  it has). Run it after `make release`. It first reads the version of the image it will pull (the version label on
+  `pambrose/history-walk:latest`), and notes when that isn't the version in `gradle.properties` (a release not yet
+  published). It then waits, up to five minutes each, until each walk's `/version` reports that version.
 
 !!! note "Building on the host"
 

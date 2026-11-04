@@ -386,23 +386,31 @@ railway-restart: ## Restart the Jermain and Moses services on Railway (no rebuil
 
 # Deploys each of RAILWAY_SERVICES again from its source, pulling the newest pambrose/history-walk image from Docker Hub
 # (railway redeploy --from-source; a plain redeploy, like a restart, reuses the image it has): what to run after make
-# release. The old deployment can answer until the new one is up, so /ping cannot tell which is running; instead it
-# waits, up to five minutes each, until every RAILWAY_URLS reports this checkout's VERSION at /version.
-railway-redeploy: ## Redeploy Jermain and Moses on Railway from the newest Docker Hub image, then wait for VERSION
+# release. It first reads the version of the image it will pull, from the label the Dockerfile puts on it
+# (org.opencontainers.image.version on DOCKER_REPO:latest), and says so if that is not this checkout's VERSION, which
+# make release has yet to publish. The old deployment can answer until the new one is up, so /ping cannot tell which is
+# running; instead it waits, up to five minutes each, until every RAILWAY_URLS reports that version at /version.
+railway-redeploy: ## Redeploy Jermain and Moses on Railway from the newest Docker Hub image, then wait for its version
 	@command -v railway >/dev/null || { echo "railway-redeploy: the Railway CLI is not installed" >&2; exit 1; }
-	@for s in $(RAILWAY_SERVICES); do \
+	@expected=$$(docker buildx imagetools inspect $(DOCKER_REPO):latest \
+		--format '{{ index (index .Image "linux/amd64").Config.Labels "org.opencontainers.image.version" }}' 2>/dev/null); \
+	[ -n "$$expected" ] || { echo "railway-redeploy: could not read the version of $(DOCKER_REPO):latest on Docker" \
+		"Hub; is Docker running?" >&2; exit 1; }; \
+	echo "Docker Hub's $(DOCKER_REPO):latest is $$expected"; \
+	[ "$$expected" = "$(VERSION)" ] || echo "  (this checkout is $(VERSION), which make release has not published yet)"; \
+	for s in $(RAILWAY_SERVICES); do \
 		echo "Redeploying $$s from the newest $(DOCKER_REPO) image"; \
 		railway redeploy --from-source --project $(RAILWAY_PROJECT) --environment $(RAILWAY_ENVIRONMENT) \
 			--service "$$s" --yes || { echo "railway-redeploy: could not redeploy $$s" >&2; exit 1; }; \
-	done
-	@for u in $(RAILWAY_URLS); do \
+	done; \
+	for u in $(RAILWAY_URLS); do \
 		printf '%s ' "$$u"; \
 		for i in $$(seq 1 100); do \
-			curl -s -m 5 "$$u/version" | grep -q "^Version: $(VERSION) " && break; printf .; sleep 3; \
+			curl -s -m 5 "$$u/version" | grep -q "^Version: $$expected " && break; printf .; sleep 3; \
 		done; \
 		v=$$(curl -s -m 5 "$$u/version"); \
-		echo "$$v" | grep -q "^Version: $(VERSION) " \
-			|| { echo " still serves \"$$v\", not $(VERSION), after five minutes" >&2; exit 1; }; \
+		echo "$$v" | grep -q "^Version: $$expected " \
+			|| { echo " still serves \"$$v\", not $$expected, after five minutes" >&2; exit 1; }; \
 		echo " $$v"; \
 	done
 

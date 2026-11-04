@@ -30,7 +30,7 @@ make docker-build       # fat jar, then image history-walk:<version>; make docke
 make docker-push        # fat jar, then buildx pushes pambrose/history-walk:<version> and :latest (amd64, arm64) to Docker Hub
 make docker-smoke       # start the image against a throwaway Postgres and check /ping, /version, headers, the 401
 make railway-restart    # restart the Jermain and Moses services on Railway (railway CLI), then check /ping and /version
-make railway-redeploy   # redeploy both from the newest Docker Hub image (after a release), then wait for VERSION
+make railway-redeploy   # redeploy both from the newest Docker Hub image (after a release), then wait for its version
 make release-check     # list every reason this checkout can't be released as VERSION (publishes nothing)
 make release           # release-check, clean + ci, ask, push the image, create the GitHub release (tag X, title vX)
 make website-serve      # the Zensical docs site (website/history-walk) at localhost:8000, rebuilt on every save
