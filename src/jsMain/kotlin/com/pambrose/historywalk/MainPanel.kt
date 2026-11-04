@@ -334,28 +334,37 @@ private fun Container.header(
 
   hPanel(alignItems = AlignItems.CENTER) {
     if (isTeacher) {
-      navLink("class summary", "fas fa-chart-bar") { document.location?.href = "/$SUMMARY" }
-      navLink("student reasons", "fas fa-comments") { document.location?.href = "/$REASONS" }
+      // The class pages open in new tabs, so the walk stays open beside them; noopener, as for help
+      navLink("class summary", "fas fa-chart-bar") { window.open("/$SUMMARY", "_blank", "noopener") }
+      navLink("student reasons", "fas fa-comments") { window.open("/$REASONS", "_blank", "noopener") }
       // The switch to the student view, and back. In the student view the server reports a teacher as a student, so
       // this link is not shown and the admin page says to come back to /admin
       navLink("admin", "fas fa-cog") { document.location?.href = "/$ADMIN" }
       // The teacher guide, in a new tab so the walk stays open; noopener keeps the guide's page from reaching this one
       navLink("help", "fas fa-question-circle") { window.open(TEACHER_GUIDE, "_blank", "noopener") }
     }
-    // Clears the teacher's own test walk and starts it again from the first slide. A POST, as logout is: the server
-    // resets nothing on a GET, which any link, image, or prefetch can send
+    // Clears the teacher's own test walk and starts it again from the first slide, once the browser's confirmation is
+    // answered OK, as the admin page's clear asks. A POST, as logout is: the server resets nothing on a GET, which any
+    // link, image, or prefetch can send
     if (isTeacher && slide.showResetButton)
-      navLink("reset", "fas fa-sync-alt", tooltip = RESET_TOOLTIP) { postTo("/$USER_RESET") }
+      navLink("reset", "fas fa-sync-alt", tooltip = RESET_TOOLTIP) {
+        if (window.confirm(RESET_CONFIRMATION)) postTo("/$USER_RESET")
+      }
     // Last, for everyone
     navLink("logout", "fas fa-sign-out-alt") { postTo("/$LOGOUT") }
   }
 }
 
-// What the reset link does, shown on mouse-over: it takes effect at once, with no dialog to explain it
+// What the reset link does, shown on mouse-over
 internal const val RESET_TOOLTIP =
   "Start your own walk over: deletes every move and reason you have made, including any made in the student view, " +
     "and sends you back to the first slide. Students' walks and other teachers' walks are not touched. " +
-    "It doesn't ask first."
+    "It asks first."
+
+// The confirmation the reset link asks for before it deletes anything
+internal const val RESET_CONFIRMATION =
+  "Start your own walk over? Every move and reason you have made will be deleted, including any made in the student " +
+    "view, and you will go back to the first slide. Students' walks and other teachers' walks are kept."
 
 // A header link: a link-styled button, with an optional tooltip (the title attribute, shown on mouse-over)
 private fun Container.navLink(

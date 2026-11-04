@@ -29,6 +29,8 @@ make build              # clean + fat jar at build/libs/history-walk.jar (server
 make docker-build       # fat jar, then image history-walk:<version>; make docker-run runs it with .env against make db
 make docker-push        # fat jar, then buildx pushes pambrose/history-walk:<version> and :latest (amd64, arm64) to Docker Hub
 make docker-smoke       # start the image against a throwaway Postgres and check /ping, /version, headers, the 401
+make railway-restart    # restart the Jermain and Moses services on Railway (railway CLI), then check /ping and /version
+make railway-redeploy   # redeploy both from the newest Docker Hub image (after a release), then wait for VERSION
 make release-check     # list every reason this checkout can't be released as VERSION (publishes nothing)
 make release           # release-check, clean + ci, ask, push the image, create the GitHub release (tag X, title vX)
 make website-serve      # the Zensical docs site (website/history-walk) at localhost:8000, rebuilt on every save
@@ -265,9 +267,10 @@ private.
 - `LoginPromptTest`, `SignInDialogTest`, `ErrorToastTest` (`orErrorToast`, `launchOrErrorToast`), `OnClickWhenIdleTest`
   (the busy gate), `ReasonDialogTest` (the five-word gate), `ChoiceFlowTest` (a click on a choice through
   `MainPanel`: makeChoice, the reason dialog, provideReason, the next slide), and `HeaderTest` (a teacher's header
-  links to the class pages, the admin page, and help (the teacher guide, `Docs.TEACHER_GUIDE`, in a new tab), then the
-  reset when it is on, whose tooltip (`RESET_TOOLTIP`) says what it deletes, and logout last; a student's to none of
-  them).
+  links to the class pages and help, each opening in a new tab (`window.open`, `noopener`; help is the teacher guide,
+  `Docs.TEACHER_GUIDE`), and the admin page, then the reset when it is on, whose tooltip (`RESET_TOOLTIP`) says what it
+  deletes and which posts only once `window.confirm(RESET_CONFIRMATION)` is answered OK, and logout last; a student's to
+  none of them).
 - The version check: `VersionCheckStateTest` (the pure decisions: when the dialog is held back, when the server's
   warning stamp is kept, the reload put off while a reason is written, the reload remembered in `sessionStorage`),
   `VersionCheckLoopTest` (the loop with a fake server and UI, on Kotest's virtual clock, `coroutineTestScope`), and

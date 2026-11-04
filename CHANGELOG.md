@@ -6,6 +6,20 @@ All notable changes to History Walk are recorded here. The format follows
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-11-04
+
+### Added
+
+- `make railway-restart`, which restarts the Jermain and Moses services on Railway with the Railway CLI, then waits
+  for each walk to answer and shows its version; and `make railway-redeploy`, which redeploys both from the newest
+  Docker Hub image after a release, then waits until each reports the new version.
+
+### Changed
+
+- A teacher's **class summary** and **student reasons** links open their pages in new tabs, so the walk stays
+  open beside them.
+- A teacher's **reset** asks for confirmation before it deletes the teacher's walk, as the admin page's clear does.
+
 ## [1.1.0] - 2026-11-04
 
 The first release. It covers all the work since the repository began in September 2021: the classroom app of
@@ -171,5 +185,6 @@ the original classroom app; [History](#history) at the end tells the story in or
   CI (#5, #7); five waves of fixes from a code review of 24 issues (#9–#12, #14); the admin page's student view
   (#13); `make docker-push` and version 1.1.0 (#16); and the documentation site (#17).
 
-[Unreleased]: https://github.com/pambrose/history-walk/compare/1.1.0...HEAD
+[Unreleased]: https://github.com/pambrose/history-walk/compare/1.1.1...HEAD
+[1.1.1]: https://github.com/pambrose/history-walk/compare/1.1.0...1.1.1
 [1.1.0]: https://github.com/pambrose/history-walk/commits/1.1.0

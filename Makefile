@@ -40,6 +40,13 @@ RELEASE_NOTES_FILE = build/release-notes-$(VERSION).md
 PUBLIC_URL   ?=
 ORIGIN_URL   ?=
 
+# The Railway project that runs the walks (railway list --json shows its ID), and the walks' services in it, each running
+# the Docker Hub image pambrose/history-walk; RAILWAY_URLS are their public addresses, checked after a restart.
+RAILWAY_PROJECT     ?= a0c8cc4e-4057-4ddc-a7a8-881ccfa721e6
+RAILWAY_ENVIRONMENT ?= production
+RAILWAY_SERVICES    ?= Jermain Moses
+RAILWAY_URLS        ?= https://jermain.up.railway.app https://moses.up.railway.app
+
 # The documentation site, a Zensical project in WEBSITE_DIR. Zensical is a dependency of the Python project in website/,
 # which each website target first syncs into website/.venv with uv. WEBSITE_ADDR=0.0.0.0:8000 serves it to the network.
 WEBSITE_DIR  := website/history-walk
@@ -50,7 +57,7 @@ ZENSICAL     := $(abspath website/.venv/bin/zensical)
 
 .PHONY: help db reset-jermain reset-moses stop-db server client build clean tests js-tests coverage lint \
 		format zizmor ci docker-build docker-push _docker-push docker-run docker-smoke release-check release \
-		_confirm-release website-env website-serve \
+		_confirm-release railway-restart railway-redeploy website-env website-serve \
 		website-build website-clean upgrade-site versions versions-all depends yarn-unlock upgrade-wrapper creds \
 		restart log \
 		served-version
@@ -306,7 +313,7 @@ release: ## Check, run every CI gate, then push VERSION's image and create its G
 	gh release create $(VERSION) --target $(RELEASE_SHA) --title v$(VERSION) --notes-file $(RELEASE_NOTES_FILE)
 	@echo; echo "Released $(VERSION): https://github.com/pambrose/history-walk/releases/tag/$(VERSION)"; \
 	echo "Still by hand:"; \
-	echo "  1. Redeploy each walk from $(RELEASE_BRANCH), then check /version on each."; \
+	echo "  1. Redeploy each walk from the new image: make railway-redeploy (it waits until each reports $(VERSION))."; \
 	echo "  2. Behind Cloudflare: make served-version PUBLIC_URL=... ORIGIN_URL=..."
 
 ##@ Website
@@ -354,6 +361,50 @@ yarn-unlock: ## Refresh the Kotlin/JS yarn lock file after npm dependency change
 
 upgrade-wrapper: ## Upgrade the Gradle wrapper (pick the version with GRADLE_VERSION=x.y.z)
 	$(GRADLE) wrapper --gradle-version=$(GRADLE_VERSION) --distribution-type=bin
+
+##@ Railway
+
+# Restarts the latest deployment of each of RAILWAY_SERVICES, as it is: nothing is rebuilt or pulled, so a newly pushed
+# image is not picked up (make railway-redeploy does that). Each walk is down for the few seconds it takes to start, so
+# avoid class time. Then waits, up to two minutes each, for every RAILWAY_URLS to answer /ping, and shows its /version.
+# Needs the Railway CLI, signed in (railway login); the project and services are named, so no railway link is needed.
+railway-restart: ## Restart the Jermain and Moses services on Railway (no rebuild), then wait for each to answer
+	@command -v railway >/dev/null || { echo "railway-restart: the Railway CLI is not installed" >&2; exit 1; }
+	@for s in $(RAILWAY_SERVICES); do \
+		echo "Restarting $$s"; \
+		railway restart --project $(RAILWAY_PROJECT) --environment $(RAILWAY_ENVIRONMENT) --service "$$s" --yes \
+			|| { echo "railway-restart: could not restart $$s" >&2; exit 1; }; \
+	done
+	@for u in $(RAILWAY_URLS); do \
+		printf '%s ' "$$u"; \
+		for i in $$(seq 1 60); do \
+			[ "$$(curl -s -m 5 "$$u/ping")" = pong ] && break; printf .; sleep 2; \
+		done; \
+		[ "$$(curl -s -m 5 "$$u/ping")" = pong ] || { echo " did not answer /ping within two minutes" >&2; exit 1; }; \
+		echo " $$(curl -s -m 5 "$$u/version")"; \
+	done
+
+# Deploys each of RAILWAY_SERVICES again from its source, pulling the newest pambrose/history-walk image from Docker Hub
+# (railway redeploy --from-source; a plain redeploy, like a restart, reuses the image it has): what to run after make
+# release. The old deployment can answer until the new one is up, so /ping cannot tell which is running; instead it
+# waits, up to five minutes each, until every RAILWAY_URLS reports this checkout's VERSION at /version.
+railway-redeploy: ## Redeploy Jermain and Moses on Railway from the newest Docker Hub image, then wait for VERSION
+	@command -v railway >/dev/null || { echo "railway-redeploy: the Railway CLI is not installed" >&2; exit 1; }
+	@for s in $(RAILWAY_SERVICES); do \
+		echo "Redeploying $$s from the newest $(DOCKER_REPO) image"; \
+		railway redeploy --from-source --project $(RAILWAY_PROJECT) --environment $(RAILWAY_ENVIRONMENT) \
+			--service "$$s" --yes || { echo "railway-redeploy: could not redeploy $$s" >&2; exit 1; }; \
+	done
+	@for u in $(RAILWAY_URLS); do \
+		printf '%s ' "$$u"; \
+		for i in $$(seq 1 100); do \
+			curl -s -m 5 "$$u/version" | grep -q "^Version: $(VERSION) " && break; printf .; sleep 3; \
+		done; \
+		v=$$(curl -s -m 5 "$$u/version"); \
+		echo "$$v" | grep -q "^Version: $(VERSION) " \
+			|| { echo " still serves \"$$v\", not $(VERSION), after five minutes" >&2; exit 1; }; \
+		echo " $$v"; \
+	done
 
 ##@ Heroku
 

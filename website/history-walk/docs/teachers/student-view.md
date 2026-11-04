@@ -72,5 +72,5 @@ back and clear before the class starts, and the class pages will show only your 
 |---|---|---|
 | Whose walk | Only yours | Every teacher's |
 | Available | Only if your administrator turned it on, and only in the teacher view | Always, on the admin page |
-| Asks first | No | Yes |
+| Asks first | Yes | Yes |
 | Also removes counted moves of former teachers | No | Yes |

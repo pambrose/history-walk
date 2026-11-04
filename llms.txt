@@ -27,7 +27,7 @@ Facts that are easy to get wrong:
 - A deployment starts the jar with its own start command, `java -jar build/libs/history-walk.jar -port=$PORT`; there is
   no Procfile.
 - Releases: `make release-check` lists what stops one; `make release` runs every gate, pushes the image to Docker Hub,
-  and creates the GitHub release (tag `1.1.0`, title `v1.1.0`, notes from `RELEASE_NOTES.md`).
+  and creates the GitHub release (tag `X.Y.Z`, title `vX.Y.Z`, notes from `RELEASE_NOTES.md`).
 - KSP is held at 2.3.12 (google/ksp#3286).
 
 ## Docs

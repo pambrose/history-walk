@@ -1,5 +1,27 @@
 # Release notes
 
+## History Walk 1.1.1 — 2026-11-04
+
+Two changes to the links at the top of a teacher's page.
+
+### For teachers
+
+- **The class pages open in new tabs.** **class summary** and **student reasons** now open beside your walk, so you
+  can keep walking and refresh them to follow your class.
+- **Reset asks first.** The **reset** link, shown only when your administrator turns it on, now asks you to confirm
+  before it deletes your own walk, as the admin page's **Clear teachers' trial walks** does. Hover over it for a
+  reminder of what it deletes.
+
+### For administrators
+
+- No new settings and no database changes: `make railway-redeploy` deploys both walks on Railway from the new image
+  and waits until each reports 1.1.1.
+- `make railway-restart` restarts both walks as they are, for a walk that is stuck.
+- The page's interface with the server is unchanged, so pages already open aren't asked to reload; they take 1.1.1 at
+  their next load.
+
+**Full Changelog**: <https://github.com/pambrose/history-walk/compare/1.1.0...1.1.1>
+
 ## History Walk 1.1.0 — 2026-11-04
 
 The first release of History Walk: a choose-your-own-path history scenario in which Athenian students make the
