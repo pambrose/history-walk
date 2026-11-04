@@ -36,12 +36,18 @@ See the [teacher guide](https://pambrose.github.io/history-walk/teachers/).
 - **Google sign-in setup.** Create an OAuth client (*Web application*, consent screen *Internal*) and add each
   deployment's callback as an authorized redirect URI, exactly, with `https`. See
   [Google sign-in](https://pambrose.github.io/history-walk/admins/google-sign-in/).
+- **The database** can come from a platform's `DATABASE_URL`, such as Railway's `${{Postgres.DATABASE_URL}}`, with
+  `DBMS_NAME` naming the walk's own database on that server; or from `DBMS_URL`, `DBMS_USERNAME`, and
+  `DBMS_PASSWORD`. A `DATABASE_URL` connection is not encrypted, so keep it on the platform's private network.
 - **The database migrates itself** at every start, and refuses to start, rather than delete anything, on a database
   whose tables survived without Flyway's history (a partial restore). Back up whole databases.
 - **Runs anywhere Java 25 does**: built from the repository, on Railway, or from the Docker image (`make docker-build`,
   `make docker-push`).
 - **Smaller and safer**: the jar is 35 MB (was 96 MB); the database password is out of the logs; per-user pages are
   never cached; `/threaddump` is for teachers only; and the runtime fetch-and-evaluate of slide code is gone.
+- **Releases** are `make release-check`, which lists anything that stops a release, and `make release`, which runs
+  every check, pushes the image, and creates the GitHub release. See
+  [Releases and updates](https://pambrose.github.io/history-walk/admins/releases/).
 
 See the [administrator guide](https://pambrose.github.io/history-walk/admins/).
 
