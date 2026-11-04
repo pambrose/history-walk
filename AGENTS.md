@@ -152,6 +152,14 @@ startup, so each deploy migrates. Never edit an applied migration (Flyway checks
 rebuilt the progress views). Tables are Exposed objects in `dbms/DbmsTables.kt`; queries are in `dbms/DbmsTxs.kt`,
 `dbms/AdminTxs.kt`, and `User.kt`.
 
+The connection (`Dbms.hikari`) comes from a platform's `DATABASE_URL` when it is set (Railway's
+`${{Postgres.DATABASE_URL}}`), else from `DBMS_URL`, `DBMS_USERNAME`, and `DBMS_PASSWORD`. `dbms/ContainerDatabaseUrl.kt`
+parses the URL: it decodes the user name and password, refuses a bad URL without echoing it, drops the query string,
+and takes `DBMS_NAME` (when not blank) as the database in place of the URL's. The log gets only its `description`,
+`host:port/db as user`. The JDBC URL sets no `ssl.mode`, so the connection is unencrypted (pgjdbc-ng's default), which
+suits a platform's private network: a deliberate choice, so don't add SSL back without asking.
+`ContainerDatabaseUrlTest` covers it.
+
 `V001` begins with `drop schema if exists history cascade`, and Flyway records what it has applied in
 `public.flyway_schema_history` (the connection's default schema, outside `history`):
 - Flyway runs `V001` whenever that table is missing or empty: its own refusal to migrate a non-empty schema without

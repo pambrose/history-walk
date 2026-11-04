@@ -11,9 +11,9 @@
 [![Java](https://img.shields.io/badge/Java-25-ED8B00?logo=openjdk&logoColor=white)](https://openjdk.org/projects/jdk/25/)
 
 A choose-your-own-path history scenario for Athenian students: a student makes the decisions of a person escaping
-slavery and explains each one, and teachers follow their class's progress and reasons. The guide for teachers and
-administrators is at <https://pambrose.github.io/history-walk/>; [CHANGELOG.md](CHANGELOG.md) and
-[RELEASE_NOTES.md](RELEASE_NOTES.md) describe each release.
+slavery and explains each one, and teachers follow their class's progress and reasons.
+
+The guide for teachers and administrators is at <https://pambrose.github.io/history-walk/>.
 
 ## Env Vars
 
@@ -124,6 +124,26 @@ java -jar build/libs/history-walk.jar -port=$PORT
 
 A host that runs containers can run the image `make docker-push` publishes. The
 [deployment guide](https://pambrose.github.io/history-walk/admins/deployment/) covers both.
+
+The database comes from either:
+
+* `DATABASE_URL`, a platform's Postgres URL such as Railway's `${{Postgres.DATABASE_URL}}`, with `DBMS_NAME` naming the
+  walk's database on that server when it isn't the one the URL names. The connection is not encrypted, so keep it on
+  the platform's private network. It wins when both are set.
+* `DBMS_URL` (`jdbc:pgsql://<host>:<port>/<database>`), `DBMS_USERNAME`, and `DBMS_PASSWORD`.
+
+### Releasing
+
+`version` in `gradle.properties` is the release. Add its sections to `CHANGELOG.md` and `RELEASE_NOTES.md`, merge to
+`master`, and once CI passes:
+
+```bash
+make release-check   # lists every reason this checkout can't be released yet; publishes nothing
+make release         # every CI gate, then asks once, pushes the image to Docker Hub, creates the GitHub release
+```
+
+The GitHub release is tagged with the version (`1.1.0`), titled with a `v` (`v1.1.0`), and takes its notes from the
+version's section of `RELEASE_NOTES.md`. Then redeploy each walk.
 
 ### Behind Cloudflare
 

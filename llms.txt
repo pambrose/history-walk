@@ -21,6 +21,13 @@ Facts that are easy to get wrong:
 - `V001` begins with `drop schema if exists history cascade`; `Dbms.migrate` refuses to run it on a database whose
   `history` tables survived without `public.flyway_schema_history`. Never edit an applied migration.
 - The database URL uses the pgjdbc-ng driver: `jdbc:pgsql:`, not `jdbc:postgresql:`.
+- A platform's `DATABASE_URL` (Railway's `${{Postgres.DATABASE_URL}}`) wins over `DBMS_URL`/`DBMS_USERNAME`/
+  `DBMS_PASSWORD`; `DBMS_NAME` names the database on that server in place of the URL's. `ContainerDatabaseUrl` parses
+  it, logs only `host:port/db as user`, and connects without SSL, for a private network.
+- A deployment starts the jar with its own start command, `java -jar build/libs/history-walk.jar -port=$PORT`; there is
+  no Procfile.
+- Releases: `make release-check` lists what stops one; `make release` runs every gate, pushes the image to Docker Hub,
+  and creates the GitHub release (tag `1.1.0`, title `v1.1.0`, notes from `RELEASE_NOTES.md`).
 - KSP is held at 2.3.12 (google/ksp#3286).
 
 ## Docs
@@ -56,7 +63,7 @@ Facts that are easy to get wrong:
 - [Routes.kt](https://raw.githubusercontent.com/pambrose/history-walk/master/src/jvmMain/kotlin/com/pambrose/historywalk/Routes.kt): the access map: which routes need a session or a teacher
 - [Pages.kt](https://raw.githubusercontent.com/pambrose/history-walk/master/src/jvmMain/kotlin/com/pambrose/historywalk/Pages.kt): the server-rendered teacher pages
 - [MainPanel.kt](https://raw.githubusercontent.com/pambrose/history-walk/master/src/jsMain/kotlin/com/pambrose/historywalk/MainPanel.kt): the walk page in the browser
-- [Makefile](https://raw.githubusercontent.com/pambrose/history-walk/master/Makefile): every development, test, Docker, and docs command (`make` lists them)
+- [Makefile](https://raw.githubusercontent.com/pambrose/history-walk/master/Makefile): every development, test, Docker, release, and docs command (`make` lists them)
 
 ## Optional
 
