@@ -46,6 +46,11 @@ RAILWAY_PROJECT     ?= a0c8cc4e-4057-4ddc-a7a8-881ccfa721e6
 RAILWAY_ENVIRONMENT ?= production
 RAILWAY_SERVICES    ?= Jermain Moses
 RAILWAY_URLS        ?= https://jermain.up.railway.app https://moses.up.railway.app
+# make log: how many recent lines of each walk's log it shows; SERVICE=Jermain or SERVICE=Moses shows one walk, and
+# FOLLOW=1 streams that one's log as it is written
+LOG_LINES           ?= 100
+SERVICE             ?=
+FOLLOW              ?=
 
 # The documentation site, a Zensical project in WEBSITE_DIR. Zensical is a dependency of the Python project in website/,
 # which each website target first syncs into website/.venv with uv. WEBSITE_ADDR=0.0.0.0:8000 serves it to the network.
@@ -57,9 +62,9 @@ ZENSICAL     := $(abspath website/.venv/bin/zensical)
 
 .PHONY: help db reset-jermain reset-moses stop-db server client build clean tests js-tests coverage lint \
 		format zizmor ci docker-build docker-push _docker-push docker-run docker-smoke release-check release \
-		_confirm-release railway-restart railway-redeploy website-env website-serve \
+		_confirm-release railway-restart railway-redeploy log website-env website-serve \
 		website-build website-clean upgrade-site versions versions-all depends yarn-unlock upgrade-wrapper creds \
-		restart log \
+		restart heroku-log \
 		served-version
 
 ##@ General
@@ -414,6 +419,25 @@ railway-redeploy: ## Redeploy Jermain and Moses on Railway from the newest Docke
 		echo " $$v"; \
 	done
 
+# Fetches the most recent LOG_LINES lines of each walk's deployment log, the server's own output: its startup lines (the
+# deck it serves, the database, the migrations), sign-ins, and errors. FOLLOW=1 streams one walk's log instead, until
+# Ctrl-C; Railway streams one service at a time, so it needs SERVICE.
+log: ## Show the last LOG_LINES (100) lines of each walk's Railway log; SERVICE=Moses for one, FOLLOW=1 to stream it
+	@command -v railway >/dev/null || { echo "log: the Railway CLI is not installed" >&2; exit 1; }
+	@services="$(or $(SERVICE),$(RAILWAY_SERVICES))"; \
+	if [ -n "$(FOLLOW)" ]; then \
+		set -- $$services; \
+		[ $$# -eq 1 ] || { echo "log: FOLLOW=1 streams one walk's log: add SERVICE=Jermain or SERVICE=Moses" >&2; \
+			exit 1; }; \
+		echo "=== $$1 (streaming; Ctrl-C stops)"; \
+		exec railway logs --project $(RAILWAY_PROJECT) --environment $(RAILWAY_ENVIRONMENT) --service "$$1"; \
+	fi; \
+	for s in $$services; do \
+		echo "=== $$s (last $(LOG_LINES) lines)"; \
+		railway logs --project $(RAILWAY_PROJECT) --environment $(RAILWAY_ENVIRONMENT) --service "$$s" \
+			--lines $(LOG_LINES) || { echo "log: could not read $$s's log" >&2; exit 1; }; \
+	done
+
 ##@ Heroku
 
 creds: ## Print the Heroku database URL
@@ -422,7 +446,7 @@ creds: ## Print the Heroku database URL
 restart: ## Restart the Heroku dynos
 	heroku ps:restart $(HEROKU_APP_FLAG)
 
-log: ## Tail the Heroku logs
+heroku-log: ## Tail the Heroku logs (make log shows the Railway walks' logs)
 	heroku logs --tail $(HEROKU_APP_FLAG)
 
 # Shows the client bundle's version as Heroku (ORIGIN_URL) serves it and as Cloudflare (PUBLIC_URL) serves it, with

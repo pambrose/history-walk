@@ -6,6 +6,17 @@ All notable changes to History Walk are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- The Apache License, Version 2.0 (`LICENSE`).
+- `make log`, which prints the last 100 lines of each walk's Railway log (`SERVICE=`, `LOG_LINES=`), or streams one
+  walk's log (`FOLLOW=1`). The Heroku log target it replaces is now `make heroku-log`.
+
+### Changed
+
+- The README is reorganized: local development first (what to install, `.env`, the make targets), every setting in one
+  table, the Gradle tasks by their current names, and the teacher pages in a section of their own.
+
 ## [1.1.1] - 2026-11-04
 
 ### Added
