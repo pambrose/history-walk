@@ -5,7 +5,7 @@
 Two numbers in `gradle.properties` describe a release:
 
 `version`
-:   The release, such as `1.1.1`. `/version` reports it, the page logs it in the browser's console, and it tags the
+:   The release, such as `1.1.2`. `/version` reports it, the page logs it in the browser's console, and it tags the
     Docker image. Bump it for every release.
 
 `apiVersion`

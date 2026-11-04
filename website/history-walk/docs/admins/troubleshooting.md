@@ -5,7 +5,7 @@
 | Address | Answers | Use |
 |---|---|---|
 | `/ping` | `pong` | The server is up. It touches neither the database nor a session; the Docker health check uses it. |
-| `/version` | `Version: 1.1.1 Release Date: … Build Date: …` | Which release a deployment runs. |
+| `/version` | `Version: 1.1.2 Release Date: … Build Date: …` | Which release a deployment runs. |
 | `/threaddump` | Every JVM thread's stack (teachers only) | A hung or slow server. Taking it briefly pauses the JVM. |
 
 ```bash
