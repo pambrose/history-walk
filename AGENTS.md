@@ -299,5 +299,6 @@ constants are SCREAMING_SNAKE_CASE, as ktlint's property-naming rule requires.
 - `docs/superpowers/` holds the Google sign-in design spec and implementation plan. They predate folding their own
   `V002` into `V001`; today's `V002` is the session version, which came later.
 - `website/history-walk/docs/` is the guide for teachers and administrators (a Zensical site; `make website-serve`).
+  Its `llms.txt` is a symlink to the top-level `llms.txt`, which the site serves at its root; edit the top-level one.
   A change a teacher or an administrator would notice (a page, a setting, an error message) needs its page updated in
   the same pull request.
