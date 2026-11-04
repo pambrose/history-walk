@@ -11,6 +11,7 @@ enum class EnvVar(
   ALLOW_SLIDE_ACCESS,
   SLIDES_VARIABLE_NAME,
   DBMS_DRIVER_CLASSNAME,
+  DBMS_NAME,
   DBMS_URL({ getEnvOrNull()?.obfuscate(4) ?: UNASSIGNED }),
   DBMS_USERNAME,
   DBMS_PASSWORD({ getEnvOrNull()?.obfuscate(1) ?: UNASSIGNED }),

@@ -1,0 +1,102 @@
+# The History Walk documentation site, built with Zensical (https://zensical.org). From the top of the repository:
+#
+#   make website-serve    # preview at http://localhost:8000, rebuilding on every change
+#   make website-build    # write the static site to site/, failing on any warning
+#   make website-clean    # remove site/ and Zensical's cache
+
+[project]
+# Where GitHub Pages publishes the site (.github/workflows/website.yml). Locally, make website-serve redirects
+# http://localhost:8000/ to the same path.
+site_url = "https://pambrose.github.io/history-walk/"
+site_name = "History Walk"
+site_description = "How teachers use History Walk, and how administrators run it"
+site_author = "Paul Ambrose"
+copyright = "Copyright &copy; 2026 Paul Ambrose"
+repo_url = "https://github.com/pambrose/history-walk"
+repo_name = "pambrose/history-walk"
+
+nav = [
+  { "Home" = "index.md" },
+  { "Teachers" = [
+    "teachers/index.md",
+    { "Signing in" = "teachers/signing-in.md" },
+    { "The walk" = "teachers/the-walk.md" },
+    { "Your teacher view" = "teachers/teacher-view.md" },
+    { "Class summary" = "teachers/class-summary.md" },
+    { "Student reasons" = "teachers/student-reasons.md" },
+    { "Trying the walk as a student" = "teachers/student-view.md" },
+    { "Questions and answers" = "teachers/faq.md" },
+  ] },
+  { "Administrators" = [
+    "admins/index.md",
+    { "Configuration" = "admins/configuration.md" },
+    { "Google sign-in" = "admins/google-sign-in.md" },
+    { "Teachers and students" = "admins/access.md" },
+    { "Deployment" = "admins/deployment.md" },
+    { "Database" = "admins/database.md" },
+    { "Releases and updates" = "admins/releases.md" },
+    { "Slide decks" = "admins/slide-decks.md" },
+    { "Monitoring and troubleshooting" = "admins/troubleshooting.md" },
+    { "Development" = "admins/development.md" },
+    { "These docs" = "admins/docs-site.md" },
+  ] },
+]
+
+[project.theme]
+language = "en"
+features = [
+  "content.code.copy",
+  "content.tabs.link",
+  "content.tooltips",
+  "navigation.footer",
+  "navigation.indexes",
+  "navigation.path",
+  "navigation.sections",
+  "navigation.top",
+  "navigation.tracking",
+  "search.highlight",
+]
+
+[project.theme.icon]
+logo = "lucide/footprints"
+repo = "fontawesome/brands/github"
+
+# Dark is the default: the first palette is the one a first visit gets, whatever the system's preference. The toggle
+# switches to light, and the browser remembers the choice.
+[[project.theme.palette]]
+scheme = "slate"
+primary = "blue"
+accent = "light-blue"
+toggle.icon = "lucide/sun"
+toggle.name = "Switch to light mode"
+
+[[project.theme.palette]]
+scheme = "default"
+primary = "blue"
+accent = "light-blue"
+toggle.icon = "lucide/moon"
+toggle.name = "Switch to dark mode"
+
+[project.markdown_extensions]
+abbr = {}
+admonition = {}
+attr_list = {}
+def_list = {}
+footnotes = {}
+md_in_html = {}
+toc.permalink = true
+pymdownx.betterem = {}
+pymdownx.details = {}
+pymdownx.emoji.emoji_generator = "zensical.extensions.emoji.to_svg"
+pymdownx.emoji.emoji_index = "zensical.extensions.emoji.twemoji"
+pymdownx.highlight.anchor_linenums = true
+pymdownx.highlight.pygments_lang_class = true
+pymdownx.inlinehilite = {}
+pymdownx.keys = {}
+pymdownx.mark = {}
+pymdownx.smartsymbols = {}
+pymdownx.superfences.custom_fences = [
+  { name = "mermaid", class = "mermaid", format = "pymdownx.superfences.fence_code_format" },
+]
+pymdownx.tabbed.alternate_style = true
+pymdownx.tasklist.custom_checkbox = true

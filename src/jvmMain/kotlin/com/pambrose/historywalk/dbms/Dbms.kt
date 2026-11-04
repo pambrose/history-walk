@@ -92,15 +92,19 @@ object Dbms {
   private fun hikari(config: ApplicationConfig) =
     HikariConfig()
       .apply {
-        val herokuDbmsUrl = System.getenv("DATABASE_URL").orEmpty()
-        if (herokuDbmsUrl.isNotEmpty()) {
-          // DATABASE_URL holds the password, and the logs go to Papertrail, so only the description is logged.
-          val heroku = HerokuDatabaseUrl.parse(herokuDbmsUrl)
-          logger.info { "Heroku database: ${heroku.description}" }
+        val containerDbmsUrl = System.getenv("DATABASE_URL").orEmpty()
+        if (containerDbmsUrl.isNotEmpty()) {
+          // DATABASE_URL holds the password, so only the description is logged.
+          val database =
+            ContainerDatabaseUrl.parse(
+              databaseUrl = containerDbmsUrl,
+              dbNameOverride = EnvVar.DBMS_NAME.getEnv(""),
+            )
+          logger.info { "Container database: ${database.description}" }
 
-          username = heroku.username
-          password = heroku.password
-          jdbcUrl = heroku.jdbcUrl
+          username = database.username
+          password = database.password
+          jdbcUrl = database.jdbcUrl
         } else {
           username = EnvVar.DBMS_USERNAME.getEnv(Property.DBMS_USERNAME.getRequiredProperty())
           password = EnvVar.DBMS_PASSWORD.getEnv(Property.DBMS_PASSWORD.getRequiredProperty())

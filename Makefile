@@ -30,11 +30,19 @@ DOCKER_PLATFORMS ?= linux/amd64,linux/arm64
 PUBLIC_URL   ?=
 ORIGIN_URL   ?=
 
+# The documentation site, a Zensical project in WEBSITE_DIR. Zensical is a dependency of the Python project in website/,
+# which each website target first syncs into website/.venv with uv. WEBSITE_ADDR=0.0.0.0:8000 serves it to the network.
+WEBSITE_DIR  := website/history-walk
+WEBSITE_ADDR ?= localhost:8000
+ZENSICAL     := $(abspath website/.venv/bin/zensical)
+
 .DEFAULT_GOAL := help
 
 .PHONY: help db reset-jermain reset-moses stop-db server client build clean tests js-tests coverage lint \
-		format zizmor ci procfile-check docker-build docker-push docker-run docker-smoke versions versions-all \
-		depends yarn-unlock upgrade-wrapper creds restart log served-version
+		format zizmor ci docker-build docker-push docker-run docker-smoke website-env website-serve \
+		website-build website-clean upgrade-site versions versions-all depends yarn-unlock upgrade-wrapper creds \
+		restart log \
+		served-version
 
 ##@ General
 
@@ -87,7 +95,7 @@ client: ## Run the webpack dev server on port 3000 (proxies the API to 8080)
 
 ##@ Build and test
 
-build: clean ## Clean, then build the fat jar (build/libs/history-walk.jar, the file the Procfile runs)
+build: clean ## Clean, then build the fat jar (build/libs/history-walk.jar, the file deployments run)
 	$(GRADLE) jar
 
 clean: ## Remove build outputs
@@ -120,31 +128,14 @@ zizmor: ## Audit the GitHub Actions workflows and dependabot.yml with zizmor, as
 
 # Every gate CI runs, in one command, so this is the check before merging: lint, the zizmor audit, the JVM tests with
 # coverage (checked against the floor in build.gradle.kts) and the client tests (their results not taken from the build
-# cache), the Docker image build, the Procfile check against the jar that build wrote, and the image started against
-# Postgres. Needs Docker, Chrome, and zizmor.
-ci: ## Run every CI gate locally: lint, zizmor, the JVM and client tests, the image build, procfile-check, the smoke test
+# cache), the Docker image build, and the image started against Postgres. Needs Docker, Chrome, and zizmor.
+ci: ## Run every CI gate locally: lint, zizmor, the JVM and client tests, the image build, the smoke test
 	$(MAKE) lint
 	$(MAKE) zizmor
 	$(GRADLE) --no-build-cache cleanJvmTest cleanJsBrowserTest jvmTest jsBrowserTest koverXmlReport koverHtmlReport koverLog \
 		koverVerify
 	$(MAKE) docker-build
-	$(MAKE) procfile-check
 	$(MAKE) docker-smoke
-
-# Heroku starts the dyno with the Procfile's command, so a Procfile naming a jar the build did not write leaves the app
-# down after a deploy. The fat jar's name leaves out the version (build.gradle.kts) for that reason, and this check
-# keeps the two in step. It reads the jar path from the Procfile's web line and fails if there is no such file, so build
-# the jar first (make build, make docker-build, or ./gradlew jar): make ci and the Docker Image workflow run it right
-# after docker-build. A jar left by an earlier build also passes, so run it after a clean build to be sure.
-procfile-check: ## Check that the jar the Procfile runs is in build/libs (build the jar first)
-	@jar=$$(sed -n 's/^web:.*[[:space:]]-jar[[:space:]]\{1,\}\([^[:space:]]\{1,\}\).*/\1/p' Procfile); \
-	[ -n "$$jar" ] || { echo "procfile-check: found no 'web: ... -jar <path>' line in the Procfile" >&2; exit 1; }; \
-	if [ ! -f "$$jar" ]; then \
-		echo "procfile-check: the Procfile runs $$jar, which the build did not write. build/libs holds:" >&2; \
-		ls -1 build/libs >&2 2>/dev/null || echo "  (nothing: build the jar first)" >&2; \
-		exit 1; \
-	fi; \
-	echo "procfile-check: the Procfile runs $$jar, which the build wrote"
 
 ##@ Docker
 
@@ -221,6 +212,31 @@ docker-smoke: ## Start the image (make docker-build first) against a throwaway P
 	[ "$$status" = 401 ] || fail "an RPC call without a session got $$status, not 401"; \
 	cleanup; \
 	echo "docker-smoke: $(DOCKER_IMAGE):$(VERSION) migrated an empty database and answered every check"
+
+##@ Website
+
+# Installs Zensical, at the version uv.lock pins, into website/.venv. Only the dependencies: website/ is not a package
+# the docs need built.
+website-env:
+	@uv sync --project website --no-install-project --quiet
+
+website-serve: website-env ## Serve the documentation site at WEBSITE_ADDR (localhost:8000), rebuilding it on every save
+	cd $(WEBSITE_DIR) && $(ZENSICAL) serve --dev-addr $(WEBSITE_ADDR)
+
+# --strict stops the build at the first warning, such as a link to a page that does not exist
+website-build: website-env ## Build the documentation site into website/history-walk/site, failing on any warning
+	cd $(WEBSITE_DIR) && $(ZENSICAL) build --clean --strict
+
+website-clean: ## Remove the built documentation site and Zensical's cache
+	rm -rf $(WEBSITE_DIR)/site $(WEBSITE_DIR)/.cache
+
+# Moves every package in website/uv.lock (Zensical and what it depends on) to its latest release that pyproject.toml
+# allows, then installs them. Run make website-build afterwards to check that the site still builds cleanly.
+upgrade-site: ## Upgrade Zensical and its dependencies in website/uv.lock to their latest releases, and install them
+	@before=$$($(ZENSICAL) --version 2>/dev/null || echo "not installed"); \
+	uv lock --project website --upgrade && \
+	uv sync --project website --no-install-project --quiet && \
+	echo "Zensical: $$before -> $$($(ZENSICAL) --version)"
 
 ##@ Dependencies
 

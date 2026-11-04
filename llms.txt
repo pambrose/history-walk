@@ -1,0 +1,66 @@
+# History Walk
+
+> History Walk is a choose-your-own-path history scenario for Athenian students. A student plays a person escaping
+> slavery, makes each slide's decision, and explains it in at least five words; teachers follow their class's progress
+> and reasons. It is a Kotlin Multiplatform app: a Ktor server and a KVision single-page client talking over Kilua RPC,
+> with Postgres behind Exposed and Flyway, and Google sign-in for the school's accounts.
+
+Facts that are easy to get wrong:
+
+- One deployment serves one walk. `SLIDES_VARIABLE_NAME` is `jermain` (the default) or `moses`; any other value stops
+  the server. The decks are Kotlin values compiled into the jar, not data.
+- The role comes from the Google account's address: in `TEACHER_EMAILS` means teacher; a local part starting with two
+  digits (`27msmith@athenian.org`) means student; anyone else is refused. Only `athenian.org` accounts sign in.
+- A slide's identity is its path name, the chain of titles from the first slide (`/Introduction/1st Decision`).
+  Progress is stored by path name, so renaming or moving a slide strands students on it; `SlidePathsTest` pins every
+  path name to a snapshot.
+- Moves are validated on the server against the deck; the client's titles and flags are ignored.
+- Teachers' walks are left out of the class pages, except moves made while the admin page's "Teachers see student
+  view" switch is on (`history.settings`, `user_choices.counted_as_student`).
+- `OAUTH_CALLBACK_URL` must be `https` for a deployed server; `http` only works for `localhost`.
+- `V001` begins with `drop schema if exists history cascade`; `Dbms.migrate` refuses to run it on a database whose
+  `history` tables survived without `public.flyway_schema_history`. Never edit an applied migration.
+- The database URL uses the pgjdbc-ng driver: `jdbc:pgsql:`, not `jdbc:postgresql:`.
+- KSP is held at 2.3.12 (google/ksp#3286).
+
+## Docs
+
+- [Overview](https://raw.githubusercontent.com/pambrose/history-walk/master/website/history-walk/docs/index.md): what History Walk is, the two walks, and where to start
+- [Teacher guide](https://raw.githubusercontent.com/pambrose/history-walk/master/website/history-walk/docs/teachers/index.md): what teachers can do, and a first session step by step
+- [Signing in](https://raw.githubusercontent.com/pambrose/history-walk/master/website/history-walk/docs/teachers/signing-in.md): Google sign-in, its messages, session length, sign-out
+- [The walk](https://raw.githubusercontent.com/pambrose/history-walk/master/website/history-walk/docs/teachers/the-walk.md): slides, choices, reasons, dead ends, going back, the update dialog
+- [Your teacher view](https://raw.githubusercontent.com/pambrose/history-walk/master/website/history-walk/docs/teachers/teacher-view.md): the teacher's header links, test walks, slide jumping
+- [Class summary](https://raw.githubusercontent.com/pambrose/history-walk/master/website/history-walk/docs/teachers/class-summary.md): the `/summary` page's columns and order
+- [Student reasons](https://raw.githubusercontent.com/pambrose/history-walk/master/website/history-walk/docs/teachers/student-reasons.md): the `/reasons` page
+- [Trying the walk as a student](https://raw.githubusercontent.com/pambrose/history-walk/master/website/history-walk/docs/teachers/student-view.md): the admin page's switch and the clear of teachers' walks
+- [Teacher questions and answers](https://raw.githubusercontent.com/pambrose/history-walk/master/website/history-walk/docs/teachers/faq.md): sign-in, walk, and class-page problems
+- [Administrator guide](https://raw.githubusercontent.com/pambrose/history-walk/master/website/history-walk/docs/admins/index.md): the architecture and common tasks
+- [Configuration](https://raw.githubusercontent.com/pambrose/history-walk/master/website/history-walk/docs/admins/configuration.md): every environment variable and its default
+- [Google sign-in](https://raw.githubusercontent.com/pambrose/history-walk/master/website/history-walk/docs/admins/google-sign-in.md): the OAuth client, redirect URIs, and `redirect_uri_mismatch`
+- [Teachers and students](https://raw.githubusercontent.com/pambrose/history-walk/master/website/history-walk/docs/admins/access.md): the role rule and the teacher list
+- [Deployment](https://raw.githubusercontent.com/pambrose/history-walk/master/website/history-walk/docs/admins/deployment.md): building from the repository, Railway, and Docker
+- [Database](https://raw.githubusercontent.com/pambrose/history-walk/master/website/history-walk/docs/admins/database.md): schema, migrations, the startup guard, backups, and queries
+- [Releases and updates](https://raw.githubusercontent.com/pambrose/history-walk/master/website/history-walk/docs/admins/releases.md): `version` and `apiVersion`, the update check, and Cloudflare caching
+- [Slide decks](https://raw.githubusercontent.com/pambrose/history-walk/master/website/history-walk/docs/admins/slide-decks.md): the deck DSL and path names
+- [Monitoring and troubleshooting](https://raw.githubusercontent.com/pambrose/history-walk/master/website/history-walk/docs/admins/troubleshooting.md): health checks, log lines, and startup and build errors
+- [Development](https://raw.githubusercontent.com/pambrose/history-walk/master/website/history-walk/docs/admins/development.md): local setup, tests, and CI
+
+## Code
+
+- [AGENTS.md](https://raw.githubusercontent.com/pambrose/history-walk/master/AGENTS.md): the detailed guide to the code: commands, architecture, sign-in, caching, version check, tests, and gotchas
+- [README.md](https://raw.githubusercontent.com/pambrose/history-walk/master/README.md): environment variables, Google Cloud setup, and Gradle tasks
+- [CHANGELOG.md](https://raw.githubusercontent.com/pambrose/history-walk/master/CHANGELOG.md): what changed in each release
+- [RELEASE_NOTES.md](https://raw.githubusercontent.com/pambrose/history-walk/master/RELEASE_NOTES.md): each release for teachers and administrators, with upgrade steps
+- [Services.kt](https://raw.githubusercontent.com/pambrose/history-walk/master/src/commonMain/kotlin/com/pambrose/historywalk/Services.kt): `IContentService`, the whole client/server RPC interface
+- [ServiceImpl.kt](https://raw.githubusercontent.com/pambrose/history-walk/master/src/jvmMain/kotlin/com/pambrose/historywalk/ServiceImpl.kt): the RPC service, which validates every move against the deck
+- [Routes.kt](https://raw.githubusercontent.com/pambrose/history-walk/master/src/jvmMain/kotlin/com/pambrose/historywalk/Routes.kt): the access map: which routes need a session or a teacher
+- [Pages.kt](https://raw.githubusercontent.com/pambrose/history-walk/master/src/jvmMain/kotlin/com/pambrose/historywalk/Pages.kt): the server-rendered teacher pages
+- [MainPanel.kt](https://raw.githubusercontent.com/pambrose/history-walk/master/src/jsMain/kotlin/com/pambrose/historywalk/MainPanel.kt): the walk page in the browser
+- [Makefile](https://raw.githubusercontent.com/pambrose/history-walk/master/Makefile): every development, test, Docker, and docs command (`make` lists them)
+
+## Optional
+
+- [Code review, 2026-10-31](https://raw.githubusercontent.com/pambrose/history-walk/master/docs/code-review-2026-10-31.md): 24 issues and the five waves of fixes
+- [Jermain slide paths](https://raw.githubusercontent.com/pambrose/history-walk/master/src/jvmTest/resources/slide-paths/jermain.txt): every reachable path name in the Jermain deck
+- [Moses slide paths](https://raw.githubusercontent.com/pambrose/history-walk/master/src/jvmTest/resources/slide-paths/moses.txt): every reachable path name in the Moses deck
+- [Documentation site](https://pambrose.github.io/history-walk/): the docs above, rendered

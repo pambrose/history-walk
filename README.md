@@ -1,5 +1,20 @@
 # History Walk
 
+[![Tests](https://github.com/pambrose/history-walk/actions/workflows/tests.yml/badge.svg)](https://github.com/pambrose/history-walk/actions/workflows/tests.yml)
+[![Lint](https://github.com/pambrose/history-walk/actions/workflows/lint.yml/badge.svg)](https://github.com/pambrose/history-walk/actions/workflows/lint.yml)
+[![Docker Image](https://github.com/pambrose/history-walk/actions/workflows/docker.yml/badge.svg)](https://github.com/pambrose/history-walk/actions/workflows/docker.yml)
+[![zizmor](https://github.com/pambrose/history-walk/actions/workflows/zizmor.yml/badge.svg)](https://github.com/pambrose/history-walk/actions/workflows/zizmor.yml)
+[![Website](https://github.com/pambrose/history-walk/actions/workflows/website.yml/badge.svg)](https://github.com/pambrose/history-walk/actions/workflows/website.yml)
+[![Release](https://img.shields.io/github/v/release/pambrose/history-walk)](https://github.com/pambrose/history-walk/releases)
+[![Docs](https://img.shields.io/badge/docs-pambrose.github.io-blue)](https://pambrose.github.io/history-walk/)
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.4.21-7F52FF?logo=kotlin&logoColor=white)](https://kotlinlang.org)
+[![Java](https://img.shields.io/badge/Java-25-ED8B00?logo=openjdk&logoColor=white)](https://openjdk.org/projects/jdk/25/)
+
+A choose-your-own-path history scenario for Athenian students: a student makes the decisions of a person escaping
+slavery and explains each one, and teachers follow their class's progress and reasons. The guide for teachers and
+administrators is at <https://pambrose.github.io/history-walk/>; [CHANGELOG.md](CHANGELOG.md) and
+[RELEASE_NOTES.md](RELEASE_NOTES.md) describe each release.
+
 ## Env Vars
 
 * SLIDES_VARIABLE_NAME - `jermain` for the Jermain Longuen walk (the default when unset), or `moses` for the Moses walk,
@@ -22,10 +37,12 @@ digits) and the teachers listed in `TEACHER_EMAILS` are admitted; anyone else is
 3. Create an OAuth client of type **Web application**, and copy its client id and client secret
    (`GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` below).
 4. Add these authorized redirect URIs:
-   * `https://<jermain-app>.herokuapp.com/auth/callback`
-   * `https://<moses-app>.herokuapp.com/auth/callback`
+   * `https://<jermain-deployment>/auth/callback`
+   * `https://<moses-deployment>/auth/callback`
    * `http://localhost:8080/auth/callback` (running the jar, or `make server` alone)
    * `http://localhost:3000/auth/callback` (with `make client`, whose dev server proxies `/auth/*`)
+
+   A deployed callback must be `https`: Google accepts `http` only for `localhost`.
 5. Set the environment variables below. The server refuses to start without `GOOGLE_CLIENT_ID`,
    `GOOGLE_CLIENT_SECRET`, and `OAUTH_CALLBACK_URL`.
 
@@ -33,7 +50,7 @@ digits) and the teachers listed in `TEACHER_EMAILS` are admitted; anyone else is
 |---|---|
 | `GOOGLE_CLIENT_ID` | Google OAuth client id |
 | `GOOGLE_CLIENT_SECRET` | Google OAuth client secret |
-| `OAUTH_CALLBACK_URL` | e.g. `https://<app>.herokuapp.com/auth/callback`; locally `http://localhost:8080/auth/callback` |
+| `OAUTH_CALLBACK_URL` | e.g. `https://<deployment>/auth/callback`; locally `http://localhost:8080/auth/callback` |
 | `SESSION_SECRET` | Key for the session cookie and signed state; required in production |
 | `SCHOOL_EMAIL_DOMAIN` | Defaults to `athenian.org` |
 | `TEACHER_EMAILS` | Comma-separated teacher addresses; the only accounts with the teacher view. Empty means no teachers |
@@ -45,7 +62,7 @@ Generate `SESSION_SECRET` with:
 openssl rand -hex 32
 ```
 
-Use a distinct `SESSION_SECRET` for each Heroku app. Rotating it signs everyone out.
+Use a distinct `SESSION_SECRET` for each deployment. Rotating it signs everyone out.
 
 A sign-in lasts 12 hours. Signing out ends that account's sessions in every browser, not only the one used.
 
@@ -69,9 +86,8 @@ with a logged warning. Any other host is production and requires `SESSION_SECRET
 * jsJar - Packages a standalone "web" frontend jar with all required files into `build/libs/*.jar`
 * jvmJar - Packages a backend jar with compiled source files into `build/libs/*.jar`
 * jar - Packages a "fat" jar with all backend sources and dependencies while also embedding frontend resources
-  into `build/libs/history-walk.jar`. The name has no version, so the Procfile and the Dockerfile name the same file in
-  every release; `make procfile-check`, run after a build, fails if the Procfile names a file the build did not write.
-  (`jar` is Gradle's prefix match for the Kilua RPC plugin's `jarWithJs` task.)
+  into `build/libs/history-walk.jar`. The name has no version, so the Dockerfile and a deployment's start command name
+  the same file in every release. (`jar` is Gradle's prefix match for the Kilua RPC plugin's `jarWithJs` task.)
 
 ## Docker
 
@@ -96,44 +112,41 @@ Use `DOCKER_PORT=8090` to run beside `make server`, and `DOCKER_DB=moses` (with
 `linux/amd64` and `linux/arm64` with `docker buildx`. Run `docker login` once first. It asks before pushing, and
 `DOCKER_REPO` and `DOCKER_PLATFORMS` override the repository and the platforms.
 
-## Heroku Deployment
+## Deployment
 
-* Add a Procfile
-* Add config var `GRADLE_TASK = -Pprod=true jar`
-* Add buildpack `heroku/gradle`
+Each walk is its own deployment of the fat jar, on Java 25, with its own Postgres database and environment variables.
+A host that builds from the repository runs `./gradlew jar` and starts the jar with this start command (on Railway,
+the service's custom start command):
 
-To determine the database URL:
 ```bash
-heroku pg:credentials:url DATABASE -a app-name
+java -jar build/libs/history-walk.jar -port=$PORT
 ```
+
+A host that runs containers can run the image `make docker-push` publishes. The
+[deployment guide](https://pambrose.github.io/history-walk/admins/deployment/) covers both.
 
 ### Behind Cloudflare
 
-The apps are served through Cloudflare. The page, `main.bundle.js`, and the images go out with
-`Cache-Control: no-cache, private` and an ETag, so Cloudflare keeps no copy and a browser checks with the server on each
-page load, getting a 304 until a release changes the file. After a deploy, check what each side serves:
+The page, `main.bundle.js`, and the images go out with `Cache-Control: no-cache, private` and an ETag, so Cloudflare
+keeps no copy and a browser checks with the server on each page load, getting a 304 until a release changes the file.
+After a deploy, check what each side serves:
 
 ```bash
-make served-version PUBLIC_URL=https://<cloudflare-address> ORIGIN_URL=https://<app>.herokuapp.com
+make served-version PUBLIC_URL=https://<cloudflare-address> ORIGIN_URL=https://<origin-address>
 ```
 
-It fails if Cloudflare serves an older bundle than Heroku (purge `main.bundle.js` in Cloudflare) or caches the bundle.
-Do not add a Cloudflare cache rule that overrides the origin's `Cache-Control`.
-
-### Pushing to Heroku from a branch
-
-```bash
-git push heroku Jan-2026:main
-```
+It fails if Cloudflare serves an older bundle than the origin (purge `main.bundle.js` in Cloudflare) or caches the
+bundle. Do not add a Cloudflare cache rule that overrides the origin's `Cache-Control`.
 
 ### Building the Database
 
 The schema is managed by [Flyway](https://documentation.red-gate.com/flyway). Migrations live in
 `src/jvmMain/resources/db/migration` and are applied automatically when the server starts, so every
-Heroku deploy brings the database up to date. The initial schema is `V001__create_schema.sql`;
-`V002__session_version.sql` adds the per-user session version that signing out increments.
+deploy brings the database up to date. The initial schema is `V001__create_schema.sql`;
+`V002__session_version.sql` adds the per-user session version that signing out increments, and
+`V003__teachers_see_student_view.sql` the admin page's student-view switch.
 
-To change the schema, add a new migration with the next version number, e.g. `V003__add_column.sql`.
+To change the schema, add a new migration with the next version number, e.g. `V004__add_column.sql`.
 Never edit a migration that has already been applied: Flyway checksums applied migrations and will
 refuse to start if one changes.
 
@@ -141,8 +154,7 @@ Flyway records the migrations it has applied in `public.flyway_schema_history`, 
 schema that holds the users and their choices. `V001` begins by dropping the `history` schema, so if
 `history` holds tables while that table is missing or empty, the server refuses to start rather than
 run `V001` again, and its error names the fix. A backup or restore must therefore include
-`public.flyway_schema_history`: `heroku pg:backups:restore` and `heroku pg:copy` take whole databases,
-which is fine; a dump of the `history` schema alone is not.
+`public.flyway_schema_history`: a backup of the whole database is fine; a dump of the `history` schema alone is not.
 
 ### Debug Deployment
 

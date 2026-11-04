@@ -77,9 +77,8 @@ val mainClassName = "io.ktor.server.cio.EngineMain"
 
 // `./gradlew jar` runs jarWithJs, the Kilua RPC plugin's fat jar of the server and the webpacked client: Kotlin
 // Multiplatform has no task named jar, and Gradle runs the one task whose name starts with it. The fat jar's name
-// leaves out the version, so the Procfile (Heroku) and the Dockerfile name the same file in every release, and
-// `make procfile-check` fails if the Procfile names a file the build did not write. The jvmJar and jsArchive jars it
-// is assembled from keep their versioned names.
+// leaves out the version, so the Dockerfile and a deployment's start command (java -jar build/libs/history-walk.jar)
+// name the same file in every release. The jvmJar and jsArchive jars it is assembled from keep their versioned names.
 configure<KiluaRpcExtension> {
     jarArchiveFileName = "history-walk.jar"
 }
