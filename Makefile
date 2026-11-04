@@ -21,6 +21,10 @@ DOCKER_PORT  ?= 8080
 DOCKER_DB    ?= jermain
 ENV_FILE     ?= .env
 
+# The Docker Hub repository `make docker-push` publishes the image to (docker login first), and the platforms it builds.
+DOCKER_REPO      ?= pambrose/history-walk
+DOCKER_PLATFORMS ?= linux/amd64,linux/arm64
+
 # The addresses `make served-version` compares: the app as Cloudflare serves it, and the Heroku app behind it, e.g.
 # make served-version PUBLIC_URL=https://walk.example.org ORIGIN_URL=https://<app>.herokuapp.com
 PUBLIC_URL   ?=
@@ -29,7 +33,7 @@ ORIGIN_URL   ?=
 .DEFAULT_GOAL := help
 
 .PHONY: help db reset-jermain reset-moses stop-db server client build clean tests js-tests coverage lint \
-		format zizmor ci procfile-check docker-build docker-run docker-smoke versions versions-all \
+		format zizmor ci procfile-check docker-build docker-push docker-run docker-smoke versions versions-all \
 		depends yarn-unlock upgrade-wrapper creds restart log served-version
 
 ##@ General
@@ -149,6 +153,20 @@ procfile-check: ## Check that the jar the Procfile runs is in build/libs (build 
 docker-build: ## Build the fat jar, then an image holding it (history-walk:VERSION and :latest)
 	$(GRADLE) jar
 	docker build --build-arg APP_VERSION=$(VERSION) -t $(DOCKER_IMAGE):$(VERSION) -t $(DOCKER_IMAGE):latest .
+
+# One jar serves every platform, and the base image is pinned to its multi-arch index, so buildx builds the image for
+# each of DOCKER_PLATFORMS from the same jar and pushes them under one tag. The image holds no secrets (they come from
+# the environment at startup), and a repository the first push creates takes the account's default visibility. It asks
+# before publishing, and a push replaces what Docker Hub held under both tags, so bump the version in gradle.properties
+# first to keep the previous release's image.
+docker-push: ## Build the fat jar, then build and push a multi-arch image to Docker Hub (DOCKER_REPO:VERSION and :latest)
+	@echo "About to publish to Docker Hub for $(DOCKER_PLATFORMS):"
+	@echo "  $(DOCKER_REPO):$(VERSION)"
+	@echo "  $(DOCKER_REPO):latest"
+	@printf 'Continue? [y/N] ' && read ans && [ "$$ans" = "y" ]
+	$(GRADLE) jar
+	docker buildx build --build-arg APP_VERSION=$(VERSION) --platform $(DOCKER_PLATFORMS) \
+		-t $(DOCKER_REPO):$(VERSION) -t $(DOCKER_REPO):latest --push .
 
 # ENV_FILE is read as the shell reads it (so quoted values lose their quotes), then each of its variables is passed to the
 # container. Inside the container localhost is the container itself, so the database is reached through

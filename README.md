@@ -92,6 +92,10 @@ make docker-run     # serves http://localhost:8080 using .env
 Use `DOCKER_PORT=8090` to run beside `make server`, and `DOCKER_DB=moses` (with
 `SLIDES_VARIABLE_NAME=moses` in `.env`) for the Moses walk. The container's health check probes `/ping`.
 
+`make docker-push` publishes the image to Docker Hub as `pambrose/history-walk:1.1.0` and `:latest`, built for
+`linux/amd64` and `linux/arm64` with `docker buildx`. Run `docker login` once first. It asks before pushing, and
+`DOCKER_REPO` and `DOCKER_PLATFORMS` override the repository and the platforms.
+
 ## Heroku Deployment
 
 * Add a Procfile
