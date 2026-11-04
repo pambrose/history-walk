@@ -1,7 +1,7 @@
 # Class summary
 
 The class summary (**class summary** at the top right, or `/summary`) has one row for each student who has signed in
-to this walk, with where they are and how far they've come.
+to this walk, with where they are and how far they've come. It opens in its own tab, titled *Class Summary*.
 
 ## The columns
 

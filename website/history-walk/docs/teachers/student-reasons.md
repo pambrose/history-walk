@@ -1,7 +1,7 @@
 # Student reasons
 
 The student reasons page (**student reasons** at the top right, or `/reasons`) lists every reason every student gave,
-grouped by student.
+grouped by student. It opens in its own tab, titled *Student Reasons*.
 
 ## Layout
 
