@@ -33,10 +33,10 @@ The parts:
 - **Postgres**, holding users, their moves and reasons, and the app's one setting. The server migrates the schema
   itself, with [Flyway](https://flywaydb.org), each time it starts.
 - **Google OAuth** for sign-in. Only accounts in the school's domain are admitted; the role comes from the address.
-- **Cloudflare** in front of the Heroku deployments. The server's headers keep it from caching anything per-user,
+- **Cloudflare**, where a deployment sits behind it. The server's headers keep it from caching anything per-user,
   and make every release reach browsers at their next page load (see [Releases and updates](releases.md)).
 
-The server needs **Java 25**. It runs the same way on Heroku, on Railway, and in Docker.
+The server needs **Java 25**. It runs the same way built from the repository, on Railway, and in Docker.
 
 ## Common tasks
 

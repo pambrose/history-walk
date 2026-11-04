@@ -36,7 +36,6 @@ Do this once per deployment, or once for several, listing each deployment's call
 
     | Where | Redirect URI |
     |---|---|
-    | A Heroku deployment | `https://<app>.herokuapp.com/auth/callback` |
     | A Railway deployment | `https://<service>.up.railway.app/auth/callback` |
     | A custom domain | `https://<domain>/auth/callback` |
     | Running the jar, `make server`, or `make docker-run` locally | `http://localhost:8080/auth/callback` |

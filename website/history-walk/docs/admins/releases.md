@@ -19,10 +19,10 @@ Two numbers in `gradle.properties` describe a release:
 1. Merge the changes to `master`, with CI green.
 2. Bump `version` in `gradle.properties` (and `apiVersion`, if the interface changed). For a GitHub release, tag
    without a `v` (`1.1.0`) and title it with one (`v1.1.0`).
-3. Deploy each walk: on Heroku, push `master` to each app's git remote, or let the app deploy from GitHub. On Docker
-   hosts, `make docker-push` and redeploy the image.
+3. Deploy each walk: a host that builds from the repository builds `master`; on a host that runs the image,
+   `make docker-push` and redeploy it.
 4. Each deployment migrates its database as it starts. Check `/version` on each.
-5. On Heroku behind Cloudflare, check that Cloudflare serves the new page bundle ([below](#after-a-deploy)).
+5. Behind Cloudflare, check that Cloudflare serves the new page bundle ([below](#after-a-deploy)).
 
 ## What open pages do
 
@@ -55,14 +55,14 @@ would serve old bundles after a release, and could cache per-user pages.
 
 ### After a deploy
 
-A change to these headers doesn't clear a copy Cloudflare already holds. After a deploy, compare the bundle Heroku
-serves with the one Cloudflare serves:
+A change to these headers doesn't clear a copy Cloudflare already holds. After a deploy, compare the bundle the deployment
+serves (the origin) with the one Cloudflare serves:
 
 ```bash
-make served-version PUBLIC_URL=https://<public address> ORIGIN_URL=https://<app>.herokuapp.com
+make served-version PUBLIC_URL=https://<public address> ORIGIN_URL=https://<origin address>
 ```
 
-It prints the version in this checkout, in Heroku's bundle, and in Cloudflare's, with Cloudflare's `cf-cache-status`,
+It prints the version in this checkout, in the origin's bundle, and in Cloudflare's, with Cloudflare's `cf-cache-status`,
 and fails if they differ or Cloudflare is caching the bundle. If it fails, purge `main.bundle.js` in Cloudflare's
 dashboard (Caching → Configuration → Purge Cache → Custom Purge) and run it again.
 

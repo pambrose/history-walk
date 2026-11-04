@@ -50,7 +50,7 @@ A new, empty database and an already-migrated one both pass the check, which onl
 
 A backup must include **both** the `history` schema and `public.flyway_schema_history`.
 
-- `heroku pg:backups:capture` and `heroku pg:copy` take whole databases: fine.
+- A host's whole-database backup or copy: fine.
 - `pg_dump` of the whole database: fine.
 - `pg_dump -n history` alone: **not enough**. Restoring it into an empty database trips the startup guard above.
 

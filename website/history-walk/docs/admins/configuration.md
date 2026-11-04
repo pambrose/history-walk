@@ -1,9 +1,8 @@
 # Configuration
 
-The server is configured entirely through environment variables. A host's settings page (Heroku's *Config Vars*,
-Railway's *Variables*) sets them; locally they come from `.env` (see [Development](development.md)). The server reads
-them once, at startup, so a change takes effect when the server restarts. Heroku and Railway restart it by
-themselves when a variable changes.
+The server is configured entirely through environment variables. A host's settings page (Railway's *Variables*, for
+example) sets them; locally they come from `.env` (see [Development](development.md)). The server reads them once, at
+startup, so a change takes effect when the server restarts. Railway restarts it by itself when a variable changes.
 
 ## Required
 
@@ -13,7 +12,7 @@ The server refuses to start without these.
 |---|---|
 | `GOOGLE_CLIENT_ID` | The OAuth client ID from Google Cloud, `….apps.googleusercontent.com`. See [Google sign-in](google-sign-in.md). |
 | `GOOGLE_CLIENT_SECRET` | That client's secret. |
-| `OAUTH_CALLBACK_URL` | Where Google sends the browser back after sign-in: the deployment's public address followed by `/auth/callback`, such as `https://<app>.herokuapp.com/auth/callback`. It must be **`https`** for a deployed server, and must match an authorized redirect URI of the client exactly. |
+| `OAUTH_CALLBACK_URL` | Where Google sends the browser back after sign-in: the deployment's public address followed by `/auth/callback`, such as `https://<service>.up.railway.app/auth/callback`. It must be **`https`** for a deployed server, and must match an authorized redirect URI of the client exactly. |
 | `SESSION_SECRET` | The key for the session cookie and the sign-in state, at least 16 characters. Required whenever `OAUTH_CALLBACK_URL`'s host is not `localhost`, `127.0.0.1`, or `::1`. Generate one with `openssl rand -hex 32`. |
 
 !!! warning "`SESSION_SECRET`"
@@ -41,12 +40,12 @@ The server refuses to start without these.
 
 ## Database
 
-On Heroku, the Postgres add-on sets `DATABASE_URL`, and the server uses it in place of the `DBMS_*` variables.
-Elsewhere, set the `DBMS_*` variables.
+Set the `DBMS_*` variables. A single `DATABASE_URL`, as some hosts' Postgres services provide it, works too, and the
+server then uses it in place of the `DBMS_*` variables.
 
 | Variable | Default | Value |
 |---|---|---|
-| `DATABASE_URL` | none | `postgres://user:password@host:port/database`, as Heroku sets it. When present, it wins over the three below. A password containing `@` must be percent-encoded. |
+| `DATABASE_URL` | none | `postgres://user:password@host:port/database`. When present, it wins over the three below, and the server connects with SSL required. A password containing `@` must be percent-encoded. |
 | `DBMS_URL` | `jdbc:pgsql://localhost:5432/historywalk` | A JDBC URL for the [pgjdbc-ng](https://impossibl.github.io/pgjdbc-ng/) driver: note **`jdbc:pgsql:`**, not `jdbc:postgresql:`. |
 | `DBMS_USERNAME` | `postgres` | The database user. |
 | `DBMS_PASSWORD` | `docker` | That user's password. |
@@ -66,14 +65,8 @@ An open page asks the server every minute whether a newer version has been relea
 
 ## The port
 
-The server listens on the port given with `-port=` on its command line; the Procfile passes Heroku's `$PORT`
+The server listens on the port given with `-port=` on its command line; the Procfile passes the host's `$PORT`
 (`java -jar build/libs/history-walk.jar -port=$PORT`). The Docker image listens on 8080.
-
-## Heroku build setting
-
-| Variable | Value |
-|---|---|
-| `GRADLE_TASK` | `-Pprod=true jar`: what Heroku's Gradle buildpack runs to build the jar. |
 
 ## A complete example
 
@@ -83,10 +76,12 @@ A deployed Jermain walk, with placeholders for the secrets:
 SLIDES_VARIABLE_NAME=jermain
 GOOGLE_CLIENT_ID=1234567890-abcdefg.apps.googleusercontent.com
 GOOGLE_CLIENT_SECRET=<from Google Cloud>
-OAUTH_CALLBACK_URL=https://<jermain-app>.herokuapp.com/auth/callback
+OAUTH_CALLBACK_URL=https://<jermain-service>.up.railway.app/auth/callback
 SESSION_SECRET=<openssl rand -hex 32>
 TEACHER_EMAILS=ateacher@athenian.org,another@athenian.org
 ALLOW_SLIDE_ACCESS=true
 LOGIN_GREETING=History Walk
-# DATABASE_URL is set by the Heroku Postgres add-on; elsewhere set DBMS_URL, DBMS_USERNAME, and DBMS_PASSWORD
+DBMS_URL=jdbc:pgsql://<host>:<port>/<database>
+DBMS_USERNAME=<user>
+DBMS_PASSWORD=<password>
 ```

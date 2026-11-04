@@ -13,36 +13,19 @@ Whatever the host, a new deployment needs:
 - [ ] Its callback added to the Google client's authorized redirect URIs (see [Google sign-in](google-sign-in.md)).
 - [ ] A check after it starts: `/ping` answers `pong`, `/version` names the release, and a teacher can sign in.
 
-## Heroku
+## Building from the repository
 
-The two walks run as two Heroku apps, built from this repository by Heroku's Gradle buildpack.
+A host that builds from the repository needs Java 25. It runs `./gradlew jar`, which writes
+`build/libs/history-walk.jar`, and starts it as the `Procfile` does:
 
-How Heroku builds and runs it
-:   `system.properties` asks for Java 25 (`java.runtime.version=25`). The buildpack runs `./gradlew` with
-    `GRADLE_TASK` (`-Pprod=true jar`), which writes `build/libs/history-walk.jar`. The `Procfile` runs it:
+```text
+web: java -jar build/libs/history-walk.jar -port=$PORT
+```
 
-    ```text
-    web: java -jar build/libs/history-walk.jar -port=$PORT
-    ```
+The jar's name has no version in it, so a release never leaves the Procfile pointing at a file the build no longer
+writes; `make procfile-check` (in CI) checks the two agree.
 
-    The jar's name has no version in it, so a release never leaves the Procfile pointing at a file the build no
-    longer writes; `make procfile-check` (in CI) checks the two agree.
-
-Settings
-:   Each app's Config Vars are listed in `heroku.md` in the repository: the Heroku Postgres add-on sets
-    `DATABASE_URL`, and Papertrail sets `PAPERTRAIL_API_TOKEN`; you set the rest. Both apps have
-    `ALLOW_SLIDE_ACCESS=true`.
-
-Make targets
-:   Pass the app with `APP=` (or leave it off to use the git remote's default app):
-
-    | Command | Does |
-    |---|---|
-    | `make log APP=<app>` | Tails the app's log. |
-    | `make restart APP=<app>` | Restarts its dynos. |
-    | `make creds APP=<app>` | Prints its database URL, credentials included. |
-
-The apps sit behind Cloudflare. After each deploy, check that Cloudflare serves the new release; see
+A deployment behind Cloudflare needs one more check after each deploy, that Cloudflare serves the new release; see
 [Releases and updates](releases.md#after-a-deploy).
 
 ## Railway
@@ -52,7 +35,7 @@ A Railway service runs the same jar or image with the same variables:
 - Set the variables in the service's **Variables**. Give the server its database with `DBMS_URL`
   (`jdbc:pgsql://<host>:<port>/<database>`, note `pgsql`), `DBMS_USERNAME`, and `DBMS_PASSWORD`. A `DATABASE_URL`
   variable, if the service has one, takes precedence over those three, and the server connects to it with SSL
-  required, as Heroku's databases expect; leave it off unless the database accepts SSL.
+  required; leave it off unless the database accepts SSL.
 - Set `OAUTH_CALLBACK_URL` to `https://<service>.up.railway.app/auth/callback`, or the custom domain's, and add the
   same URI to the Google client. It must start with `https://`.
 - Keep a copy of the service's variables outside the repository. `secrets/` is gitignored for this, such as
