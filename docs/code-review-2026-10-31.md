@@ -41,11 +41,11 @@ session are not listed: the go-back offsets, the quotes in slide text, and lint.
 | [17](#issue-17) | ✅ | Low      | Client         | Nothing stops a reload loop while a stale bundle is still served                       |
 | [18](#issue-18) | ✅ | Low      | Client         | Before the first successful call, any error shows the sign-in dialog                   |
 | [19](#issue-19) | ✅ | Low      | Ops            | An unknown `SLIDES_VARIABLE_NAME` silently serves the Moses walk                       |
-| [20](#issue-20) | ⬜ | Low      | Database       | `V001` begins with `drop schema if exists history cascade`                             |
+| [20](#issue-20) | ✅ | Low      | Database       | `V001` begins with `drop schema if exists history cascade`                             |
 | [21](#issue-21) | ✅ | Low      | Client         | Panels and dialogs are never disposed, so each slide leaks a little                    |
-| [22](#issue-22) | ⬜ | Low      | Supply chain   | Dependabot covers only GitHub Actions, and the Docker base image is not pinned         |
-| [23](#issue-23) | ⬜ | Low      | CI             | No coverage floor, so coverage can fall without a failing check                        |
-| [24](#issue-24) | ⬜ | Low      | Build          | Gradle deprecations block Gradle 10, and patch updates are pending                     |
+| [22](#issue-22) | ✅ | Low      | Supply chain   | Dependabot covers only GitHub Actions, and the Docker base image is not pinned         |
+| [23](#issue-23) | ✅ | Low      | CI             | No coverage floor, so coverage can fall without a failing check                        |
+| [24](#issue-24) | ✅ | Low      | Build          | Gradle deprecations block Gradle 10, and patch updates are pending                     |
 
 Things checked and found sound:
 
@@ -406,8 +406,12 @@ Things checked and found sound:
   setting is missing. Log the deck it chose.
 
 <a id="issue-20"></a>
-### ⬜ 20. `V001` begins with `drop schema if exists history cascade`
+### ✅ 20. `V001` begins with `drop schema if exists history cascade`
 
+- **Status:** done in Wave 5. A Testcontainers probe confirmed the risk: with `public.flyway_schema_history` dropped or
+  emptied, startup re-ran `V001` and lost every user, because Flyway checks only `public` for data. `Dbms.migrate` now
+  refuses to migrate when `V001` is pending and the `history` schema holds tables, naming the fixes (restore the
+  history table, or baseline deliberately). AGENTS.md and the README say a backup must take the history table along.
 - **Severity:** Low
 - **Where:** `src/jvmMain/resources/db/migration/V001__create_schema.sql:1`
 - **Problem:**
@@ -438,8 +442,11 @@ Things checked and found sound:
 - **Fix:** Use `disposeAll()` in `displaySlide`, and dispose the reason dialog after `getResult()` returns.
 
 <a id="issue-22"></a>
-### ⬜ 22. Dependabot covers only GitHub Actions, and the Docker base image is not pinned
+### ✅ 22. Dependabot covers only GitHub Actions, and the Docker base image is not pinned
 
+- **Status:** done in Wave 5: Dependabot has `gradle` (security updates only) and `docker` entries, and the Dockerfile
+  pins `eclipse-temurin:25-jre-alpine` to its multi-arch index digest. Dependabot does not cover the `postgres:18`
+  image that `make db`, `make docker-smoke`, and the Testcontainers specs use.
 - **Severity:** Low
 - **Where:** `.github/dependabot.yml:10`, `Dockerfile:2` (`FROM eclipse-temurin:25-jre-alpine`)
 - **Problem:**
@@ -450,8 +457,10 @@ Things checked and found sound:
   as canvas-cache does, and pin the base image by digest.
 
 <a id="issue-23"></a>
-### ⬜ 23. No coverage floor, so coverage can fall without a failing check
+### ✅ 23. No coverage floor, so coverage can fall without a failing check
 
+- **Status:** done in Wave 5: `koverVerify` enforces a 90% JVM line-coverage floor (91.5% today) in the required
+  `test` job, `make ci`, and `make coverage`.
 - **Severity:** Low
 - **Where:** `build.gradle.kts` (the `kover` block), `.github/workflows/tests.yml`
 - **Problem:** Kover reports about 88% line coverage, but nothing verifies it, so a change can delete tests or add
@@ -460,8 +469,12 @@ Things checked and found sound:
   `make ci`, and raise the floor as coverage grows.
 
 <a id="issue-24"></a>
-### ⬜ 24. Gradle deprecations block Gradle 10, and patch updates are pending
+### ✅ 24. Gradle deprecations block Gradle 10, and patch updates are pending
 
+- **Status:** done in Wave 5, as far as this repo can take it. The only deprecation is `Configuration.setVisible`
+  (removal in Gradle 11; Gradle's summary always names the next major). KSP 2.3.13 stopped calling it; Kover 0.9.11
+  still does, until a release carries Kotlin/kotlinx-kover#838, so the warning remains. Kotlin is 2.4.21 and KSP
+  2.3.13; `jsTest` now takes `kotlin("test")` so the client specs compile when Kotlin is ahead of KVision's testutils.
 - **Severity:** Low
 - **Where:** the build (each run warns "Deprecated Gradle features were used in this build, making it incompatible with
   Gradle 10"), and `gradle/libs.versions.toml`
@@ -530,10 +543,10 @@ progress, then add the version-check tests once it lands.
 
 | Step | Status | Issues | Work | Files |
 |------|:------:|--------|------|-------|
-| 13 | ⬜ | [22](#issue-22) | Dependabot `gradle` (security only) and `docker`; pin the base image by digest | `.github/dependabot.yml`, `Dockerfile` |
-| 14 | ⬜ | [23](#issue-23) | A Kover coverage floor, enforced in CI and `make ci` | `build.gradle.kts`, `tests.yml`, `Makefile` |
-| 15 | ⬜ | [24](#issue-24) | Find and fix the Gradle deprecations; take Kotlin 2.4.21 and KSP 2.3.13 | `build.gradle.kts`, `libs.versions.toml` |
-| 16 | ⬜ | [20](#issue-20) | Document the restore requirement; optionally add the startup guard | `AGENTS.md`, `Dbms.kt` |
+| 13 | ✅ | [22](#issue-22) | Dependabot `gradle` (security only) and `docker`; pin the base image by digest | `.github/dependabot.yml`, `Dockerfile` |
+| 14 | ✅ | [23](#issue-23) | A Kover coverage floor, enforced in CI and `make ci` | `build.gradle.kts`, `tests.yml`, `Makefile` |
+| 15 | ✅ | [24](#issue-24) | Find and fix the Gradle deprecations; take Kotlin 2.4.21 and KSP 2.3.13 | `build.gradle.kts`, `libs.versions.toml` |
+| 16 | ✅ | [20](#issue-20) | Document the restore requirement; optionally add the startup guard | `AGENTS.md`, `Dbms.kt` |
 
 Steps 13–16 touch separate files, except that 14 and 15 both edit `build.gradle.kts`. Land 14 after Wave 2, so the floor
 is set at the coverage the new tests reach.

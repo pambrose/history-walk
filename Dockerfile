@@ -1,5 +1,7 @@
 # The fat jar is built outside Docker (make docker-build runs ./gradlew jar first), so the image holds only a JRE and that jar.
-FROM eclipse-temurin:25-jre-alpine
+# The base is pinned to its multi-arch (amd64 and arm64) index digest, so a commit always builds on the same JRE; the
+# tag is kept for readers. Dependabot (.github/dependabot.yml) opens a PR with the new digest when the tag moves.
+FROM eclipse-temurin:25-jre-alpine@sha256:56f273059de6b13a6b49fe0ded691ed2d0399bbee76156a8f2d385f7524a3d43
 LABEL maintainer="Paul Ambrose <pambrose@mac.com>"
 
 # Run as an unprivileged user rather than root, even inside the container.

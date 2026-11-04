@@ -133,6 +133,13 @@ To change the schema, add a new migration with the next version number, e.g. `V0
 Never edit a migration that has already been applied: Flyway checksums applied migrations and will
 refuse to start if one changes.
 
+Flyway records the migrations it has applied in `public.flyway_schema_history`, outside the `history`
+schema that holds the users and their choices. `V001` begins by dropping the `history` schema, so if
+`history` holds tables while that table is missing or empty, the server refuses to start rather than
+run `V001` again, and its error names the fix. A backup or restore must therefore include
+`public.flyway_schema_history`: `heroku pg:backups:restore` and `heroku pg:copy` take whole databases,
+which is fine; a dump of the `history` schema alone is not.
+
 ### Debug Deployment
 
 * SHOW_RESET_BUTTON=true

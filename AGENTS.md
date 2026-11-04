@@ -20,7 +20,7 @@ make server             # Ktor on :8080, continuous rebuild (./gradlew jvmRun -t
 make client             # webpack dev server on :3000 with hot reload, proxying server routes to :8080
 make tests              # JVM and client specs: ./gradlew jvmTest --rerun jsBrowserTest --rerun (Docker and Chrome)
 make js-tests           # the client specs alone, Kotest in headless Chrome (./gradlew jsBrowserTest --rerun); no Docker
-make coverage           # the tests plus Kover reports of the JVM code (build/reports/kover/html/index.html)
+make coverage           # the tests plus Kover reports of the JVM code (build/reports/kover/html/index.html), then koverVerify
 ./gradlew jvmTest --tests 'com.pambrose.historywalk.auth.AuthRoutesTest'   # one JVM spec (a client run is always whole)
 make lint               # kotlinter (./gradlew lintKotlin); make format fixes what it can
 make zizmor             # audit .github (workflows, dependabot.yml) as the zizmor workflow does
@@ -143,8 +143,20 @@ restart, together with the snapshot rewritten and committed with the deck change
 **Database.** `Dbms.migrate` runs Flyway (`src/jvmMain/resources/db/migration`) before `Database.connect` on every
 startup, so each deploy migrates. Never edit an applied migration (Flyway checksums them); add the next `V00N__...sql`
 (`V002` added `users.session_version`, `V003` the `history.settings` row and `user_choices.counted_as_student`, and
-rebuilt the progress views). Note `V001` begins with `drop schema if exists history cascade`. Tables are Exposed
-objects in `dbms/DbmsTables.kt`; queries are in `dbms/DbmsTxs.kt`, `dbms/AdminTxs.kt`, and `User.kt`.
+rebuilt the progress views). Tables are Exposed objects in `dbms/DbmsTables.kt`; queries are in `dbms/DbmsTxs.kt`,
+`dbms/AdminTxs.kt`, and `User.kt`.
+
+`V001` begins with `drop schema if exists history cascade`, and Flyway records what it has applied in
+`public.flyway_schema_history` (the connection's default schema, outside `history`):
+- Flyway runs `V001` whenever that table is missing or empty: its own refusal to migrate a non-empty schema without
+  one looks only at `public`. So a database whose `history` schema survived without it (a restore or copy that left it
+  out, the table dropped or emptied) would lose every user and choice at startup.
+- `Dbms.migrate` refuses instead, before Flyway writes anything: when `V001` is pending and the `history` schema holds
+  tables, startup fails with an error naming the table and the fixes. Restore `public.flyway_schema_history` from the
+  same backup, or, if `history` is known to be at the latest migration, run Flyway's `baseline` at that version.
+  A fresh database (no `history` schema) and a migrated one (`V001` recorded) pass, and the check only reads.
+- So a backup or restore must take `public.flyway_schema_history` along with the `history` schema.
+  `heroku pg:backups` and `pg:copy` take whole databases, which is fine; a `pg_dump -n history` is not.
 
 **Dev proxy.** In `make client`, the browser talks to :3000; `webpack.config.d/proxy.js` forwards `/auth`, `/rpc*`,
 `/static`, and the teacher/reset pages to :8080. A new server route that the browser loads directly must be added there.
@@ -196,6 +208,9 @@ Kotest `StringSpec` on both targets. A spec in `src/commonTest` (`ReasonRuleTest
 - The database specs (`UserRepositoryTest`, `DbmsTxsTest`, `ContentServiceTest`, `PagesTest`, `AdminTest`,
   `UserResetTest`, `SignOutTest`) each start their own `TestPostgres`, a Testcontainers `postgres:18` with the real Flyway migrations
   applied, and share the small deck and helpers in `TestWalk.kt`.
+- `DbmsMigrateTest` runs `Dbms.migrate` on databases of its own in that container (`TestPostgres.emptyDatabase`): a
+  fresh one migrates, a migrated one runs nothing and loses nothing, one whose Flyway history table was dropped or
+  emptied is refused with its data untouched, and restoring the table or a deliberate baseline lets it start again.
 - `ContentServiceTest` mocks `ApplicationCall.userUuid` (a `mockkStatic` of `UserSessionKt`) to drive the RPC service
   as a signed-in user, with the teacher addresses passed to `ContentService`. In the student view a teacher is reported
   as a student and their moves are counted; a student's never are.
@@ -256,9 +271,14 @@ private.
 against a throwaway Postgres and checks `/ping`, `/version`, the page shell's `Cache-Control`, and a 401 for an unsigned
 RPC call; `zizmor.yml` audits `.github` changes; `lint.yml` runs `make lint`; `dependency-graph.yml` submits
 `jvmRuntimeClasspath` so Dependabot sees the JVM libraries; `cleanup-runs.yml` deletes runs older than 30 days every
-Monday, keeping the newest 10. `.gitignore` ignores dot-directories, so `.github/` is re-included explicitly. `make ci`
-runs the same gates locally. The lint and format tasks skip `build/generated` by path (see `build.gradle.kts`); the
-slide decks' text constants are SCREAMING_SNAKE_CASE, as ktlint's property-naming rule requires.
+Monday, keeping the newest 10. `dependabot.yml` proposes action updates and new digests for the Dockerfile's base image
+(pinned by digest, tag kept) weekly, 7 days after each release, but for the JVM libraries only security updates
+(`open-pull-requests-limit: 0`; `make versions` lists the rest). `.gitignore` ignores dot-directories, so `.github/` is
+re-included explicitly. `make ci` runs the same gates locally. `koverVerify` (in `tests.yml`, `make ci`, and
+`make coverage`) fails when the JVM line coverage that `koverLog` prints falls under the floor in `build.gradle.kts`'s
+`kover` block (90%, about 91.5% today): a ratchet, so raise it as coverage grows and never lower it to let a change
+through. The lint and format tasks skip `build/generated` by path (see `build.gradle.kts`); the slide decks' text
+constants are SCREAMING_SNAKE_CASE, as ktlint's property-naming rule requires.
 
 ## Gotchas
 
