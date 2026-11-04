@@ -29,6 +29,8 @@ make build              # clean + fat jar at build/libs/history-walk.jar (server
 make docker-build       # fat jar, then image history-walk:<version>; make docker-run runs it with .env against make db
 make docker-push        # fat jar, then buildx pushes pambrose/history-walk:<version> and :latest (amd64, arm64) to Docker Hub
 make docker-smoke       # start the image against a throwaway Postgres and check /ping, /version, headers, the 401
+make release-check     # list every reason this checkout can't be released as VERSION (publishes nothing)
+make release           # release-check, clean + ci, ask, push the image, create the GitHub release (tag X, title vX)
 make website-serve      # the Zensical docs site (website/history-walk) at localhost:8000, rebuilt on every save
 make website-build      # build the docs site into website/history-walk/site, failing on any warning
 make website-clean      # remove the built docs site and Zensical's cache

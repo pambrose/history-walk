@@ -71,4 +71,4 @@ See the [administrator guide](https://pambrose.github.io/history-walk/admins/).
 - The teacher pages (class summary, student reasons, admin) are plain pages; refresh them to see new moves.
 
 **Full Changelog**: <https://github.com/pambrose/history-walk/commits/1.1.0> (every change since the repository
-began), and [CHANGELOG.md](CHANGELOG.md).
+began), and [CHANGELOG.md](https://github.com/pambrose/history-walk/blob/master/CHANGELOG.md).
