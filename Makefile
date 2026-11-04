@@ -1,10 +1,6 @@
 GRADLE         := ./gradlew
 GRADLE_VERSION ?= 9.8.2
 
-# Heroku app for the Heroku targets, e.g. `make log APP=history-walk`; omit to use the git remote's default app.
-APP ?=
-HEROKU_APP_FLAG := $(if $(APP),-a $(APP))
-
 # One local Postgres instance holding both databases; override any of these, e.g. `make db DB_PORT=5433`.
 DATABASES    := jermain moses
 DB_CONTAINER ?= history-walk
@@ -35,8 +31,8 @@ VERSION_RE   = $(subst .,\.,$(VERSION))
 # Where make release writes VERSION's section of RELEASE_NOTES.md, the GitHub release's notes
 RELEASE_NOTES_FILE = build/release-notes-$(VERSION).md
 
-# The addresses `make served-version` compares: the app as Cloudflare serves it, and the Heroku app behind it, e.g.
-# make served-version PUBLIC_URL=https://walk.example.org ORIGIN_URL=https://<app>.herokuapp.com
+# The addresses `make served-version` compares: the app as Cloudflare serves it, and the deployment behind it (the
+# origin), e.g. make served-version PUBLIC_URL=https://walk.example.org ORIGIN_URL=https://<service>.up.railway.app
 PUBLIC_URL   ?=
 ORIGIN_URL   ?=
 
@@ -46,6 +42,11 @@ RAILWAY_PROJECT     ?= a0c8cc4e-4057-4ddc-a7a8-881ccfa721e6
 RAILWAY_ENVIRONMENT ?= production
 RAILWAY_SERVICES    ?= Jermain Moses
 RAILWAY_URLS        ?= https://jermain.up.railway.app https://moses.up.railway.app
+# make log: how many recent lines of each walk's log it shows, and SERVICE=Jermain or SERVICE=Moses for one walk;
+# make log-jermain and make log-moses: how many lines they show before following the log
+LOG_LINES           ?= 100
+SERVICE             ?=
+TAIL_LINES          ?= 10
 
 # The documentation site, a Zensical project in WEBSITE_DIR. Zensical is a dependency of the Python project in website/,
 # which each website target first syncs into website/.venv with uv. WEBSITE_ADDR=0.0.0.0:8000 serves it to the network.
@@ -57,15 +58,14 @@ ZENSICAL     := $(abspath website/.venv/bin/zensical)
 
 .PHONY: help db reset-jermain reset-moses stop-db server client build clean tests js-tests coverage lint \
 		format zizmor ci docker-build docker-push _docker-push docker-run docker-smoke release-check release \
-		_confirm-release railway-restart railway-redeploy website-env website-serve \
-		website-build website-clean upgrade-site versions versions-all depends yarn-unlock upgrade-wrapper creds \
-		restart log \
+		_confirm-release railway-restart railway-redeploy log log-jermain log-moses _follow-log website-env website-serve \
+		website-build website-clean upgrade-site versions versions-all depends yarn-unlock upgrade-wrapper \
 		served-version
 
 ##@ General
 
 help: ## Show this help
-	@awk 'BEGIN { FS = ":.*## "; printf "Usage: make \033[36m<target>\033[0m [APP=<heroku-app>]\n" } \
+	@awk 'BEGIN { FS = ":.*## "; printf "Usage: make \033[36m<target>\033[0m\n" } \
 		/^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } \
 		/^[a-zA-Z0-9_-]+:.*## / { printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 
@@ -414,24 +414,60 @@ railway-redeploy: ## Redeploy Jermain and Moses on Railway from the newest Docke
 		echo " $$v"; \
 	done
 
-##@ Heroku
+# Fetches the most recent LOG_LINES lines of each walk's deployment log, the server's own output: its startup lines (the
+# deck it serves, the database, the migrations), sign-ins, and errors. make log-jermain and make log-moses follow one.
+log: ## Show the last LOG_LINES (100) lines of each walk's Railway log; SERVICE=Moses for one walk
+	@command -v railway >/dev/null || { echo "log: the Railway CLI is not installed" >&2; exit 1; }
+	@services="$(or $(SERVICE),$(RAILWAY_SERVICES))"; \
+	for s in $$services; do \
+		echo "=== $$s (last $(LOG_LINES) lines)"; \
+		railway logs --project $(RAILWAY_PROJECT) --environment $(RAILWAY_ENVIRONMENT) --service "$$s" \
+			--lines $(LOG_LINES) || { echo "log: could not read $$s's log" >&2; exit 1; }; \
+	done
 
-creds: ## Print the Heroku database URL
-	heroku pg:credentials:url DATABASE $(HEROKU_APP_FLAG)
+log-jermain: ## Follow the Jermain walk's Railway log like tail -f (its last TAIL_LINES lines, then each new one)
+	@$(MAKE) --no-print-directory _follow-log FOLLOW_SERVICE=Jermain
 
-restart: ## Restart the Heroku dynos
-	heroku ps:restart $(HEROKU_APP_FLAG)
+log-moses: ## Follow the Moses walk's Railway log like tail -f (its last TAIL_LINES lines, then each new one)
+	@$(MAKE) --no-print-directory _follow-log FOLLOW_SERVICE=Moses
 
-log: ## Tail the Heroku logs
-	heroku logs --tail $(HEROKU_APP_FLAG)
+# A walk's Railway log, followed like tail -f until Ctrl-C: its last TAIL_LINES lines, then, every FOLLOW_EVERY seconds,
+# the lines written since. It polls rather than streams: railway logs follows a stream only when it writes straight to a
+# terminal, and holds the new lines back when its output goes to a pipe, as it must here to be filtered. Each poll asks
+# for the lines since the last one shown (--since, which works to the second, so it repeats a few), and drops those no
+# newer than that line, comparing timestamps with their fractions padded to nanoseconds (they vary in length). The
+# timestamps are Railway's, when it received each line, so they only move forward. Needs the Railway CLI and jq.
+FOLLOW_EVERY ?= 3
+FOLLOW_JQ_NORM = def norm: sub("Z$$"; "") | split(".") | .[0] + "." + (((.[1] // "") + "000000000")[0:9]);
+_follow-log:
+	@command -v railway >/dev/null || { echo "the Railway CLI is not installed" >&2; exit 1; }
+	@command -v jq >/dev/null || { echo "jq is not installed (brew install jq)" >&2; exit 1; }
+	@[ -n "$(FOLLOW_SERVICE)" ] || { echo "make log-jermain or make log-moses runs this" >&2; exit 1; }
+	@args="--project $(RAILWAY_PROJECT) --environment $(RAILWAY_ENVIRONMENT) --service $(FOLLOW_SERVICE)"; \
+	show() { jq -R -r --arg since "$$1" \
+		'$(FOLLOW_JQ_NORM) fromjson? | select(((.timestamp // "") | norm) > ($$since | norm)) | .message // empty'; }; \
+	latest() { jq -R -s -r --arg since "$$1" \
+		'$(FOLLOW_JQ_NORM) [split("\n")[] | fromjson? | .timestamp // empty] | max_by(norm) // $$since'; }; \
+	batch=$$(railway logs $$args --lines $(TAIL_LINES) --json) \
+		|| { echo "could not read $(FOLLOW_SERVICE)'s log" >&2; exit 1; }; \
+	echo "=== $(FOLLOW_SERVICE) (following every $(FOLLOW_EVERY)s; Ctrl-C stops)"; \
+	printf '%s\n' "$$batch" | show ""; \
+	since=$$(printf '%s\n' "$$batch" | latest "$$(date -u +%Y-%m-%dT%H:%M:%SZ)"); \
+	while sleep $(FOLLOW_EVERY); do \
+		batch=$$(railway logs $$args --since "$$since" --json 2>/dev/null) || continue; \
+		printf '%s\n' "$$batch" | show "$$since"; \
+		since=$$(printf '%s\n' "$$batch" | latest "$$since"); \
+	done
 
-# Shows the client bundle's version as Heroku (ORIGIN_URL) serves it and as Cloudflare (PUBLIC_URL) serves it, with
-# Cloudflare's cf-cache-status. The version is the line App.start() logs, "History Walk version VERSION - release date".
-# It fails when Cloudflare serves another bundle than Heroku, or caches the bundle, which a deploy then does not
-# replace: purge PUBLIC_URL/main.bundle.js in Cloudflare (see AGENTS.md). It fetches with GET, not HEAD.
+##@ Cloudflare
+
+# Shows the client bundle's version as the deployment (ORIGIN_URL) serves it and as Cloudflare (PUBLIC_URL) serves it,
+# with Cloudflare's cf-cache-status. The version is the line App.start() logs, "History Walk version VERSION - release
+# date". It fails when Cloudflare serves another bundle than the origin, or caches the bundle, which a deploy then does
+# not replace: purge PUBLIC_URL/main.bundle.js in Cloudflare (see AGENTS.md). It fetches with GET, not HEAD.
 BUNDLE_VERSION_RE = History Walk version [0-9]+\.[0-9]+\.[0-9]+ - [^"]+
-served-version: ## Show the bundle version Heroku and Cloudflare serve; fails if they differ or Cloudflare caches it
-	@[ -n "$(PUBLIC_URL)" ] || { echo "Set PUBLIC_URL (and ORIGIN_URL), e.g. make served-version PUBLIC_URL=https://walk.example.org ORIGIN_URL=https://<app>.herokuapp.com" >&2; exit 1; }
+served-version: ## Show the bundle version the origin and Cloudflare serve; fails if they differ or Cloudflare caches it
+	@[ -n "$(PUBLIC_URL)" ] || { echo "Set PUBLIC_URL (and ORIGIN_URL), e.g. make served-version PUBLIC_URL=https://walk.example.org ORIGIN_URL=https://<service>.up.railway.app" >&2; exit 1; }
 	@problems=0; problem() { echo "  - $$1" >&2; problems=$$((problems + 1)); }; \
 	served() { curl -sS --compressed -m 30 -D - "$$1/main.bundle.js" \
 		| LC_ALL=C grep -aoiE '^cf-cache-status: [a-z]+|$(BUNDLE_VERSION_RE)'; }; \
@@ -439,15 +475,15 @@ served-version: ## Show the bundle version Heroku and Cloudflare serve; fails if
 	echo "This checkout:       $(VERSION)"; \
 	if [ -n "$(ORIGIN_URL)" ]; then \
 		origin=$$(served "$(ORIGIN_URL)" | version); \
-		echo "Heroku's bundle:     $${origin:-not found}"; \
-	else origin=; echo "Heroku's bundle:     (set ORIGIN_URL to compare)"; fi; \
+		echo "The origin's bundle: $${origin:-not found}"; \
+	else origin=; echo "The origin's bundle: (set ORIGIN_URL to compare)"; fi; \
 	fetched=$$(served "$(PUBLIC_URL)"); \
 	public=$$(echo "$$fetched" | version); \
 	cached=$$(echo "$$fetched" | sed -n 's/^[Cc][Ff]-[Cc][Aa][Cc][Hh][Ee]-[Ss][Tt][Aa][Tt][Uu][Ss]: //p'); \
 	echo "Cloudflare's bundle: $${public:-not found} (cf-cache-status: $${cached:-none})"; \
 	[ -n "$$public" ] || problem "found no version in $(PUBLIC_URL)/main.bundle.js"; \
 	[ -z "$$origin" ] || [ -z "$$public" ] || [ "$$origin" = "$$public" ] \
-		|| problem "Cloudflare serves another bundle than Heroku: purge $(PUBLIC_URL)/main.bundle.js in Cloudflare"; \
+		|| problem "Cloudflare serves another bundle than the origin: purge $(PUBLIC_URL)/main.bundle.js in Cloudflare"; \
 	case "$$cached" in ""|BYPASS|DYNAMIC) ;; \
 		*) problem "Cloudflare caches the bundle ($$cached), so a deploy does not replace its copy: see AGENTS.md";; \
 	esac; \

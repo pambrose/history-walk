@@ -6,7 +6,7 @@ This file provides guidance to AI coding agents working with code in this reposi
 
 History Walk is a choose-your-own-path history scenario for Athenian students. It is a Kotlin Multiplatform app: a Ktor
 server (`jvmMain`) and a KVision single-page client (`jsMain`) that talk over Kilua RPC, with Postgres behind Exposed and
-Flyway. The same repo is deployed as two Heroku apps (jermain-walk and moses-walk) that differ only in env vars.
+Flyway. The same repo is deployed as two Railway services (Jermain and Moses) that differ only in env vars.
 
 ## Commands
 
@@ -31,6 +31,8 @@ make docker-push        # fat jar, then buildx pushes pambrose/history-walk:<ver
 make docker-smoke       # start the image against a throwaway Postgres and check /ping, /version, headers, the 401
 make railway-restart    # restart the Jermain and Moses services on Railway (railway CLI), then check /ping and /version
 make railway-redeploy   # redeploy both from the newest Docker Hub image (after a release), then wait for its version
+make log                # the last LOG_LINES (100) lines of each walk's Railway log; SERVICE=Moses for one walk
+make log-jermain        # follow one walk's Railway log like tail -f (make log-moses for the other); Ctrl-C stops
 make release-check     # list every reason this checkout can't be released as VERSION (publishes nothing)
 make release           # release-check, clean + ci, ask, push the image, create the GitHub release (tag X, title vX)
 make website-serve      # the Zensical docs site (website/history-walk) at localhost:8000, rebuilt on every save
@@ -172,7 +174,7 @@ suits a platform's private network: a deliberate choice, so don't add SSL back w
   same backup, or, if `history` is known to be at the latest migration, run Flyway's `baseline` at that version.
   A fresh database (no `history` schema) and a migrated one (`V001` recorded) pass, and the check only reads.
 - So a backup or restore must take `public.flyway_schema_history` along with the `history` schema.
-  `heroku pg:backups` and `pg:copy` take whole databases, which is fine; a `pg_dump -n history` is not.
+  A host's whole-database backup or copy is fine; a `pg_dump -n history` is not.
 
 **Dev proxy.** In `make client`, the browser talks to :3000; `webpack.config.d/proxy.js` forwards `/auth`, `/rpc*`,
 `/static`, and the teacher/reset pages to :8080. A new server route that the browser loads directly must be added there.
@@ -192,7 +194,7 @@ release reaches a browser at its next page load only because of these; do not dr
 Cloudflare keeps no copy of a response marked `private` (`cf-cache-status: BYPASS`) and passes the header on unchanged;
 a Cloudflare cache rule that ignores the origin's headers would bring stale bundles back. A change to these headers does
 not clear a copy Cloudflare already holds: after a deploy, run `make served-version PUBLIC_URL=... ORIGIN_URL=...`,
-which reads the version line `App.start()` logs from the bundle as Heroku and as Cloudflare serve it, and purge
+which reads the version line `App.start()` logs from the bundle as the origin and as Cloudflare serve it, and purge
 `main.bundle.js` in Cloudflare if they differ. `StaticContentCachingTest` builds its own routes from `staticContent()`,
 so it would not notice `appRoutes` dropping that call; `NoStoreCachingTest` checks the shell, the bundle, and an image
 through `appRoutes`, and that the per-user routes (sign-in and sign-out, the reset, the teacher pages) go out

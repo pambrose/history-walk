@@ -1,5 +1,28 @@
 # Release notes
 
+## History Walk 1.1.2 — 2026-11-04
+
+A release for administrators and contributors; nothing changes for teachers or students.
+
+### For administrators
+
+- **`make log`** prints the last 100 lines of each walk's Railway log (`SERVICE=Moses` for one walk, `LOG_LINES=500`
+  for more). **`make log-jermain`** and **`make log-moses`** follow one walk's log like `tail -f` until Ctrl-C.
+- **The Heroku make targets are gone** (`log`, `restart`, `creds`, and their `APP=` setting): the walks run on
+  Railway, where `make log`, `make railway-restart`, and `make railway-redeploy` cover them. `make served-version`
+  still compares the bundle the deployment serves with Cloudflare's.
+- No new settings and no database changes: `make railway-redeploy` deploys both walks from the new image and waits
+  until each reports 1.1.2.
+
+### For contributors
+
+- History Walk is now licensed under the Apache License, Version 2.0 (`LICENSE`).
+- The README is reorganized: local development first (what to install, an example `.env`, the make targets), every
+  setting in one table with its default, the Gradle tasks by their current names, and the teacher pages in a section
+  of their own.
+
+**Full Changelog**: <https://github.com/pambrose/history-walk/compare/1.1.1...1.1.2>
+
 ## History Walk 1.1.1 — 2026-11-04
 
 Two changes to the links at the top of a teacher's page.

@@ -18,8 +18,9 @@ class SessionConfigTest : StringSpec() {
       ).forEach { isLocalCallback(it) shouldBe true }
     }
 
-    "a Heroku callback is not local" {
-      isLocalCallback("https://history-walk.herokuapp.com/auth/callback") shouldBe false
+    "a Railway callback is not local" {
+      isLocalCallback("https://jermain.up.railway.app/auth/callback") shouldBe false
+      isLocalCallback("https://moses.up.railway.app/auth/callback") shouldBe false
     }
 
     "no callback is local, a blank one is not" {

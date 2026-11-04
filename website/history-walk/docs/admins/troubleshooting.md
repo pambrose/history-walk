@@ -5,7 +5,7 @@
 | Address | Answers | Use |
 |---|---|---|
 | `/ping` | `pong` | The server is up. It touches neither the database nor a session; the Docker health check uses it. |
-| `/version` | `Version: 1.1.1 Release Date: … Build Date: …` | Which release a deployment runs. |
+| `/version` | `Version: 1.1.2 Release Date: … Build Date: …` | Which release a deployment runs. |
 | `/threaddump` | Every JVM thread's stack (teachers only) | A hung or slow server. Taking it briefly pauses the JVM. |
 
 ```bash
@@ -15,7 +15,10 @@ curl -s https://<deployment>/version
 
 ## Logs
 
-- **Railway**: the service's **Logs** tab.
+- **Railway**: `make log` prints the last 100 lines of each walk's log (`LOG_LINES=500` for more, `SERVICE=Moses` for
+  one walk). `make log-jermain` and `make log-moses` follow one walk's log like `tail -f`: its last 10 lines
+  (`TAIL_LINES=` for more), then each new line within a few seconds (`FOLLOW_EVERY=` sets how often it checks), until
+  Ctrl-C. Or the service's **Logs** tab.
 - **Docker**: `docker logs <container>`.
 
 Worth knowing in the log:
