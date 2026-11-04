@@ -20,6 +20,10 @@ object Pages {
   const val STUDENT_VIEW = "student"
   const val TEACHER_VIEW = "teacher"
 
+  // The class pages' headings; their browser tabs, which open apart from the walk, show them with the app's name
+  const val SUMMARY_TITLE = "Class Summary"
+  const val REASONS_TITLE = "Student Reasons"
+
   /**
    * The switch that lets teachers walk as students do, and the clear. The switch's button names what pressing it does,
    * so the page also says which view teachers see now. In the student view a teacher's walk has no link here, so the
@@ -89,6 +93,8 @@ object Pages {
     createHTML()
       .html {
         head {
+          meta(charset = "utf-8")
+          title { +"$REASONS_TITLE · History Walk" }
           style {
             unsafe {
               +"table, th, td {border: 1px solid black; border-collapse: collapse;}"
@@ -97,6 +103,7 @@ object Pages {
           }
         }
         body {
+          h2 { +REASONS_TITLE }
           div {
             allUserReasons()
               .groupBy { it.email }
@@ -143,7 +150,12 @@ object Pages {
   fun displayUserSummary() =
     createHTML()
       .html {
+        head {
+          meta(charset = "utf-8")
+          title { +"$SUMMARY_TITLE · History Walk" }
+        }
         body {
+          h2 { +SUMMARY_TITLE }
           div {
             table {
               style = "border-collapse: separate; border-spacing: 10px 5px;"

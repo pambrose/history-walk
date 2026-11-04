@@ -1,5 +1,22 @@
 # Release notes
 
+## History Walk 1.1.3 — 2026-11-04
+
+The class pages are easier to find among your browser tabs.
+
+### For teachers
+
+- **The class pages have titles.** The class summary is headed **Class Summary** and the student reasons **Student
+  Reasons**, and their browser tabs say so ("Class Summary · History Walk"), so you can tell them apart from your walk
+  and from each other.
+
+### For administrators
+
+- No new settings and no database changes: `make railway-redeploy` deploys both walks from the new image and waits
+  until each reports 1.1.3.
+
+**Full Changelog**: <https://github.com/pambrose/history-walk/compare/1.1.2...1.1.3>
+
 ## History Walk 1.1.2 — 2026-11-04
 
 A release for administrators and contributors; nothing changes for teachers or students.

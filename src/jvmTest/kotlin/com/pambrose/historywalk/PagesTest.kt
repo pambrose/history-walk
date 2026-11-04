@@ -113,6 +113,21 @@ class PagesTest : StringSpec() {
       displayUserSummary().tableRows() shouldBe listOf(listOf("Name", "Email", "Decisions", "Success", "Last Slide"))
     }
 
+    "the summary and reasons pages each have a tab title and a heading, in UTF-8" {
+      student("27titled")
+
+      displayUserSummary().run {
+        pageTitle() shouldBe "Class Summary · History Walk"
+        heading() shouldBe "Class Summary"
+        this shouldContain "<meta charset=\"utf-8\">"
+      }
+      displayUserReasons().run {
+        pageTitle() shouldBe "Student Reasons · History Walk"
+        heading() shouldBe "Student Reasons"
+        this shouldContain "<meta charset=\"utf-8\">"
+      }
+    }
+
     "the reasons page lists each student's reasons under their email, in the order they were given" {
       val bob = student("27bob")
       val alice = student("27alice")
@@ -332,6 +347,16 @@ class PagesTest : StringSpec() {
       split(Regex("<p>\\s*<b>\\s*User:"))
         .drop(1)
         .map { section -> section.substringBefore("</p>").cellText() to section.tableRows() }
+
+    // The page's <title>, and the text of its first <h2>; null when it has none
+    fun String.pageTitle(): String? = firstMatch("<title>(.*?)</title>")
+
+    fun String.heading(): String? = firstMatch("<h2[^>]*>(.*?)</h2>")
+
+    private fun String.firstMatch(pattern: String): String? {
+      val match = Regex(pattern, dotAll).find(this) ?: return null
+      return match.groupValues[1].cellText()
+    }
 
     // Each link's target and text, in page order
     fun String.links(): List<Pair<String, String>> =
