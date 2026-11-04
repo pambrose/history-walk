@@ -49,7 +49,7 @@ jobs:
           path: |
             build/reports/tests/
             build/test-results/
-          retention-days: 14
+          retention-days: 30
 
       - name: Upload coverage reports
         if: always()
@@ -57,4 +57,4 @@ jobs:
         with:
           name: coverage-reports
           path: build/reports/kover/
-          retention-days: 14
+          retention-days: 30

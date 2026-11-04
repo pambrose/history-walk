@@ -282,21 +282,22 @@ private.
   run; `build.gradle.kts` replaces that condition so the run fails instead.
 
 **CI** (`.github/workflows`, all actions pinned to commit SHAs): `tests.yml`'s `test` job runs `jvmTest` with Kover and
-`jsTest` (the client specs, in the runner's Chrome) on pushes and pull requests to master; `docker.yml` runs
-`make docker-build` and `make docker-smoke`, which starts the image
-against a throwaway Postgres and checks `/ping`, `/version`, the page shell's `Cache-Control`, and a 401 for an unsigned
-RPC call; `zizmor.yml` audits `.github` changes; `lint.yml` runs `make lint`; `dependency-graph.yml` submits
-`jvmRuntimeClasspath` so Dependabot sees the JVM libraries; `cleanup-runs.yml` deletes runs older than 30 days every
-Monday, keeping the newest 10; `website.yml` builds the docs site with `make website-build` when `website/` changes, as
-a check on pull requests, and on master deploys it to GitHub Pages (`https://pambrose.github.io/history-walk/`, which
-needs Settings → Pages → Source set to GitHub Actions). `dependabot.yml` proposes action updates and new digests for the Dockerfile's base image
-(pinned by digest, tag kept) weekly, 7 days after each release, but for the JVM libraries only security updates
-(`open-pull-requests-limit: 0`; `make versions` lists the rest). `.gitignore` ignores dot-directories, so `.github/` is
-re-included explicitly. `make ci` runs the same gates locally. `koverVerify` (in `tests.yml`, `make ci`, and
-`make coverage`) fails when the JVM line coverage that `koverLog` prints falls under the floor in `build.gradle.kts`'s
-`kover` block (90%, about 91.5% today): a ratchet, so raise it as coverage grows and never lower it to let a change
-through. The lint and format tasks skip `build/generated` by path (see `build.gradle.kts`); the slide decks' text
-constants are SCREAMING_SNAKE_CASE, as ktlint's property-naming rule requires.
+`jsTest` (the client specs, in the runner's Chrome) on pushes and pull requests to master; `docker.yml` runs `make
+docker-build` and `make docker-smoke`, which starts the image against a throwaway Postgres and checks `/ping`,
+`/version`, the page shell's `Cache-Control`, and a 401 for an unsigned RPC call; `zizmor.yml` audits `.github` changes;
+`lint.yml` runs `make lint`; `dependency-graph.yml` submits `jvmRuntimeClasspath` so Dependabot sees the JVM libraries;
+`cleanup-runs.yml` deletes runs older than 30 days every Monday, keeping each workflow's most recent run (uploaded
+reports expire after 30 days, `retention-days`); `website.yml` builds the docs site with `make website-build` when
+`website/` changes, as a check on pull requests, and on master deploys it to GitHub Pages
+(`https://pambrose.github.io/history-walk/`, which needs Settings → Pages → Source set to GitHub Actions).
+`dependabot.yml` proposes action updates and new digests for the Dockerfile's base image (pinned by digest, tag kept)
+weekly, 7 days after each release, but for the JVM libraries only security updates (`open-pull-requests-limit: 0`; `make
+versions` lists the rest). `.gitignore` ignores dot-directories, so `.github/` is re-included explicitly. `make ci` runs
+the same gates locally. `koverVerify` (in `tests.yml`, `make ci`, and `make coverage`) fails when the JVM line coverage
+that `koverLog` prints falls under the floor in `build.gradle.kts`'s `kover` block (90%, about 91.5% today): a ratchet,
+so raise it as coverage grows and never lower it to let a change through. The lint and format tasks skip
+`build/generated` by path (see `build.gradle.kts`); the slide decks' text constants are SCREAMING_SNAKE_CASE, as
+ktlint's property-naming rule requires.
 
 ## Gotchas
 

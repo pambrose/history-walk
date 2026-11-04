@@ -92,9 +92,10 @@ the original classroom app; [History](#history) at the end tells the story in or
 - `SlidePathsTest`, which pins every path name a student can reach to a snapshot, so a rename that would strand saved
   progress fails CI.
 - A 90% floor on JVM line coverage (91.9% at release).
-- GitHub Actions: tests, lint, the Docker image with its smoke test, a zizmor audit, the dependency graph, a weekly
-  cleanup of old runs, and the docs site; every action pinned to a commit SHA. Dependabot for the actions, the Docker
-  base image, and security fixes in the Java libraries.
+- GitHub Actions: tests, lint, the Docker image with its smoke test, a zizmor audit, the dependency graph, the docs
+  site, and a weekly cleanup that deletes runs and their logs after 30 days, keeping each workflow's most recent run;
+  test, coverage, and lint reports are kept for 30 days. Every action is pinned to a commit SHA. Dependabot for the
+  actions, the Docker base image, and security fixes in the Java libraries.
 
 ### Changed
 

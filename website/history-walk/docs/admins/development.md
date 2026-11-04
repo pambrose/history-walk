@@ -60,7 +60,7 @@ as coverage grows; never lower it to let a change through.
 
 ## Continuous integration
 
-GitHub Actions runs on every push to `master` and every pull request:
+GitHub Actions runs these on every push to `master` and every pull request:
 
 | Workflow | Checks |
 |---|---|
@@ -68,6 +68,17 @@ GitHub Actions runs on every push to `master` and every pull request:
 | Lint | `make lint`. |
 | Docker Image | Builds the jar and the image, and runs the smoke test. |
 | zizmor | Audits the workflow files, when they change. |
+| Website | Builds the docs site when `website/` or `llms.txt` changes; on `master`, publishes it to GitHub Pages. |
+
+And these on their own:
+
+| Workflow | Does |
+|---|---|
+| Dependency Graph | On each push to `master`, reports the Java libraries to GitHub, so Dependabot can raise security alerts for them. |
+| Clean Up Workflow Runs | Every Monday, deletes the runs, and their logs, that are more than 30 days old, keeping each workflow's most recent run whatever its age. **Run workflow** with *dry run* lists what it would delete. |
+
+The Tests and Lint runs upload their reports as artifacts (test results, coverage, and lint reports), which you can
+download from the run's page for 30 days; then they expire by themselves.
 
 All actions are pinned to commit hashes, and Dependabot proposes their updates.
 
