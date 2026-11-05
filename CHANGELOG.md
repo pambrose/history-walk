@@ -6,6 +6,11 @@ All notable changes to History Walk are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- A **Release notes** page on the docs site, the same text as `RELEASE_NOTES.md` (a symlink), linked from the home
+  page.
+
 ## [1.1.3] - 2026-11-04
 
 ### Changed

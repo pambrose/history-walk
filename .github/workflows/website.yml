@@ -1,21 +1,23 @@
 name: Website
 
 # Publishes the documentation site (website/history-walk, built with Zensical) to GitHub Pages. A pull request that
-# changes it gets the build as a check, and nothing is published until it reaches master. The site's llms.txt is a
-# symlink to the top-level llms.txt, so a change to that file publishes the site too. GitHub Pages must be set to
-# deploy from GitHub Actions (Settings > Pages > Build and deployment > Source).
+# changes it gets the build as a check, and nothing is published until it reaches master. The site's llms.txt and its
+# release notes page are symlinks to the top-level llms.txt and RELEASE_NOTES.md, so a change to either publishes the
+# site too. GitHub Pages must be set to deploy from GitHub Actions (Settings > Pages > Build and deployment > Source).
 on:
   push:
     branches: [ master ]
     paths:
       - "website/**"
       - "llms.txt"
+      - "RELEASE_NOTES.md"
       - ".github/workflows/website.yml"
   pull_request:
     branches: [ master ]
     paths:
       - "website/**"
       - "llms.txt"
+      - "RELEASE_NOTES.md"
       - ".github/workflows/website.yml"
   workflow_dispatch:
 
