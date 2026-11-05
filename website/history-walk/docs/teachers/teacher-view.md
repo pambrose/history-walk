@@ -15,8 +15,8 @@ At the top right
 
 | Link | Opens |
 |---|---|
-| **class summary** | Every student's progress, in a new tab. See [Class summary](class-summary.md). |
-| **student reasons** | Every reason every student gave, in a new tab. See [Student reasons](student-reasons.md). |
+| **class summary** | Every student's progress, in a new tab titled *Class Summary*. See [Class summary](class-summary.md). |
+| **student reasons** | Every reason every student gave, in a new tab titled *Student Reasons*. See [Student reasons](student-reasons.md). |
 | **admin** | The switch between the teacher and student views, and the clear for teachers' walks. See [Trying the walk as a student](student-view.md). |
 | **help** | This guide, in a new tab, so your walk stays open. |
 | **reset** | Only if your administrator turned it on: deletes *your own* walk and sends you back to the first slide, once you confirm. Hover over it for a reminder. |

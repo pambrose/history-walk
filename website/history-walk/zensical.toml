@@ -17,6 +17,7 @@ repo_name = "pambrose/history-walk"
 
 nav = [
   { "Home" = "index.md" },
+  { "Release notes" = "release-notes.md" },
   { "Teachers" = [
     "teachers/index.md",
     { "Signing in" = "teachers/signing-in.md" },

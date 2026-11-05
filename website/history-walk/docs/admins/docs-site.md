@@ -47,6 +47,8 @@ Custom domain**, and change `site_url` to match.
 - A new page needs an entry in `nav` in `zensical.toml`, or it won't appear in the navigation.
 - `docs/llms.txt` is a symlink to the repository's `llms.txt`, so the site serves the same file at
   <https://pambrose.github.io/history-walk/llms.txt>. Edit the one at the top of the repository.
+- `docs/release-notes.md` is a symlink to the repository's `RELEASE_NOTES.md`, so the site's **Release notes** page is
+  the same text `make release` uses for each GitHub release. Edit the one at the top of the repository.
 - Dark mode is the default: the first `[[project.theme.palette]]` entry (`slate`) is what a first visit gets, and the
   toggle in the header switches to light. The browser remembers the choice.
 - The pages use admonitions (`!!! note`), collapsible questions (`??? question`), tables, and Mermaid diagrams; see

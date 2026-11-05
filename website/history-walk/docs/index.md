@@ -46,3 +46,5 @@ There are two walks, each served by its own copy of the app:
 - A student never sees another student's walk. Only teachers see the class pages.
 - A teacher's own walk is a test walk: it is left out of the class pages, unless the app is switched to the
   [student view](teachers/student-view.md).
+
+What changed in each release, for teachers and for administrators, is in the [release notes](release-notes.md).

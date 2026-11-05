@@ -237,8 +237,9 @@ Kotest `StringSpec` on both targets. A spec in `src/commonTest` (`ReasonRuleTest
   clear leaving students' walks alone, and a student or a signed-out visitor refused the page and both buttons.
 - `SignOutTest` signs a student out and replays the old cookie, which must no longer sign anyone in.
 - `PagesTest` renders the teacher pages from Postgres, checking that a student's reason or name reaches the page as
-  text, never markup, and drives `/summary`, `/reasons`, `/slides`, and the `/slide/{id}/{version}` jump as a signed-in
-  teacher.
+  text, never markup, and that the summary and reasons pages carry their titles (`SUMMARY_TITLE`, `REASONS_TITLE`, in
+  the heading and the tab), and drives `/summary`, `/reasons`, `/slides`, and the `/slide/{id}/{version}` jump as a
+  signed-in teacher.
 - `AuthCallbackTest` runs a real `/auth/login` and then `/auth/callback`, with a Ktor `MockEngine` as Google's token
   and userinfo endpoints (the `HttpClient` passed to `configureGoogleAuth` and `signInRoutes`) and
   `User.upsertFromGoogle` mocked (`mockkObject`): a matching state cookie gets a session, a missing or another sign-in's
@@ -317,6 +318,7 @@ ktlint's property-naming rule requires.
 - `docs/superpowers/` holds the Google sign-in design spec and implementation plan. They predate folding their own
   `V002` into `V001`; today's `V002` is the session version, which came later.
 - `website/history-walk/docs/` is the guide for teachers and administrators (a Zensical site; `make website-serve`).
-  Its `llms.txt` is a symlink to the top-level `llms.txt`, which the site serves at its root; edit the top-level one.
+  Its `llms.txt` and `release-notes.md` are symlinks to the top-level `llms.txt` and `RELEASE_NOTES.md` (the site
+  serves the first at its root, and shows the second as its Release notes page); edit the top-level ones.
   A change a teacher or an administrator would notice (a page, a setting, an error message) needs its page updated in
   the same pull request.
