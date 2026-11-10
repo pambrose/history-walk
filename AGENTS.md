@@ -24,7 +24,7 @@ make coverage           # the tests plus Kover reports of the JVM code (build/re
 ./gradlew jvmTest --tests 'com.pambrose.historywalk.auth.AuthRoutesTest'   # one JVM spec (a client run is always whole)
 make lint               # kotlinter (./gradlew lintKotlin); make format fixes what it can
 make zizmor             # audit .github (workflows, dependabot.yml) as the zizmor workflow does
-make ci                 # every CI gate: lint, zizmor, JVM and client tests, docker-build, docker-smoke
+make ci                 # every CI gate but the Trivy scan: lint, zizmor, JVM and client tests, docker-build, docker-smoke
 make build              # clean + fat jar at build/libs/history-walk.jar (server + bundled JS client; no version)
 make docker-build       # fat jar, then image history-walk:<version>; make docker-run runs it with .env against make db
 make docker-push        # fat jar, then buildx pushes pambrose/history-walk:<version> and :latest (amd64, arm64) to Docker Hub
@@ -304,7 +304,8 @@ docker-build` and `make docker-smoke`, which starts the image against a throwawa
 `/version`, the page shell's `Cache-Control`, and a 401 for an unsigned RPC call; `security.yml` builds the image and
 has Trivy scan it (the Alpine and JRE layers and the fat jar's libraries) on pushes and pull requests to master and every
 Monday, since the digest-pinned base means a new CVE changes nothing in the repository: a HIGH or CRITICAL vulnerability
-with a fix fails the job, and master's and the weekly runs upload their findings to code scanning; `zizmor.yml` audits
+with a fix fails the job, master's and the weekly runs upload their findings to code scanning, and `make
+release-check` requires its `image-scan` to have passed for the release commit (`RELEASE_CHECKS`); `zizmor.yml` audits
 `.github` changes; `lint.yml` runs `make lint`; `dependency-graph.yml` submits `jvmRuntimeClasspath` so Dependabot sees
 the JVM libraries; `cleanup-runs.yml` deletes runs older than 30 days every Monday, keeping each workflow's most recent
 run (uploaded reports expire after 30 days, `retention-days`), and every Trivy database in the Actions cache but
@@ -315,7 +316,7 @@ master's newest (about 1 GB each, one per day scanned); `website.yml` builds the
 weekly, 7 days after each release, but for the JVM libraries only security updates (`open-pull-requests-limit: 0`; `make
 versions` lists the rest). `.gitignore` ignores dot-directories, so `.github/` is re-included explicitly. `make ci` runs
 the same gates locally, except the Trivy scan, which runs only in CI. `koverVerify` (in `tests.yml`, `make ci`, and `make coverage`) fails when the JVM line coverage
-that `koverLog` prints falls under the floor in `build.gradle.kts`'s `kover` block (90%, about 91.5% today): a ratchet,
+that `koverLog` prints falls under the floor in `build.gradle.kts`'s `kover` block (90%, about 91.8% today): a ratchet,
 so raise it as coverage grows and never lower it to let a change through. The lint and format tasks skip
 `build/generated` by path (see `build.gradle.kts`); the slide decks' text constants are SCREAMING_SNAKE_CASE, as
 ktlint's property-naming rule requires.

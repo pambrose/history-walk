@@ -3,12 +3,13 @@
 [![Tests](https://github.com/pambrose/history-walk/actions/workflows/tests.yml/badge.svg)](https://github.com/pambrose/history-walk/actions/workflows/tests.yml)
 [![Lint](https://github.com/pambrose/history-walk/actions/workflows/lint.yml/badge.svg)](https://github.com/pambrose/history-walk/actions/workflows/lint.yml)
 [![Docker Image](https://github.com/pambrose/history-walk/actions/workflows/docker.yml/badge.svg)](https://github.com/pambrose/history-walk/actions/workflows/docker.yml)
+[![Security](https://github.com/pambrose/history-walk/actions/workflows/security.yml/badge.svg)](https://github.com/pambrose/history-walk/actions/workflows/security.yml)
 [![zizmor](https://github.com/pambrose/history-walk/actions/workflows/zizmor.yml/badge.svg)](https://github.com/pambrose/history-walk/actions/workflows/zizmor.yml)
 [![Website](https://github.com/pambrose/history-walk/actions/workflows/website.yml/badge.svg)](https://github.com/pambrose/history-walk/actions/workflows/website.yml)
 [![Release](https://img.shields.io/github/v/release/pambrose/history-walk)](https://github.com/pambrose/history-walk/releases)
 [![Docs](https://img.shields.io/badge/docs-pambrose.github.io-blue)](https://pambrose.github.io/history-walk/)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
-[![Kotlin](https://img.shields.io/badge/Kotlin-2.4.21-7F52FF?logo=kotlin&logoColor=white)](https://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.4.20-7F52FF?logo=kotlin&logoColor=white)](https://kotlinlang.org)
 [![Java](https://img.shields.io/badge/Java-25-ED8B00?logo=openjdk&logoColor=white)](https://openjdk.org/projects/jdk/25/)
 
 A choose-your-own-path history scenario for Athenian students: a student makes the decisions of a person escaping
@@ -44,7 +45,7 @@ make db        # Postgres 18 in Docker, with the jermain and moses databases
 make server    # the server on :8080, rebuilt as you edit
 make client    # the page on :3000, with hot reload, proxying the server's routes; open http://localhost:3000
 make tests     # the JVM tests (Docker) and the client tests (Chrome)
-make ci        # every CI gate: lint, zizmor, all tests, the Docker build, and its smoke test
+make ci        # every CI gate but the image scan: lint, zizmor, all tests, the Docker build, and its smoke test
 ```
 
 `make` alone lists every target. [AGENTS.md](AGENTS.md) is the detailed guide to the code, for people and coding
@@ -164,7 +165,7 @@ A host that runs containers can run the image `make docker-push` publishes; the 
 
 ```bash
 make release-check   # lists every reason this checkout can't be released yet; publishes nothing
-make release         # every CI gate, then asks once, pushes the image to Docker Hub, creates the GitHub release
+make release         # make ci, then asks once, pushes the image to Docker Hub, creates the GitHub release
 ```
 
 The GitHub release is tagged with the version (`X.Y.Z`), titled with a `v` (`vX.Y.Z`), and takes its notes from the

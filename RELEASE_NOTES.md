@@ -1,5 +1,49 @@
 # Release notes
 
+## History Walk 1.2.0 — 2026-11-10
+
+A release for administrators: a new database driver, and an image checked for known vulnerabilities. Nothing changes
+in the walk for teachers or students.
+
+### For teachers
+
+- **Release notes in the guide.** The [guide](https://pambrose.github.io/history-walk/) has a **Release notes** page,
+  linked from its home page, with what each release changed.
+
+### For administrators
+
+- **Check `DBMS_URL` before you deploy.** The server now uses the standard PostgreSQL JDBC driver in place of
+  pgjdbc-ng.
+    - A walk that gets its database from `DATABASE_URL` (Railway's `${{Postgres.DATABASE_URL}}`) needs no change.
+    - A walk that sets `DBMS_URL` needs it to start with `jdbc:postgresql:` in place of `jdbc:pgsql:`, with any
+      `ssl.mode` parameter written `sslmode`. The server refuses any other `DBMS_URL` at startup, with a message that
+      says what to change. A local `.env` needs the same change.
+- **The connection stays unencrypted** unless its URL sets `sslmode=require` (or a stricter mode), as before, which
+  suits a platform's private network.
+- **`DBMS_QUERY_PATH`** is new: with `DATABASE_URL`, the query string to use in place of the URL's, such as
+  `sslmode=require`. A `DATABASE_URL`'s own query string, which was dropped, now reaches the driver, so a
+  `?sslmode=require` on it now encrypts the connection.
+- **No known HIGH or CRITICAL vulnerabilities in the image.** The old driver bundled an old Netty in which a scan
+  found eight, though the code they affect had been left out of the driver. Every image CI builds is now scanned, and
+  again every week; findings appear under the repository's **Security → Code scanning**.
+- No database changes, and the page's interface with the server is unchanged, so open pages aren't asked to reload.
+  Once each walk's database settings are right, `make railway-redeploy` deploys both walks from the new image and
+  waits until each reports 1.2.0.
+
+See [Configuration](https://pambrose.github.io/history-walk/admins/configuration/#database).
+
+### For contributors
+
+- The app and the tests now use the same driver, pgjdbc (`org.postgresql`); `pgjdbc-ng-all` is gone.
+  `Dbms.requirePgjdbcUrl` checks `DBMS_URL`, and `Dbms.unencryptedUnlessAsked` keeps pgjdbc from trying SSL first.
+- The **Security** workflow (`security.yml`) builds the image and fails on a HIGH or CRITICAL vulnerability that has a
+  fix. `make ci` doesn't run it, since it needs Trivy; CI does, and `make release-check` requires it to have passed
+  for the release commit. The weekly cleanup also deletes old Trivy databases from the Actions cache.
+- Gradle 9.9.1, Exposed 1.6.1, Flyway 13.12.1, kotlin-logging 8.0.7, and MockK 1.14.12; the docs site builds with
+  Zensical 0.1.1. Kotlin goes back to 2.4.20, deliberately.
+
+**Full Changelog**: <https://github.com/pambrose/history-walk/compare/1.1.3...1.2.0>
+
 ## History Walk 1.1.3 — 2026-11-04
 
 The class pages are easier to find among your browser tabs.

@@ -1,6 +1,6 @@
 [versions]
 # Kotlin and JVM
-kotlin = "2.4.21"
+kotlin = "2.4.20"
 jvm = "25"
 
 config = "6.1.2"
@@ -13,16 +13,16 @@ kover = "0.9.11"
 ksp = "2.3.12"
 kvision = "9.7.0"
 versions = "0.67.0"
-exposed = "1.6.0"
+exposed = "1.6.1"
 flexmark = "0.64.8"
-flyway = "13.12.0"
+flyway = "13.12.1"
 hikari = "7.1.0"
 ktor = "3.6.1"
 logback = "1.6.6"
 kotest = "6.2.6"
-mockk = "1.14.11"
+mockk = "1.14.12"
 testcontainers = "2.0.5"
-logging = "8.0.4"
+logging = "8.0.7"
 postgresql = "42.7.14"
 utils = "5.2.0"
 
