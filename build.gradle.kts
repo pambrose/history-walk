@@ -179,7 +179,6 @@ kotlin {
             //implementation("dev.hayden:khealth:$khealthVersion")
 
             implementation(libs.postgresql)
-            implementation(libs.pgjdbc.ng)
             implementation(libs.hikariCP)
             implementation(libs.exposed.jdbc)
             implementation(libs.exposed.kotlin.datetime)

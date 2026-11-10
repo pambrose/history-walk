@@ -43,8 +43,9 @@ make upgrade-site       # upgrade Zensical and its dependencies in website/uv.lo
 
 Local settings and secrets live in `.env` (gitignored, loaded by the IntelliJ run configs and `make docker-run`). The
 server refuses to start without `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, and `OAUTH_CALLBACK_URL`. The DB defaults in
-`Property.kt` point at a database named `historywalk`, so set `DBMS_URL` (e.g. `jdbc:pgsql://localhost:5432/jermain`).
-The app uses the pgjdbc-ng driver (`jdbc:pgsql:` URLs); the tests use the standard `org.postgresql` driver.
+`Property.kt` point at a database named `historywalk`, so set `DBMS_URL` (e.g.
+`jdbc:postgresql://localhost:5432/jermain`). The app and the tests use the standard PostgreSQL JDBC driver
+(`org.postgresql`, pgjdbc); a `jdbc:pgsql:` URL, written for the pgjdbc-ng driver used through 1.1.3, is refused.
 
 ## Architecture
 
@@ -158,11 +159,21 @@ rebuilt the progress views). Tables are Exposed objects in `dbms/DbmsTables.kt`;
 
 The connection (`Dbms.hikari`) comes from a platform's `DATABASE_URL` when it is set (Railway's
 `${{Postgres.DATABASE_URL}}`), else from `DBMS_URL`, `DBMS_USERNAME`, and `DBMS_PASSWORD`. `dbms/ContainerDatabaseUrl.kt`
-parses the URL: it decodes the user name and password, refuses a bad URL without echoing it, drops the query string,
-and takes `DBMS_NAME` (when not blank) as the database in place of the URL's. The log gets only its `description`,
-`host:port/db as user`. The JDBC URL sets no `ssl.mode`, so the connection is unencrypted (pgjdbc-ng's default), which
-suits a platform's private network: a deliberate choice, so don't add SSL back without asking.
-`ContainerDatabaseUrlTest` covers it.
+parses the URL: it decodes the user name and password, refuses a bad URL without echoing it, takes `DBMS_NAME` (when
+not blank) as the database in place of the URL's, and `DBMS_QUERY_PATH` (when not blank, a leading `?` dropped) as the
+query string in place of the URL's. The query string goes on the end of the JDBC URL still percent-encoded, since
+pgjdbc decodes it. Its parameters are pgjdbc's (libpq's names for the common ones, such as `sslmode`); the driver
+ignores a name it doesn't know. The log gets only its `description`, `host:port/db as user`, which leaves out the query
+string (pgjdbc would take a `password` there). `ContainerDatabaseUrlTest` covers it.
+
+The driver is pgjdbc (`org.postgresql`), the one the tests use. Through 1.1.3 it was pgjdbc-ng (`pgjdbc-ng-all`), whose
+shaded Netty 4.1.63 failed the Trivy scan. `Dbms.requirePgjdbcUrl` trims `DBMS_URL` and refuses it at startup unless
+it starts with `jdbc:postgresql:`, the only scheme pgjdbc takes, with a hint of its own for one still written for
+pgjdbc-ng (`jdbc:pgsql:`); either message names the fix and no part of the URL. pgjdbc tries SSL first (`prefer`) when a URL sets no `sslmode`;
+`Dbms.unencryptedUnlessAsked` sets `sslmode=disable` as a driver property, which a URL's own `sslmode` overrides, so the
+connection is unencrypted unless asked (`sslmode=require`), as it was under pgjdbc-ng. That suits a platform's private
+network: a deliberate choice, so don't add SSL by default without asking. `DbmsConnectionTest` checks both through
+pgjdbc's own URL parsing.
 
 `V001` begins with `drop schema if exists history cascade`, and Flyway records what it has applied in
 `public.flyway_schema_history` (the connection's default schema, outside `history`):
@@ -290,16 +301,20 @@ private.
 **CI** (`.github/workflows`, all actions pinned to commit SHAs): `tests.yml`'s `test` job runs `jvmTest` with Kover and
 `jsTest` (the client specs, in the runner's Chrome) on pushes and pull requests to master; `docker.yml` runs `make
 docker-build` and `make docker-smoke`, which starts the image against a throwaway Postgres and checks `/ping`,
-`/version`, the page shell's `Cache-Control`, and a 401 for an unsigned RPC call; `zizmor.yml` audits `.github` changes;
-`lint.yml` runs `make lint`; `dependency-graph.yml` submits `jvmRuntimeClasspath` so Dependabot sees the JVM libraries;
-`cleanup-runs.yml` deletes runs older than 30 days every Monday, keeping each workflow's most recent run (uploaded
-reports expire after 30 days, `retention-days`); `website.yml` builds the docs site with `make website-build` when
+`/version`, the page shell's `Cache-Control`, and a 401 for an unsigned RPC call; `security.yml` builds the image and
+has Trivy scan it (the Alpine and JRE layers and the fat jar's libraries) on pushes and pull requests to master and every
+Monday, since the digest-pinned base means a new CVE changes nothing in the repository: a HIGH or CRITICAL vulnerability
+with a fix fails the job, and master's and the weekly runs upload their findings to code scanning; `zizmor.yml` audits
+`.github` changes; `lint.yml` runs `make lint`; `dependency-graph.yml` submits `jvmRuntimeClasspath` so Dependabot sees
+the JVM libraries; `cleanup-runs.yml` deletes runs older than 30 days every Monday, keeping each workflow's most recent
+run (uploaded reports expire after 30 days, `retention-days`), and every Trivy database in the Actions cache but
+master's newest (about 1 GB each, one per day scanned); `website.yml` builds the docs site with `make website-build` when
 `website/` changes, as a check on pull requests, and on master deploys it to GitHub Pages
 (`https://pambrose.github.io/history-walk/`, which needs Settings → Pages → Source set to GitHub Actions).
 `dependabot.yml` proposes action updates and new digests for the Dockerfile's base image (pinned by digest, tag kept)
 weekly, 7 days after each release, but for the JVM libraries only security updates (`open-pull-requests-limit: 0`; `make
 versions` lists the rest). `.gitignore` ignores dot-directories, so `.github/` is re-included explicitly. `make ci` runs
-the same gates locally. `koverVerify` (in `tests.yml`, `make ci`, and `make coverage`) fails when the JVM line coverage
+the same gates locally, except the Trivy scan, which runs only in CI. `koverVerify` (in `tests.yml`, `make ci`, and `make coverage`) fails when the JVM line coverage
 that `koverLog` prints falls under the floor in `build.gradle.kts`'s `kover` block (90%, about 91.5% today): a ratchet,
 so raise it as coverage grows and never lower it to let a change through. The lint and format tasks skip
 `build/generated` by path (see `build.gradle.kts`); the slide decks' text constants are SCREAMING_SNAKE_CASE, as

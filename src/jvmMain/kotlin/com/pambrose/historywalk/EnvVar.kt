@@ -12,6 +12,7 @@ enum class EnvVar(
   SLIDES_VARIABLE_NAME,
   DBMS_DRIVER_CLASSNAME,
   DBMS_NAME,
+  DBMS_QUERY_PATH({ getEnvOrNull()?.obfuscate(4) ?: UNASSIGNED }),
   DBMS_URL({ getEnvOrNull()?.obfuscate(4) ?: UNASSIGNED }),
   DBMS_USERNAME,
   DBMS_PASSWORD({ getEnvOrNull()?.obfuscate(1) ?: UNASSIGNED }),

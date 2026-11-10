@@ -137,11 +137,11 @@ enum class Property(
 
       DBMS_DRIVER_CLASSNAME.setPropertyFromConfig(
         this,
-        "com.impossibl.postgres.jdbc.PGDriver",
+        "org.postgresql.Driver",
       )
       DBMS_URL.setPropertyFromConfig(
         this,
-        "jdbc:pgsql://localhost:5432/historywalk",
+        "jdbc:postgresql://localhost:5432/historywalk",
       )
       DBMS_USERNAME.setPropertyFromConfig(
         this,

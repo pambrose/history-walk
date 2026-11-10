@@ -38,9 +38,9 @@ A Railway service runs the same jar or image with the same variables:
 - Set the variables in the service's **Variables**. Give the server its database either with
   `DATABASE_URL = ${{Postgres.DATABASE_URL}}`, a reference to the Postgres service, which stays on Railway's private
   network, plus `DBMS_NAME` (`jermain` or `moses`) when the walk's database is not the one the URL names; or with
-  `DBMS_URL` (`jdbc:pgsql://<host>:<port>/<database>`, note `pgsql`), `DBMS_USERNAME`, and `DBMS_PASSWORD`. When both
-  are set, `DATABASE_URL` wins. Its connection is not encrypted, so don't point it at a database reached over the
-  internet.
+  `DBMS_URL` (`jdbc:postgresql://<host>:<port>/<database>`), `DBMS_USERNAME`, and `DBMS_PASSWORD`. When both are
+  set, `DATABASE_URL` wins. Its connection is not encrypted unless `DBMS_QUERY_PATH` (or the URL's own query string)
+  sets `sslmode=require`, so without that don't point it at a database reached over the internet.
 - Set `OAUTH_CALLBACK_URL` to `https://<service>.up.railway.app/auth/callback`, or the custom domain's, and add the
   same URI to the Google client. It must start with `https://`.
 - Keep a copy of the service's variables outside the repository. `secrets/` is gitignored for this, such as

@@ -45,12 +45,13 @@ server then uses it in place of the `DBMS_*` variables.
 
 | Variable | Default | Value |
 |---|---|---|
-| `DATABASE_URL` | none | `postgres://user:password@host:port/database`, such as Railway's `${{Postgres.DATABASE_URL}}`. When present, it wins over the three below. The connection is not encrypted (any `sslmode` in the URL is ignored), as suits a platform's private network. A password containing `@` must be percent-encoded. |
+| `DATABASE_URL` | none | `postgres://user:password@host:port/database`, such as Railway's `${{Postgres.DATABASE_URL}}`. When present, it wins over the three below. A password containing `@` must be percent-encoded. A query string (`?name=value&...`) is passed on to the [PostgreSQL JDBC driver](https://jdbc.postgresql.org/documentation/use/#connection-parameters), so its parameters are that driver's, such as `sslmode`. The connection is not encrypted unless it sets `sslmode=require` (or a stricter mode), as suits a platform's private network. |
 | `DBMS_NAME` | none | With `DATABASE_URL`: the database to use in place of the URL's, on the same server with the same user, such as `jermain` when the URL names Railway's default database. Spaces around it are dropped. |
-| `DBMS_URL` | `jdbc:pgsql://localhost:5432/historywalk` | A JDBC URL for the [pgjdbc-ng](https://impossibl.github.io/pgjdbc-ng/) driver: note **`jdbc:pgsql:`**, not `jdbc:postgresql:`. |
+| `DBMS_QUERY_PATH` | none | With `DATABASE_URL`: the query string to use in place of the URL's, such as `sslmode=require`, written as in a URL (percent-encoded, `&` between parameters). Spaces around it and a leading `?` are dropped. |
+| `DBMS_URL` | `jdbc:postgresql://localhost:5432/historywalk` | A JDBC URL for the [PostgreSQL JDBC driver](https://jdbc.postgresql.org/documentation/use/), which must start with `jdbc:postgresql:`; the server refuses any other at startup. Not encrypted unless it sets `sslmode=require` (or a stricter mode). Versions through 1.1.3 used the pgjdbc-ng driver, whose URLs begin `jdbc:pgsql:`: change `pgsql` to `postgresql`, and any `ssl.mode` parameter to `sslmode`. |
 | `DBMS_USERNAME` | `postgres` | The database user. |
 | `DBMS_PASSWORD` | `docker` | That user's password. |
-| `DBMS_DRIVER_CLASSNAME` | `com.impossibl.postgres.jdbc.PGDriver` | The JDBC driver class. Leave it alone. |
+| `DBMS_DRIVER_CLASSNAME` | `org.postgresql.Driver` | The JDBC driver class. Leave it alone. |
 
 The server logs a description of the database it connects to, never the password.
 
@@ -82,7 +83,7 @@ SESSION_SECRET=<openssl rand -hex 32>
 TEACHER_EMAILS=ateacher@athenian.org,another@athenian.org
 ALLOW_SLIDE_ACCESS=true
 LOGIN_GREETING=History Walk
-DBMS_URL=jdbc:pgsql://<host>:<port>/<database>
+DBMS_URL=jdbc:postgresql://<host>:<port>/<database>
 DBMS_USERNAME=<user>
 DBMS_PASSWORD=<password>
 ```

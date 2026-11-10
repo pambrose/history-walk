@@ -86,7 +86,7 @@ db: ## Start the Postgres instance and create the jermain and moses databases if
 	@for db in $(DATABASES); do \
 		docker exec $(DB_CONTAINER) psql -U $(DB_USER) -tAc "SELECT 1 FROM pg_database WHERE datname = '$$db'" | grep -qx 1 \
 			|| docker exec $(DB_CONTAINER) createdb -U $(DB_USER) $$db || exit 1; \
-		echo "Postgres ready: jdbc:pgsql://localhost:$(DB_PORT)/$$db (user $(DB_USER))"; \
+		echo "Postgres ready: jdbc:postgresql://localhost:$(DB_PORT)/$$db (user $(DB_USER))"; \
 	done
 
 reset-jermain: ## Drop and recreate the jermain database (its data is lost; moses is untouched)
@@ -187,7 +187,7 @@ _docker-push:
 docker-run: docker-build ## Run the image on DOCKER_PORT with ENV_FILE (.env), against the DOCKER_DB database (jermain)
 	@[ -f "$(ENV_FILE)" ] || { echo "$(ENV_FILE) not found: it supplies GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, and the rest"; exit 1; }
 	@set -a && . "$(abspath $(ENV_FILE))" && set +a && \
-		export DBMS_URL="jdbc:pgsql://host.docker.internal:$(DB_PORT)/$(DOCKER_DB)" && \
+		export DBMS_URL="jdbc:postgresql://host.docker.internal:$(DB_PORT)/$(DOCKER_DB)" && \
 		export OAUTH_CALLBACK_URL="http://localhost:$(DOCKER_PORT)/auth/callback" && \
 		docker run --rm --name $(DOCKER_IMAGE)-server -p 127.0.0.1:$(DOCKER_PORT):8080 \
 			--add-host=host.docker.internal:host-gateway \
@@ -215,7 +215,7 @@ docker-smoke: ## Start the image (make docker-build first) against a throwaway P
 	done; \
 	[ -n "$$ready" ] || fail "Postgres did not start"; \
 	docker run -d --name $(SMOKE_NAME)-app --network $(SMOKE_NAME) -p 127.0.0.1:$(SMOKE_PORT):8080 \
-		-e DBMS_URL=jdbc:pgsql://$(SMOKE_NAME)-db:5432/historywalk -e DBMS_USERNAME=postgres -e DBMS_PASSWORD=smoke \
+		-e DBMS_URL=jdbc:postgresql://$(SMOKE_NAME)-db:5432/historywalk -e DBMS_USERNAME=postgres -e DBMS_PASSWORD=smoke \
 		-e GOOGLE_CLIENT_ID=smoke -e GOOGLE_CLIENT_SECRET=smoke \
 		-e OAUTH_CALLBACK_URL=http://localhost:8080/auth/callback \
 		$(DOCKER_IMAGE):$(VERSION) >/dev/null; \

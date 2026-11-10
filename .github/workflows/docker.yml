@@ -18,7 +18,7 @@ concurrency:
 jobs:
   # Builds what a deploy ships, the fat jar with the webpacked client and then the image, without pushing it, and starts
   # the image against Postgres with make docker-smoke, as make ci does: Flyway migrates the empty database on startup,
-  # so a server that answers has applied the migrations and connected through the app's own pgjdbc-ng driver.
+  # so a server that answers has applied the migrations and connected through the app's own pgjdbc driver.
   docker-image:
     runs-on: ubuntu-latest
     timeout-minutes: 30

@@ -10,6 +10,21 @@ All notable changes to History Walk are recorded here. The format follows
 
 - A **Release notes** page on the docs site, the same text as `RELEASE_NOTES.md` (a symlink), linked from the home
   page.
+- `DATABASE_URL`'s query string reaches the JDBC URL, still percent-encoded, in place of being dropped, and
+  `DBMS_QUERY_PATH`, when not blank, replaces it, as `DBMS_NAME` replaces the database. Its parameters are the
+  PostgreSQL JDBC driver's (`sslmode=require` encrypts the connection), and the logged description leaves it out.
+- A **Security** workflow: Trivy scans the Docker image on pushes and pull requests to master and every Monday, failing
+  on a HIGH or CRITICAL vulnerability that has a fix and reporting findings to code scanning. The weekly cleanup also
+  deletes the old Trivy databases from the Actions cache.
+
+### Changed
+
+- The server connects with the standard PostgreSQL JDBC driver (`org.postgresql`, pgjdbc), the one the tests already
+  used, in place of pgjdbc-ng 0.8.9, whose bundled Netty 4.1.63 has known HIGH and CRITICAL vulnerabilities. A
+  `DBMS_URL` is now `jdbc:postgresql://host:port/database`, and an `ssl.mode` parameter becomes `sslmode`. Any other
+  `DBMS_URL`, one still written `jdbc:pgsql:` included, stops the server at startup with the fix. `DATABASE_URL` needs no change. The connection stays
+  unencrypted unless the URL sets `sslmode`, as before: the server sets `sslmode=disable` where pgjdbc would default to
+  `prefer`.
 
 ## [1.1.3] - 2026-11-04
 
