@@ -129,8 +129,10 @@ object Dbms {
   // and pgjdbc lets a URL's own parameters win over those.
   internal fun HikariConfig.unencryptedUnlessAsked() = addDataSourceProperty("sslmode", "disable")
 
-  // DBMS_URL took pgjdbc-ng's jdbc:pgsql: scheme until the app moved to pgjdbc, which would refuse it with a message that
-  // repeats the URL. The URL may hold a password, so this names only the scheme.
+  // DBMS_URL took pgjdbc-ng's jdbc:pgsql: scheme until the app moved to pgjdbc. Hikari would refuse such a URL only with
+  // "Driver org.postgresql.Driver claims to not accept jdbcUrl", which says nothing of the fix, so this says what to
+  // change. It names only the scheme: the URL may hold a password outside a password= parameter, the one part Hikari
+  // masks.
   internal fun requirePgjdbcUrl(jdbcUrl: String): String =
     jdbcUrl.also {
       require(!it.trim().startsWith("jdbc:pgsql:")) {
