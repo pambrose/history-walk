@@ -54,8 +54,8 @@ student, if it starts with two digits.
 | **reset** link | no | when `SHOW_RESET_BUTTON=true`, in the teacher view |
 
 Someone not signed in who opens a teacher page is sent to Google sign-in first. The class pages, the admin page,
-sign-in, and sign-out are sent with `Cache-Control: no-store, private`, so neither the browser nor Cloudflare keeps a
-copy.
+sign-in, and sign-out are sent with `Cache-Control: no-store, private`, so neither the browser nor any cache in between
+keeps a copy.
 
 ## The student view
 

@@ -30,7 +30,6 @@ Two numbers in `gradle.properties` describe a release:
    notes. If the checkout changes while `make ci` runs, it publishes nothing.
 4. Deploy each walk: on Railway, `make railway-redeploy` pulls the new image and waits until each walk reports the new
    version. Each deployment migrates its database as it starts.
-5. Behind Cloudflare, check that Cloudflare serves the new page bundle ([below](#after-a-deploy)).
 
 ## What open pages do
 
@@ -48,31 +47,18 @@ The dialog and the reload wait while another dialog is open or a student is writ
 lost; every move before that is already saved. If a reload brings back the old page (a cache still serving the old
 bundle), the page doesn't loop: it shows the dialog once and stops reloading itself in that tab.
 
-## Caching, and Cloudflare
+## Caching
 
 The page's script, `main.bundle.js`, has the same name in every release, so caches must check it every time. The
 server makes sure they do:
 
 | What | `Cache-Control` | Effect |
 |---|---|---|
-| The page (`/`), `main.bundle.js`, and images under `/static` | `no-cache, private` with an `ETag` | Browsers ask each time and get a short *304 Not Modified* when nothing changed; a new release is picked up at the next load. Cloudflare keeps no copy. |
+| The page (`/`), `main.bundle.js`, and images under `/static` | `no-cache, private` with an `ETag` | Browsers ask each time and get a short *304 Not Modified* when nothing changed; a new release is picked up at the next load. No shared cache keeps a copy. |
 | Sign-in, sign-out, the reset, the class pages, the admin page | `no-store, private` | Never stored anywhere, so Back after a sign-out on a shared computer shows nothing. |
 
-Don't add a Cloudflare cache rule that ignores the origin's headers (such as *Cache Everything* with an edge TTL): it
-would serve old bundles after a release, and could cache per-user pages.
-
-### After a deploy
-
-A change to these headers doesn't clear a copy Cloudflare already holds. After a deploy, compare the bundle the deployment
-serves (the origin) with the one Cloudflare serves:
-
-```bash
-make served-version PUBLIC_URL=https://<public address> ORIGIN_URL=https://<origin address>
-```
-
-It prints the version in this checkout, in the origin's bundle, and in Cloudflare's, with Cloudflare's `cf-cache-status`,
-and fails if they differ or Cloudflare is caching the bundle. If it fails, purge `main.bundle.js` in Cloudflare's
-dashboard (Caching → Configuration → Purge Cache → Custom Purge) and run it again.
+A cache or CDN put in front of a deployment must honor these headers: one that ignores them would serve old bundles
+after a release, and could cache per-user pages.
 
 ## Dependencies
 

@@ -101,7 +101,7 @@ else refused. The role is recomputed from the live `TEACHER_EMAILS` on every req
   `ClientUtils.postTo`); a GET or HEAD of either only redirects to `/`, since any link, image, or prefetch can send one.
 - Sign-in, sign-out, `/userreset`, and the teacher pages sit inside `noStore` (`RouteGuards.kt`), which sends
   `Cache-Control: no-store, private` on every response there, the Google redirect and the guards' 403 included, so after
-  a sign-out on a shared computer Back cannot show class data from a cache and Cloudflare stores none of it.
+  a sign-out on a shared computer Back cannot show class data from a cache, and no shared cache stores any of it.
 - On the client, Kilua turns only a 401 into `SecurityException`; KVision's `SecurityMgr.withAuth` then calls
   `Security.login()`, which shows `SignInDialog` once and parks forever (see the comment on `LoginPrompt` before changing it).
 - `App.start()` reloads a page the browser restores from its back/forward cache (`pageshow` with `persisted`), so Back
@@ -192,24 +192,21 @@ pgjdbc's own URL parsing.
 The files in `webpack.config.d/` are concatenated into the generated webpack config; the app does not use jQuery (an old
 `ProvidePlugin` for it broke Bootstrap under jQuery 4 and was removed).
 
-**Cloudflare caching.** The apps sit behind Cloudflare, and `main.bundle.js` has the same name in every release, so a
-release reaches a browser at its next page load only because of these; do not drop any of them:
+**Page caching.** `main.bundle.js` has the same name in every release, so a release reaches a browser at its next page
+load only because of these; do not drop any of them:
 - `Routes.staticContent` serves the page shell (`/`, the jar's `assets/index.html`), the bundle, and the `/static`
   images with `Cache-Control: no-cache, private` and a SHA-256 ETag (`revalidatedEachTime`). Kilua's own static
-  handling is off (`initRpc(initStaticResources = false)`): it sent no Cache-Control, so Cloudflare kept the bundle for
-  hours and told browsers to keep it too, and it answered every unknown path with the page shell.
+  handling is off (`initRpc(initStaticResources = false)`): it sent no Cache-Control, so a cache could keep the bundle
+  for hours, and it answered every unknown path with the page shell.
 - `ConditionalHeaders` (`Installs.installConditionalHeaders`) turns a matching `If-None-Match` into a 304 with no body.
 - `AutoHeadResponse` (`Installs.installAutoHeadResponse`) answers HEAD, which `curl -sI` sends, with a GET's headers;
-  without it every HEAD is a 404, which Cloudflare can pass on in place of the bundle's headers.
+  without it every HEAD is a 404.
 
-Cloudflare keeps no copy of a response marked `private` (`cf-cache-status: BYPASS`) and passes the header on unchanged;
-a Cloudflare cache rule that ignores the origin's headers would bring stale bundles back. A change to these headers does
-not clear a copy Cloudflare already holds: after a deploy, run `make served-version PUBLIC_URL=... ORIGIN_URL=...`,
-which reads the version line `App.start()` logs from the bundle as the origin and as Cloudflare serve it, and purge
-`main.bundle.js` in Cloudflare if they differ. `StaticContentCachingTest` builds its own routes from `staticContent()`,
-so it would not notice `appRoutes` dropping that call; `NoStoreCachingTest` checks the shell, the bundle, and an image
-through `appRoutes`, and that the per-user routes (sign-in and sign-out, the reset, the teacher pages) go out
-`no-store, private` instead (see `noStore` under Sign-in).
+`private` keeps any shared cache (a proxy or CDN) from storing these responses; one put in front of a deployment must
+honor the origin's headers, or it would serve stale bundles after a release. `StaticContentCachingTest` builds its own
+routes from `staticContent()`, so it would not notice `appRoutes` dropping that call; `NoStoreCachingTest` checks the
+shell, the bundle, and an image through `appRoutes`, and that the per-user routes (sign-in and sign-out, the reset, the
+teacher pages) go out `no-store, private` instead (see `noStore` under Sign-in).
 
 **Version check.** A page left open across a release keeps its old bundle, so `ClientVersionCheck` (started from
 `App.start()`) sends its `BuildConfig` versions to `IContentService.versionCheck` every
@@ -224,7 +221,7 @@ goes around `withAuth`, so a signed-out page is left to the sign-in dialog. The 
   a reason (`writingReason`, `MainPanel.kt`), and a due reload, its countdown included, is put off while a reason is
   being written.
 - Before reloading itself, the page records its bundle's `apiVersion` in `sessionStorage`
-  (`history-walk.reloaded-for-api-version`). If the reload brings back the same bundle (Cloudflare still serving the old
+  (`history-walk.reloaded-for-api-version`). If the reload brings back the same bundle (a cache still serving the old
   `main.bundle.js`), the page sends no stamp, so it shows the dialog once and never reloads itself again for that bundle
   in that tab; an up-to-date answer clears the record.
 

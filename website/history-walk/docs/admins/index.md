@@ -15,8 +15,7 @@ environment variable, and has its own database, teacher list, and Google sign-in
 
 ```mermaid
 flowchart LR
-  browser["Browser<br/>(KVision page)"] -- "HTTPS" --> cf["Cloudflare"]
-  cf --> app["History Walk server<br/>(Ktor, one fat jar)"]
+  browser["Browser<br/>(KVision page)"] -- "HTTPS" --> app["History Walk server<br/>(Ktor, one fat jar)"]
   app -- "Kilua RPC + teacher pages" --> browser
   app -- "JDBC" --> db[("Postgres<br/>schema history")]
   browser -- "sign-in" --> google["Google OAuth"]
@@ -33,8 +32,6 @@ The parts:
 - **Postgres**, holding users, their moves and reasons, and the app's one setting. The server migrates the schema
   itself, with [Flyway](https://flywaydb.org), each time it starts.
 - **Google OAuth** for sign-in. Only accounts in the school's domain are admitted; the role comes from the address.
-- **Cloudflare**, where a deployment sits behind it. The server's headers keep it from caching anything per-user,
-  and make every release reach browsers at their next page load (see [Releases and updates](releases.md)).
 
 The server needs **Java 25**. It runs the same way built from the repository, on Railway, and in Docker.
 
