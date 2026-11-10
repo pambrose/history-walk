@@ -28,9 +28,6 @@ repository has no Procfile, so the start command must be set on the host. `build
 name `history-walk.jar` exactly rather than letting the host pick one. Its name has no version in it, so a release
 never leaves the start command pointing at a file the build no longer writes.
 
-A deployment behind Cloudflare needs one more check after each deploy, that Cloudflare serves the new release; see
-[Releases and updates](releases.md#after-a-deploy).
-
 ## Railway
 
 A Railway service runs the same jar or image with the same variables:

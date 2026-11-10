@@ -50,7 +50,7 @@ Facts that are easy to get wrong:
 - [Teachers and students](https://raw.githubusercontent.com/pambrose/history-walk/master/website/history-walk/docs/admins/access.md): the role rule and the teacher list
 - [Deployment](https://raw.githubusercontent.com/pambrose/history-walk/master/website/history-walk/docs/admins/deployment.md): building from the repository, Railway, and Docker
 - [Database](https://raw.githubusercontent.com/pambrose/history-walk/master/website/history-walk/docs/admins/database.md): schema, migrations, the startup guard, backups, and queries
-- [Releases and updates](https://raw.githubusercontent.com/pambrose/history-walk/master/website/history-walk/docs/admins/releases.md): `version` and `apiVersion`, the update check, and Cloudflare caching
+- [Releases and updates](https://raw.githubusercontent.com/pambrose/history-walk/master/website/history-walk/docs/admins/releases.md): `version` and `apiVersion`, the update check, and caching
 - [Slide decks](https://raw.githubusercontent.com/pambrose/history-walk/master/website/history-walk/docs/admins/slide-decks.md): the deck DSL and path names
 - [Monitoring and troubleshooting](https://raw.githubusercontent.com/pambrose/history-walk/master/website/history-walk/docs/admins/troubleshooting.md): health checks, log lines, and startup and build errors
 - [Development](https://raw.githubusercontent.com/pambrose/history-walk/master/website/history-walk/docs/admins/development.md): local setup, tests, and CI

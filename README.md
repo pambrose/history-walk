@@ -176,18 +176,11 @@ and waits until each reports the new version.
 more). `make log-jermain` and `make log-moses` follow one walk's log like `tail -f`: its last 10 lines, then each new
 line within a few seconds, until Ctrl-C.
 
-### Behind Cloudflare
+### Caching
 
-The page, `main.bundle.js`, and the images go out with `Cache-Control: no-cache, private` and an ETag, so Cloudflare
-keeps no copy and a browser checks with the server on each page load, getting a 304 until a release changes the file.
-After a deploy, check what each side serves:
-
-```bash
-make served-version PUBLIC_URL=https://<cloudflare-address> ORIGIN_URL=https://<origin-address>
-```
-
-It fails if Cloudflare serves an older bundle than the origin (purge `main.bundle.js` in Cloudflare) or caches the
-bundle. Do not add a Cloudflare cache rule that overrides the origin's `Cache-Control`.
+The page, `main.bundle.js`, and the images go out with `Cache-Control: no-cache, private` and an ETag, so a browser
+checks with the server on each page load, getting a 304 until a release changes the file, and no shared cache keeps a
+copy. A cache or CDN put in front of a walk must honor these headers.
 
 ## Database
 

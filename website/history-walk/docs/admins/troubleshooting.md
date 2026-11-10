@@ -64,7 +64,7 @@ See [Google sign-in](google-sign-in.md#other-sign-in-problems). The most common:
 |---|---|
 | *Something went wrong loading the page. Please reload it.* | The page couldn't reach the server at start-up. Check `/ping`. |
 | *Something went wrong, so nothing changed* on every click | The server is failing requests; check the log. |
-| An *Application Update* dialog that comes back after reloading | Cloudflare is serving the old `main.bundle.js`. Run `make served-version` and purge the bundle ([Releases](releases.md#after-a-deploy)). |
+| An *Application Update* dialog that comes back after reloading | Something between the browser and the server, such as a proxy or CDN, is serving the old `main.bundle.js` despite the server's headers ([Caching](releases.md#caching)). |
 | A student is back on the first slide unexpectedly | A release renamed or moved the slide they were on ([Slide decks](slide-decks.md#slide-identity-path-names)). |
 | A teacher's moves show in the class pages | Moves made in the student view. **Clear teachers' trial walks** on `/admin`. |
 
