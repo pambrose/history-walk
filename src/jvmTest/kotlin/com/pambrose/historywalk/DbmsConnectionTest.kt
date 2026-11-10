@@ -30,18 +30,40 @@ class DbmsConnectionTest : StringSpec() {
         "verify-full"
     }
 
-    "a pgjdbc URL passes as it is" {
+    "a pgjdbc URL passes, with the spaces around it dropped" {
       val url = "jdbc:postgresql://localhost:5432/jermain?sslmode=require"
       Dbms.requirePgjdbcUrl(url) shouldBe url
+      Dbms.requirePgjdbcUrl(" $url\n") shouldBe url
+      Dbms.requirePgjdbcUrl("jdbc:postgresql:jermain") shouldBe "jdbc:postgresql:jermain"
     }
 
-    "a pgjdbc-ng jdbc:pgsql: URL is refused, naming the fix but not the URL, which may hold a password" {
-      shouldThrow<IllegalArgumentException> {
-        Dbms.requirePgjdbcUrl(" jdbc:pgsql://localhost:5432/jermain?password=xyzzy")
-      }.message.orEmpty().run {
-        this shouldStartWith "DBMS_URL starts with jdbc:pgsql:"
-        this shouldNotContain "xyzzy"
-        this shouldNotContain "jermain"
+    "a pgjdbc-ng jdbc:pgsql: URL, in any case, is refused, naming the fix but not the URL, which may hold a password" {
+      listOf(
+        " jdbc:pgsql://localhost:5432/jermain?password=xyzzy",
+        "JDBC:PGSQL://localhost:5432/jermain?password=xyzzy",
+      ).forEach { url ->
+        shouldThrow<IllegalArgumentException> { Dbms.requirePgjdbcUrl(url) }.message.orEmpty().run {
+          this shouldStartWith "DBMS_URL starts with jdbc:pgsql:"
+          this shouldNotContain "xyzzy"
+          this shouldNotContain "jermain"
+        }
+      }
+    }
+
+    "any other URL is refused, without repeating it" {
+      listOf(
+        "postgres://walker:xyzzy@db.example.com:5432/jermain",
+        "jdbc:postgres://walker:xyzzy@db.example.com:5432/jermain",
+        "JDBC:POSTGRESQL://db.example.com:5432/jermain?password=xyzzy",
+        "db.example.com:5432/jermain?password=xyzzy",
+        "",
+      ).forEach { url ->
+        shouldThrow<IllegalArgumentException> { Dbms.requirePgjdbcUrl(url) }.message.orEmpty().run {
+          this shouldStartWith "DBMS_URL must start with jdbc:postgresql:"
+          this shouldNotContain "xyzzy"
+          this shouldNotContain "walker"
+          this shouldNotContain "example"
+        }
       }
     }
   }

@@ -21,8 +21,8 @@ All notable changes to History Walk are recorded here. The format follows
 
 - The server connects with the standard PostgreSQL JDBC driver (`org.postgresql`, pgjdbc), the one the tests already
   used, in place of pgjdbc-ng 0.8.9, whose bundled Netty 4.1.63 has known HIGH and CRITICAL vulnerabilities. A
-  `DBMS_URL` is now `jdbc:postgresql://host:port/database`; one still written `jdbc:pgsql:` stops the server at startup
-  with the fix, and an `ssl.mode` parameter becomes `sslmode`. `DATABASE_URL` needs no change. The connection stays
+  `DBMS_URL` is now `jdbc:postgresql://host:port/database`, and an `ssl.mode` parameter becomes `sslmode`. Any other
+  `DBMS_URL`, one still written `jdbc:pgsql:` included, stops the server at startup with the fix. `DATABASE_URL` needs no change. The connection stays
   unencrypted unless the URL sets `sslmode`, as before: the server sets `sslmode=disable` where pgjdbc would default to
   `prefer`.
 

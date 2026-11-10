@@ -167,8 +167,9 @@ ignores a name it doesn't know. The log gets only its `description`, `host:port/
 string (pgjdbc would take a `password` there). `ContainerDatabaseUrlTest` covers it.
 
 The driver is pgjdbc (`org.postgresql`), the one the tests use. Through 1.1.3 it was pgjdbc-ng (`pgjdbc-ng-all`), whose
-shaded Netty 4.1.63 failed the Trivy scan, so `Dbms.requirePgjdbcUrl` refuses a `DBMS_URL` still written for it
-(`jdbc:pgsql:`) with the fix, not the URL. pgjdbc tries SSL first (`prefer`) when a URL sets no `sslmode`;
+shaded Netty 4.1.63 failed the Trivy scan. `Dbms.requirePgjdbcUrl` trims `DBMS_URL` and refuses it at startup unless
+it starts with `jdbc:postgresql:`, the only scheme pgjdbc takes, with a hint of its own for one still written for
+pgjdbc-ng (`jdbc:pgsql:`); either message names the fix and no part of the URL. pgjdbc tries SSL first (`prefer`) when a URL sets no `sslmode`;
 `Dbms.unencryptedUnlessAsked` sets `sslmode=disable` as a driver property, which a URL's own `sslmode` overrides, so the
 connection is unencrypted unless asked (`sslmode=require`), as it was under pgjdbc-ng. That suits a platform's private
 network: a deliberate choice, so don't add SSL by default without asking. `DbmsConnectionTest` checks both through

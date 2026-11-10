@@ -45,6 +45,7 @@ Worth knowing in the log:
 | *DATABASE_URL has no host; an @ in the password must be percent-encoded* (and other *DATABASE_URL …* errors) | Fix the URL. |
 | A Flyway *checksum mismatch* | An applied migration was edited. Put it back as it was, and make the change a new migration. |
 | *DBMS_URL starts with jdbc:pgsql:, the scheme of the pgjdbc-ng driver, which History Walk no longer uses* | The URL was written for versions through 1.1.3. Change `jdbc:pgsql:` to `jdbc:postgresql:`, and any `ssl.mode` parameter to `sslmode`. See [Configuration](configuration.md#database). |
+| *DBMS_URL must start with jdbc:postgresql:* | Write it as `jdbc:postgresql://<host>:<port>/<database>`. A host's `postgres://user:password@host:port/database` URL goes in `DATABASE_URL` instead. See [Configuration](configuration.md#database). |
 | A connection error | The database is down or unreachable, or the `DBMS_*` settings are wrong. |
 
 ## Sign-in problems

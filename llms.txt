@@ -20,8 +20,8 @@ Facts that are easy to get wrong:
 - `OAUTH_CALLBACK_URL` must be `https` for a deployed server; `http` only works for `localhost`.
 - `V001` begins with `drop schema if exists history cascade`; `Dbms.migrate` refuses to run it on a database whose
   `history` tables survived without `public.flyway_schema_history`. Never edit an applied migration.
-- The database driver is the PostgreSQL JDBC driver (pgjdbc, `jdbc:postgresql:` URLs). The server refuses a `DBMS_URL`
-  still written for pgjdbc-ng (`jdbc:pgsql:`), which it used through 1.1.3.
+- The database driver is the PostgreSQL JDBC driver (pgjdbc). The server refuses a `DBMS_URL` that doesn't start with
+  `jdbc:postgresql:`, such as one still written for pgjdbc-ng (`jdbc:pgsql:`), which it used through 1.1.3.
 - A platform's `DATABASE_URL` (Railway's `${{Postgres.DATABASE_URL}}`) wins over `DBMS_URL`/`DBMS_USERNAME`/
   `DBMS_PASSWORD`; `DBMS_NAME` names the database on that server in place of the URL's, and `DBMS_QUERY_PATH` the query
   string. `ContainerDatabaseUrl` parses it, passes the query string to pgjdbc, and logs only `host:port/db as user`.

@@ -129,17 +129,23 @@ object Dbms {
   // and pgjdbc lets a URL's own parameters win over those.
   internal fun HikariConfig.unencryptedUnlessAsked() = addDataSourceProperty("sslmode", "disable")
 
-  // DBMS_URL took pgjdbc-ng's jdbc:pgsql: scheme until the app moved to pgjdbc. Hikari would refuse such a URL only with
-  // "Driver org.postgresql.Driver claims to not accept jdbcUrl", which says nothing of the fix, so this says what to
-  // change. It names only the scheme: the URL may hold a password outside a password= parameter, the one part Hikari
-  // masks.
-  internal fun requirePgjdbcUrl(jdbcUrl: String): String =
-    jdbcUrl.also {
-      require(!it.trim().startsWith("jdbc:pgsql:")) {
-        "DBMS_URL starts with jdbc:pgsql:, the scheme of the pgjdbc-ng driver, which History Walk no longer uses. " +
-          "Write it as jdbc:postgresql://host:port/database, with any ssl.mode=... parameter as sslmode=..."
-      }
+  // DBMS_URL must be pgjdbc's, which takes only a URL that starts with jdbc:postgresql:, as written. Hikari would refuse
+  // any other only with "Driver org.postgresql.Driver claims to not accept jdbcUrl", which says nothing of the fix, so
+  // this says what to change, with a hint of its own for pgjdbc-ng's jdbc:pgsql:, the scheme DBMS_URL took until the
+  // app moved to pgjdbc. A refusal repeats no part of the URL, which may hold a password outside a password=
+  // parameter, the one part Hikari masks. The spaces around the URL are dropped.
+  internal fun requirePgjdbcUrl(jdbcUrl: String): String {
+    val url = jdbcUrl.trim()
+    require(!url.startsWith("jdbc:pgsql:", ignoreCase = true)) {
+      "DBMS_URL starts with jdbc:pgsql:, the scheme of the pgjdbc-ng driver, which History Walk no longer uses. " +
+        "Write it as jdbc:postgresql://host:port/database, with any ssl.mode=... parameter as sslmode=..."
     }
+    require(url.startsWith("jdbc:postgresql:")) {
+      "DBMS_URL must start with jdbc:postgresql:, as in jdbc:postgresql://host:port/database. A platform's " +
+        "postgres://user:password@host:port/database URL goes in DATABASE_URL instead."
+    }
+    return url
+  }
 
   suspend fun <T> dbQuery(block: JdbcTransaction.() -> T): T =
     withContext(Dispatchers.IO) {
