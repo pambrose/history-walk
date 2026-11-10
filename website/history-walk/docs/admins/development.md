@@ -53,7 +53,7 @@ The dev server forwards `/auth`, the API, `/static`, and the teacher pages to th
 | `./gradlew jvmTest --tests 'com.pambrose.historywalk.AdminTest'` | One server spec. The page's tests always run whole. |
 | `make coverage` | The tests, then Kover's coverage reports (`build/reports/kover/html/index.html`), and the coverage floor. |
 | `make lint` / `make format` | Checks, or fixes, the Kotlin style. |
-| `make ci` | Every CI gate: lint, the workflow audit, all tests, the Docker build, and the image's smoke test. |
+| `make ci` | Every CI gate but the image scan: lint, the workflow audit, all tests, the Docker build, and the image's smoke test. |
 
 The JVM line coverage must stay at or above the floor in `build.gradle.kts` (90%); CI fails under it. Raise the floor
 as coverage grows; never lower it to let a change through.
@@ -67,6 +67,7 @@ GitHub Actions runs these on every push to `master` and every pull request:
 | Tests | The server's tests with coverage and the floor, and the page's tests in Chrome. |
 | Lint | `make lint`. |
 | Docker Image | Builds the jar and the image, and runs the smoke test. |
+| Security | Builds the image and scans it with Trivy (Alpine, the Java runtime, and every library in the jar), failing on a HIGH or CRITICAL vulnerability that has a fix. It also runs every Monday, since a newly published vulnerability changes nothing in the repository. The findings from `master` and the weekly run, including those with no fix yet, appear under **Security → Code scanning**. |
 | zizmor | Audits the workflow files, when they change. |
 | Website | Builds the docs site when `website/` or `llms.txt` changes; on `master`, publishes it to GitHub Pages. |
 
@@ -75,7 +76,7 @@ And these on their own:
 | Workflow | Does |
 |---|---|
 | Dependency Graph | On each push to `master`, reports the Java libraries to GitHub, so Dependabot can raise security alerts for them. |
-| Clean Up Workflow Runs | Every Monday, deletes the runs, and their logs, that are more than 30 days old, keeping each workflow's most recent run whatever its age. **Run workflow** with *dry run* lists what it would delete. |
+| Clean Up Workflow Runs | Every Monday, deletes the runs, and their logs, that are more than 30 days old, keeping each workflow's most recent run whatever its age, and every Trivy database saved in the Actions cache but `master`'s newest (about 1 GB each). **Run workflow** with *dry run* lists what it would delete. |
 
 The Tests and Lint runs upload their reports as artifacts (test results, coverage, and lint reports), which you can
 download from the run's page for 30 days; then they expire by themselves.

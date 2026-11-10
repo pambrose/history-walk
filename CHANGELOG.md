@@ -6,25 +6,38 @@ All notable changes to History Walk are recorded here. The format follows
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-11-10
+
 ### Added
 
-- A **Release notes** page on the docs site, the same text as `RELEASE_NOTES.md` (a symlink), linked from the home
-  page.
-- `DATABASE_URL`'s query string reaches the JDBC URL, still percent-encoded, in place of being dropped, and
-  `DBMS_QUERY_PATH`, when not blank, replaces it, as `DBMS_NAME` replaces the database. Its parameters are the
-  PostgreSQL JDBC driver's (`sslmode=require` encrypts the connection), and the logged description leaves it out.
+- `DBMS_QUERY_PATH`: with `DATABASE_URL`, the query string to use in place of the URL's, as `DBMS_NAME` replaces the
+  database, such as `sslmode=require`.
 - A **Security** workflow: Trivy scans the Docker image on pushes and pull requests to master and every Monday, failing
   on a HIGH or CRITICAL vulnerability that has a fix and reporting findings to code scanning. The weekly cleanup also
   deletes the old Trivy databases from the Actions cache.
+- A **Release notes** page on the docs site, the same text as `RELEASE_NOTES.md` (a symlink), linked from the home
+  page.
 
 ### Changed
 
 - The server connects with the standard PostgreSQL JDBC driver (`org.postgresql`, pgjdbc), the one the tests already
-  used, in place of pgjdbc-ng 0.8.9, whose bundled Netty 4.1.63 has known HIGH and CRITICAL vulnerabilities. A
-  `DBMS_URL` is now `jdbc:postgresql://host:port/database`, and an `ssl.mode` parameter becomes `sslmode`. Any other
-  `DBMS_URL`, one still written `jdbc:pgsql:` included, stops the server at startup with the fix. `DATABASE_URL` needs no change. The connection stays
-  unencrypted unless the URL sets `sslmode`, as before: the server sets `sslmode=disable` where pgjdbc would default to
-  `prefer`.
+  used, in place of pgjdbc-ng 0.8.9. `DBMS_URL` must start with `jdbc:postgresql:` (it was `jdbc:pgsql:`), and an
+  `ssl.mode` parameter becomes `sslmode`; any other `DBMS_URL` stops the server at startup with the fix, and spaces
+  around it are dropped. `DATABASE_URL` needs no change. The connection stays unencrypted unless the URL sets
+  `sslmode`, as before: the server sets `sslmode=disable` where pgjdbc would default to `prefer`.
+- `DATABASE_URL`'s query string reaches the driver, still percent-encoded, in place of being dropped, so a
+  `?sslmode=require` on it now encrypts the connection. The logged description still leaves it out.
+- `make release-check` (and so `make release`) also requires the Security workflow's `image-scan` to have passed for
+  the release commit, the one CI gate `make ci` doesn't run.
+- Gradle 9.9.1 (was 9.8.2), Exposed 1.6.1, Flyway 13.12.1, kotlin-logging 8.0.7, and MockK 1.14.12; the docs site
+  builds with Zensical 0.1.1 and pymdown-extensions 13.0.
+- Kotlin goes back to 2.4.20 (from 2.4.21), deliberately.
+
+### Security
+
+- The image no longer carries Netty 4.1.63, shaded inside pgjdbc-ng, in which Trivy found eight HIGH or CRITICAL
+  vulnerabilities with fixes (the classes they name were left out of the shaded jar). Trivy finds no HIGH or CRITICAL
+  vulnerability in the 1.2.0 image.
 
 ## [1.1.3] - 2026-11-04
 
@@ -230,7 +243,8 @@ the original classroom app; [History](#history) at the end tells the story in or
   CI (#5, #7); five waves of fixes from a code review of 24 issues (#9–#12, #14); the admin page's student view
   (#13); `make docker-push` and version 1.1.0 (#16); and the documentation site (#17).
 
-[Unreleased]: https://github.com/pambrose/history-walk/compare/1.1.3...HEAD
+[Unreleased]: https://github.com/pambrose/history-walk/compare/1.2.0...HEAD
+[1.2.0]: https://github.com/pambrose/history-walk/compare/1.1.3...1.2.0
 [1.1.3]: https://github.com/pambrose/history-walk/compare/1.1.2...1.1.3
 [1.1.2]: https://github.com/pambrose/history-walk/compare/1.1.1...1.1.2
 [1.1.1]: https://github.com/pambrose/history-walk/compare/1.1.0...1.1.1

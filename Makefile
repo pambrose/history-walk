@@ -1,5 +1,5 @@
 GRADLE         := ./gradlew
-GRADLE_VERSION ?= 9.8.2
+GRADLE_VERSION ?= 9.9.1
 
 # One local Postgres instance holding both databases; override any of these, e.g. `make db DB_PORT=5433`.
 DATABASES    := jermain moses
@@ -22,10 +22,11 @@ DOCKER_REPO      ?= pambrose/history-walk
 DOCKER_PLATFORMS ?= linux/amd64,linux/arm64
 
 # `make release` publishes only from a clean checkout of this branch that matches origin, and whose CI on GitHub passed:
-# each of the RELEASE_CHECKS jobs (the Tests, Lint, and Docker Image workflows) must have run and passed, so a release
-# started before CI has queued them all stops rather than passing on the ones that ran.
+# each of the RELEASE_CHECKS jobs (the Tests, Lint, Docker Image, and Security workflows) must have run and passed, so a
+# release started before CI has queued them all stops rather than passing on the ones that ran. image-scan is the one
+# gate make ci can't run, since it needs Trivy, so this is where a release waits for it.
 RELEASE_BRANCH ?= master
-RELEASE_CHECKS := test lint docker-image
+RELEASE_CHECKS := test lint docker-image image-scan
 # VERSION as a regular expression, for finding its sections in CHANGELOG.md and RELEASE_NOTES.md
 VERSION_RE   = $(subst .,\.,$(VERSION))
 # Where make release writes VERSION's section of RELEASE_NOTES.md, the GitHub release's notes
@@ -144,10 +145,11 @@ zizmor: ## Audit the GitHub Actions workflows and dependabot.yml with zizmor, as
 	if [ -n "$$GH_TOKEN" ]; then export GH_TOKEN; else unset GH_TOKEN; fi; \
 	zizmor .
 
-# Every gate CI runs, in one command, so this is the check before merging: lint, the zizmor audit, the JVM tests with
-# coverage (checked against the floor in build.gradle.kts) and the client tests (their results not taken from the build
-# cache), the Docker image build, and the image started against Postgres. Needs Docker, Chrome, and zizmor.
-ci: ## Run every CI gate locally: lint, zizmor, the JVM and client tests, the image build, the smoke test
+# Every gate CI runs but the Trivy image scan (security.yml, which needs Trivy), in one command, so this is the check
+# before merging: lint, the zizmor audit, the JVM tests with coverage (checked against the floor in build.gradle.kts)
+# and the client tests (their results not taken from the build cache), the Docker image build, and the image started
+# against Postgres. Needs Docker, Chrome, and zizmor.
+ci: ## Run every CI gate locally but the image scan: lint, zizmor, the JVM and client tests, the image build, the smoke test
 	$(MAKE) lint
 	$(MAKE) zizmor
 	$(GRADLE) --no-build-cache cleanJvmTest cleanJsBrowserTest jvmTest jsBrowserTest koverXmlReport koverHtmlReport koverLog \

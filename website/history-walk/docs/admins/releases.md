@@ -5,7 +5,7 @@
 Two numbers in `gradle.properties` describe a release:
 
 `version`
-:   The release, such as `1.1.3`. `/version` reports it, the page logs it in the browser's console, and it tags the
+:   The release, such as `1.2.0`. `/version` reports it, the page logs it in the browser's console, and it tags the
     Docker image. Bump it for every release.
 
 `apiVersion`
@@ -21,9 +21,10 @@ Two numbers in `gradle.properties` describe a release:
    `**Full Changelog**:` link). Merge it all to `master`, with CI green.
 2. On an up-to-date `master`, run `make release-check`. It publishes nothing; it lists every reason the checkout
    can't be released yet: a dirty tree, another branch, a commit not on GitHub, a missing changelog or release-notes
-   section, a tag or GitHub release that already exists, CI that hasn't passed for the commit, Docker not running, or
-   the version already on Docker Hub.
-3. Run `make release`. It runs `release-check` again, a clean build and every CI gate (`make ci`), then asks once.
+   section, a tag or GitHub release that already exists, CI that hasn't passed for the commit (the Tests, Lint, Docker
+   Image, and Security workflows must all have run), Docker not running, or the version already on Docker Hub.
+3. Run `make release`. It runs `release-check` again, a clean build and the CI gates (`make ci`, all but the image
+   scan, which CI runs), then asks once.
    Then it pushes the image to Docker Hub (`pambrose/history-walk:<version>` and `:latest`, amd64 and arm64) and
    creates the GitHub release: tag `1.2.0`, title `v1.2.0`, and the version's section of `RELEASE_NOTES.md` as its
    notes. If the checkout changes while `make ci` runs, it publishes nothing.
