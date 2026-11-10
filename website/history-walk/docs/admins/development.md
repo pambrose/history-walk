@@ -19,7 +19,7 @@ Put your settings in `.env` at the top of the repository. It is gitignored; the 
 GOOGLE_CLIENT_ID=….apps.googleusercontent.com
 GOOGLE_CLIENT_SECRET=…
 OAUTH_CALLBACK_URL=http://localhost:3000/auth/callback
-DBMS_URL=jdbc:pgsql://localhost:5432/jermain
+DBMS_URL=jdbc:postgresql://localhost:5432/jermain
 TEACHER_EMAILS=you@athenian.org
 SLIDES_VARIABLE_NAME=jermain
 ALLOW_SLIDE_ACCESS=true

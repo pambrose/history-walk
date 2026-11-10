@@ -33,7 +33,7 @@ Put your settings in `.env` at the top of the repository (it is gitignored; see 
 GOOGLE_CLIENT_ID=….apps.googleusercontent.com
 GOOGLE_CLIENT_SECRET=…
 OAUTH_CALLBACK_URL=http://localhost:3000/auth/callback
-DBMS_URL=jdbc:pgsql://localhost:5432/jermain
+DBMS_URL=jdbc:postgresql://localhost:5432/jermain
 TEACHER_EMAILS=you@athenian.org
 ```
 
@@ -82,9 +82,10 @@ The server reads its settings from environment variables at startup. The
 | `SHOW_RESET_BUTTON` | `false` | `true` gives teachers a **reset** link for their own walk |
 | `ALLOW_SLIDE_ACCESS` | `false` | `true` lets teachers open `/slides` and jump to any slide |
 | `DISPLAY_CONSECUTIVE_CORRECT_DECISIONS` | `true` | `false` hides the *Consecutive Correct Decisions* line on every page |
-| `DATABASE_URL` | none | A platform's Postgres URL, such as Railway's `${{Postgres.DATABASE_URL}}`; wins over the `DBMS_*` settings. Not encrypted, so keep it on the platform's private network |
+| `DATABASE_URL` | none | A platform's Postgres URL, such as Railway's `${{Postgres.DATABASE_URL}}`; wins over the `DBMS_*` settings. Not encrypted unless its query string sets `sslmode`, so keep it on the platform's private network |
 | `DBMS_NAME` | none | With `DATABASE_URL`: the walk's database on that server, when it isn't the one the URL names |
-| `DBMS_URL` | `jdbc:pgsql://localhost:5432/historywalk` | The database, for the pgjdbc-ng driver: `jdbc:pgsql:`, not `jdbc:postgresql:` |
+| `DBMS_QUERY_PATH` | none | With `DATABASE_URL`: the driver's parameters, such as `sslmode=require`, in place of the URL's query string |
+| `DBMS_URL` | `jdbc:postgresql://localhost:5432/historywalk` | The database, as a PostgreSQL JDBC URL; not encrypted unless it sets `sslmode` |
 | `DBMS_USERNAME` | `postgres` | The database user |
 | `DBMS_PASSWORD` | `docker` | That user's password |
 | `CLIENT_VERSION_CHECK_INTERVAL_SECS` | `60` | How often an open page asks whether its version is current |

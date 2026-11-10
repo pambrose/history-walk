@@ -24,7 +24,6 @@ mockk = "1.14.11"
 testcontainers = "2.0.5"
 logging = "8.0.4"
 pgsql = "42.7.14"
-pgjdbc = "0.8.9"
 utils = "5.2.0"
 
 [plugins]
@@ -93,7 +92,6 @@ common-utils-exposed ={ group = "com.pambrose.common-utils", name = "exposed-uti
 #history-walk-slides = { group = "com.github.pambrose", name = "history-walk-slides", version.ref = "slides" }
 
 postgresql = { group = "org.postgresql", name = "postgresql", version.ref = "pgsql" }
-pgjdbc-ng = { group = "com.impossibl.pgjdbc-ng", name = "pgjdbc-ng-all", version.ref = "pgjdbc" }
 hikariCP = { group = "com.zaxxer", name = "HikariCP", version.ref = "hikari" }
 
 # Database

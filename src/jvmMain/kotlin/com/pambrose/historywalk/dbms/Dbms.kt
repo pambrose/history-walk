@@ -89,7 +89,7 @@ object Dbms {
     )
   }
 
-  private fun hikari(config: ApplicationConfig) =
+  private fun hikari(config: ApplicationConfig): HikariDataSource =
     HikariConfig()
       .apply {
         val containerDbmsUrl = System.getenv("DATABASE_URL").orEmpty()
@@ -99,6 +99,7 @@ object Dbms {
             ContainerDatabaseUrl.parse(
               databaseUrl = containerDbmsUrl,
               dbNameOverride = EnvVar.DBMS_NAME.getEnv(""),
+              queryPathOverride = EnvVar.DBMS_QUERY_PATH.getEnv(""),
             )
           logger.info { "Container database: ${database.description}" }
 
@@ -108,13 +109,13 @@ object Dbms {
         } else {
           username = EnvVar.DBMS_USERNAME.getEnv(Property.DBMS_USERNAME.getRequiredProperty())
           password = EnvVar.DBMS_PASSWORD.getEnv(Property.DBMS_PASSWORD.getRequiredProperty())
-          jdbcUrl = EnvVar.DBMS_URL.getEnv(Property.DBMS_URL.getRequiredProperty())
+          jdbcUrl = requirePgjdbcUrl(EnvVar.DBMS_URL.getEnv(Property.DBMS_URL.getRequiredProperty()))
         }
 
         driverClassName = EnvVar.DBMS_DRIVER_CLASSNAME.getEnv(Property.DBMS_DRIVER_CLASSNAME.getRequiredProperty())
+        unencryptedUnlessAsked()
         maximumPoolSize = Property.DBMS_MAX_POOL_SIZE.getRequiredProperty().toInt()
 
-        // isAutoCommit = false
         transactionIsolation = "TRANSACTION_REPEATABLE_READ"
         maxLifetime = Property.DBMS_MAX_LIFETIME_MINS
           .getRequiredProperty()
@@ -122,6 +123,21 @@ object Dbms {
           .minutes.inWholeMilliseconds
         validate()
       }.let { HikariDataSource(it) }
+
+  // pgjdbc tries SSL first when a URL sets no sslmode (prefer). The connection stays unencrypted unless the URL asks
+  // (sslmode=require), as it was under pgjdbc-ng, which suits a platform's private network: this is a driver property,
+  // and pgjdbc lets a URL's own parameters win over those.
+  internal fun HikariConfig.unencryptedUnlessAsked() = addDataSourceProperty("sslmode", "disable")
+
+  // DBMS_URL took pgjdbc-ng's jdbc:pgsql: scheme until the app moved to pgjdbc, which would refuse it with a message that
+  // repeats the URL. The URL may hold a password, so this names only the scheme.
+  internal fun requirePgjdbcUrl(jdbcUrl: String): String =
+    jdbcUrl.also {
+      require(!it.trim().startsWith("jdbc:pgsql:")) {
+        "DBMS_URL starts with jdbc:pgsql:, the scheme of the pgjdbc-ng driver, which History Walk no longer uses. " +
+          "Write it as jdbc:postgresql://host:port/database, with any ssl.mode=... parameter as sslmode=..."
+      }
+    }
 
   suspend fun <T> dbQuery(block: JdbcTransaction.() -> T): T =
     withContext(Dispatchers.IO) {

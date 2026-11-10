@@ -4,7 +4,8 @@ name: Clean Up Workflow Runs
 # recent run of each workflow whatever its age, so a workflow that has not run for a month still has its last run to
 # compare its next failure against. The runs' artifacts expire by themselves after 30 days (retention-days in each
 # workflow's upload step). A run still in progress is never deleted. Runs of a workflow whose file has been removed are deleted whatever
-# their age. Run it by hand with dry_run to list what it would delete.
+# their age. It also deletes the old Trivy vulnerability databases from the Actions cache. Run it by hand with dry_run to
+# list what it would delete.
 on:
   schedule:
     - cron: '0 10 * * 1'
@@ -27,10 +28,37 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
-      actions: write # to delete workflow runs
+      actions: write # to delete workflow runs and caches
     steps:
       - uses: Mattraks/delete-workflow-runs@b3018382ca039b53d238908238bd35d1fb14f8ee # v2.1.0
         with:
           retain_days: 30
           keep_minimum_runs: 1
           dry_run: ${{ inputs.dry_run == true }}
+
+      # trivy-action (security.yml) saves about 1 GB under a new cache-trivy-YYYY-MM-DD key each day it scans, and a scan
+      # starts from only the newest of them, so the older ones would crowd master's Gradle caches out of GitHub's 10 GB
+      # limit. The Monday scan runs before this, so the database kept is the one it saved. Cache keys are untrusted, since
+      # a fork's pull request can save one under any name on its own ref: the one kept is chosen from master's caches
+      # alone, and each is deleted by its numeric id, read from a record in which @tsv escapes any tab or newline. bash,
+      # for pipefail, so a failed listing fails the step rather than piping nothing to jq.
+      - name: Delete every saved Trivy database but master's newest
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          DRY_RUN: ${{ inputs.dry_run == true }}
+        run: |
+          caches=$(gh cache list --key cache-trivy- --limit 1000 --json id,key,ref)
+          newest=$(jq -r 'map(select(.ref == "refs/heads/master").key) | max // empty' <<< "$caches")
+          echo "Keeping ${newest:-no Trivy database}"
+          jq -r --arg newest "$newest" \
+            '.[] | select(.ref != "refs/heads/master" or .key != $newest) | [.id, .key, .ref] | @tsv' <<< "$caches" |
+            while IFS=$'\t' read -r id key ref; do
+              if [ "$DRY_RUN" = true ]; then
+                echo "Would delete $key on $ref ($id)"
+              else
+                echo "Deleting $key on $ref ($id)"
+                gh cache delete "$id" || echo "::warning::Could not delete $key ($id)"
+              fi
+            done
