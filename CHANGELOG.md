@@ -6,6 +6,16 @@ All notable changes to History Walk are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- `make railway-versions`, which runs `make served-version` for each walk on Railway, showing the client bundle version
+  each serves beside this checkout's version.
+
+### Changed
+
+- `make served-version` without `ORIGIN_URL` shows only the bundle `PUBLIC_URL` serves, as "The served bundle", and
+  says nothing of Cloudflare; with `ORIGIN_URL` it compares Cloudflare's bundle with the origin's as before.
+
 ## [1.2.1] - 2026-11-10
 
 Nothing changes in the app: this release is the docs and the repository.

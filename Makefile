@@ -32,8 +32,9 @@ VERSION_RE   = $(subst .,\.,$(VERSION))
 # Where make release writes VERSION's section of RELEASE_NOTES.md, the GitHub release's notes
 RELEASE_NOTES_FILE = build/release-notes-$(VERSION).md
 
-# The addresses `make served-version` compares: the app as Cloudflare serves it, and the deployment behind it (the
-# origin), e.g. make served-version PUBLIC_URL=https://walk.example.org ORIGIN_URL=https://<service>.up.railway.app
+# The addresses `make served-version` reads: the app as its users reach it, and, for one behind Cloudflare, the
+# deployment behind it (the origin), e.g. make served-version PUBLIC_URL=https://walk.example.org
+# ORIGIN_URL=https://<service>.up.railway.app. Without ORIGIN_URL it shows only PUBLIC_URL's bundle.
 PUBLIC_URL   ?=
 ORIGIN_URL   ?=
 
@@ -61,7 +62,7 @@ ZENSICAL     := $(abspath website/.venv/bin/zensical)
 		format zizmor ci docker-build docker-push _docker-push docker-run docker-smoke release-check release \
 		_confirm-release railway-restart railway-redeploy log log-jermain log-moses _follow-log website-env website-serve \
 		website-build website-clean upgrade-site versions versions-all depends yarn-unlock upgrade-wrapper \
-		served-version
+		railway-versions served-version
 
 ##@ General
 
@@ -416,6 +417,17 @@ railway-redeploy: ## Redeploy Jermain and Moses on Railway from the newest Docke
 		echo " $$v"; \
 	done
 
+# Runs make served-version for each of RAILWAY_URLS, as PUBLIC_URL with no ORIGIN_URL (Railway serves the walks
+# directly), so it shows the client bundle each walk serves next to this checkout's VERSION. Checks every walk, then
+# fails if any one failed. Needs only curl.
+railway-versions: ## Show the client bundle version each Railway walk serves (make served-version for each)
+	@failed=; \
+	for u in $(RAILWAY_URLS); do \
+		echo "=== $$u"; \
+		$(MAKE) --no-print-directory served-version PUBLIC_URL="$$u" ORIGIN_URL= || failed="$$failed $$u"; \
+	done; \
+	[ -z "$$failed" ] || { echo "railway-versions: served-version failed for$$failed" >&2; exit 1; }
+
 # Fetches the most recent LOG_LINES lines of each walk's deployment log, the server's own output: its startup lines (the
 # deck it serves, the database, the migrations), sign-ins, and errors. make log-jermain and make log-moses follow one.
 log: ## Show the last LOG_LINES (100) lines of each walk's Railway log; SERVICE=Moses for one walk
@@ -463,26 +475,34 @@ _follow-log:
 
 ##@ Cloudflare
 
-# Shows the client bundle's version as the deployment (ORIGIN_URL) serves it and as Cloudflare (PUBLIC_URL) serves it,
-# with Cloudflare's cf-cache-status. The version is the line App.start() logs, "History Walk version VERSION - release
-# date". It fails when Cloudflare serves another bundle than the origin, or caches the bundle, which a deploy then does
-# not replace: purge PUBLIC_URL/main.bundle.js in Cloudflare (see AGENTS.md). It fetches with GET, not HEAD.
+# Shows the client bundle's version as PUBLIC_URL serves it, beside this checkout's VERSION, and fails when it finds
+# none. The version is the line App.start() logs, "History Walk version VERSION - release date". It fetches with GET,
+# not HEAD. With ORIGIN_URL, PUBLIC_URL is the address Cloudflare serves and ORIGIN_URL the deployment behind it: it
+# shows both bundles and Cloudflare's cf-cache-status, and also fails when Cloudflare serves another bundle than the
+# origin, or caches the bundle, which a deploy then does not replace: purge PUBLIC_URL/main.bundle.js in Cloudflare.
+# Without ORIGIN_URL it says nothing of Cloudflare, and shows a cf-cache-status only when the response carries one; a
+# caching one (Cloudflare in front after all) still fails.
 BUNDLE_VERSION_RE = History Walk version [0-9]+\.[0-9]+\.[0-9]+ - [^"]+
-served-version: ## Show the bundle version the origin and Cloudflare serve; fails if they differ or Cloudflare caches it
+served-version: ## Show the bundle version PUBLIC_URL serves; with ORIGIN_URL, check Cloudflare serves the origin's
 	@[ -n "$(PUBLIC_URL)" ] || { echo "Set PUBLIC_URL (and ORIGIN_URL), e.g. make served-version PUBLIC_URL=https://walk.example.org ORIGIN_URL=https://<service>.up.railway.app" >&2; exit 1; }
 	@problems=0; problem() { echo "  - $$1" >&2; problems=$$((problems + 1)); }; \
 	served() { curl -sS --compressed -m 30 -D - "$$1/main.bundle.js" \
 		| LC_ALL=C grep -aoiE '^cf-cache-status: [a-z]+|$(BUNDLE_VERSION_RE)'; }; \
 	version() { grep -iv '^cf-cache-status' | head -1; }; \
 	echo "This checkout:       $(VERSION)"; \
+	origin=; \
 	if [ -n "$(ORIGIN_URL)" ]; then \
 		origin=$$(served "$(ORIGIN_URL)" | version); \
 		echo "The origin's bundle: $${origin:-not found}"; \
-	else origin=; echo "The origin's bundle: (set ORIGIN_URL to compare)"; fi; \
+	fi; \
 	fetched=$$(served "$(PUBLIC_URL)"); \
 	public=$$(echo "$$fetched" | version); \
 	cached=$$(echo "$$fetched" | sed -n 's/^[Cc][Ff]-[Cc][Aa][Cc][Hh][Ee]-[Ss][Tt][Aa][Tt][Uu][Ss]: //p'); \
-	echo "Cloudflare's bundle: $${public:-not found} (cf-cache-status: $${cached:-none})"; \
+	if [ -n "$(ORIGIN_URL)" ]; then \
+		echo "Cloudflare's bundle: $${public:-not found} (cf-cache-status: $${cached:-none})"; \
+	else \
+		echo "The served bundle:   $${public:-not found}$${cached:+ (cf-cache-status: $$cached)}"; \
+	fi; \
 	[ -n "$$public" ] || problem "found no version in $(PUBLIC_URL)/main.bundle.js"; \
 	[ -z "$$origin" ] || [ -z "$$public" ] || [ "$$origin" = "$$public" ] \
 		|| problem "Cloudflare serves another bundle than the origin: purge $(PUBLIC_URL)/main.bundle.js in Cloudflare"; \

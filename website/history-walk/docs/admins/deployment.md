@@ -52,6 +52,9 @@ A Railway service runs the same jar or image with the same variables:
   it has). Run it after `make release`. It first reads the version of the image it will pull (the version label on
   `pambrose/history-walk:latest`), and notes when that isn't the version in `gradle.properties` (a release not yet
   published). It then waits, up to five minutes each, until each walk's `/version` reports that version.
+- `make railway-versions` runs `make served-version` for each walk (`RAILWAY_URLS`), showing the client bundle version
+  it serves beside the version in `gradle.properties`, and fails if a walk's bundle can't be read. It needs only
+  `curl`, not the Railway CLI.
 - `make log` prints the last 100 lines of each walk's log; `SERVICE=` picks one walk and `LOG_LINES=` sets the count.
   `make log-jermain` and `make log-moses` follow one walk's log like `tail -f`. See
   [Monitoring and troubleshooting](troubleshooting.md#logs).
