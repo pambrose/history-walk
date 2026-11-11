@@ -48,3 +48,7 @@ There are two walks, each served by its own copy of the app:
   [student view](teachers/student-view.md).
 
 What changed in each release, for teachers and for administrators, is in the [release notes](release-notes.md).
+
+A question this guide doesn't seem to answer? The chat button at the bottom right of every page opens an assistant
+that answers from this guide and the app's source. It can be wrong, so check its answer against the page it points
+to. What you type is sent to [Context7](https://context7.com), which runs it, so leave out students' names.
