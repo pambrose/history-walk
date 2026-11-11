@@ -6,6 +6,10 @@ All notable changes to History Walk are recorded here. The format follows
 
 ## [Unreleased]
 
+## [1.2.1] - 2026-11-10
+
+Nothing changes in the app: this release is the docs and the repository.
+
 ### Added
 
 - The docs site has a Context7 chat widget on every page, a floating button that opens an assistant answering from the
@@ -261,7 +265,8 @@ the original classroom app; [History](#history) at the end tells the story in or
   CI (#5, #7); five waves of fixes from a code review of 24 issues (#9–#12, #14); the admin page's student view
   (#13); `make docker-push` and version 1.1.0 (#16); and the documentation site (#17).
 
-[Unreleased]: https://github.com/pambrose/history-walk/compare/1.2.0...HEAD
+[Unreleased]: https://github.com/pambrose/history-walk/compare/1.2.1...HEAD
+[1.2.1]: https://github.com/pambrose/history-walk/compare/1.2.0...1.2.1
 [1.2.0]: https://github.com/pambrose/history-walk/compare/1.1.3...1.2.0
 [1.1.3]: https://github.com/pambrose/history-walk/compare/1.1.2...1.1.3
 [1.1.2]: https://github.com/pambrose/history-walk/compare/1.1.1...1.1.2

@@ -1,5 +1,34 @@
 # Release notes
 
+## History Walk 1.2.1 — 2026-11-10
+
+A release of the guide, not the app: nothing changes in the walk for teachers or students, or in how it is run.
+
+### For teachers
+
+- **Ask the guide a question.** Every page of the [guide](https://pambrose.github.io/history-walk/) has a blue chat
+  button at the bottom right. It opens an assistant, run by Context7, that answers from this guide and the app's
+  source. Check what it says against the pages it points to, and don't type students' names or other private details
+  into it: what you type is sent to Context7.
+
+### For administrators
+
+- **No change to the app.** No new settings, no database changes, and the page's interface with the server is
+  unchanged, so open pages aren't asked to reload. Deploying 1.2.1 is optional: `make railway-redeploy` deploys both
+  walks from the new image and waits until each reports 1.2.1.
+- **The guide no longer describes a Cloudflare setup**, since the walks are served from Railway directly. The caching
+  notes speak of browsers and any cache in front of a walk. `make served-version` remains for a deployment behind
+  Cloudflare.
+
+### For contributors
+
+- The docs site's template override, `website/history-walk/overrides/main.html` (`custom_dir` in `zensical.toml`),
+  adds the chat widget to every page, in the theme's primary blue.
+- Files nothing used are gone: `heroku.md`, `app.json`, `.gettext.json`, the `notes/` folder, and the
+  `handlebars.js` and `moment.js` webpack configs from the KVision project template.
+
+**Full Changelog**: <https://github.com/pambrose/history-walk/compare/1.2.0...1.2.1>
+
 ## History Walk 1.2.0 — 2026-11-10
 
 A release for administrators: a new database driver, and an image checked for known vulnerabilities. Nothing changes
