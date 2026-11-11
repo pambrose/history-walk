@@ -12,6 +12,11 @@ All notable changes to History Walk are recorded here. The format follows
   speak of browsers and any cache in front of a walk, and the steps for checking and purging Cloudflare after a deploy
   are gone. `make served-version` remains in the Makefile for a deployment behind Cloudflare.
 
+### Removed
+
+- Leftover files that nothing uses: `heroku.md` (the old Heroku settings), `app.json` (Heroku's app manifest), and
+  `.gettext.json` (KVision's translation extractor config, from the project template; the app has no translations).
+
 ## [1.2.0] - 2026-11-10
 
 ### Added
