@@ -16,6 +16,8 @@ All notable changes to History Walk are recorded here. The format follows
 
 - Leftover files that nothing uses: `heroku.md` (the old Heroku settings), `app.json` (Heroku's app manifest), and
   `.gettext.json` (KVision's translation extractor config, from the project template; the app has no translations).
+- The `notes/` folder (manual steps for a local Postgres, which `make db` replaced) and two webpack configs from the
+  project template, `handlebars.js` and `moment.js`, for libraries the client doesn't use.
 
 ## [1.2.0] - 2026-11-10
 
