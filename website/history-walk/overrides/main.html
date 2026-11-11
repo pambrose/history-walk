@@ -1,0 +1,16 @@
+{#-
+  Extends the theme's base template on every page (custom_dir = "overrides" in zensical.toml).
+
+  Adds the Context7 chat widget after the theme's own scripts: a floating button that opens an assistant answering
+  from the History Walk repository, these docs included, indexed on Context7 as /pambrose/history-walk. It is a script
+  tag rather than an extra_javascript entry, since extra_javascript can't carry the data-library attribute.
+
+  data-color is the theme's primary blue (--md-primary-fg-color for primary = "blue" in zensical.toml); change the two
+  together.
+-#}
+{% extends "base.html" %}
+
+{% block scripts %}
+  {{ super() }}
+  <script src="https://context7.com/widget.js" data-library="/pambrose/history-walk" data-color="#2094f3"></script>
+{% endblock %}

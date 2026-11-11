@@ -6,6 +6,11 @@ All notable changes to History Walk are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- The docs site has a Context7 chat widget on every page, a floating button that opens an assistant answering from the
+  repository and its docs (`website/history-walk/overrides/main.html`).
+
 ### Changed
 
 - The docs no longer describe a Cloudflare setup, since the walks are served from Railway directly: the caching notes
