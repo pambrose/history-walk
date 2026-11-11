@@ -7,6 +7,7 @@ This site is built with [Zensical](https://zensical.org) from Markdown files in 
 | `website/pyproject.toml` | The Python project that installs Zensical (`uv sync` installs it into `website/.venv`). |
 | `website/history-walk/zensical.toml` | The site's settings: its name, navigation, theme, and Markdown extensions. |
 | `website/history-walk/docs/` | The pages: `teachers/` and `admins/`. |
+| `website/history-walk/overrides/` | Template overrides (`custom_dir` in `zensical.toml`). `main.html` adds the Context7 chat widget to every page. |
 
 ## Previewing and building
 
@@ -53,6 +54,11 @@ Custom domain**, and change `site_url` to match.
   toggle in the header switches to light. The browser remembers the choice.
 - The pages use admonitions (`!!! note`), collapsible questions (`??? question`), tables, and Mermaid diagrams; see
   Zensical's authoring docs for the syntax.
+- Every page carries the [Context7](https://context7.com) chat widget: a floating button at the bottom right that opens
+  an assistant answering questions from the History Walk repository, these docs included, which Context7 indexes as
+  `/pambrose/history-walk`. It is the `<script>` tag in `overrides/main.html`; its optional `data-*` attributes set the
+  color, position, size, and opening message. The assistant knows only what Context7 last indexed, so it can lag a
+  change.
 
 When the app changes in a way a teacher or an administrator would notice, update the page that describes it in the
 same pull request.

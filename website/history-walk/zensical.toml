@@ -45,6 +45,8 @@ nav = [
 
 [project.theme]
 language = "en"
+# overrides/main.html extends the theme's template on every page, adding the Context7 chat widget.
+custom_dir = "overrides"
 features = [
   "content.code.copy",
   "content.tabs.link",
