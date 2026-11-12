@@ -365,7 +365,11 @@ scans the client's npm lock the same way, since the image scan cannot see inside
 fixable HIGH or CRITICAL vulnerability, and is a release check too. A finding is fixed by a fresh resolution (move
 `.kotlin-js-store/yarn.lock` aside, then `make yarn-unlock`; a plain `make yarn-unlock` keeps every unchanged
 resolution) or, past a dependency's range, a Yarn resolution in `build.gradle.kts` (`serialize-javascript` is pinned to
-7 for mocha that way). `rootPackageJson` does not see a changed resolution, so delete `build/js` before re-locking; `zizmor.yml` audits
+7 for mocha that way, and mocha's `diff`, `glob`, and `minimatch` and karma-webpack's `minimatch` to their patched
+majors). A path-specific resolution needs a `**/` prefix (`**/mocha/glob`): Kotlin installs through Yarn workspaces, so
+mocha sits under a workspace package, and a bare `mocha/glob` matches nothing, though it still adds a lock entry; check
+`build/js/node_modules` after re-locking. `rootPackageJson` does not see a changed resolution, so delete `build/js`
+before re-locking; `zizmor.yml` audits
 `.github` changes; `lint.yml` runs `make lint`; `dependency-graph.yml` submits `jvmRuntimeClasspath` so Dependabot sees
 the JVM libraries; `cleanup-runs.yml` deletes runs older than 30 days every Monday, keeping each workflow's most recent
 run (uploaded reports expire after 30 days, `retention-days`), and every Trivy database in the Actions cache but

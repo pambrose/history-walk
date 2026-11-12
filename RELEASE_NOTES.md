@@ -62,7 +62,8 @@ releases. Administrators: back up both databases and check the settings before d
       production.
     - A server error no longer shows its details in the browser.
     - The image's user can't rewrite the app's jar.
-    - The page's npm packages are locked and scanned for vulnerabilities, like the image's libraries.
+    - The page's npm packages are locked and scanned for vulnerabilities, like the image's libraries, and have no known
+      vulnerability left at any severity.
 - **Releases:**
     - `make release` pushes the image it just tested.
     - `make release-github` finishes a release that stopped after pushing its image.
