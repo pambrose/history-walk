@@ -100,10 +100,21 @@ All notable changes to History Walk are recorded here. The format follows
 - `/version` ends with when the server started, and `make railway-restart` waits for it to change, rather than taking
   the answer of the process being replaced for the restarted one.
 
+- The server listens on the platform's `PORT` when it sets one, else 8080 (`application.yaml`), so the image no longer
+  depends on the platform targeting 8080. A `-port=` argument still wins.
+- `make ci` also builds the docs site strictly, as the Website workflow does.
+- `AGENTS.md`, `llms.txt`, and the admin docs no longer describe a start command the Railway services don't use, a
+  Website workflow narrower than it is, or a deck that needs exactly one success slide; build and workflow comments name
+  the real sources of the Gradle deprecation warning and the real cancellation rule, and why Kotlin and KSP are held.
+
 ### Removed
 
 - The stale `kotlin-js-store` line in `.gitignore`.
 - Two unused Jermain text constants and a commented-out choice.
+- Dead code: `Dbms.dbQuery`, the never-read `historywalk.site.googleAnalyticsId` property, `User`'s instance API (its
+  database-reading constructor, `toUser`, `deleteUser`, which logged the user's address, and `userExists`, with the two
+  tests that tested only them), `DbmsTxs.MaxDeadEndDate`, the `PipelineCall` typealias, an unused `EntityID.toUuid`,
+  `SlideData.hasParents` and `hasOneParent`, and commented-out code.
 
 ## [1.2.1] - 2026-11-10
 

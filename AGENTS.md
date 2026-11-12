@@ -24,7 +24,8 @@ make coverage           # the tests plus Kover reports of the JVM code (build/re
 ./gradlew jvmTest --tests 'com.pambrose.historywalk.auth.AuthRoutesTest'   # one JVM spec (a client run is always whole)
 make lint               # kotlinter (./gradlew lintKotlin); make format fixes what it can
 make zizmor             # audit .github (workflows, dependabot.yml) as the zizmor workflow does
-make ci                 # every CI gate but the Trivy scan: lint, zizmor, JVM and client tests, docker-build, docker-smoke
+make ci                 # every CI gate but the Trivy scans: lint, zizmor, website-build, JVM and client tests, docker-build,
+                        # docker-smoke
 make build              # clean + fat jar at build/libs/history-walk.jar (server + bundled JS client; no version)
 make docker-build       # fat jar, then image history-walk:<version>; make docker-run runs it with .env against make db
 make docker-push        # fat jar, then buildx pushes pambrose/history-walk:<version> and :latest (amd64, arm64) to Docker Hub
@@ -377,7 +378,8 @@ versions` lists the rest). `.gitignore` ignores dot-directories, so `.github/` i
 `.kotlin-js-store/yarn.lock`, the client's npm lock: `build.gradle.kts` sets the Yarn plugin to fail a build whose
 resolved packages differ from it, or that finds none, so CI builds the bundle a release ships. After changing a Kotlin/JS
 or npm dependency, run `make yarn-unlock` and commit the rewritten lock with the change. `make ci` runs
-the same gates locally, except the Trivy scan, which runs only in CI. `koverVerify` (in `tests.yml`, `make ci`, and `make coverage`) fails when the JVM line coverage
+the same gates locally (the docs site's strict build included), except the two Trivy scans, which run only in CI.
+`koverVerify` (in `tests.yml`, `make ci`, and `make coverage`) fails when the JVM line coverage
 that `koverLog` prints falls under the floor in `build.gradle.kts`'s `kover` block (90%, about 91.8% today): a ratchet,
 so raise it as coverage grows and never lower it to let a change through. The lint and format tasks skip
 `build/generated` by path (see `build.gradle.kts`); the slide decks' text constants are SCREAMING_SNAKE_CASE, as
@@ -399,8 +401,10 @@ ktlint's property-naming rule requires.
   checks the distribution's `distributionSha256Sum`; `make upgrade-wrapper` fetches the new one from Gradle. The docs
   site builds with `uv sync --locked`, and `website.yml` also runs when the Makefile changes. `/version` ends with the
   server's start (`Started: <instant>`), which `make railway-restart` waits on to change.
-- There is no Procfile: a deployment starts the fat jar with its own start command (Railway's service settings),
-  `java -jar build/libs/history-walk.jar -port=$PORT`, and the Docker image runs the same jar.
+- There is no Procfile. Both Railway services run the Docker image, whose `ENTRYPOINT` starts the jar with no
+  arguments; a host that builds from source starts `java -jar build/libs/history-walk.jar` itself. Either way the port
+  is the platform's `PORT` when it sets one, else 8080 (`application.yaml`, `"$PORT:8080"`), and a `-port=...`
+  argument wins over both.
 - `./gradlew jar` (what the Makefile runs) is Gradle's prefix match for `jarWithJs`, the Kilua RPC plugin's fat jar:
   Kotlin Multiplatform has no `jar` task. `build.gradle.kts` names it `history-walk.jar` with no version, so a version
   bump does not leave the Dockerfile or a deployment's start command pointing at a file the build no longer writes.

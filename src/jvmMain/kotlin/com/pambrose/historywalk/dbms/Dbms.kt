@@ -6,13 +6,10 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.server.config.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.flywaydb.core.Flyway
 import org.flywaydb.core.api.MigrationVersion
 import org.flywaydb.core.api.output.MigrateResult
 import org.jetbrains.exposed.v1.jdbc.Database
-import org.jetbrains.exposed.v1.jdbc.JdbcTransaction
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import javax.sql.DataSource
 import kotlin.time.Duration.Companion.minutes
@@ -161,11 +158,4 @@ object Dbms {
    * reused for [HEALTH_MAX_AGE] ([HealthCheck]), as `/health` is open to anyone.
    */
   suspend fun answers(): Boolean = healthCheck.answers()
-
-  suspend fun <T> dbQuery(block: JdbcTransaction.() -> T): T =
-    withContext(Dispatchers.IO) {
-      transaction {
-        block()
-      }
-    }
 }

@@ -34,12 +34,6 @@ data class SlideData(
   val failure: Boolean
     get() = !success && choices.isEmpty()
 
-  val hasParents: Boolean
-    get() = parentTitles.isNotEmpty()
-
-  val hasOneParent: Boolean
-    get() = parentTitles.size == 1
-
   /** The ancestor a go-back [choice] returns to: an offset of -1 is this slide's parent, -2 its grandparent, and so on. */
   fun goBackTarget(choice: SlideChoice): ParentTitle {
     val steps = abs(choice.offset)

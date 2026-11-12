@@ -27,10 +27,11 @@ Facts that are easy to get wrong:
   string. `ContainerDatabaseUrl` parses it, passes the query string to pgjdbc, and logs only `host:port/db as user`.
 - The connection is unencrypted unless the URL sets `sslmode` (`Dbms.unencryptedUnlessAsked` overrides pgjdbc's
   `prefer`), which suits a platform's private network.
-- A deployment starts the jar with its own start command, `java -jar build/libs/history-walk.jar -port=$PORT`; there is
-  no Procfile.
-- Releases: `make release-check` lists what stops one; `make release` runs every gate, pushes the image to Docker Hub,
-  and creates the GitHub release (tag `X.Y.Z`, title `vX.Y.Z`, notes from `RELEASE_NOTES.md`).
+- The Railway services run the Docker image; a host that builds from source starts
+  `java -jar build/libs/history-walk.jar`. The port is the platform's `PORT`, else 8080. There is no Procfile.
+- Releases: `make release-check` lists what stops one; `make release` runs every gate, pushes the image it tested to
+  Docker Hub, and creates the GitHub release (tag `X.Y.Z`, title `vX.Y.Z`, notes from `RELEASE_NOTES.md`);
+  `make release-github` finishes one that stopped after the push.
 - KSP is held at 2.3.12 (google/ksp#3286).
 
 ## Docs
@@ -54,6 +55,8 @@ Facts that are easy to get wrong:
 - [Slide decks](https://raw.githubusercontent.com/pambrose/history-walk/master/website/history-walk/docs/admins/slide-decks.md): the deck DSL and path names
 - [Monitoring and troubleshooting](https://raw.githubusercontent.com/pambrose/history-walk/master/website/history-walk/docs/admins/troubleshooting.md): health checks, log lines, and startup and build errors
 - [Development](https://raw.githubusercontent.com/pambrose/history-walk/master/website/history-walk/docs/admins/development.md): local setup, tests, and CI
+- [The docs site](https://raw.githubusercontent.com/pambrose/history-walk/master/website/history-walk/docs/admins/docs-site.md): building, previewing, and publishing this documentation
+- [Release notes](https://raw.githubusercontent.com/pambrose/history-walk/master/RELEASE_NOTES.md): what each release changed, for teachers and administrators
 
 ## Code
 

@@ -45,7 +45,7 @@ make db        # Postgres 18 in Docker, with the jermain and moses databases
 make server    # the server on :8080, rebuilt as you edit
 make client    # the page on :3000, with hot reload, proxying the server's routes; open http://localhost:3000
 make tests     # the JVM tests (Docker) and the client tests (Chrome)
-make ci        # every CI gate but the image scan: lint, zizmor, all tests, the Docker build, and its smoke test
+make ci        # every CI gate but the Trivy scans: lint, zizmor, the docs site, all tests, the Docker build and smoke test
 ```
 
 `make` alone lists every target. [AGENTS.md](AGENTS.md) is the detailed guide to the code, for people and coding
@@ -158,6 +158,7 @@ the service's custom start command):
 java -jar build/libs/history-walk.jar -port=$PORT
 ```
 
+The server listens on the platform's `PORT` when it sets one, else 8080 (`application.yaml`); `-port=` wins over both.
 A host that runs containers can run the image `make docker-push` publishes; the two Railway services do. The
 [deployment guide](https://pambrose.github.io/history-walk/admins/deployment/) covers both.
 

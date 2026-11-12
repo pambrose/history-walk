@@ -3,17 +3,13 @@ package com.pambrose.historywalk
 import com.pambrose.common.util.isNotNull
 import com.pambrose.common.util.obfuscate
 import com.pambrose.historywalk.PropertyNames.DBMS
-import com.pambrose.historywalk.PropertyNames.HISTORYWALK
-import com.pambrose.historywalk.PropertyNames.SITE
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.server.application.*
 import io.ktor.server.config.*
 import kotlin.concurrent.atomics.AtomicBoolean
 
 object PropertyNames {
-  const val HISTORYWALK = "historywalk"
   const val DBMS = "dbms"
-  const val SITE = "site"
 }
 
 enum class Property(
@@ -25,10 +21,6 @@ enum class Property(
     )
   },
 ) {
-  ANALYTICS_ID(
-    "$HISTORYWALK.$SITE.googleAnalyticsId",
-    { getPropertyOrNull(false) ?: UNASSIGNED },
-  ),
   KTOR_PORT("ktor.deployment.port"),
   KTOR_WATCH("ktor.deployment.watch"),
 
@@ -130,11 +122,6 @@ enum class Property(
     private fun notInitialized(prop: Property) = "Property ${prop.name} not initialized"
 
     fun Application.assignProperties() {
-      ANALYTICS_ID.setPropertyFromConfig(
-        this,
-        "",
-      )
-
       DBMS_DRIVER_CLASSNAME.setPropertyFromConfig(
         this,
         "org.postgresql.Driver",

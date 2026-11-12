@@ -28,7 +28,8 @@ slideDeck {
 ```
 
 - **`slide(...)`** takes an `id` (the number `/slides` lists), a `title`, the `content`, and optionally
-  `root = true` (the first slide; a deck has exactly one), `success = true` (the success slide; exactly one), and
+  `root = true` (the first slide; a deck has exactly one), `success = true` (the success slide; at least one, and a
+  second only logs a warning, since the class summary counts successes by the first one's title), and
   `displayTitle = false` (no title bar).
 - **`choice(text, slide)`** adds a button leading to a child slide. A slide may have only one parent: to reach the
   same text from two places, use `copyOf("another title")`, which makes a copy with its own title and path. Two
@@ -43,8 +44,9 @@ slideDeck {
   parent) without asking for a reason. The Jermain deck uses these to try another building in the same town.
 - **Images** go in `src/jvmMain/resources/static/images` and are referenced as `/static/images/<name>`.
 
-The deck refuses to load (and the server to start) without exactly one root slide and one success slide, or with a
-success slide that has choices.
+The deck refuses to load (and the server to start) without exactly one root slide, without a success slide, with a
+success slide that has choices, or with two choices on one slide that have the same text. More than one success slide
+loads, with a warning in the log.
 
 ## Slide identity: path names
 

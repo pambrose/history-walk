@@ -2,8 +2,6 @@ package com.pambrose.historywalk
 
 import com.pambrose.common.exposed.get
 import com.pambrose.common.util.*
-import com.pambrose.historywalk.Email.Companion.EMPTY_EMAIL
-import com.pambrose.historywalk.FullName.Companion.EMPTY_FULLNAME
 import com.pambrose.historywalk.Utils.toUuid
 import com.pambrose.historywalk.auth.Roles.roleFor
 import com.pambrose.historywalk.auth.SchoolConfig
@@ -18,86 +16,14 @@ import org.jetbrains.exposed.v1.core.*
 import org.jetbrains.exposed.v1.jdbc.*
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.*
-import kotlin.time.measureTime
 
-class User {
-  constructor(uuid: UUID, initFields: Boolean) {
-    this.uuid = uuid
-
-    if (initFields) {
-      measureTime {
-        transaction {
-          with(UsersTable) {
-            selectAll()
-              .where { id eq uuid }
-              .map { assignRowVals(it) }
-              .firstOrNull() ?: error("UserId not found: ${this@User.uuid}")
-          }
-        }
-      }.also { logger.debug { "Selected user info in $it" } }
-    }
-  }
-
-  private constructor(
-    uuid: UUID,
-    row: ResultRow,
-  ) {
-    this.uuid = uuid
-    // this.browserSession = browserSession
-    assignRowVals(row)
-  }
-
-  val uuid: UUID
-
-  // val browserSession: BrowserSession?
-  var userUuid: String = "-1"
-  var email: Email = EMPTY_EMAIL
-  var fullName: FullName = EMPTY_FULLNAME
-
-  private fun assignRowVals(row: ResultRow) {
-    userUuid = row[UsersTable.id].toString()
-    email = Email(row[UsersTable.email])
-    fullName = FullName(row[UsersTable.fullName])
-  }
-
-  fun deleteUser() {
-    logger.info { "Deleting User: $uuid $fullName" }
-    logger.info { "User Email: $email" }
-    logger.info { "uuid: $uuid" }
-
-    transaction {
-      with(UsersTable) {
-        deleteWhere { id eq userUuid.toUuid() }
-      }
-    }
-  }
-
-  override fun toString() = "User(uuid='$uuid', name='$fullName')"
-
+/**
+ * The users table's queries, by user. Signed-in users are known by their id (a UUID) and their lowercased address;
+ * nothing holds a user in memory between requests.
+ */
+class User private constructor() {
   companion object {
     private val logger = KotlinLogging.logger {}
-
-    fun UUID.toUser(): User =
-      User(
-        this,
-        true,
-      )
-
-    fun UUID.toUser(row: ResultRow): User =
-      User(
-        uuid = this,
-        row = row,
-      )
-
-    fun userExists(uuid: UUID) =
-      transaction {
-        with(UsersTable) {
-          select(Count(id))
-            .where { id eq uuid }
-            .map { it[0] as Long }
-            .first() > 0
-        }
-      }
 
     fun upsertFromGoogle(
       email: String,
@@ -230,33 +156,5 @@ class User {
   }
 }
 
-@JvmInline
-value class FullName(
-  val value: String,
-) {
-  fun isBlank() = value.isBlank()
-
-  override fun toString() = value
-
-  companion object {
-    val EMPTY_FULLNAME = FullName("")
-  }
-}
-
-@JvmInline
-value class Email(
-  val value: String,
-) {
-  fun isBlank() = value.isBlank()
-
-  fun isNotBlank() = value.isNotBlank()
-
-  override fun toString() = value
-
-  companion object {
-    val EMPTY_EMAIL = Email("")
-  }
-}
-
-const val UNKNOWN = "Unknown"
+// The value a setting's masked log line shows when it is not set (EnvVar.maskFunc, Property.maskFunc)
 const val UNASSIGNED = "unassigned"
