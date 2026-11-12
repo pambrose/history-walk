@@ -198,8 +198,8 @@ docker-run: docker-build ## Run the image on DOCKER_PORT with ENV_FILE (.env), a
 			$(DOCKER_IMAGE):$(VERSION)
 
 # Starts the image against a throwaway Postgres on a Docker network of its own and checks that it migrates the empty
-# database and answers: /ping, /version, the page shell's Cache-Control, the bundle, and a 401 for an RPC call without
-# a session. Sign-in needs real Google credentials only when someone signs in, so placeholders let the server start, and
+# database and answers: /ping, /version, /health (the database reached), the page shell's Cache-Control, the bundle, and
+# a 401 for an RPC call without a session. Sign-in needs real Google credentials only when someone signs in, so placeholders let the server start, and
 # a loopback callback URL means no SESSION_SECRET is required. Everything it starts is removed, pass or fail; on a
 # failure it prints the end of the server's log. The Docker Image workflow runs it too.
 SMOKE_NAME ?= history-walk-smoke
@@ -230,6 +230,7 @@ docker-smoke: ## Start the image (make docker-build first) against a throwaway P
 	done; \
 	[ -n "$$up" ] || fail "the server did not answer /ping"; \
 	curl -fsS $$url/version | grep -q "$(VERSION)" || fail "/version does not report $(VERSION)"; \
+	[ "$$(curl -fsS $$url/health || true)" = ok ] || fail "/health does not report the database answering"; \
 	curl -fsS -D - -o /dev/null $$url/ | grep -qi '^cache-control: no-cache, private' \
 		|| fail "the page shell is not sent with Cache-Control: no-cache, private"; \
 	curl -fsS -o /dev/null $$url/main.bundle.js || fail "main.bundle.js is not served"; \
@@ -359,7 +360,9 @@ versions-all: ## The plugin's full dependency report, up-to-date dependencies in
 depends: ## Print the dependency tree
 	$(GRADLE) dependencies
 
-yarn-unlock: ## Refresh the Kotlin/JS yarn lock file after npm dependency changes
+# The build fails when the client's resolved npm packages differ from .kotlin-js-store/yarn.lock (build.gradle.kts), so
+# after changing a Kotlin/JS or npm dependency, run this and commit the rewritten lock with the change.
+yarn-unlock: ## Rewrite the committed Kotlin/JS yarn lock after npm dependency changes (commit the result)
 	$(GRADLE) kotlinUpgradeYarnLock
 
 upgrade-wrapper: ## Upgrade the Gradle wrapper (pick the version with GRADLE_VERSION=x.y.z)

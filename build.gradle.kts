@@ -6,6 +6,9 @@ import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import dev.kilua.rpc.gradle.KiluaRpcExtension
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.targets.js.testing.KotlinJsTest
+import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnLockMismatchReport
+import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin
+import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension
 import org.jmailen.gradle.kotlinter.tasks.FormatTask
 import org.jmailen.gradle.kotlinter.tasks.LintTask
 import java.time.LocalDate
@@ -227,6 +230,18 @@ kotlin {
         // -PupdateSlidePaths=true makes SlidePathsTest rewrite the slide path-name snapshots instead of checking them.
         // Gradle does not pass its own -D options or properties on to the test JVM, so this one is passed explicitly.
         if (providers.gradleProperty("updateSlidePaths").orNull.toBoolean()) systemProperty("updateSlidePaths", "true")
+    }
+}
+
+// The client's npm packages (webpack, KVision's, the test runner's) are pinned by .kotlin-js-store/yarn.lock, which is
+// committed, so CI builds, tests, and scans the bundle a release ships rather than whatever each run resolves within the
+// semver ranges. A build whose resolved packages differ from the lock fails (the default), and so does one with no lock
+// to compare against; nothing rewrites the lock but `make yarn-unlock`, whose result is committed.
+plugins.withType<YarnPlugin> {
+    the<YarnRootExtension>().apply {
+        yarnLockMismatchReportProperty.set(YarnLockMismatchReport.FAIL)
+        reportNewYarnLockProperty.set(true)
+        yarnLockAutoReplaceProperty.set(false)
     }
 }
 

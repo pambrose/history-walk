@@ -28,6 +28,7 @@ import com.pambrose.historywalk.auth.teachersOnly
 import com.pambrose.historywalk.auth.userUuid
 import com.pambrose.historywalk.dbms.AdminTxs.clearTeacherWalks
 import com.pambrose.historywalk.dbms.AdminTxs.setTeachersSeeStudentView
+import com.pambrose.historywalk.dbms.Dbms
 import com.pambrose.historywalk.dbms.DbmsTxs.deleteChoices
 import com.pambrose.historywalk.dbms.DbmsTxs.updateLastSlide
 import com.pambrose.historywalk.slides.SlideDeck.Companion.ROOT
@@ -41,7 +42,6 @@ import io.ktor.server.http.content.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import io.ktor.server.util.*
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.io.ByteArrayOutputStream
 import java.lang.management.ManagementFactory
@@ -90,7 +90,7 @@ object Routes {
    * - the user's own reset, a POST for any signed-in user, sending a browser without a session to Google sign-in;
    * - the class pages, the admin page and its buttons, slide tools, and thread dump, for teachers only, refusing anyone
    *   else with 403 ([teachersOnly]);
-   * - health, version, and static content ([staticContent]), open to all.
+   * - `/ping`, `/health` (which checks the database), `/version`, and static content ([staticContent]), open to all.
    *
    * Sign-in, sign-out, the reset, and the teacher pages go out marked never to be stored ([noStore]), their redirects
    * and refusals included, so none of them outlives a sign-out on a shared computer. The page shell, the bundle, and
@@ -99,6 +99,7 @@ object Routes {
   fun Route.appRoutes(
     allowSlideAccess: Boolean = ALLOW_SLIDE_ACCESS.getEnv(false),
     findEmail: (UUID) -> String? = { User.emailForUuid(it) },
+    databaseAnswers: suspend () -> Boolean = { Dbms.answers() },
     teacherEmails: () -> Set<String> = { SchoolConfig.teacherEmails },
   ) {
     noStore {
@@ -170,13 +171,10 @@ object Routes {
 
           if (allowSlideAccess) {
             get("$SLIDE/{slideId}/{version?}") {
-              val slideId = call.parameters.getOrFail("slideId").toInt()
-              val version =
-                try {
-                  call.parameters.getOrFail("version").toInt()
-                } catch (e: Exception) {
-                  0
-                }
+              val slideId =
+                call.parameters["slideId"]?.toIntOrNull()
+                  ?: return@get call.respondText("Not a slide id", Plain, HttpStatusCode.BadRequest)
+              val version = call.parameters["version"]?.toIntOrNull() ?: 0
               val slide = masterSlides.findSlideById(slideId, version)
               if (slide != null) {
                 transaction {
@@ -203,8 +201,20 @@ object Routes {
       }
     }
 
+    // Whether the server is up, and nothing more: the image's health check, so a database outage does not have the
+    // platform restart a server that cannot fix it
     get("ping") {
       call.respondText("pong", Plain)
+    }
+
+    // Whether the server can reach the database, for an uptime monitor: "ok", or a 503 once a trivial query fails or
+    // takes longer than Dbms.HEALTH_TIMEOUT
+    get("health") {
+      call.response.cacheControl(CacheControl.NoStore(null))
+      if (databaseAnswers())
+        call.respondText("ok", Plain)
+      else
+        call.respondText("the database is not answering", Plain, HttpStatusCode.ServiceUnavailable)
     }
 
     get("version") {

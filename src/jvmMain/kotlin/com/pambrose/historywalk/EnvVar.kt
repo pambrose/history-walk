@@ -33,10 +33,65 @@ enum class EnvVar(
 
   fun getEnv(default: String) = System.getenv(name) ?: default
 
-  fun getEnv(default: Boolean) = System.getenv(name)?.toBoolean() ?: default
+  /** `true` or `false`, in any case; [default] when unset or blank. Anything else fails, naming the setting. */
+  fun getEnv(default: Boolean): Boolean = parseBoolean(name, getEnvOrNull(), default)
 
-  @Suppress("unused")
-  fun getEnv(default: Int) = System.getenv(name)?.toInt() ?: default
+  /** A whole number in [range]; [default] when unset or blank. Anything else fails, naming the setting and the range. */
+  fun getEnv(
+    default: Int,
+    range: IntRange,
+  ): Int = parseInt(name, getEnvOrNull(), default, range)
 
   fun getRequiredEnv() = getEnvOrNull() ?: error("Missing $name value")
+
+  companion object {
+    /**
+     * The boolean setting [name] holds as [raw]. `toBoolean()` took anything but `true` for false, so `1` or `yes`
+     * silently turned a setting off; such a value now stops the server at startup ([verifySettings]).
+     */
+    internal fun parseBoolean(
+      name: String,
+      raw: String?,
+      default: Boolean,
+    ): Boolean =
+      when (raw?.trim()?.lowercase()) {
+        null, "" -> default
+
+        "true" -> true
+
+        "false" -> false
+
+        else -> throw IllegalArgumentException(
+          "$name is \"$raw\": set it to true or false, or leave it unset for $default",
+        )
+      }
+
+    /** The number setting [name] holds as [raw], which must be a whole number in [range]. */
+    internal fun parseInt(
+      name: String,
+      raw: String?,
+      default: Int,
+      range: IntRange,
+    ): Int {
+      val text = raw?.trim().orEmpty()
+      if (text.isEmpty()) return default
+      return text.toIntOrNull()?.takeIf { it in range }
+        ?: throw IllegalArgumentException(
+          "$name is \"$raw\": set it to a whole number from ${range.first} to ${range.last}, or leave it unset for " +
+            "$default",
+        )
+    }
+  }
+}
+
+/**
+ * Fails startup, naming the setting, when a boolean or number setting holds a value it cannot use. Each is otherwise
+ * read only when first needed, a version-check setting at a page's first check, so a typo would surface only then, as
+ * a failure on every check, and a version-check interval of 0 would have every open page poll in a tight loop.
+ */
+fun verifySettings() {
+  listOf(EnvVar.SHOW_RESET_BUTTON, EnvVar.DISPLAY_CONSECUTIVE_CORRECT_DECISIONS, EnvVar.ALLOW_SLIDE_ACCESS)
+    .forEach { it.getEnv(false) }
+  ServerVersionCheck.versionCheckInterval
+  ServerVersionCheck.reloadWarningInterval
 }

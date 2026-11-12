@@ -28,7 +28,8 @@ make ci                 # every CI gate but the Trivy scan: lint, zizmor, JVM an
 make build              # clean + fat jar at build/libs/history-walk.jar (server + bundled JS client; no version)
 make docker-build       # fat jar, then image history-walk:<version>; make docker-run runs it with .env against make db
 make docker-push        # fat jar, then buildx pushes pambrose/history-walk:<version> and :latest (amd64, arm64) to Docker Hub
-make docker-smoke       # start the image against a throwaway Postgres and check /ping, /version, headers, the 401
+make docker-smoke       # start the image against a throwaway Postgres and check /ping, /version, /health, headers, the 401
+make yarn-unlock        # rewrite the committed Kotlin/JS yarn lock after an npm dependency change (commit the result)
 make railway-restart    # restart the Jermain and Moses services on Railway (railway CLI), then check /ping and /version
 make railway-redeploy   # redeploy both from the newest Docker Hub image (after a release), then wait for its version
 make railway-versions   # make served-version for each walk: the client bundle version it serves, beside VERSION
@@ -97,7 +98,7 @@ else refused. The role is recomputed from the live `TEACHER_EMAILS` on every req
   so route tests can run without a database.
 - `Routes.appRoutes` is the access map: RPC inside `signedInApi` (no session → 401), teacher pages (`/summary`, `/reasons`,
   `/admin` and its POSTs `/admin/view` and `/admin/clear`, `/slides`, `/threaddump`) inside `teachersOnly` (→ 403 for
-  students), `/ping`, `/version`, and `/static/*` open to all.
+  students), `/ping`, `/health`, `/version`, and `/static/*` open to all.
 - `/userreset` deletes the caller's own choices and is a POST, as `/logout` is (the client posts with
   `ClientUtils.postTo`); a GET or HEAD of either only redirects to `/`, since any link, image, or prefetch can send one.
 - Sign-in, sign-out, `/userreset`, and the teacher pages sit inside `noStore` (`RouteGuards.kt`), which sends
@@ -209,6 +210,24 @@ routes from `staticContent()`, so it would not notice `appRoutes` dropping that 
 shell, the bundle, and an image through `appRoutes`, and that the per-user routes (sign-in and sign-out, the reset, the
 teacher pages) go out `no-store, private` instead (see `noStore` under Sign-in).
 
+**Failures.** `Installs.installStatusPages` answers a request that throws: a `BadRequestException` is a 400 and a
+`NotFoundException` a 404. Anything else is a 503 when a `SQLException` is among its causes (`isDatabaseFailure`), else
+a 500, each logged at ERROR with the method and path (never the query string: a callback's carries Google's code and the
+state). It used to answer every failure with a 404 logged at INFO. `SessionValidation` reads the user on every request
+that carries a session, the page shell's included, so with the database down a signed-in browser gets a 503 for
+everything while a signed-out one still gets the page. The RPC calls never reach it: Kilua answers their failures
+itself. `/ping` touches neither the database nor a session and is the image's health check, so a database outage does
+not have the platform restart the server; `/health` runs `select 1` (`Dbms.answers`) and is a 503 when it fails or takes
+over `Dbms.HEALTH_TIMEOUT` (3 seconds), for an uptime monitor. `answersWithin` runs the probe on the IO dispatcher apart
+from the call, since JDBC cannot be interrupted and Hikari waits up to 30 seconds for a connection.
+
+**Settings.** `verifySettings` (`EnvVar.kt`, run from `Main.kt` beside `verifyAuthConfig`) stops startup, naming the
+setting, when a boolean setting is not `true` or `false` (any case; unset or blank is the default), or a version-check
+interval is not a whole number in its range (`ServerVersionCheck.VERSION_CHECK_INTERVAL_SECS`, 10–3600, and
+`RELOAD_WARNING_INTERVAL_SECS`, 0–3600). `toBoolean()` used to read `1` as false, and the intervals were read at a
+page's first check, where a typo failed every check and a 0 had every open page poll in a tight loop. The page has a
+floor of its own (`VersionCheckState.MIN_CHECK_INTERVAL`, 5 seconds), whatever the server answers.
+
 **Version check.** A page left open across a release keeps its old bundle, so `ClientVersionCheck` (started from
 `App.start()`) sends its `BuildConfig` versions to `IContentService.versionCheck` every
 `CLIENT_VERSION_CHECK_INTERVAL_SECS` (60). `ServerVersionCheck` compares only `apiVersion` (gradle.properties): on a
@@ -258,6 +277,10 @@ Kotest `StringSpec` on both targets. A spec in `src/commonTest` (`ReasonRuleTest
 - `UserResetTest` checks that a POST to `/userreset` needs a session and deletes only the caller's rows, and that a
   GET or HEAD deletes nothing. `NoStoreCachingTest` (no database: it stubs the class pages and the admin page with
   `mockkObject(Pages)`) checks the `no-store` header on every per-user route.
+- `StatusPagesTest` (no database: its `findUser` and `/health` probe follow a switch) checks that with the database down
+  every request of a signed-in browser is a 503 while a signed-out one still gets `/ping`, that a bug is a 500, a bad
+  request a 400, and a missing path still a 404, and that `/health` and `Dbms.answersWithin` report a database that
+  fails or hangs. `EnvVarTest` checks the strict reading of the boolean and number settings.
 - `SlideContentTest` walks both real decks from the root and fails on a path name that does not find its slide, a
   slide shared between two parents, a go-back past the root, a missing image, or a success slide whose title differs
   from the deck's (the summary page counts successes by that title).
@@ -299,11 +322,14 @@ private.
 **CI** (`.github/workflows`, all actions pinned to commit SHAs): `tests.yml`'s `test` job runs `jvmTest` with Kover and
 `jsTest` (the client specs, in the runner's Chrome) on pushes and pull requests to master; `docker.yml` runs `make
 docker-build` and `make docker-smoke`, which starts the image against a throwaway Postgres and checks `/ping`,
-`/version`, the page shell's `Cache-Control`, and a 401 for an unsigned RPC call; `security.yml` builds the image and
+`/version`, `/health`, the page shell's `Cache-Control`, and a 401 for an unsigned RPC call; `security.yml` builds the image and
 has Trivy scan it (the Alpine and JRE layers and the fat jar's libraries) on pushes and pull requests to master and every
 Monday, since the digest-pinned base means a new CVE changes nothing in the repository: a HIGH or CRITICAL vulnerability
 with a fix fails the job, master's and the weekly runs upload their findings to code scanning, and `make
-release-check` requires its `image-scan` to have passed for the release commit (`RELEASE_CHECKS`); `zizmor.yml` audits
+release-check` requires its `image-scan` to have passed for the release commit (`RELEASE_CHECKS`). Its `lock-scan` job
+scans the client's npm lock, which the image scan cannot see inside the webpacked bundle, and only reports (a table, and
+SARIF to code scanning off pull requests): the lock's findings, all in build and test tools, are issue 28 of
+`docs/code-review-2026-11-11.md`, and once they are fixed its `exit-code` becomes `'1'`; `zizmor.yml` audits
 `.github` changes; `lint.yml` runs `make lint`; `dependency-graph.yml` submits `jvmRuntimeClasspath` so Dependabot sees
 the JVM libraries; `cleanup-runs.yml` deletes runs older than 30 days every Monday, keeping each workflow's most recent
 run (uploaded reports expire after 30 days, `retention-days`), and every Trivy database in the Actions cache but
@@ -312,7 +338,10 @@ master's newest (about 1 GB each, one per day scanned); `website.yml` builds the
 (`https://pambrose.github.io/history-walk/`, which needs Settings → Pages → Source set to GitHub Actions).
 `dependabot.yml` proposes action updates and new digests for the Dockerfile's base image (pinned by digest, tag kept)
 weekly, 7 days after each release, but for the JVM libraries only security updates (`open-pull-requests-limit: 0`; `make
-versions` lists the rest). `.gitignore` ignores dot-directories, so `.github/` is re-included explicitly. `make ci` runs
+versions` lists the rest). `.gitignore` ignores dot-directories, so `.github/` is re-included explicitly, and so is
+`.kotlin-js-store/yarn.lock`, the client's npm lock: `build.gradle.kts` sets the Yarn plugin to fail a build whose
+resolved packages differ from it, or that finds none, so CI builds the bundle a release ships. After changing a Kotlin/JS
+or npm dependency, run `make yarn-unlock` and commit the rewritten lock with the change. `make ci` runs
 the same gates locally, except the Trivy scan, which runs only in CI. `koverVerify` (in `tests.yml`, `make ci`, and `make coverage`) fails when the JVM line coverage
 that `koverLog` prints falls under the floor in `build.gradle.kts`'s `kover` block (90%, about 91.8% today): a ratchet,
 so raise it as coverage grows and never lower it to let a change through. The lint and format tasks skip
@@ -323,6 +352,11 @@ ktlint's property-naming rule requires.
 
 - IntelliJ has twice auto-imported JDK-internal classes (`sun.jvmstat...`, `sun.jvm.hotspot.HelloWorld.e`) into Kotlin
   files, which breaks the build; delete such imports.
+- Adding a defaulted parameter to a function the JVM specs call (`Routes.appRoutes`, in the 2026-11-11 Wave 1) once
+  left Kotlin's incremental compile with test classes calling the old `$default` method. Dozens of specs failed with
+  `NoSuchMethodError`, and the build cache kept the stale output, so even `./gradlew clean` restored it and the
+  classes stayed up to date under `--no-build-cache`. `./gradlew compileTestKotlinJvm --rerun` recompiles them and
+  replaces the cached copy.
 - There is no Procfile: a deployment starts the fat jar with its own start command (Railway's service settings),
   `java -jar build/libs/history-walk.jar -port=$PORT`, and the Docker image runs the same jar.
 - `./gradlew jar` (what the Makefile runs) is Gradle's prefix match for `jarWithJs`, the Kilua RPC plugin's fat jar:

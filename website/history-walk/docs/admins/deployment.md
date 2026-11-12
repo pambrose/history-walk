@@ -11,7 +11,8 @@ Whatever the host, a new deployment needs:
   `SESSION_SECRET` (its own).
 - [ ] `SLIDES_VARIABLE_NAME` (`jermain` or `moses`) and `TEACHER_EMAILS`.
 - [ ] Its callback added to the Google client's authorized redirect URIs (see [Google sign-in](google-sign-in.md)).
-- [ ] A check after it starts: `/ping` answers `pong`, `/version` names the release, and a teacher can sign in.
+- [ ] A check after it starts: `/ping` answers `pong`, `/health` answers `ok`, `/version` names the release, and a teacher
+  can sign in.
 
 ## Building from the repository
 
@@ -74,7 +75,7 @@ The image holds a Java 25 JRE (Alpine) and the fat jar, nothing else, and runs i
 |---|---|
 | `make docker-build` | Builds the jar, then the image `history-walk:<version>` and `:latest`. |
 | `make docker-run` | Runs the image on port 8080 with `.env`, against the local `jermain` database from `make db` (`DOCKER_DB=moses` for the other; `DOCKER_PORT=8090` for another port). |
-| `make docker-smoke` | Starts the image against a throwaway Postgres and checks that it migrates an empty database and answers `/ping`, `/version`, the page, and a refused API call. CI runs it on every pull request. |
+| `make docker-smoke` | Starts the image against a throwaway Postgres and checks that it migrates an empty database and answers `/ping`, `/version`, `/health`, the page, and a refused API call. CI runs it on every pull request. |
 | `make docker-push` | Builds the jar, then builds the image for `linux/amd64` and `linux/arm64` and pushes `pambrose/history-walk:<version>` and `:latest` to Docker Hub. It asks before pushing; `docker login` once first. `DOCKER_REPO` and `DOCKER_PLATFORMS` override the repository and the platforms. |
 
 The image:

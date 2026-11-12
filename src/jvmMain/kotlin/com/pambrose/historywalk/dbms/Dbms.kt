@@ -6,8 +6,11 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.server.config.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import org.flywaydb.core.Flyway
 import org.flywaydb.core.api.MigrationVersion
 import org.flywaydb.core.api.output.MigrateResult
@@ -15,7 +18,9 @@ import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.JdbcTransaction
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import javax.sql.DataSource
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 object Dbms {
   private val logger = KotlinLogging.logger {}
@@ -145,6 +150,25 @@ object Dbms {
         "postgres://user:password@host:port/database URL goes in DATABASE_URL instead."
     }
     return url
+  }
+
+  /** How long `/health` waits for the database before it reports it down. */
+  val HEALTH_TIMEOUT = 3.seconds
+
+  /** Whether the database answers a trivial query within [HEALTH_TIMEOUT] (see [answersWithin]). */
+  suspend fun answers(): Boolean = answersWithin(HEALTH_TIMEOUT) { transaction { exec("select 1") } }
+
+  /**
+   * Whether [probe] returns, rather than throws, within [timeout]. It runs on the IO dispatcher, apart from the caller,
+   * since JDBC cannot be interrupted: with the database down, Hikari waits up to its connection timeout (30 seconds) for
+   * a connection, and the caller is answered at [timeout] while that wait finishes on its own.
+   */
+  internal suspend fun answersWithin(
+    timeout: Duration,
+    probe: () -> Unit,
+  ): Boolean {
+    val check = CoroutineScope(Dispatchers.IO).async { runCatching(probe).isSuccess }
+    return withTimeoutOrNull(timeout) { check.await() } ?: false.also { check.cancel() }
   }
 
   suspend fun <T> dbQuery(block: JdbcTransaction.() -> T): T =

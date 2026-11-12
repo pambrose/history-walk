@@ -197,6 +197,17 @@ class VersionCheckStateTest : StringSpec() {
       state.decideOn(upToDateAnswer(checkInterval = null)) shouldBe UP_TO_DATE
       state.checkInterval shouldBe 90.seconds
     }
+
+    "no answer can make the wait between checks shorter than the floor, so a page never polls in a tight loop" {
+      state.decideOn(upToDateAnswer(checkInterval = Duration.ZERO)) shouldBe UP_TO_DATE
+      state.checkInterval shouldBe VersionCheckState.MIN_CHECK_INTERVAL
+
+      state.decideOn(upToDateAnswer(checkInterval = (-30).seconds)) shouldBe UP_TO_DATE
+      state.checkInterval shouldBe VersionCheckState.MIN_CHECK_INTERVAL
+
+      state.decideOn(dialogAnswer(checkInterval = 1.seconds), modalOpen = true) shouldBe HOLD_DIALOG
+      state.checkInterval shouldBe VersionCheckState.MIN_CHECK_INTERVAL
+    }
   }
 }
 

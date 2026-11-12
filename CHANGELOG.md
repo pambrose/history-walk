@@ -10,11 +10,32 @@ All notable changes to History Walk are recorded here. The format follows
 
 - `make railway-versions`, which runs `make served-version` for each walk on Railway, showing the client bundle version
   each serves beside this checkout's version.
+- `/health`, open to all: `ok` while the database answers a trivial query within 3 seconds, else a 503, for an uptime
+  monitor. `make docker-smoke` checks it. `/ping` is unchanged and stays the image's health check.
+- `docs/code-review-2026-11-11.md`, a review of the whole repository: 28 numbered issues and the order to fix them in.
+- The client's npm lock, `.kotlin-js-store/yarn.lock`, is committed, and the Security workflow's new `lock-scan` job
+  reports its HIGH and CRITICAL vulnerabilities to code scanning, without failing yet (issue 28 of the review).
 
 ### Changed
 
 - `make served-version` without `ORIGIN_URL` shows only the bundle `PUBLIC_URL` serves, as "The served bundle", and
   says nothing of Cloudflare; with `ORIGIN_URL` it compares Cloudflare's bundle with the origin's as before.
+- A request that fails is answered by what went wrong: 400 for a bad parameter, 404 where there is nothing, 503 when
+  the database is not answering, 500 for anything else. Each 5xx is logged at ERROR with the method and path. Every
+  failure used to be a 404 logged at INFO, so with the database down a signed-in student's page was a bare
+  "404 Not Found". `/slide/<id>` with an id that is not a number is a 400.
+- The boolean settings (`SHOW_RESET_BUTTON`, `ALLOW_SLIDE_ACCESS`, `DISPLAY_CONSECUTIVE_CORRECT_DECISIONS`) take only
+  `true` or `false`, in any case. `CLIENT_VERSION_CHECK_INTERVAL_SECS` takes a whole number from 10 to 3600 and
+  `CLIENT_RELOAD_WARNING_INTERVAL_SECS` one from 0 to 3600. Any other value stops the server at startup, naming the
+  setting. Before, `1` or `yes` silently meant false, a typo in an interval failed every version check, and a 0 had
+  every open page poll the server nonstop. The page also never waits less than 5 seconds between checks.
+- The build fails when the client's resolved npm packages differ from the committed lock, or when there is no lock, so
+  CI builds and tests the bundle a release ships. After an npm dependency change, run `make yarn-unlock` and commit the
+  lock.
+
+### Removed
+
+- The stale `kotlin-js-store` line in `.gitignore`.
 
 ## [1.2.1] - 2026-11-10
 
