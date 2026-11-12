@@ -218,8 +218,11 @@ that carries a session, the page shell's included, so with the database down a s
 everything while a signed-out one still gets the page. The RPC calls never reach it: Kilua answers their failures
 itself. `/ping` touches neither the database nor a session and is the image's health check, so a database outage does
 not have the platform restart the server; `/health` runs `select 1` (`Dbms.answers`) and is a 503 when it fails or takes
-over `Dbms.HEALTH_TIMEOUT` (3 seconds), for an uptime monitor. `answersWithin` runs the probe on the IO dispatcher apart
-from the call, since JDBC cannot be interrupted and Hikari waits up to 30 seconds for a connection.
+over `Dbms.HEALTH_TIMEOUT` (3 seconds), for an uptime monitor. It is open to anyone, so `dbms/HealthCheck` runs one
+probe at a time (a call that finds one running waits on it) and reuses a finished one's answer for
+`Dbms.HEALTH_MAX_AGE` (5 seconds): no number of calls can pile up threads or take the walk's connections. The probe runs
+on the IO dispatcher apart from the calls, since JDBC cannot be interrupted and Hikari waits up to 30 seconds for a
+connection.
 
 **Settings.** `verifySettings` (`EnvVar.kt`, run from `Main.kt` beside `verifyAuthConfig`) stops startup, naming the
 setting, when a boolean setting is not `true` or `false` (any case; unset or blank is the default), or a version-check
@@ -279,8 +282,9 @@ Kotest `StringSpec` on both targets. A spec in `src/commonTest` (`ReasonRuleTest
   `mockkObject(Pages)`) checks the `no-store` header on every per-user route.
 - `StatusPagesTest` (no database: its `findUser` and `/health` probe follow a switch) checks that with the database down
   every request of a signed-in browser is a 503 while a signed-out one still gets `/ping`, that a bug is a 500, a bad
-  request a 400, and a missing path still a 404, and that `/health` and `Dbms.answersWithin` report a database that
-  fails or hangs. `EnvVarTest` checks the strict reading of the boolean and number settings.
+  request a 400, and a missing path still a 404, and that `/health` reports a database that fails. `HealthCheckTest`
+  checks the probe behind it: its timeout, one probe at a time however many calls wait, and an answer reused for its
+  maximum age (a `TestTimeSource`). `EnvVarTest` checks the strict reading of the boolean and number settings.
 - `SlideContentTest` walks both real decks from the root and fails on a path name that does not find its slide, a
   slide shared between two parents, a go-back past the root, a missing image, or a success slide whose title differs
   from the deck's (the summary page counts successes by that title).

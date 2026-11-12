@@ -11,7 +11,8 @@ All notable changes to History Walk are recorded here. The format follows
 - `make railway-versions`, which runs `make served-version` for each walk on Railway, showing the client bundle version
   each serves beside this checkout's version.
 - `/health`, open to all: `ok` while the database answers a trivial query within 3 seconds, else a 503, for an uptime
-  monitor. `make docker-smoke` checks it. `/ping` is unchanged and stays the image's health check.
+  monitor. One query runs at a time and its answer is reused for 5 seconds, so no number of calls can load the database.
+  `make docker-smoke` checks it. `/ping` is unchanged and stays the image's health check.
 - `docs/code-review-2026-11-11.md`, a review of the whole repository: 28 numbered issues and the order to fix them in.
 - The client's npm lock, `.kotlin-js-store/yarn.lock`, is committed, and the Security workflow's new `lock-scan` job
   reports its HIGH and CRITICAL vulnerabilities to code scanning, without failing yet (issue 28 of the review).

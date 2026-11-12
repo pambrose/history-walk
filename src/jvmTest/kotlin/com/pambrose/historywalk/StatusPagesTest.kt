@@ -8,9 +8,7 @@ import com.pambrose.historywalk.auth.assignUserSession
 import com.pambrose.historywalk.auth.configureGoogleAuth
 import com.pambrose.historywalk.auth.googleOAuthSettings
 import com.pambrose.historywalk.auth.installUserSessions
-import com.pambrose.historywalk.dbms.Dbms
 import io.kotest.core.spec.style.StringSpec
-import io.kotest.matchers.ints.shouldBeLessThan
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldStartWith
 import io.ktor.client.HttpClient
@@ -32,15 +30,13 @@ import io.ktor.server.routing.routing
 import io.ktor.server.testing.testApplication
 import java.sql.SQLException
 import java.util.UUID
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
-import kotlin.time.measureTime
 
 /**
  * A request that fails is answered by what went wrong: a 400 for a bad parameter, a 404 where there is nothing, a 503
  * when the database is not answering, and a 500 for anything else, never the 404 every failure used to get. The session
  * check reads the user on every request that carries a session, so with the database down a signed-in browser's every
- * request, the page shell's included, is a 503. `/health` reports the database; `/ping` does not.
+ * request, the page shell's included, is a 503. `/health` reports the database; `/ping` does not. HealthCheckTest checks
+the probe behind `/health`.
  */
 class StatusPagesTest : StringSpec() {
   private val teacher = UUID.randomUUID()
@@ -176,18 +172,6 @@ class StatusPagesTest : StringSpec() {
           bodyAsText() shouldBe "the database is not answering"
         }
       }
-    }
-
-    "the database check is true when the probe returns, and false when it throws" {
-      Dbms.answersWithin(1.seconds) {} shouldBe true
-      Dbms.answersWithin(1.seconds) { throw SQLException("Connection refused") } shouldBe false
-    }
-
-    "the database check gives up at its timeout, without waiting for a probe that hangs" {
-      var answered = true
-      val elapsed = measureTime { answered = Dbms.answersWithin(100.milliseconds) { Thread.sleep(5_000) } }
-      answered shouldBe false
-      elapsed.inWholeMilliseconds.toInt() shouldBeLessThan 2_000
     }
   }
 }

@@ -116,6 +116,8 @@ Things checked and found sound:
     path.
   - `/slide/{id}` answers a non-numeric id with a 400.
   - `/health` runs `select 1` within 3 seconds (`Dbms.answers`), and `docker-smoke` checks it; `/ping` is unchanged.
+    `/health` is open to anyone, so `HealthCheck` runs one probe at a time and reuses its answer for 5 seconds (a
+    finding of the automated security review of the first commit).
   - `StatusPagesTest` covers each case; `troubleshooting.md` and `deployment.md` describe them.
   - `make railway-restart` still waits on `/ping`; moving it to `/health` is left to Step 18.
 - **Severity:** Medium

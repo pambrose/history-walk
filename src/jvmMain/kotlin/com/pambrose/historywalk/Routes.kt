@@ -208,7 +208,8 @@ object Routes {
     }
 
     // Whether the server can reach the database, for an uptime monitor: "ok", or a 503 once a trivial query fails or
-    // takes longer than Dbms.HEALTH_TIMEOUT
+    // takes longer than Dbms.HEALTH_TIMEOUT. Open to all, so one query runs at a time and its answer is reused for
+    // Dbms.HEALTH_MAX_AGE
     get("health") {
       call.response.cacheControl(CacheControl.NoStore(null))
       if (databaseAnswers())
