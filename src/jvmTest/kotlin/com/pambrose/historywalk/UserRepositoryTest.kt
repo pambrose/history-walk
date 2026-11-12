@@ -54,7 +54,7 @@ class UserRepositoryTest : StringSpec() {
             .use { rs -> while (rs.next()) rows += rs.getString(1) to rs.getBoolean(2) }
         }
       }
-      rows.map { it.first }.shouldContainExactly("001", "002", "003")
+      rows.map { it.first }.shouldContainExactly("001", "002", "003", "004")
       rows.all { it.second } shouldBe true
     }
 

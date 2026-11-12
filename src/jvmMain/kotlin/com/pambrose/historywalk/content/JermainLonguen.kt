@@ -4,12 +4,12 @@ import com.pambrose.historywalk.slides.SlideDeck.Companion.slideDeck
 
 const val TITLE_PAGE = """
     <div style="text-align:center;">
-    <img src="/static/images/jermain-longuen.jpg" alt="Pic" style="width:334px;height:518px;border:2px solid grey;float:right;margin-left:10px;"/>
+    <img src="/static/images/jermain-longuen.jpg" alt="Engraved portrait of Jermain W. Loguen, signed Yours truly, J. W. Loguen" style="width:334px;height:518px;border:2px solid grey;float:right;margin-left:10px;"/>
     <div style="padding-top:130px;padding-bottom:20px;">
     <font size="+3">
     UGRR Scenario:
     <br>
-    Jarm Logue, later known as Reverend Jermain W. Longuen
+    Jarm Logue, later known as Reverend Jermain W. Loguen
     </font>
     </div>
     <div style="padding-top:70px;padding-bottom:40px;">
@@ -36,15 +36,15 @@ const val MAJOR_DECISION = """
 
 const val COMPANION_DECISION = """
     <div>
-    <img src="/static/images/pistol.jpg" alt="Pic" style="width:130px;height:61px;border:1px solid white;float:left"/>
-    <img src="/static/images/salami.jpg" alt="Pic" style="width:123px;height:76px;border:1px solid white;float:right"/>
+    <img src="/static/images/pistol.jpg" alt="An old single-shot pistol" style="width:130px;height:61px;border:1px solid white;float:left"/>
+    <img src="/static/images/salami.jpg" alt="Cured sausages, food for the journey" style="width:123px;height:76px;border:1px solid white;float:right"/>
 
     <p style="padding-top:80px;">
     Eager to join you, your friend John Farney asks around and says that
     you should contact **first** (1) an ‘entrepreneurial’ (and maybe sympathetic?)
     white man named Ross –– who offers to ‘obtain’ and provide forged free
     papers and a pair of pistols (executable offenses for Ross) in exchange
-    for $10 dollars cash (a lot at the time!), bacon, flour, and other staples
+    for $10 cash (a lot at the time!), bacon, flour, and other staples
     and **second** (2) an elderly enslaved man named Ben, who is known for being
     very wise.
 
@@ -56,7 +56,7 @@ const val COMPANION_DECISION = """
 
 const val DECISION_WHEN_TO_GO = """
     * Will you leave in the summer, when the weather is warmest and you can easily sleep outdoors?
-    * Will you leave in the autumn, hoping to slip away in the business and hub-bub of harvest time?
+    * Will you leave in the autumn, hoping to slip away in the busyness and hubbub of harvest time?
     * Will you leave in the spring, when love is in the air?
     * Will you leave in the winter, right at Christmas, when it is coldest and darkest?
 """
@@ -69,9 +69,8 @@ const val OLD_BEN_VIA_ROSS = """
     <i>
     **One**, demands for field work are down, so you won’t be as missed.
     **Two**, owners, as well as patrollers, are distracted and less vigilant, with people interested in family gatherings and feasting.
-    **Three** the colder weather also means the patrollers will not be outdoors as often.
-    **Lastly**, there will be the greatest cover of darkness with longer nights. But you
-    had better get yourself some warmer clothes.
+    **Three**, the colder weather also means the patrollers will not be outdoors as often.
+    **Lastly**, there will be the greatest cover of darkness with longer nights.
     </i>
 
     [That said, if you decide upon leaving in winter, you will need to make sure to have
@@ -120,9 +119,9 @@ const val SUMMER_CROSS_COUNTRY = """
 
 const val FLEE_INTO_DEEP_FOREST_END = """
     <div>
-    <img src="/static/images/deep-forest.jpg" alt="Pic" style="width:233px;height:217px;border:2px solid gray;float:right;margin-left:10px;"/>
+    <img src="/static/images/deep-forest.jpg" alt="Engraving of hounds attacking a man in the forest as armed slave catchers close in" style="width:233px;height:217px;border:2px solid gray;float:right;margin-left:10px;"/>
     <div style="padding-top:20px;padding-bottom:20px;">
-    You dash into the deep forest, gasping for air, as the sound of hounds follow you.
+    You dash into the deep forest, gasping for air, as the sound of hounds follows you.
     You begin to panic as the sounds get louder and closer.
 
     Suddenly, they are upon you. The hounds grab you by the legs and then rip you
@@ -134,24 +133,24 @@ const val FLEE_INTO_DEEP_FOREST_END = """
 """
 
 const val AUTUMN_DEPARTURE = """
-    As harvest time come along, you decide to make your move, hoping to take advantage
-    the heightened activity and slip away in the mix. Initially, it seems that you are
+    As harvest time comes along, you decide to make your move, hoping to take advantage
+    of the heightened activity and slip away in the mix. Initially, it seems that you are
     successful, making your way off the plantation and down the road into the countryside.
-    However, as you near the brushy cover on outskirts of the next hamlet, a quick rustling
+    However, as you near the brushy cover on the outskirts of the next hamlet, a quick rustling
     sound precedes...
 """
 
 const val SPRING_DEPARTURE = """
-    In springtime, it is said that thoughts turn romance and courting, distracting one from
+    In springtime, it is said that thoughts turn to romance and courting, distracting one from
     ordinary, difficult, or boring tasks. That is your hope, anyway, as you seek to escape
-    while adversaries are hopefully off their guard. However, such is not the case. It seem
+    while adversaries are hopefully off their guard. However, such is not the case. It seems
     that you were spotted. At the sound of the harsh braying of pursuing hounds, you flee
     blindly into the brush, emerging to...
 """
 
 const val PADDY_ROLLERS_END = """
     <p>
-    <img src="/static/images/paddyrollers.jpg" alt="Pic" style="width:301px;height:159px;border:2px solid gray;float:right;margin-left:10px;margin-top:10px;"/>
+    <img src="/static/images/paddyrollers.jpg" alt="Engraving of a group of men in top hats seizing a man" style="width:301px;height:159px;border:2px solid gray;float:right;margin-left:10px;margin-top:10px;"/>
     You are surprised by the sudden appearance of four ‘paddy rollers,’ as slave-catchers
     were sometimes called, who were waiting to ambush you. Speedily they seize you up,
     bind you, and, after torturing you for information, return you to your owner for a reward.
@@ -162,17 +161,17 @@ const val PADDY_ROLLERS_END = """
 """
 
 const val WINTER_DEPARTURE_ALONE = """
-    <p>
-    <img src="/static/images/winterdeparture.jpg" alt="Pic" style="width:187px;height:258px;border:2px solid gray;float:right;margin-left:10px;"/>
+    <div>
+    <img src="/static/images/winterdeparture.jpg" alt="A bearded man in a heavy winter overcoat and hat" style="width:187px;height:258px;border:2px solid gray;float:right;margin-left:10px;"/>
     <p style="padding-top:100px;padding-bottom:90px;">
     Will you try to steal an overcoat in order to survive the elements as you hopefully head... North?
     </p>
-    </p>
+    </div>
 """
 
 const val STEAL_OVERCOAT = """
     <div>
-    <img src="/static/images/winterdeparture.jpg" alt="Pic" style="width:187px;height:258px;border:2px solid gray;float:right;margin-left:10px;"/>
+    <img src="/static/images/winterdeparture.jpg" alt="A bearded man in a heavy winter overcoat and hat" style="width:187px;height:258px;border:2px solid gray;float:right;margin-left:10px;"/>
     <div style="padding-top:60px;margin-bottom:45px;">
     <p>
     That evening, you creep into the main household, enter the coat room, and grab
@@ -201,7 +200,7 @@ const val WINTER_CROSS_COUNTRY = """
 
 const val ROSS_ENCOUNTER = """
     <div>
-    <img src="/static/images/ross.jpg" alt="Pic" style="width:164;height:383px;border:2px solid gray;float:right;margin-left:10px;margin-top:15px;"/>
+    <img src="/static/images/ross.jpg" alt="Engraving of a cloaked man with a lantern and a rifle, a dog at his side" style="width:164px;height:383px;border:2px solid gray;float:right;margin-left:10px;margin-top:15px;"/>
     Having risked severe punishment, you have managed to steal some bacon,
     flour, bread, fruit preserves, and 12 dollars (two of which you will keep).
     In the past, you would not have dared to even think of stealing from your
@@ -228,7 +227,7 @@ const val ROSS_ADVICE = """
     shall come down upon you.</i></b>
 
     <b><i>These free papers are an invitation to act free. Be confident, be forthright, be bold,
-    take initiate, be relaxed, be engaging—none will take you for slave.</i></b>
+    take initiative, be relaxed, be engaging—none will take you for a slave.</i></b>
 
     <b><i>So, do not take the sidetrack or back road—stick to the main thoroughfare, and when you
     enter a town, go to the grandest structure and call upon the proprietor for lodging.</i></b>
@@ -240,16 +239,9 @@ const val ROSS_ADVICE = """
     you risk getting caught by staying a little longer to seek out the advice of old Ben?
 """
 
-// TODO This slide is not used
-const val WINTER_TRAVEL_END = """
-    ...Without a coat, you freeze to death in the wilderness.
-
-    THE END.
-"""
-
 const val STEAL_OVERCOAT_VIA_ROSS = """
     <div>
-    <img src="/static/images/winterdeparture.jpg" alt="Pic" style="width:187px;height:258px;border:2px solid gray;float:right;margin-left:10px;"/>
+    <img src="/static/images/winterdeparture.jpg" alt="A bearded man in a heavy winter overcoat and hat" style="width:187px;height:258px;border:2px solid gray;float:right;margin-left:10px;"/>
     <div style="padding-top:55px;padding-bottom:20px;">
     <p>
     That evening, you creep into the main household, enter the coat room, and grab
@@ -267,11 +259,11 @@ const val STEAL_OVERCOAT_VIA_ROSS = """
 
 const val MAJOR_ENCOUNTER_PATROL = """
     <div>
-    <img src="/static/images/patrol.jpg" alt="Pic" style="width:196px;height:379px;border:2px solid gray;float:right;margin-left:10px;"/>
+    <img src="/static/images/patrol.jpg" alt="Engraving of a patroller on a rearing horse, his rifle raised" style="width:196px;height:379px;border:2px solid gray;float:right;margin-left:10px;"/>
     <p style="padding-top:90px;">
     Rounding the bend on the main road that you have been following, you come to a crossroads
-    just as two men ride up from the side, one with a rifle slung across back. They quickly
-    pull along side, grab the reins of your horses, and begin to question you aggressively,
+    just as two men ride up from the side, one with a rifle slung across his back. They quickly
+    pull alongside, grab the reins of your horses, and begin to question you aggressively,
     demanding to see your passes, to know your origins and destination, and to learn your
     intentions.
     </p>
@@ -283,11 +275,11 @@ const val MAJOR_ENCOUNTER_PATROL = """
 
 const val MAJOR_ENCOUNTER_VIA_ROSS1ST_PATROL = """
     <div>
-    <img src="/static/images/patrol.jpg" alt="Pic" style="width:196px;height:379px;border:2px solid gray;float:right;margin-left:10px;"/>
+    <img src="/static/images/patrol.jpg" alt="Engraving of a patroller on a rearing horse, his rifle raised" style="width:196px;height:379px;border:2px solid gray;float:right;margin-left:10px;"/>
     <p style="padding-top:90px;">
     Rounding the bend on the main road that you have been following, you come to a crossroads
-    just as two men ride up from the side, one with a rifle slung across back. They quickly
-    pull along side, grab the reins of your horses, and begin to question you aggressively,
+    just as two men ride up from the side, one with a rifle slung across his back. They quickly
+    pull alongside, grab the reins of your horses, and begin to question you aggressively,
     demanding to see your passes, to know your origins and destination, and to learn your
     intentions.
     </p>
@@ -299,10 +291,10 @@ const val MAJOR_ENCOUNTER_VIA_ROSS1ST_PATROL = """
 
 const val MAJOR_ENCOUNTER_FLEE_PATROL_END = """
     <div>
-    <img src="/static/images/fleepatrol.jpg" alt="Pic" style="width:200px;height:300px;border:2px solid gray;float:right;margin-left:10px;"/>
+    <img src="/static/images/fleepatrol.jpg" alt="Engraving of a man running into the woods as two men fire at him" style="width:200px;height:300px;border:2px solid gray;float:right;margin-left:10px;"/>
     <p style="padding-top:60px;">
-    As you turn to run, you hear the loud blast of a pistol, following by an hot, stabbing
-    pain in your thigh. Stumbling and and falling, you fumble futilely for some weapon.
+    As you turn to run, you hear the loud blast of a pistol, followed by a hot, stabbing
+    pain in your thigh. Stumbling and falling, you fumble futilely for some weapon.
     The pain is overwhelming and the bleeding great. As your vision begins to blur, you
     know that you will awaken either back at the plantation or in the hereafter...
     </p>
@@ -313,7 +305,7 @@ const val MAJOR_ENCOUNTER_FLEE_PATROL_END = """
 """
 
 const val MAJOR_ENCOUNTER_FIGHT1ST_PATROL_END = """
-    You and your companion boldly respond by trying to throw the men from their horses.
+    You boldly respond by trying to throw the men from their horses.
 
     Melee ensues, and you find yourself beaten to a pulp, shortly to be bound, strapped
     to the back of horse, and taken back to the plantation.
@@ -323,7 +315,7 @@ const val MAJOR_ENCOUNTER_FIGHT1ST_PATROL_END = """
 
 const val MAJOR_ENCOUNTER_VIA_ROSS_FIGHT1ST_PATROL = """
     You and your companion boldly respond by drawing your pistols and firing at the men.
-    Hitting one and causing the horses to panic, the other ride flees in terror as the
+    Hitting one and causing the horses to panic, the other rider flees in terror as the
     wounded rider drops to the ground, unconscious.
 
     Rolling his body into the brush and sending his horse off, you are able to continue
@@ -356,7 +348,7 @@ const val POLITE_AND_SUBMISSIVE_BLUFF = """
 """
 
 const val CONFIDENT_AND_ARROGANT_BLUFF = """
-    Your confident and arrogant tone convince the men that you are purpose is legitimate.
+    Your confident and arrogant tone convinces the men that your purpose is legitimate.
     Ross’ advice was useful this time.
 
     The armed patrol allows you to continue down the main road into town.
@@ -368,7 +360,7 @@ const val FIRST_TOWN = """
 """
 
 const val MAJOR_ENCOUNTER_BARONIAL_MANSION = """
-    <img src="/static/images/mansion.jpg" alt="Pic" style="width:596px;height:249px;border:3px solid gray;display: block;margin-left: auto;margin-right: auto;margin-bottom: 30px;"/>
+    <img src="/static/images/mansion.jpg" alt="A large white mansion with tall columns, framed by trees hung with Spanish moss" style="width:596px;height:249px;border:3px solid gray;display: block;margin-left: auto;margin-right: auto;margin-bottom: 30px;"/>
 
     A regally dressed servant opens the door and asks your business.
 
@@ -378,7 +370,7 @@ const val MAJOR_ENCOUNTER_BARONIAL_MANSION = """
 const val TEXT31_POLITE_AND_SUBMISSIVE_BLUFF = """
     Your polite and submissive tone arouses the servant’s suspicions. An old,
     well-dressed woman, brusquely yells from somewhere inside, “Thomas, send
-    that riff raff away!”
+    that riffraff away!”
 
     Will you...
 """
@@ -400,7 +392,7 @@ const val MAJOR_ENCOUNTER_RAMSHACKLE_HUT = """
     A gnarled old face peers from behind a dirty window when you knock. The door opens...
     a nearly toothless smile greets you, and a wrinkled hand beckons you in.
 
-    The hut dwelling friendly old man kindly offers you soup, and a chance to warm your
+    The friendly old man of the hut kindly offers you soup, and a chance to warm your
     feet by the fire.
 
     Do you...
@@ -475,7 +467,7 @@ const val TEXT42_MAJOR_ENCOUNTER_RAMSHACKLE_HUT_CONTD = """
 
 const val MAJOR_ENCOUNTER_BORDELLO = """
     You enter the bordello. Several heads turn your way, with sneering expressions
-    upon seeing you. A garishly dressed women says: “You DO NOT belong here, get
+    upon seeing you. A garishly dressed woman says: “You DO NOT belong here, get
     out before I call the authorities!”
 
     Will you...
@@ -533,7 +525,7 @@ const val TEXT51_MAJOR_ENCOUNTER_RAMSHACKLE_HUT_CONTD = """
 """
 
 const val MAJOR_ENCOUNTER_PHARMACY = """
-    A bell rings as you enter the pharmacy. A bespeckled clerk peers at you over his
+    A bell rings as you enter the pharmacy. A bespectacled clerk peers at you over his
     glasses, and coolly declares, “You do not belong here!”
 
     Will you...
@@ -541,7 +533,7 @@ const val MAJOR_ENCOUNTER_PHARMACY = """
 
 const val MAJOR_ENCOUNTER2ND_PATROL = """
     <div>
-    <img src="/static/images/2ndpatrol.jpg" alt="Pic" style="width:178px;height:417px;border:2px solid gray;float:right;margin-left:10px;"/>
+    <img src="/static/images/2ndpatrol.jpg" alt="Engraving of two armed riders on a road" style="width:178px;height:417px;border:2px solid gray;float:right;margin-left:10px;"/>
     <p style="padding-top:110px;">
     After riding for some hours, you enter into a brushy area with low visibility.
     Suddenly, a rider moves out from the cover of the foliage to block your path forward.
@@ -557,23 +549,14 @@ const val MAJOR_ENCOUNTER2ND_PATROL = """
 
 const val MAJOR_ENCOUNTER_FIGHT2ND_PATROL = """
     You and your companion boldly respond by drawing your pistols and firing at the men.
-    Hitting one and causing the horses to panic, the other ride flees in terror as the
+    Hitting one and causing the horses to panic, the other rider flees in terror as the
     wounded rider drops to the ground, unconscious.
 
     Rolling his body into the brush and sending his horse off, you are able to continue
     down the main road swiftly.
 
-    Having successfully fought off two patrols now, your companion anxiously suggests
+    Having made it past two patrols now, your companion anxiously suggests
     that you both get off the main road and strike out cross-country.
-"""
-
-// TODO This slide is not used
-const val TEXT55_MAJOR_ENCOUNTER_BLUFF2ND_PATROL = """
-    You try to explain that you have been sent on a mission by your master, which was
-    not an uncommon occurrence. However, the man with a rifle demands to see your travel
-    papers. You have none.
-
-    Having failed at bluffing, will you...
 """
 
 const val BACKROADS = """
@@ -586,8 +569,8 @@ const val BACKROADS = """
 
 const val RIVER_CROSSING = """
     As you approach, you see a white man chopping logs. He looks you up and down and,
-    in a tone that strikes as sympathetic rather than hostile, he warns you of patrols
-    in the area and tells you to follow horse tracks across frozen Ohio.
+    in a tone that strikes you as sympathetic rather than hostile, he warns you of patrols
+    in the area and tells you to follow horse tracks across the frozen Ohio.
 
     Do you...
 """
@@ -760,7 +743,7 @@ val jermainLonguenSlides =
             content = BACKROADS,
           ) {
             choice(
-              text = "Approach the cottage?",
+              text = "Approach the log cabin?",
               slide = slide57RiverCrossing,
             )
             choice(
@@ -891,7 +874,7 @@ val jermainLonguenSlides =
           slide = slide20MajorEncounterPatrol.copyOf(),
         )
         choice(
-          text = "Head into back into town and try another building",
+          text = "Head back into town and try another building",
           slide = goBack(-2),
         )
       }
@@ -1165,7 +1148,7 @@ val jermainLonguenSlides =
             content = MAJOR_ENCOUNTER_POST_OFFICE,
           ) {
             choice(
-              text = ".Try another building in town?",
+              text = "Try another building in town?",
               slide = goBack(-1),
             )
             choice(
@@ -1268,7 +1251,7 @@ val jermainLonguenSlides =
           slide = slide8SummerCrossCountry.copyOf(),
         )
         choice(
-          text = "Leave in the autumn, hoping to slip away in the business and hub-bub of harvest time",
+          text = "Leave in the autumn, hoping to slip away in the busyness and hubbub of harvest time",
           slide = slide10AutumDeparture.copyOf(),
         )
         // TODO This is straight to Paddy Rollers (slide 12) in slides, which I think is a mistake
@@ -1396,7 +1379,7 @@ val jermainLonguenSlides =
           slide = slide7SummerDeparture.copyOf(),
         )
         choice(
-          text = "Leave in the autumn, hoping to slip away in the business and hub-bub of harvest time",
+          text = "Leave in the autumn, hoping to slip away in the busyness and hubbub of harvest time",
           slide = slide10AutumDeparture.copyOf(),
         )
         choice(
@@ -1410,7 +1393,6 @@ val jermainLonguenSlides =
       }
 
     val slide3CompanionDecision =
-      // TODO The first two choices are the same
       slide(
         id = 3,
         title = "Companion Decision",
@@ -1420,10 +1402,6 @@ val jermainLonguenSlides =
           text = "Yes, take your chances and go meet with Ross then meet with Ben",
           slide = slide16RossEncounter.copyOf(),
         )
-//        choice(
-//          "Yes, take your chances, but skip talking to Ben and just go to meet with Ross",
-//          slide16RossEncounter.copyOf()
-//        )
         choice(
           text = "No, skip Ross and just go to Old Ben",
           slide = slide6OldBenWhenToGo.copyOf(),

@@ -24,6 +24,7 @@ its database. The migrations are SQL files in `src/jvmMain/resources/db/migratio
 | `V001__create_schema.sql` | The `history` schema: users, choices, and the progress views. It begins with `drop schema if exists history cascade`. |
 | `V002__session_version.sql` | `users.session_version`, so a sign-out ends a user's sessions everywhere. |
 | `V003__teachers_see_student_view.sql` | `history.settings` (the student-view switch) and `user_choices.counted_as_student`, and rebuilds the progress views to count teachers' moves made in the student view. |
+| `V004__dead_end_through_continue.sql` | Data only: marks as dead ends the stored Jermain decisions that led to a slide whose only choice, a *Continue*, ends the walk (the Autumn and Spring Departures, the Ramshackle Hut (cont.) slides), which were stored as correct. Changes nothing on the Moses database. |
 
 The log shows what happened at each start: *Flyway applied N migration(s); schema version … -> …*.
 

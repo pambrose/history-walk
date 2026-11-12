@@ -220,5 +220,59 @@ class SlideDeckTest : StringSpec() {
         }
       }.message shouldContain "duplicate choice slide titles"
     }
+
+    "a slide leads to a dead end when it is one, or when its one forward choice leads to one" {
+      lateinit var departure: Slide
+      lateinit var twoSteps: Slide
+      lateinit var toWin: Slide
+      lateinit var tryAgain: Slide
+      lateinit var start: Slide
+      slideDeck {
+        val win = slide(id = 2, title = "Win", content = "w", success = true)
+        val caught = slide(id = 3, title = "Caught", content = "c")
+        departure = slide(id = 4, title = "Departure", content = "d") { choice("Continue", caught) }
+        twoSteps = slide(id = 5, title = "Road", content = "r") { choice("Continue", departure.copyOf()) }
+        toWin = slide(id = 6, title = "Boat", content = "b") { choice("Continue", win.copyOf()) }
+        tryAgain = slide(id = 7, title = "Wrong building", content = "t") { choice("Try another", goBack(-1)) }
+        start =
+          slide(id = 1, title = "Start", content = "s", root = true) {
+            choice("caught", caught.copyOf())
+            choice("depart", departure)
+            choice("road", twoSteps)
+            choice("boat", toWin)
+            choice("building", tryAgain)
+            choice("win", win)
+          }
+      }
+      departure.isDeadEnd.shouldBeFalse()
+      departure.leadsToDeadEnd.shouldBeTrue()
+      twoSteps.leadsToDeadEnd.shouldBeTrue()
+      toWin.leadsToDeadEnd.shouldBeFalse()
+      // A go-back is not a way on: the student tries another building
+      tryAgain.leadsToDeadEnd.shouldBeFalse()
+      // A slide with several choices is a decision, whatever one of them leads to
+      start.leadsToDeadEnd.shouldBeFalse()
+      start.choices
+        .getValue("caught")
+        .leadsToDeadEnd
+        .shouldBeTrue()
+      start.choices
+        .getValue("win")
+        .leadsToDeadEnd
+        .shouldBeFalse()
+    }
+
+    "two choices of a slide cannot have the same text, which would silently drop the first" {
+      shouldThrow<IllegalArgumentException> {
+        slideDeck {
+          val win = slide(id = 2, title = "Win", content = "w", success = true)
+          val lose = slide(id = 3, title = "Lose", content = "l")
+          slide(id = 1, title = "Start", content = "s", root = true) {
+            choice("wait", win)
+            choice("wait", lose)
+          }
+        }
+      }.message shouldContain "Slide \"Start\" has two choices with the text \"wait\""
+    }
   }
 }

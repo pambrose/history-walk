@@ -106,14 +106,14 @@ class ContentService(
               row[fromTitle] = move.from.title
               row[toPathName] = move.to.pathName
               row[toTitle] = move.to.title
-              row[deadEnd] = move.to.isDeadEnd
+              row[deadEnd] = move.to.leadsToDeadEnd
               row[choiceText] = move.choiceText
               row[reason] = reasonText
               row[countedAsStudent] = counted
             }.insertedCount
           }
         if (inserted > 0) {
-          logger.info { "Recorded ${move.describe()} deadEnd=${move.to.isDeadEnd} for $uuid" }
+          logger.info { "Recorded ${move.describe()} deadEnd=${move.to.leadsToDeadEnd} for $uuid" }
         } else {
           logger.info { "Already recorded ${move.describe()} for $uuid; kept the first reason" }
         }
@@ -150,7 +150,7 @@ class ContentService(
     val advance get() = from.choices.size == 1
 
     fun slideChoice(alreadyVisited: Boolean) =
-      SlideChoice(choiceText, to.pathName, to.title, to.isDeadEnd, offset = 0, alreadyVisited = alreadyVisited)
+      SlideChoice(choiceText, to.pathName, to.title, to.leadsToDeadEnd, offset = 0, alreadyVisited = alreadyVisited)
 
     fun describe() = "${from.pathName} -> ${to.pathName}"
   }

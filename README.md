@@ -76,7 +76,7 @@ The server reads its settings from environment variables at startup. The
 | `GOOGLE_CLIENT_SECRET` | required | That client's secret |
 | `OAUTH_CALLBACK_URL` | required | `https://<deployment>/auth/callback`; locally `http://localhost:8080/auth/callback` |
 | `SESSION_SECRET` | required in production | Key for the session cookie and the signed sign-in state, at least 16 characters |
-| `SLIDES_VARIABLE_NAME` | `jermain` | The walk: `jermain` (the Jermain Longuen walk) or `moses`, in any case; any other value stops the server at startup |
+| `SLIDES_VARIABLE_NAME` | `jermain` | The walk: `jermain` (the Jermain Loguen walk) or `moses`, in any case; any other value stops the server at startup |
 | `TEACHER_EMAILS` | none | Comma-separated teacher addresses; the only accounts with the teacher view |
 | `SCHOOL_EMAIL_DOMAIN` | `athenian.org` | The Google Workspace domain whose accounts may sign in |
 | `LOGIN_GREETING` | `History Walk` | The title of the sign-in dialog |

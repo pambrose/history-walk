@@ -32,16 +32,16 @@ and in the step that fixes it under [Suggested order of work](#suggested-order-o
 | [2](#issue-2)   | ✅ | Medium   | Server            | Every server error is answered "404 Not Found" and logged at INFO                               |
 | [3](#issue-3)   | ✅ | Medium   | Server, client    | The version-check settings are not validated: a typo kills the check, a 0 floods the server     |
 | [4](#issue-4)   | ✅ | Medium   | Supply chain      | The client's npm dependencies are not locked, so CI builds and scans a different bundle         |
-| [5](#issue-5)   | ⬜ | Medium   | Content (Moses)   | Slide 14 silently loses one of its three choices                                                |
+| [5](#issue-5)   | ✅ | Medium   | Content (Moses)   | Slide 14 silently loses one of its three choices                                                |
 | [6](#issue-6)   | ⬜ | Medium   | Content (Jermain) | Refusing Ross's deal still puts the student on the Ross path, and the patrol slide contradicts it |
-| [7](#issue-7)   | ⬜ | Medium   | Content, data     | Five fatal Jermain decisions are recorded as correct ones                                       |
-| [8](#issue-8)   | ⬜ | Medium   | Content (Moses)   | Two correct choices say one thing and the next slide says the opposite                          |
-| [9](#issue-9)   | ⬜ | Medium   | Content (Moses)   | The opening contradicts the later story of Moses's mother                                       |
-| [10](#issue-10) | ⬜ | Medium   | Content (Jermain) | The title slide and the docs misspell Loguen as "Longuen"                                       |
+| [7](#issue-7)   | ✅ | Medium   | Content, data     | Five fatal Jermain decisions are recorded as correct ones                                       |
+| [8](#issue-8)   | ✅ | Medium   | Content (Moses)   | Two correct choices say one thing and the next slide says the opposite                          |
+| [9](#issue-9)   | ✅ | Medium   | Content (Moses)   | The opening contradicts the later story of Moses's mother                                       |
+| [10](#issue-10) | ✅ | Medium   | Content (Jermain) | The title slide and the docs misspell Loguen as "Longuen"                                       |
 | [11](#issue-11) | ⬜ | Low      | Content           | "Decison" in 26 Moses slide titles, and lowercase verbs in four Jermain titles                  |
-| [12](#issue-12) | ⬜ | Low      | Content           | Typos and grammar errors in both decks' text                                                    |
+| [12](#issue-12) | ✅ | Low      | Content           | Typos and grammar errors in both decks' text                                                    |
 | [13](#issue-13) | ⬜ | Low      | Content (Jermain) | Companions, horses, patrols, and seasons that do not match the student's path                   |
-| [14](#issue-14) | ⬜ | Low      | Content (a11y)    | Every image's alt text is "Pic", and a few markup slips                                         |
+| [14](#issue-14) | ✅ | Low      | Content (a11y)    | Every image's alt text is "Pic", and a few markup slips                                         |
 | [15](#issue-15) | ⬜ | Low      | Teacher pages     | The reasons page cannot show which wrong answer a Moses student chose                           |
 | [16](#issue-16) | ⬜ | Low      | Server            | A failed RPC call sends the exception's message and class name to the browser                   |
 | [17](#issue-17) | ⬜ | Low      | Server, data      | The class pages go by the role stored at sign-in, not the role the app uses                     |
@@ -219,8 +219,15 @@ Things checked and found sound:
   - Add a Trivy filesystem scan of `.kotlin-js-store/yarn.lock` to `security.yml`.
 
 <a id="issue-5"></a>
-### ⬜ 5. Moses slide 14 silently loses one of its three choices
+### ✅ 5. Moses slide 14 silently loses one of its three choices
 
+- **Status:** done in Wave 2.
+  - The new third choice, "Try to break your irons with a rock right there, beside the sleeping guards", leads to
+    `Incorrect1`, a path that only appears.
+  - The waiting choice keeps `Incorrect2`, the path any saved walk is on.
+  - `choice()` refuses a second choice with the same text, tested in `SlideDeckTest`, and the dead check in
+    `validateSlide` is gone.
+  - Review the new choice's wording as the content author.
 - **Severity:** Medium
 - **Where:** `content/Moses.kt:680-687`; `slides/Slide.kt:57-64` (`choice`) and `:69-75` (`validateSlide`);
   `src/jvmTest/resources/slide-paths/moses.txt:61`
@@ -257,8 +264,14 @@ Things checked and found sound:
     branches restart), and rewrite `slide-paths/jermain.txt` in the same pull request.
 
 <a id="issue-7"></a>
-### ⬜ 7. Five fatal Jermain decisions are recorded as correct ones
+### ✅ 7. Five fatal Jermain decisions are recorded as correct ones
 
+- **Status:** done in Wave 2.
+  - `Slide.leadsToDeadEnd` (a dead end, or a slide whose one forward choice leads to one) is what `provideReason`
+    stores and what `slideData` offers.
+  - Migration `V004` marks the stored rows. It names the 22 Jermain path names that lead through a *Continue* to a
+    dead end, worked out from the deck; Moses has none.
+  - Tested in `SlideDeckTest`, `ContentServiceTest`, and `DbmsMigrateTest`.
 - **Severity:** Medium
 - **Where:**
   - `content/JermainLonguen.kt:652-674` (Autumn Departure, Spring Departure) and the three "Ramshackle Hut (cont.)"
@@ -281,8 +294,10 @@ Things checked and found sound:
   - Test it in `ContentServiceTest` with a chain in the test deck.
 
 <a id="issue-8"></a>
-### ⬜ 8. Two correct Moses choices say one thing and the next slide says the opposite
+### ✅ 8. Two correct Moses choices say one thing and the next slide says the opposite
 
+- **Status:** done in Wave 2: slide 17 says downstream, slide 5 says a bridge or a boat, and the choice reads "Look
+  downstream for a bridge or watercraft".
 - **Severity:** Medium
 - **Where:** `content/Moses.kt:644` → `:185`, and `:890` → `:67`
 - **Problem:**
@@ -294,8 +309,10 @@ Things checked and found sound:
 - **Fix:** align the choice text and the slide text. No titles change.
 
 <a id="issue-9"></a>
-### ⬜ 9. The opening contradicts the later story of Moses's mother
+### ✅ 9. The opening contradicts the later story of Moses's mother
 
+- **Status:** done in Wave 2: the opening says Moses was sold away from his mother and passed through several owners
+  before Mr. Gooch, as the later slides have it; `index.md` matches. Review the wording as the content author.
 - **Severity:** Medium
 - **Where:** `content/Moses.kt:15-19`; `:101`, `:107`; `website/history-walk/docs/index.md:16`
 - **Problem:**
@@ -309,8 +326,10 @@ Things checked and found sound:
   - Fix `index.md:16` to match.
 
 <a id="issue-10"></a>
-### ⬜ 10. The title slide and the docs misspell Loguen as "Longuen"
+### ✅ 10. The title slide and the docs misspell Loguen as "Longuen"
 
+- **Status:** done in Wave 2: the title slide, the README, the docs' home page, the changelog, and the test names say
+  Loguen. The Kotlin identifiers, the file, and the image keep their names.
 - **Severity:** Medium
 - **Where:** `content/JermainLonguen.kt:12`; `README.md:79`; `website/history-walk/docs/index.md:15`;
   `CHANGELOG.md:125`
@@ -337,8 +356,10 @@ Things checked and found sound:
   - Rewrite both snapshots, and the example in `admins/slide-decks.md:22`.
 
 <a id="issue-12"></a>
-### ⬜ 12. Typos and grammar errors in both decks' text
+### ✅ 12. Typos and grammar errors in both decks' text
 
+- **Status:** done in Wave 2: every item below is fixed. "SS Fox" is now "the Fox, a sailing ship". No title changed,
+  so `SlidePathsTest` found no path lost.
 - **Severity:** Low
 - **Where and what** (body and choice text only, so no path names change):
   - `JermainLonguen.kt`:
@@ -395,6 +416,18 @@ Things checked and found sound:
 <a id="issue-13"></a>
 ### ⬜ 13. Companions, horses, patrols, and seasons that do not match the student's path
 
+- **Status:** partly done in Wave 2. Fixed:
+  - The fight ending no longer says "You and your companion".
+  - "Having made it past two patrols now" replaces "Having successfully fought off two patrols now".
+  - The winter-clothes advice is given once.
+  - The choice now says "Approach the log cabin?".
+
+  Left:
+  - **The horses.** Loguen's escape is generally told as made on horseback, with John Farney (the companion the
+    deck names), so the likely fix is to give the student the horse where the walk begins rather than remove the
+    rides. That is the content author's call.
+  - **The season reroutes and the TODO at the Ross path's spring choice.** These change path names, so they belong to
+    Step 8.
 - **Severity:** Low
 - **Where:** `content/JermainLonguen.kt`
 - **Problem:**
@@ -410,8 +443,13 @@ Things checked and found sound:
   names, which needs the same care as issue 6.
 
 <a id="issue-14"></a>
-### ⬜ 14. Every image's alt text is "Pic", and a few markup slips
+### ✅ 14. Every image's alt text is "Pic", and a few markup slips
 
+- **Status:** done in Wave 2.
+  - Every Jermain image has alt text written from the picture itself; Moses has no images.
+  - The nested `<p>` is a `<div>`, the width has its unit, and the two unused constants are deleted, along with the
+    TODO and the commented-out choice.
+  - `SlideContentTest` refuses an `alt` that is empty or `Pic`.
 - **Severity:** Low
 - **Where:** both decks' `<img ... alt="Pic">`; `JermainLonguen.kt:165-170` (a `<p>` nested in a `<p>`), `:204`
   (`width:164;` with no unit), `:244` and `:571` (unused constants `WINTER_TRAVEL_END` and `TEXT55_…`), `:1413` (a stale
@@ -696,9 +734,9 @@ The four steps share no files. Step 1 is a check in two dashboards, not code.
 
 | Step | Status | Issues | Work | Files |
 |------|:------:|--------|------|-------|
-| 5  | ⬜ | [5](#issue-5), [8](#issue-8), [9](#issue-9), [12](#issue-12) (Moses) | Slide 14's third choice and the duplicate-choice guard; upstream and downstream; the mother; Moses typos | `Moses.kt`, `Slide.kt`, `SlideDeckTest.kt`, `slide-paths/moses.txt`, `docs/index.md` |
-| 6  | ⬜ | [10](#issue-10), [12](#issue-12) (Jermain), [13](#issue-13) (text only), [14](#issue-14) | Loguen; Jermain typos; continuity rewording; alt text and markup | `JermainLonguen.kt`, `Moses.kt` (alt text), `README.md`, `docs/index.md` |
-| 7  | ⬜ | [7](#issue-7) | `leadsToDeadEnd` for the recorded `dead_end`; optionally fix the stored rows; tests | `Slide.kt`, `ServiceImpl.kt`, `DbmsTxs.kt`, `ContentServiceTest.kt`, optional migration |
+| 5  | ✅ | [5](#issue-5), [8](#issue-8), [9](#issue-9), [12](#issue-12) (Moses) | Slide 14's third choice and the duplicate-choice guard; upstream and downstream; the mother; Moses typos | `Moses.kt`, `Slide.kt`, `SlideDeckTest.kt`, `slide-paths/moses.txt`, `docs/index.md` |
+| 6  | ✅ | [10](#issue-10), [12](#issue-12) (Jermain), [13](#issue-13) (text only), [14](#issue-14) | Loguen; Jermain typos; continuity rewording; alt text and markup | `JermainLonguen.kt`, `Moses.kt` (alt text), `README.md`, `docs/index.md` |
+| 7  | ✅ | [7](#issue-7) | `leadsToDeadEnd` for the recorded `dead_end`; optionally fix the stored rows; tests | `Slide.kt`, `ServiceImpl.kt`, `DbmsTxs.kt`, `ContentServiceTest.kt`, optional migration |
 
 - Steps 5 and 6 edit different decks, except the alt text in `Moses.kt`. Do that part in Step 5, or after it.
 - Steps 5 and 7 both edit `Slide.kt`, in different functions. Merge the second on top of the first.
@@ -767,9 +805,9 @@ The four steps share no files. Step 1 is a check in two dashboards, not code.
 | Server errors and headers | 2 → 14 | now (Step 2 is done) |
 | Settings | 3 | done |
 | Supply chain | 4 → 16, 19, and 23 | now (Step 4 is done) |
-| Moses content | 5 → 9 | now (with the content author) |
-| Jermain content | 6 → 8 → 9 | now (with the content author) |
-| Walk data | 7 → 10 | now |
+| Moses content | 5 → 9 | Step 9 (Step 5 is done) |
+| Jermain content | 6 → 8 → 9 | Step 8 (Step 6 is done) |
+| Walk data | 7 → 10 | Step 10 (Step 7 is done) |
 | Hardening | 11, 12, 13, 15 | now |
 | Build and CI | 17, 18 | now (one person, the Makefile) |
 | Docs and cleanup | 20, 21 → 22 | after the steps above |

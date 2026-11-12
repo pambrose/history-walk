@@ -11,7 +11,7 @@ import io.kotest.matchers.shouldBe
 
 // Checks the real decks the way a student walks them: from the root slide, through every choice (DeckWalk.kt)
 class SlideContentTest : StringSpec() {
-  private val decks = listOf("Jermain Longuen" to jermainLonguenSlides, "Moses" to mosesSlides)
+  private val decks = listOf("Jermain Loguen" to jermainLonguenSlides, "Moses" to mosesSlides)
 
   init {
     decks.forEach { (name, deck) ->
@@ -49,6 +49,21 @@ class SlideContentTest : StringSpec() {
         images.filter { javaClass.getResource("/static/images/$it") == null }.shouldBeEmpty()
       }
 
+      // A screen reader reads an image's alt text aloud in place of the picture, so each must describe it
+      "$name: every image a slide shows has alt text that describes it" {
+        slides
+          .flatMap { slide -> imgTagPattern.findAll(slide.content).map { slide.pathName to it.value } }
+          .filter { (_, img) ->
+            altPattern
+              .find(img)
+              ?.groupValues
+              ?.get(1)
+              ?.trim()
+              .let { it.isNullOrEmpty() || it.equals("Pic", ignoreCase = true) }
+          }.map { (path, img) -> "$path: $img" }
+          .shouldBeEmpty()
+      }
+
       "$name: every slide renders to HTML" {
         slides
           .filter { slide -> slide.content.transformText().let { it.isBlank() || "---" in it } }
@@ -59,7 +74,7 @@ class SlideContentTest : StringSpec() {
 
     // Each of the walk's go-backs is offered as trying another building, so each must land on the nearest town above
     // it ("Third Town"), not on a building or on a road named for a town ("Main Road out of First Town")
-    "Jermain Longuen: every go-back returns to the town the student is in" {
+    "Jermain Loguen: every go-back returns to the town the student is in" {
       val town = Regex("""^\w+ Town$""")
       jermainLonguenSlides
         .reachableSlides()
@@ -75,6 +90,10 @@ class SlideContentTest : StringSpec() {
 
   companion object {
     private val imagePattern = Regex("""/static/images/([^"'\s)]+)""")
+
+    // An <img> tag, and the value of its alt attribute
+    private val imgTagPattern = Regex("""<img\b[^>]*>""", RegexOption.IGNORE_CASE)
+    private val altPattern = Regex("""\balt\s*=\s*"([^"]*)"""", RegexOption.IGNORE_CASE)
 
     // The slide as the client gets it, with only what a go-back reads: its ancestors, root first, and its choices
     private fun Slide.toSlideData() =

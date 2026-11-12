@@ -12,8 +12,8 @@ There are two walks, each served by its own copy of the app:
 
 | Walk | Who you play | Where it starts |
 |---|---|---|
-| **Jermain** | Jarm Logue, later known as Reverend Jermain W. Longuen, on the Underground Railroad | *UGRR Scenario* |
-| **Moses** | Moses, sold with his mother to a cruel slave owner, Mr. Gooch | *Introduction* |
+| **Jermain** | Jarm Logue, later known as Reverend Jermain W. Loguen, on the Underground Railroad | *UGRR Scenario* |
+| **Moses** | Moses, sold away from his mother and owned at last by a cruel slave owner, Mr. Gooch | *Introduction* |
 
 ## Where to start
 

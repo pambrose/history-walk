@@ -10,7 +10,7 @@ import io.kotest.matchers.types.shouldBeSameInstanceAs
 // through to the other walk
 class SlideDecksTest : StringSpec() {
   init {
-    "jermain selects the Jermain Longuen deck" {
+    "jermain selects the Jermain Loguen deck" {
       slideDeckFor("jermain") shouldBeSameInstanceAs jermainLonguenSlides
       slideDeckName("jermain") shouldBe "jermain"
     }
@@ -20,7 +20,7 @@ class SlideDecksTest : StringSpec() {
       slideDeckName("moses") shouldBe "moses"
     }
 
-    "an unset or blank value selects the default, the Jermain Longuen deck" {
+    "an unset or blank value selects the default, the Jermain Loguen deck" {
       DEFAULT_SLIDE_DECK shouldBe "jermain"
       listOf(null, "", " ", "\t\n").forEach { value ->
         slideDeckFor(value) shouldBeSameInstanceAs jermainLonguenSlides

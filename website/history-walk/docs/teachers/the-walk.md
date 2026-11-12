@@ -20,7 +20,8 @@ Total Decisions
 
 Consecutive Correct Decisions
 :   How many decisions the student has made since their last decision that led to a dead end (or all of them, if
-    none has). An administrator can hide this line.
+    none has). A decision counts as leading to a dead end even when a *Continue* slide stands between it and the
+    ending, as when leaving in the autumn ends with the Paddy Rollers. An administrator can hide this line.
 
 ## Making a choice
 
