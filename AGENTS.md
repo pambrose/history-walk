@@ -155,12 +155,19 @@ an edit fails CI, listing the paths that disappeared (each orphans the students 
 deliberate rename needs either a migration that moves the stored path names or acceptance that the affected students
 restart, together with the snapshot rewritten and committed with the deck change:
 `./gradlew jvmTest --tests 'com.pambrose.historywalk.content.SlidePathsTest' -PupdateSlidePaths=true`.
+`V005` is such a migration: text replacements of whole titles or chains of titles over `users.last_path_name` and the
+four path and title columns of `user_choices`, worked out and checked against the before and after snapshots. Its
+check stays: `DbmsMigrateTest` stores a student at every path either deck had before it
+(`slide-paths/before-v005/`), and one who made every move between them, runs every migration, and requires each place
+to find a slide the current deck reaches and each move to be moved whole or left as it was. A later rename that strands
+a place fails it too, so it needs a migration of its own or, if the students are to restart, a deliberate fixture edit.
 
 **Database.** `Dbms.migrate` runs Flyway (`src/jvmMain/resources/db/migration`) before `Database.connect` on every
 startup, so each deploy migrates. Never edit an applied migration (Flyway checksums them); add the next `V00N__...sql`
 (`V002` added `users.session_version`, `V003` the `history.settings` row and `user_choices.counted_as_student`, and
 rebuilt the progress views; `V004` is data only, marking as dead ends the stored decisions `Slide.leadsToDeadEnd` now
-catches, by path name). Tables are Exposed objects in `dbms/DbmsTables.kt`; queries are in `dbms/DbmsTxs.kt`,
+catches, by path name; `V005` is data only too, moving the stored places and moves of renamed and rerouted slides, as
+described under Slides). Tables are Exposed objects in `dbms/DbmsTables.kt`; queries are in `dbms/DbmsTxs.kt`,
 `dbms/AdminTxs.kt`, and `User.kt`.
 
 The connection (`Dbms.hikari`) comes from a platform's `DATABASE_URL` when it is set (Railway's

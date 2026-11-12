@@ -21,6 +21,9 @@ All notable changes to History Walk are recorded here. The format follows
   now refuses a second choice with the same text, so a deck with one fails to load.
 - Migration `V004`, data only: the stored Jermain decisions that led to a *Continue* on to a dead end are marked as
   dead ends (see Fixed).
+- Migration `V005`, data only: moves the stored places and moves of the slides renamed and rerouted below, so each
+  student keeps their place. `DbmsMigrateTest` puts a student at every place either deck had before it and checks that
+  each still finds its slide afterwards.
 
 ### Changed
 
@@ -56,6 +59,16 @@ All notable changes to History Walk are recorded here. The format follows
     to a log cabin and now says so.
   - Every Jermain image has alt text describing it, for screen readers, in place of "Pic"; a test refuses an empty or
     "Pic" alt.
+
+- Moses's slide titles say "Decision", not "Decison", and four Jermain titles capitalize their verb ("Bluff",
+  "Fight"); stored places and moves move with them (`V005`).
+- In the Jermain walk, refusing Ross's deal led to the slides that assume Ross's papers and pistols. It now leads to
+  Old Ben's own advice. A student who was on that branch's via-Ross winter, which is gone, goes back to the branch's
+  first slide and chooses when to go again.
+- The patrol that the town exits and the walk without Ross share no longer tells a student with Ross's papers that
+  they have none.
+- Leaving in the summer on Old Ben's advice via Ross, and in the spring on Old Ben's own advice, now go through the
+  Summer and Spring Departure slides, as on every other path.
 
 ### Removed
 
