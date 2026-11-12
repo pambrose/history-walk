@@ -89,8 +89,11 @@ The server reads its settings from environment variables at startup. The
 | `DBMS_URL` | `jdbc:postgresql://localhost:5432/historywalk` | The database, as a PostgreSQL JDBC URL; not encrypted unless it sets `sslmode` |
 | `DBMS_USERNAME` | `postgres` | The database user |
 | `DBMS_PASSWORD` | `docker` | That user's password |
-| `CLIENT_VERSION_CHECK_INTERVAL_SECS` | `60` | How often an open page asks whether its version is current |
-| `CLIENT_RELOAD_WARNING_INTERVAL_SECS` | `60` | How long an out-of-date page shows its reload dialog before it reloads itself |
+| `CLIENT_VERSION_CHECK_INTERVAL_SECS` | `60` | How often an open page asks whether its version is current (10 to 3600 seconds) |
+| `CLIENT_RELOAD_WARNING_INTERVAL_SECS` | `60` | How long an out-of-date page shows its reload dialog before it reloads itself (0 to 3600 seconds) |
+
+The `true`/`false` settings take only those two words, in any case, and the two intervals only whole numbers in their
+ranges; any other value stops the server at startup with an error naming the setting.
 
 Generate `SESSION_SECRET` with `openssl rand -hex 32`, and use a distinct one for each deployment. Rotating it signs
 everyone out. A callback host of `localhost`, `127.0.0.1`, or `::1` counts as local: there a blank `SESSION_SECRET` falls

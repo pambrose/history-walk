@@ -16,6 +16,7 @@ import org.jetbrains.exposed.v1.jdbc.JdbcTransaction
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import javax.sql.DataSource
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 object Dbms {
   private val logger = KotlinLogging.logger {}
@@ -146,6 +147,20 @@ object Dbms {
     }
     return url
   }
+
+  /** How long `/health` waits for the database before it reports it down. */
+  val HEALTH_TIMEOUT = 3.seconds
+
+  /** How long `/health` reuses a finished check, so callers, however many, run at most one query in that time. */
+  val HEALTH_MAX_AGE = 5.seconds
+
+  private val healthCheck = HealthCheck(HEALTH_TIMEOUT, HEALTH_MAX_AGE) { transaction { exec("select 1") } }
+
+  /**
+   * Whether the database answers a trivial query within [HEALTH_TIMEOUT]. One query runs at a time and its answer is
+   * reused for [HEALTH_MAX_AGE] ([HealthCheck]), as `/health` is open to anyone.
+   */
+  suspend fun answers(): Boolean = healthCheck.answers()
 
   suspend fun <T> dbQuery(block: JdbcTransaction.() -> T): T =
     withContext(Dispatchers.IO) {

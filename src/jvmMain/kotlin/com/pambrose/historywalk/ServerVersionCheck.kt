@@ -19,11 +19,24 @@ import kotlin.time.Instant
  * (`Routes.staticContent`).
  */
 object ServerVersionCheck {
+  /**
+   * The seconds CLIENT_VERSION_CHECK_INTERVAL_SECS may hold. Every open page checks this often, so the floor keeps a
+   * small value from flooding the server; the client has a floor of its own (VersionCheckState.MIN_CHECK_INTERVAL).
+   */
+  internal val VERSION_CHECK_INTERVAL_SECS = 10..3600
+
+  /** The seconds CLIENT_RELOAD_WARNING_INTERVAL_SECS may hold: 0 reloads with no dialog first. */
+  internal val RELOAD_WARNING_INTERVAL_SECS = 0..3600
+
   /** How often a page checks while its version matches (CLIENT_VERSION_CHECK_INTERVAL_SECS, default 60). */
-  val versionCheckInterval: Duration by lazy { CLIENT_VERSION_CHECK_INTERVAL_SECS.getEnv(60).seconds }
+  val versionCheckInterval: Duration by lazy {
+    CLIENT_VERSION_CHECK_INTERVAL_SECS.getEnv(60, VERSION_CHECK_INTERVAL_SECS).seconds
+  }
 
   /** How long the reload dialog is offered before the page reloads itself (CLIENT_RELOAD_WARNING_INTERVAL_SECS, 60). */
-  val reloadWarningInterval: Duration by lazy { CLIENT_RELOAD_WARNING_INTERVAL_SECS.getEnv(60).seconds }
+  val reloadWarningInterval: Duration by lazy {
+    CLIENT_RELOAD_WARNING_INTERVAL_SECS.getEnv(60, RELOAD_WARNING_INTERVAL_SECS).seconds
+  }
 
   /** How often a page that has been warned checks, so the dialog turns into the countdown soon after it is due. */
   internal val WARNED_CHECK_INTERVAL = 15.seconds

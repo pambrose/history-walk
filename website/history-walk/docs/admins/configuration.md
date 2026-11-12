@@ -32,6 +32,9 @@ The server refuses to start without these.
 
 ## Features
 
+Each takes `true` or `false`, in any case; unset or blank means the default. Any other value, such as `1` or `yes`,
+stops the server at startup with an error naming the variable.
+
 | Variable | Default | Effect |
 |---|---|---|
 | `SHOW_RESET_BUTTON` | `false` | `true` gives teachers a **reset** link that deletes their own walk. Students never get one. |
@@ -62,8 +65,12 @@ An open page asks the server every minute whether a newer version has been relea
 
 | Variable | Default | Value |
 |---|---|---|
-| `CLIENT_VERSION_CHECK_INTERVAL_SECS` | `60` | How often an open page checks, in seconds. |
-| `CLIENT_RELOAD_WARNING_INTERVAL_SECS` | `60` | How long an out-of-date page shows its update dialog before it counts down and reloads itself, in seconds. |
+| `CLIENT_VERSION_CHECK_INTERVAL_SECS` | `60` | How often an open page checks, in seconds: a whole number from 10 to 3600. |
+| `CLIENT_RELOAD_WARNING_INTERVAL_SECS` | `60` | How long an out-of-date page shows its update dialog before it counts down and reloads itself, in seconds: a whole number from 0 (no dialog) to 3600. |
+
+A value that isn't a whole number in its range stops the server at startup with an error naming the variable and the
+range. Every open page checks at the first interval, so a small one would load the server; a page never checks more
+often than every 5 seconds, whatever the server says.
 
 ## The port
 

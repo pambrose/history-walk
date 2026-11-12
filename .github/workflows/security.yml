@@ -1,7 +1,8 @@
 name: Security
 
 # Scans the image a deploy ships for known vulnerabilities: Trivy reads the Alpine and JRE layers and every library in
-# the fat jar, and fails on a HIGH or CRITICAL vulnerability that has a fix. The base image is pinned by digest, so a
+# the fat jar, and fails on a HIGH or CRITICAL vulnerability that has a fix. It also reports, without failing, on the
+# client's npm lock (lock-scan), whose packages the image scan cannot see. The base image is pinned by digest, so a
 # newly published CVE changes nothing in the repository: only the weekly run would notice it. Findings from master and
 # the weekly run go to the repository's code scanning alerts. No untrusted event payloads are referenced.
 on:
@@ -76,3 +77,48 @@ jobs:
         with:
           sarif_file: trivy-image.sarif
           category: trivy-image
+
+  # The client's npm packages are webpacked into the jar's main.bundle.js, where the image scan cannot see them, so their
+  # lock (.kotlin-js-store/yarn.lock) is scanned on its own. It reports and does not fail: the lock's fixable HIGH and
+  # CRITICAL findings, all in the build and test tools (karma, webpack's helpers), are issue 28 of
+  # docs/code-review-2026-11-11.md. Once they are fixed, give the first step exit-code '1' to make this a gate.
+  lock-scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Report fixable HIGH or CRITICAL vulnerabilities in the npm lock
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: .kotlin-js-store
+          scanners: vuln
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: '0'
+          format: table
+
+      - name: Write the findings as SARIF
+        if: github.event_name != 'pull_request'
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: .kotlin-js-store
+          scanners: vuln
+          severity: HIGH,CRITICAL
+          limit-severities-for-sarif: true
+          format: sarif
+          output: trivy-npm-lock.sarif
+
+      - name: Upload the findings to code scanning
+        if: github.event_name != 'pull_request'
+        uses: github/codeql-action/upload-sarif@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
+        with:
+          sarif_file: trivy-npm-lock.sarif
+          category: trivy-npm-lock

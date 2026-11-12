@@ -69,7 +69,10 @@ internal class VersionCheckState(
   private val bundleApiVersion: String,
   private val reloadMemory: ReloadMemory,
 ) {
-  /** How long to wait before the next check: the server's last say, or [DEFAULT_CHECK_INTERVAL] until it has one. */
+  /**
+   * How long to wait before the next check: the server's last say, or [DEFAULT_CHECK_INTERVAL] until it has one, and
+   * never less than [MIN_CHECK_INTERVAL], whatever the server says.
+   */
   var checkInterval: Duration = DEFAULT_CHECK_INTERVAL
     private set
 
@@ -110,7 +113,7 @@ internal class VersionCheckState(
     modalOpen: Boolean,
     writingReason: Boolean,
   ): VersionCheckAction {
-    response.versionCheckInterval?.also { checkInterval = it }
+    response.versionCheckInterval?.also { checkInterval = maxOf(it, MIN_CHECK_INTERVAL) }
     return when (response.alertLevel) {
       AlertLevel.NONE -> {
         // Current again, after a reload that worked or a server that went back: forget the warning and the reload
@@ -184,5 +187,12 @@ internal class VersionCheckState(
   companion object {
     /** How long the page waits between checks until the server says otherwise. */
     val DEFAULT_CHECK_INTERVAL = 60.seconds
+
+    /**
+     * The shortest wait between checks. A server that answers with less (a zero, or a negative, from a misconfigured
+     * CLIENT_VERSION_CHECK_INTERVAL_SECS, which the server now refuses at startup) would otherwise have every open page
+     * call it in a tight loop.
+     */
+    val MIN_CHECK_INTERVAL = 5.seconds
   }
 }

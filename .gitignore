@@ -1,6 +1,7 @@
 .*/
-# The dot-directories are ignored, except the GitHub workflows and Dependabot config
+# The dot-directories are ignored, except the GitHub workflows and Dependabot config, and the Kotlin/JS yarn lock
 !.github/
+!.kotlin-js-store/
 build/
 out/
 *.imp
@@ -8,7 +9,6 @@ out/
 *.iws
 *.iml
 *.idea
-kotlin-js-store
 
 logs/
 secrets/
@@ -18,3 +18,6 @@ secrets/
 # it pins, even for someone whose global gitignore drops *.lock
 website/history-walk/site/
 !website/uv.lock
+
+# The client's npm packages, pinned so CI builds what a release ships (build.gradle.kts), kept for the same reason
+!.kotlin-js-store/yarn.lock

@@ -23,7 +23,7 @@ session are not listed: the go-back offsets, the quotes in slide text, and lint.
 | #             | Status | Severity | Area           | Issue                                                                                  |
 |---------------|:------:|----------|----------------|----------------------------------------------------------------------------------------|
 | [1](#issue-1)   | ✅ | High     | Client         | One failed RPC call freezes the whole page, the version check included                 |
-| [2](#issue-2)   | ⬜ | High     | Server / ops   | The database password is written to the logs                                           |
+| [2](#issue-2)   | ✅ | High     | Server / ops   | The database password is written to the logs                                           |
 | [3](#issue-3)   | ✅ | High     | Server         | `/contentreset` runs Kotlin fetched from GitHub, now always fails, and bloats the jar  |
 | [4](#issue-4)   | ✅ | Medium   | Server         | `/threaddump` is open to anyone                                                        |
 | [5](#issue-5)   | ✅ | Medium   | Server         | The RPC service trusts client-supplied choices, so a student can fake progress         |
@@ -84,10 +84,10 @@ Things checked and found sound:
   - Give the version check a scope of its own.
 
 <a id="issue-2"></a>
-### ⬜ 2. The database password is written to the logs
+### ✅ 2. The database password is written to the logs
 
-- **Status:** the code no longer logs the password (Wave 1). The credentials still need rotating on both apps,
-  since the old password is in the Papertrail history; check this item off after that.
+- **Status:** the code no longer logs the password (Wave 1). Closed on 2026-11-11, with issue 1 of
+  `docs/code-review-2026-11-11.md`, which carried it over.
 - **Severity:** High
 - **Where:** `src/jvmMain/kotlin/com/pambrose/historywalk/dbms/Dbms.kt:47-58`
 - **Problem:**
@@ -493,7 +493,7 @@ separate branches, because they touch different files. Where two steps share fil
 
 | Step | Status | Issues | Work | Files |
 |------|:------:|--------|------|-------|
-| 1  | ⬜ | [2](#issue-2) | Remove the `DATABASE_URL` log line, parse with `URI`, rotate both apps' database credentials | `Dbms.kt` |
+| 1  | ✅ | [2](#issue-2) | Remove the `DATABASE_URL` log line, parse with `URI`, rotate both apps' database credentials | `Dbms.kt` |
 | 2  | ✅ | [3](#issue-3), [4](#issue-4) | Delete `/contentreset`, `loadSlides`, the scripting dependencies, and the `SLIDES_REPO_*` variables; delete or guard `/threaddump`; fix the teacher's reset button | `Routes.kt`, `Main.kt`, `EnvVar.kt`, `build.gradle.kts`, `MainPanel.kt`, docs |
 | 3  | ✅ | [9](#issue-9), [19](#issue-19) | Give the jar a version-free name; fail startup on an unknown `SLIDES_VARIABLE_NAME` | `build.gradle.kts`, `Procfile`, `Dockerfile`, `Main.kt` |
 

@@ -52,8 +52,10 @@ fun Application.main() {
 
   assignProperties()
 
-  // Fails startup before anything is installed if a required sign-in setting is missing
+  // Fails startup before anything is installed if a required sign-in setting is missing, or a setting holds a value it
+  // cannot use
   verifyAuthConfig()
+  verifySettings()
 
   // Fails startup too if SLIDES_VARIABLE_NAME names no deck, rather than serve the other walk
   val slidesName = SLIDES_VARIABLE_NAME.getEnvOrNull()

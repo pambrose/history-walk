@@ -5,11 +5,13 @@
 | Address | Answers | Use |
 |---|---|---|
 | `/ping` | `pong` | The server is up. It touches neither the database nor a session; the Docker health check uses it. |
+| `/health` | `ok`, or a 503 | The server can reach the database: a trivial query answered within 3 seconds. For an uptime monitor; a 503 means the database is down or unreachable. An answer is reused for 5 seconds, so it can lag that much. |
 | `/version` | `Version: 1.2.1 Release Date: … Build Date: …` | Which release a deployment runs. |
 | `/threaddump` | Every JVM thread's stack (teachers only) | A hung or slow server. Taking it briefly pauses the JVM. |
 
 ```bash
 curl -s https://<deployment>/ping
+curl -s https://<deployment>/health
 curl -s https://<deployment>/version
 ```
 
@@ -32,6 +34,7 @@ Worth knowing in the log:
 | *Signing out the session for user …: …* | A session was ended, with why: expired, signed out elsewhere, or no longer admitted. |
 | *Teachers see the student view* / *teacher view* | Someone pressed the admin page's switch. |
 | *Cleared N moves of M teachers* | Someone pressed **Clear teachers' trial walks**. |
+| *ERROR … GET /… failed with …: answered 503* (or *500*) | A request failed, with its stack trace below. A 503 is the database (down, unreachable, or out of connections); a 500 is a bug. The method and path are logged, never the query string. |
 
 ## The server won't start
 
@@ -41,6 +44,8 @@ Worth knowing in the log:
 | *SESSION_SECRET must be set for a server reached at …* | Set `SESSION_SECRET` (`openssl rand -hex 32`). |
 | *SESSION_SECRET is too weak (min 16 chars)* | Generate a longer one. |
 | An error naming `SLIDES_VARIABLE_NAME`'s value | It must be `jermain` or `moses`, or unset. |
+| *SHOW_RESET_BUTTON is "…": set it to true or false* (or another feature setting) | Set it to `true` or `false`, or unset it. See [Configuration](configuration.md#features). |
+| *CLIENT_VERSION_CHECK_INTERVAL_SECS is "…": set it to a whole number from 10 to 3600* (or `CLIENT_RELOAD_WARNING_INTERVAL_SECS`, from 0) | Set a whole number of seconds in the range, or unset it. See [Configuration](configuration.md#update-checks). |
 | *Refusing to migrate: the history schema holds tables, but Flyway's schema history table … is missing or empty* | A restore left out `public.flyway_schema_history`. Restore it; see [the startup guard](database.md#the-startup-guard). |
 | *DATABASE_URL has no host; an @ in the password must be percent-encoded* (and other *DATABASE_URL …* errors) | Fix the URL. |
 | A Flyway *checksum mismatch* | An applied migration was edited. Put it back as it was, and make the change a new migration. |
@@ -62,7 +67,9 @@ See [Google sign-in](google-sign-in.md#other-sign-in-problems). The most common:
 
 | Symptom | Likely cause |
 |---|---|
-| *Something went wrong loading the page. Please reload it.* | The page couldn't reach the server at start-up. Check `/ping`. |
+| *Something went wrong loading the page. Please reload it.* | The page couldn't reach the server at start-up. Check `/ping` and `/health`. |
+| *503 Service Unavailable: the database is not answering* in place of the page | The server is up but can't reach the database, so every signed-in request fails; a signed-out browser still gets the page. Check `/health` and the database. |
+| *500 Internal Server Error: something went wrong* | A bug; the log has an *ERROR* line with the stack trace. |
 | *Something went wrong, so nothing changed* on every click | The server is failing requests; check the log. |
 | An *Application Update* dialog that comes back after reloading | Something between the browser and the server, such as a proxy or CDN, is serving the old `main.bundle.js` despite the server's headers ([Caching](releases.md#caching)). |
 | A student is back on the first slide unexpectedly | A release renamed or moved the slide they were on ([Slide decks](slide-decks.md#slide-identity-path-names)). |
