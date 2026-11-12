@@ -23,10 +23,11 @@ DOCKER_PLATFORMS ?= linux/amd64,linux/arm64
 
 # `make release` publishes only from a clean checkout of this branch that matches origin, and whose CI on GitHub passed:
 # each of the RELEASE_CHECKS jobs (the Tests, Lint, Docker Image, and Security workflows) must have run and passed, so a
-# release started before CI has queued them all stops rather than passing on the ones that ran. image-scan is the one
-# gate make ci can't run, since it needs Trivy, so this is where a release waits for it.
+# release started before CI has queued them all stops rather than passing on the ones that ran. image-scan and lock-scan
+# (the image, and the client's npm lock) are the gates make ci can't run, since they need Trivy, so this is where a
+# release waits for them.
 RELEASE_BRANCH ?= master
-RELEASE_CHECKS := test lint docker-image image-scan
+RELEASE_CHECKS := test lint docker-image image-scan lock-scan
 # VERSION as a regular expression, for finding its sections in CHANGELOG.md and RELEASE_NOTES.md
 VERSION_RE   = $(subst .,\.,$(VERSION))
 # Where make release writes VERSION's section of RELEASE_NOTES.md, the GitHub release's notes
@@ -60,8 +61,8 @@ ZENSICAL     := $(abspath website/.venv/bin/zensical)
 
 .PHONY: help db reset-jermain reset-moses stop-db server client build clean tests js-tests coverage lint \
 		format zizmor ci docker-build docker-push _docker-push docker-run docker-smoke release-check release \
-		_confirm-release railway-restart railway-redeploy log log-jermain log-moses _follow-log website-env website-serve \
-		website-build website-clean upgrade-site versions versions-all depends yarn-unlock upgrade-wrapper \
+		_confirm-release release-github railway-restart railway-redeploy log log-jermain log-moses _follow-log website-env \
+		website-serve website-build website-clean upgrade-site versions versions-all depends yarn-unlock upgrade-wrapper \
 		railway-versions served-version
 
 ##@ General
@@ -83,8 +84,15 @@ db: ## Start the Postgres instance and create the jermain and moses databases if
 			-p 127.0.0.1:$(DB_PORT):5432 -v $(DB_DATA_DIR):/var/lib/postgresql \
 			--restart unless-stopped $(DB_IMAGE) >/dev/null; \
 	fi
-	@# Probe over TCP: the image's first-run init server listens only on the socket, then restarts.
-	@until docker exec $(DB_CONTAINER) pg_isready -q -h 127.0.0.1 -U $(DB_USER); do sleep 1; done
+	@# Probe over TCP: the image's first-run init server listens only on the socket, then restarts. A container that
+	@# never gets there (one crash-looping under --restart unless-stopped, say, on data from another Postgres major in
+	@# DB_DATA_DIR) is given up on after a minute, with the end of its log.
+	@ready=; for _ in $$(seq 1 60); do \
+		if docker exec $(DB_CONTAINER) pg_isready -q -h 127.0.0.1 -U $(DB_USER) 2>/dev/null; then ready=1; break; fi; \
+		sleep 1; \
+	done; \
+	[ -n "$$ready" ] || { echo "make db: Postgres in $(DB_CONTAINER) was not ready within a minute; its log ends:" >&2; \
+		docker logs --tail 30 $(DB_CONTAINER) >&2; exit 1; }
 	@for db in $(DATABASES); do \
 		docker exec $(DB_CONTAINER) psql -U $(DB_USER) -tAc "SELECT 1 FROM pg_database WHERE datname = '$$db'" | grep -qx 1 \
 			|| docker exec $(DB_CONTAINER) createdb -U $(DB_USER) $$db || exit 1; \
@@ -160,11 +168,13 @@ ci: ## Run every CI gate locally but the image scan: lint, zizmor, the JVM and c
 
 ##@ Docker
 
-# APP_VERSION only labels the image (org.opencontainers.image.version): the jar the Dockerfile copies has no version in
-# its name.
+# APP_VERSION and APP_REVISION only label the image (org.opencontainers.image.version and .revision, the commit it was
+# built from): the jar the Dockerfile copies has no version in its name.
+APP_REVISION = $(shell git rev-parse HEAD 2>/dev/null)
 docker-build: ## Build the fat jar, then an image holding it (history-walk:VERSION and :latest)
 	$(GRADLE) jar
-	docker build --build-arg APP_VERSION=$(VERSION) -t $(DOCKER_IMAGE):$(VERSION) -t $(DOCKER_IMAGE):latest .
+	docker build --build-arg APP_VERSION=$(VERSION) --build-arg APP_REVISION=$(APP_REVISION) \
+		-t $(DOCKER_IMAGE):$(VERSION) -t $(DOCKER_IMAGE):latest .
 
 # One jar serves every platform, and the base image is pinned to its multi-arch index, so buildx builds the image for
 # each of DOCKER_PLATFORMS from the same jar and pushes them under one tag. The image holds no secrets (they come from
@@ -176,13 +186,16 @@ docker-push: ## Build the fat jar, then build and push a multi-arch image to Doc
 	@echo "  $(DOCKER_REPO):$(VERSION)"
 	@echo "  $(DOCKER_REPO):latest"
 	@printf 'Continue? [y/N] ' && read ans && [ "$$ans" = "y" ]
+	$(GRADLE) jar
 	@$(MAKE) --no-print-directory _docker-push
 
-# The push itself, with no prompt: docker-push asks first, and make release asks once for the whole release.
+# The push itself, of the jar build/libs holds, with no prompt: docker-push builds the jar and asks first, and make
+# release pushes the jar make ci built and the smoke test ran, rather than a rebuild (asking for jar stamps a new build
+# time, so the build would compile and webpack again).
 _docker-push:
-	$(GRADLE) jar
-	docker buildx build --build-arg APP_VERSION=$(VERSION) --platform $(DOCKER_PLATFORMS) \
-		-t $(DOCKER_REPO):$(VERSION) -t $(DOCKER_REPO):latest --push .
+	@[ -f build/libs/history-walk.jar ] || { echo "_docker-push: build/libs/history-walk.jar is missing" >&2; exit 1; }
+	docker buildx build --build-arg APP_VERSION=$(VERSION) --build-arg APP_REVISION=$(APP_REVISION) \
+		--platform $(DOCKER_PLATFORMS) -t $(DOCKER_REPO):$(VERSION) -t $(DOCKER_REPO):latest --push .
 
 # ENV_FILE is read as the shell reads it (so quoted values lose their quotes), then each of its variables is passed to the
 # container. Inside the container localhost is the container itself, so the database is reached through
@@ -200,19 +213,22 @@ docker-run: docker-build ## Run the image on DOCKER_PORT with ENV_FILE (.env), a
 # Starts the image against a throwaway Postgres on a Docker network of its own and checks that it migrates the empty
 # database and answers: /ping, /version, /health (the database reached), the page shell's Cache-Control and security
 # headers, the bundle, and a 401 for an RPC call without a session. Sign-in needs real Google credentials only when
-# someone signs in, so placeholders let the server start, and a loopback callback URL means no SESSION_SECRET is required. Everything it starts is removed, pass or fail; on a
-# failure it prints the end of the server's log. The Docker Image workflow runs it too.
+# someone signs in, so placeholders let the server start, and a loopback callback URL means no SESSION_SECRET is
+# required. Everything it starts is removed however it ends (a trap on exit), and a failure says which check failed and
+# prints the end of the server's log. The Docker Image workflow runs it too.
 SMOKE_NAME ?= history-walk-smoke
 SMOKE_PORT ?= 18080
 docker-smoke: ## Start the image (make docker-build first) against a throwaway Postgres and check that it answers
 	@set -e; \
 	cleanup() { docker rm -f $(SMOKE_NAME)-app $(SMOKE_NAME)-db >/dev/null 2>&1 || true; \
 		docker network rm $(SMOKE_NAME) >/dev/null 2>&1 || true; }; \
-	fail() { echo "docker-smoke: $$1" >&2; docker logs $(SMOKE_NAME)-app 2>&1 | tail -40 >&2 || true; cleanup; exit 1; }; \
+	fail() { echo "docker-smoke: $$1" >&2; docker logs $(SMOKE_NAME)-app 2>&1 | tail -40 >&2 || true; exit 1; }; \
 	cleanup; \
-	docker network create $(SMOKE_NAME) >/dev/null; \
+	trap cleanup EXIT; \
+	docker network create $(SMOKE_NAME) >/dev/null || fail "could not create the Docker network $(SMOKE_NAME)"; \
 	docker run -d --name $(SMOKE_NAME)-db --network $(SMOKE_NAME) \
-		-e POSTGRES_PASSWORD=smoke -e POSTGRES_DB=historywalk $(DB_IMAGE) >/dev/null; \
+		-e POSTGRES_PASSWORD=smoke -e POSTGRES_DB=historywalk $(DB_IMAGE) >/dev/null \
+		|| fail "could not start Postgres ($(DB_IMAGE))"; \
 	ready=; for _ in $$(seq 1 60); do \
 		if docker exec $(SMOKE_NAME)-db pg_isready -q -h 127.0.0.1 -U postgres; then ready=1; break; fi; sleep 1; \
 	done; \
@@ -221,7 +237,7 @@ docker-smoke: ## Start the image (make docker-build first) against a throwaway P
 		-e DBMS_URL=jdbc:postgresql://$(SMOKE_NAME)-db:5432/historywalk -e DBMS_USERNAME=postgres -e DBMS_PASSWORD=smoke \
 		-e GOOGLE_CLIENT_ID=smoke -e GOOGLE_CLIENT_SECRET=smoke \
 		-e OAUTH_CALLBACK_URL=http://localhost:8080/auth/callback \
-		$(DOCKER_IMAGE):$(VERSION) >/dev/null; \
+		$(DOCKER_IMAGE):$(VERSION) >/dev/null || fail "could not start $(DOCKER_IMAGE):$(VERSION); make docker-build first"; \
 	url=http://127.0.0.1:$(SMOKE_PORT); up=; \
 	for _ in $$(seq 1 60); do \
 		if curl -fsS -o /dev/null $$url/ping 2>/dev/null; then up=1; break; fi; \
@@ -236,9 +252,8 @@ docker-smoke: ## Start the image (make docker-build first) against a throwaway P
 	curl -fsS -D - -o /dev/null $$url/ | grep -qi '^x-content-type-options: nosniff' \
 		|| fail "the page shell is not sent with X-Content-Type-Options: nosniff"; \
 	curl -fsS -o /dev/null $$url/main.bundle.js || fail "main.bundle.js is not served"; \
-	status=$$(curl -s -o /dev/null -w '%{http_code}' -X POST $$url/rpc/routeContentServiceManager0); \
+	status=$$(curl -s -o /dev/null -w '%{http_code}' -X POST $$url/rpc/routeContentServiceManager0 || true); \
 	[ "$$status" = 401 ] || fail "an RPC call without a session got $$status, not 401"; \
-	cleanup; \
 	echo "docker-smoke: $(DOCKER_IMAGE):$(VERSION) migrated an empty database and answered every check"
 
 ##@ Release
@@ -283,7 +298,7 @@ release-check: ## Fail, listing every reason, unless this checkout is fit to rel
 		done; \
 	else problem "could not read HEAD's CI checks from GitHub: is HEAD pushed, and gh signed in?"; fi; \
 	if out=$$(docker buildx imagetools inspect $(DOCKER_REPO):$(VERSION) 2>&1); then \
-		problem "$(DOCKER_REPO):$(VERSION) is already on Docker Hub: bump the version"; \
+		problem "$(DOCKER_REPO):$(VERSION) is on Docker Hub: bump the version, or finish its release: make release-github"; \
 	elif ! echo "$$out" | grep -q 'not found'; then \
 		problem "could not ask Docker Hub for $(DOCKER_REPO):$(VERSION): $$(echo "$$out" | tail -1)"; \
 	fi; \
@@ -295,7 +310,7 @@ release-check: ## Fail, listing every reason, unless this checkout is fit to rel
 _confirm-release:
 	@[ -n "$(RELEASE_SHA)" ] || { echo "ERROR: make release runs this, setting RELEASE_SHA" >&2; exit 1; }
 	@[ "$$(git rev-parse HEAD)" = "$(RELEASE_SHA)" ] && [ -z "$$(git status --porcelain)" ] \
-		|| { echo "ERROR: the checkout changed while the release ran; nothing	 published" >&2; exit 1; }
+		|| { echo "ERROR: the checkout changed while the release ran; nothing published" >&2; exit 1; }
 	@echo "About to release $(VERSION) from $$(git rev-parse --short HEAD):"
 	@echo "  - push $(DOCKER_REPO):$(VERSION) and :latest to Docker Hub, for $(DOCKER_PLATFORMS)"
 	@echo "  - create the GitHub release v$(VERSION), tagged $(VERSION), with RELEASE_NOTES.md's $(VERSION) section"
@@ -303,20 +318,41 @@ _confirm-release:
 	case "$$answer" in [yY]|[yY][eE][sS]) ;; *) echo "Nothing published."; exit 1 ;; esac
 
 # Each step runs only if the one before it passed, so nothing is published until the checkout passes release-check,
-# every CI gate (make ci, after a clean build) and the prompt. The image goes first: if its push fails, no release or tag
-# is created. The GitHub release follows the house rules: tag VERSION, title vVERSION, and RELEASE_NOTES.md's section
-# for VERSION as its notes. What stays by hand is printed at the end.
+# every CI gate (make ci, after a clean build) and the prompt. The image goes first, built from the jar make ci built and
+# smoke-tested: if its push fails, no release or tag is created. If the GitHub release then fails (gh signed out, the
+# network), the image is on Docker Hub, which a second make release refuses; make release-github finishes it.
 release: RELEASE_SHA := $(shell git rev-parse HEAD 2>/dev/null)
 release: ## Check, run every CI gate, then push VERSION's image and create its GitHub release (asks first)
 	$(MAKE) release-check
 	$(MAKE) clean
 	$(MAKE) ci
 	@$(MAKE) --no-print-directory _confirm-release RELEASE_SHA=$(RELEASE_SHA)
-	$(MAKE) _docker-push
+	$(MAKE) _docker-push APP_REVISION=$(RELEASE_SHA)
+	@$(MAKE) --no-print-directory release-github RELEASE_SHA=$(RELEASE_SHA)
+
+# Creates VERSION's GitHub release, following the house rules: tag VERSION at RELEASE_SHA (HEAD, unless make release
+# passes the commit it started from), title vVERSION, and RELEASE_NOTES.md's section for VERSION as its notes. make
+# release runs it last; run it alone to finish a release that stopped after pushing its image. It first checks that
+# Docker Hub's DOCKER_REPO:VERSION was built from RELEASE_SHA (the image's org.opencontainers.image.revision label), so
+# the tag lands on the commit the image holds. What stays by hand is printed at the end.
+release-github: RELEASE_SHA ?= $(shell git rev-parse HEAD 2>/dev/null)
+release-github: ## Create VERSION's GitHub release, e.g. to finish a make release that stopped after pushing the image
+	@! gh release view "$(VERSION)" >/dev/null 2>&1 \
+		|| { echo "release-github: GitHub already has a release $(VERSION)" >&2; exit 1; }
+	@built=$$(docker buildx imagetools inspect $(DOCKER_REPO):$(VERSION) \
+		--format '{{ index (index .Image "linux/amd64").Config.Labels "org.opencontainers.image.revision" }}' 2>/dev/null); \
+	[ -n "$$built" ] || { echo "release-github: $(DOCKER_REPO):$(VERSION) is not on Docker Hub, or says no revision:" \
+		"run make release" >&2; exit 1; }; \
+	[ "$$built" = "$(RELEASE_SHA)" ] || { echo "release-github: $(DOCKER_REPO):$(VERSION) was built from $$built, not" \
+		"$(RELEASE_SHA)" >&2; exit 1; }
 	@mkdir -p $(dir $(RELEASE_NOTES_FILE))
 	@awk '/^## History Walk $(VERSION_RE)( |$$)/ { f = 1; next } /^## / { f = 0 } f' RELEASE_NOTES.md \
 		> $(RELEASE_NOTES_FILE)
-	gh release create $(VERSION) --target $(RELEASE_SHA) --title v$(VERSION) --notes-file $(RELEASE_NOTES_FILE)
+	@[ -s $(RELEASE_NOTES_FILE) ] \
+		|| { echo "release-github: RELEASE_NOTES.md has no \"## History Walk $(VERSION)\" section" >&2; exit 1; }
+	gh release create $(VERSION) --target $(RELEASE_SHA) --title v$(VERSION) --notes-file $(RELEASE_NOTES_FILE) \
+		|| { echo "release-github: the image is on Docker Hub; once that is fixed, finish with make release-github" >&2; \
+			exit 1; }
 	@echo; echo "Released $(VERSION): https://github.com/pambrose/history-walk/releases/tag/$(VERSION)"; \
 	echo "Still by hand:"; \
 	echo "  1. Redeploy each walk from the new image: make railway-redeploy (it waits until each reports $(VERSION))."; \
@@ -325,9 +361,10 @@ release: ## Check, run every CI gate, then push VERSION's image and create its G
 ##@ Website
 
 # Installs Zensical, at the version uv.lock pins, into website/.venv. Only the dependencies: website/ is not a package
-# the docs need built.
+# the docs need built. --locked fails, rather than quietly re-locking, when uv.lock no longer matches pyproject.toml, so
+# the site CI publishes is built with the versions the lock pins; make upgrade-site is how the lock changes.
 website-env:
-	@uv sync --project website --no-install-project --quiet
+	@uv sync --project website --no-install-project --locked --quiet
 
 website-serve: website-env ## Serve the documentation site at WEBSITE_ADDR (localhost:8000), rebuilding it on every save
 	cd $(WEBSITE_DIR) && $(ZENSICAL) serve --dev-addr $(WEBSITE_ADDR)
@@ -367,29 +404,40 @@ depends: ## Print the dependency tree
 yarn-unlock: ## Rewrite the committed Kotlin/JS yarn lock after npm dependency changes (commit the result)
 	$(GRADLE) kotlinUpgradeYarnLock
 
-upgrade-wrapper: ## Upgrade the Gradle wrapper (pick the version with GRADLE_VERSION=x.y.z)
-	$(GRADLE) wrapper --gradle-version=$(GRADLE_VERSION) --distribution-type=bin
+# Also records the distribution's SHA-256 (distributionSha256Sum in gradle-wrapper.properties), from the .sha256 file
+# Gradle publishes beside it, so the wrapper refuses a download that does not match.
+upgrade-wrapper: ## Upgrade the Gradle wrapper (pick the version with GRADLE_VERSION=x.y.z), with its checksum
+	@sum=$$(curl -fsSL https://services.gradle.org/distributions/gradle-$(GRADLE_VERSION)-bin.zip.sha256) \
+		|| { echo "upgrade-wrapper: could not fetch the checksum of Gradle $(GRADLE_VERSION)" >&2; exit 1; }; \
+	$(GRADLE) wrapper --gradle-version=$(GRADLE_VERSION) --distribution-type=bin --gradle-distribution-sha256-sum=$$sum
 
 ##@ Railway
 
 # Restarts the latest deployment of each of RAILWAY_SERVICES, as it is: nothing is rebuilt or pulled, so a newly pushed
 # image is not picked up (make railway-redeploy does that). Each walk is down for the few seconds it takes to start, so
-# avoid class time. Then waits, up to two minutes each, for every RAILWAY_URLS to answer /ping, and shows its /version.
-# Needs the Railway CLI, signed in (railway login); the project and services are named, so no railway link is needed.
-railway-restart: ## Restart the Jermain and Moses services on Railway (no rebuild), then wait for each to answer
+# avoid class time. The CLI can return before the old process stops, so /ping alone could be answered by the process
+# being replaced. /version also says when the server started, so this reads it from each of RAILWAY_URLS before
+# restarting, then waits, up to two minutes each, until it changes, and shows it. Needs the Railway CLI, signed in
+# (railway login); the project and services are named, so no railway link is needed.
+railway-restart: ## Restart the Jermain and Moses services on Railway (no rebuild), then wait for each to restart
 	@command -v railway >/dev/null || { echo "railway-restart: the Railway CLI is not installed" >&2; exit 1; }
-	@for s in $(RAILWAY_SERVICES); do \
+	@befores=$$(for u in $(RAILWAY_URLS); do printf '%s\t%s\n' "$$u" "$$(curl -s -m 5 "$$u/version")"; done); \
+	for s in $(RAILWAY_SERVICES); do \
 		echo "Restarting $$s"; \
 		railway restart --project $(RAILWAY_PROJECT) --environment $(RAILWAY_ENVIRONMENT) --service "$$s" --yes \
 			|| { echo "railway-restart: could not restart $$s" >&2; exit 1; }; \
-	done
-	@for u in $(RAILWAY_URLS); do \
+	done; \
+	for u in $(RAILWAY_URLS); do \
+		before=$$(printf '%s\n' "$$befores" | awk -F '\t' -v u="$$u" '$$1 == u { print $$2 }'); \
 		printf '%s ' "$$u"; \
-		for i in $$(seq 1 60); do \
-			[ "$$(curl -s -m 5 "$$u/ping")" = pong ] && break; printf .; sleep 2; \
+		for _ in $$(seq 1 60); do \
+			v=$$(curl -s -m 5 "$$u/version"); \
+			case "$$v" in "Version: "*) [ "$$v" != "$$before" ] && break;; esac; \
+			printf .; sleep 2; \
 		done; \
-		[ "$$(curl -s -m 5 "$$u/ping")" = pong ] || { echo " did not answer /ping within two minutes" >&2; exit 1; }; \
-		echo " $$(curl -s -m 5 "$$u/version")"; \
+		case "$$v" in "Version: "*) [ "$$v" != "$$before" ];; *) false;; esac \
+			|| { echo " did not restart within two minutes (it answers \"$$v\")" >&2; exit 1; }; \
+		echo " $$v"; \
 	done
 
 # Deploys each of RAILWAY_SERVICES again from its source, pulling the newest pambrose/history-walk image from Docker Hub

@@ -30,13 +30,15 @@ make docker-build       # fat jar, then image history-walk:<version>; make docke
 make docker-push        # fat jar, then buildx pushes pambrose/history-walk:<version> and :latest (amd64, arm64) to Docker Hub
 make docker-smoke       # start the image against a throwaway Postgres and check /ping, /version, /health, headers, the 401
 make yarn-unlock        # rewrite the committed Kotlin/JS yarn lock after an npm dependency change (commit the result)
-make railway-restart    # restart the Jermain and Moses services on Railway (railway CLI), then check /ping and /version
+make railway-restart    # restart the Jermain and Moses services on Railway (railway CLI), then wait for /version to change
 make railway-redeploy   # redeploy both from the newest Docker Hub image (after a release), then wait for its version
 make railway-versions   # make served-version for each walk: the client bundle version it serves, beside VERSION
 make log                # the last LOG_LINES (100) lines of each walk's Railway log; SERVICE=Moses for one walk
 make log-jermain        # follow one walk's Railway log like tail -f (make log-moses for the other); Ctrl-C stops
 make release-check     # list every reason this checkout can't be released as VERSION (publishes nothing)
-make release           # release-check, clean + ci, ask, push the image, create the GitHub release (tag X, title vX)
+make release           # release-check, clean + ci, ask, push the image make ci tested, then make release-github
+make release-github    # create VERSION's GitHub release (tag X, title vX), checking the image's revision; finishes a
+                       # make release that stopped after the push
 make website-serve      # the Zensical docs site (website/history-walk) at localhost:8000, rebuilt on every save
 make website-build      # build the docs site into website/history-walk/site, failing on any warning
 make website-clean      # remove the built docs site and Zensical's cache
@@ -358,9 +360,11 @@ has Trivy scan it (the Alpine and JRE layers and the fat jar's libraries) on pus
 Monday, since the digest-pinned base means a new CVE changes nothing in the repository: a HIGH or CRITICAL vulnerability
 with a fix fails the job, master's and the weekly runs upload their findings to code scanning, and `make
 release-check` requires its `image-scan` to have passed for the release commit (`RELEASE_CHECKS`). Its `lock-scan` job
-scans the client's npm lock, which the image scan cannot see inside the webpacked bundle, and only reports (a table, and
-SARIF to code scanning off pull requests): the lock's findings, all in build and test tools, are issue 28 of
-`docs/code-review-2026-11-11.md`, and once they are fixed its `exit-code` becomes `'1'`; `zizmor.yml` audits
+scans the client's npm lock the same way, since the image scan cannot see inside the webpacked bundle, fails on a
+fixable HIGH or CRITICAL vulnerability, and is a release check too. A finding is fixed by a fresh resolution (move
+`.kotlin-js-store/yarn.lock` aside, then `make yarn-unlock`; a plain `make yarn-unlock` keeps every unchanged
+resolution) or, past a dependency's range, a Yarn resolution in `build.gradle.kts` (`serialize-javascript` is pinned to
+7 for mocha that way). `rootPackageJson` does not see a changed resolution, so delete `build/js` before re-locking; `zizmor.yml` audits
 `.github` changes; `lint.yml` runs `make lint`; `dependency-graph.yml` submits `jvmRuntimeClasspath` so Dependabot sees
 the JVM libraries; `cleanup-runs.yml` deletes runs older than 30 days every Monday, keeping each workflow's most recent
 run (uploaded reports expire after 30 days, `retention-days`), and every Trivy database in the Actions cache but
@@ -388,6 +392,13 @@ ktlint's property-naming rule requires.
   `NoSuchMethodError`, and the build cache kept the stale output, so even `./gradlew clean` restored it and the
   classes stayed up to date under `--no-build-cache`. `./gradlew compileTestKotlinJvm --rerun` recompiles them and
   replaces the cached copy.
+- `make release` pushes the jar `make ci` built and smoke-tested (`_docker-push` builds nothing), and labels the
+  image with the commit (`org.opencontainers.image.revision`, `APP_REVISION`). If the GitHub release then fails, a
+  second `make release` refuses (the image is on Docker Hub), and `make release-github` finishes it, once it has checked
+  that the image on Docker Hub was built from HEAD. The image's user owns neither `/app` nor the jar. The Gradle wrapper
+  checks the distribution's `distributionSha256Sum`; `make upgrade-wrapper` fetches the new one from Gradle. The docs
+  site builds with `uv sync --locked`, and `website.yml` also runs when the Makefile changes. `/version` ends with the
+  server's start (`Started: <instant>`), which `make railway-restart` waits on to change.
 - There is no Procfile: a deployment starts the fat jar with its own start command (Railway's service settings),
   `java -jar build/libs/history-walk.jar -port=$PORT`, and the Docker image runs the same jar.
 - `./gradlew jar` (what the Makefile runs) is Gradle's prefix match for `jarWithJs`, the Kilua RPC plugin's fat jar:

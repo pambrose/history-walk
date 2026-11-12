@@ -22,12 +22,15 @@ Two numbers in `gradle.properties` describe a release:
 2. On an up-to-date `master`, run `make release-check`. It publishes nothing; it lists every reason the checkout
    can't be released yet: a dirty tree, another branch, a commit not on GitHub, a missing changelog or release-notes
    section, a tag or GitHub release that already exists, CI that hasn't passed for the commit (the Tests, Lint, Docker
-   Image, and Security workflows must all have run), Docker not running, or the version already on Docker Hub.
+   Image, and Security workflows must all have run, the Security workflow's scans of the image and of the client's npm
+   lock included), Docker not running, or the version already on Docker Hub.
 3. Run `make release`. It runs `release-check` again, a clean build and the CI gates (`make ci`, all but the image
    scan, which CI runs), then asks once.
-   Then it pushes the image to Docker Hub (`pambrose/history-walk:<version>` and `:latest`, amd64 and arm64) and
-   creates the GitHub release: tag `1.2.1`, title `v1.2.1`, and the version's section of `RELEASE_NOTES.md` as its
-   notes. If the checkout changes while `make ci` runs, it publishes nothing.
+   Then it pushes the image to Docker Hub (`pambrose/history-walk:<version>` and `:latest`, amd64 and arm64), built
+   from the jar `make ci` just tested, and creates the GitHub release: tag `1.2.1`, title `v1.2.1`, and the version's
+   section of `RELEASE_NOTES.md` as its notes. If the checkout changes while `make ci` runs, it publishes nothing.
+   If the GitHub release fails after the push (`gh` signed out, the network), run `make release-github` to finish it:
+   it checks that the image on Docker Hub was built from the current commit, then creates the release.
 4. Deploy each walk: on Railway, `make railway-redeploy` pulls the new image and waits until each walk reports the new
    version. Each deployment migrates its database as it starts.
 
@@ -66,7 +69,7 @@ after a release, and could cache per-user pages.
 |---|---|
 | `make versions` | Lists the dependencies that have newer versions. |
 | `make versions-all` | The full dependency report. |
-| `make upgrade-wrapper GRADLE_VERSION=x.y.z` | Upgrades the Gradle wrapper. |
+| `make upgrade-wrapper GRADLE_VERSION=x.y.z` | Upgrades the Gradle wrapper, recording the distribution's checksum, which the wrapper then checks. |
 
 Dependabot proposes updates to GitHub Actions and to the Docker base image, and security fixes for the Java
 libraries. Other library updates are made by hand from `make versions`.

@@ -1,10 +1,10 @@
 name: Security
 
 # Scans the image a deploy ships for known vulnerabilities: Trivy reads the Alpine and JRE layers and every library in
-# the fat jar, and fails on a HIGH or CRITICAL vulnerability that has a fix. It also reports, without failing, on the
-# client's npm lock (lock-scan), whose packages the image scan cannot see. The base image is pinned by digest, so a
-# newly published CVE changes nothing in the repository: only the weekly run would notice it. Findings from master and
-# the weekly run go to the repository's code scanning alerts. No untrusted event payloads are referenced.
+# the fat jar, and fails on a HIGH or CRITICAL vulnerability that has a fix. It scans the client's npm lock the same
+# way (lock-scan), since the image scan cannot see the packages webpacked into the bundle. The base image is pinned by
+# digest, so a newly published CVE changes nothing in the repository: only the weekly run would notice it. Findings from
+# master and the weekly run go to the repository's code scanning alerts. No untrusted event payloads are referenced.
 on:
   push:
     branches: [ master ]
@@ -78,10 +78,12 @@ jobs:
           sarif_file: trivy-image.sarif
           category: trivy-image
 
-  # The client's npm packages are webpacked into the jar's main.bundle.js, where the image scan cannot see them, so their
-  # lock (.kotlin-js-store/yarn.lock) is scanned on its own. It reports and does not fail: the lock's fixable HIGH and
-  # CRITICAL findings, all in the build and test tools (karma, webpack's helpers), are issue 28 of
-  # docs/code-review-2026-11-11.md. Once they are fixed, give the first step exit-code '1' to make this a gate.
+  # The client's npm packages are webpacked into the jar's main.bundle.js, where the image scan cannot see them, so
+  # their lock (.kotlin-js-store/yarn.lock) is scanned on its own, and a fixable HIGH or CRITICAL vulnerability fails
+  # it, as the image's does. Most of the lock is the build and test tools (webpack, Karma, mocha), which run in CI and
+  # on the developer's machine. make release-check requires it to have passed (RELEASE_CHECKS). A finding is fixed by
+  # taking the newer version (make yarn-unlock re-resolves only what changed; moving the lock aside first resolves
+  # everything afresh), or, past a dependency's range, by a Yarn resolution in build.gradle.kts.
   lock-scan:
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -93,7 +95,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Report fixable HIGH or CRITICAL vulnerabilities in the npm lock
+      - name: Fail on a fixable HIGH or CRITICAL vulnerability in the npm lock
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           scan-type: fs
@@ -101,11 +103,11 @@ jobs:
           scanners: vuln
           severity: HIGH,CRITICAL
           ignore-unfixed: true
-          exit-code: '0'
+          exit-code: '1'
           format: table
 
       - name: Write the findings as SARIF
-        if: github.event_name != 'pull_request'
+        if: always() && github.event_name != 'pull_request'
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           scan-type: fs
@@ -117,7 +119,7 @@ jobs:
           output: trivy-npm-lock.sarif
 
       - name: Upload the findings to code scanning
-        if: github.event_name != 'pull_request'
+        if: always() && github.event_name != 'pull_request'
         uses: github/codeql-action/upload-sarif@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
         with:
           sarif_file: trivy-npm-lock.sarif

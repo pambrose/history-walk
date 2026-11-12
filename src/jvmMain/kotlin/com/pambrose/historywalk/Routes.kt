@@ -46,6 +46,8 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.io.ByteArrayOutputStream
 import java.lang.management.ManagementFactory
 import java.net.URL
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 import java.util.UUID
 import kotlin.text.Charsets.UTF_8
 
@@ -218,11 +220,18 @@ object Routes {
         call.respondText("the database is not answering", Plain, HttpStatusCode.ServiceUnavailable)
     }
 
+    // The release, and when this server process started: a restart changes the second part even when it runs the same
+    // release, which is how make railway-restart tells that a walk has restarted rather than still answering as before
     get("version") {
-      call.respondText(HistoryWalkServer::class.versionDesc(), Plain)
+      call.respondText("${HistoryWalkServer::class.versionDesc()} Started: $STARTED", Plain)
     }
 
     staticContent()
+  }
+
+  /** When this JVM started, to the second, as an ISO-8601 instant. */
+  internal val STARTED: String by lazy {
+    Instant.ofEpochMilli(ManagementFactory.getRuntimeMXBean().startTime).truncatedTo(ChronoUnit.SECONDS).toString()
   }
 
   private object ThreadDumpInfo {
