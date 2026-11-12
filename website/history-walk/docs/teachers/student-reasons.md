@@ -10,6 +10,7 @@ For each student, in order of their address, the page shows **User:** and their 
 | Column | Shows |
 |---|---|
 | **From/To** | The decision, as *the slide they were on* -> *the slide the choice led to*. |
+| **Choice** | The choice they made, as its button read. Where every wrong answer leads to the same kind of slide (each Moses decision's *Incorrect* slides), this is what says which one they picked. |
 | **Reason** | What they wrote, exactly as typed. |
 
 Within a student's table, the reasons are in the order the student gave them, so the table reads as the story of

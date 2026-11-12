@@ -27,7 +27,7 @@ The server refuses to start without these.
 |---|---|---|
 | `SLIDES_VARIABLE_NAME` | `jermain` | The deck this deployment serves: `jermain` or `moses`, in any case. Any other value stops the server at startup with an error naming it. |
 | `TEACHER_EMAILS` | none | The teachers' addresses, separated by commas, in any case: `ateacher@athenian.org,another@athenian.org`. Only these accounts get the teacher view. Empty means no teachers. See [Teachers and students](access.md). |
-| `SCHOOL_EMAIL_DOMAIN` | `athenian.org` | The Google Workspace domain whose accounts may sign in. |
+| `SCHOOL_EMAIL_DOMAIN` | `athenian.org` | The Google Workspace domain whose accounts may sign in. The sign-in dialog names it (*Sign in with your … Google account*), as does the message for an account from another domain. |
 | `LOGIN_GREETING` | `History Walk` | The title of the sign-in dialog. |
 
 ## Features

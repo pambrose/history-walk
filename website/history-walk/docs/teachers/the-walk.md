@@ -31,6 +31,9 @@ Consecutive Correct Decisions
    many there are. A reason can be up to 2,000 characters.
 4. **OK** saves the reason and moves on to the next slide. **Cancel** stays on the slide, with nothing saved.
 
+If the student's sign-in has run out when they press **OK** (a sign-in lasts 12 hours), the sign-in dialog appears.
+The reason isn't lost: once they're signed in again and make the same choice, the dialog opens with it already typed.
+
 Some moves don't ask for a reason:
 
 - **A slide with a single way forward**, such as a *continue*, just moves on. It isn't counted as a decision.

@@ -3,6 +3,7 @@ package com.pambrose.historywalk
 import com.pambrose.historywalk.User.Companion.emailForUuid
 import com.pambrose.historywalk.User.Companion.incrementSessionVersion
 import com.pambrose.historywalk.User.Companion.sessionUserFor
+import com.pambrose.historywalk.User.Companion.syncStoredRoles
 import com.pambrose.historywalk.User.Companion.upsertFromGoogle
 import com.pambrose.historywalk.User.Companion.userInfoFor
 import com.pambrose.historywalk.auth.SessionUser
@@ -41,9 +42,38 @@ class UserRepositoryTest : StringSpec() {
       }
     }
 
+  private fun storedRole(email: String) =
+    transaction {
+      UsersTable
+        .selectAll()
+        .where { UsersTable.email eq email }
+        .single()[UsersTable.role]
+    }
+
   init {
     beforeSpec { db = TestPostgres() }
     afterSpec { db.close() }
+
+    "the stored roles follow TEACHER_EMAILS at startup, so the class pages count by the role the app uses" {
+      // Signed in under an older list: a student since given teacher access, a teacher since taken off the list who has
+      // a student's address, a teacher who has left, and a student and a teacher whom the change leaves as they were
+      upsertFromGoogle("27helper@athenian.org", "Helper", null, Role.STUDENT)
+      upsertFromGoogle("26formerhelper@athenian.org", "Former helper", null, Role.TEACHER)
+      upsertFromGoogle("leftschool@athenian.org", "Left", null, Role.TEACHER)
+      upsertFromGoogle("27student@athenian.org", "Student", null, Role.STUDENT)
+      upsertFromGoogle("pambrose@athenian.org", "Teacher", null, Role.TEACHER)
+      val teachers = setOf("pambrose@athenian.org", "27helper@athenian.org")
+
+      syncStoredRoles(teachers) shouldBe 2
+      storedRole("27helper@athenian.org") shouldBe "teacher"
+      storedRole("26formerhelper@athenian.org") shouldBe "student"
+      // Not admitted any more, so left out of the class pages as before
+      storedRole("leftschool@athenian.org") shouldBe "teacher"
+      storedRole("27student@athenian.org") shouldBe "student"
+      storedRole("pambrose@athenian.org") shouldBe "teacher"
+
+      syncStoredRoles(teachers) shouldBe 0
+    }
 
     "the schema migration is applied" {
       val rows = mutableListOf<Pair<String, Boolean>>()
@@ -54,7 +84,7 @@ class UserRepositoryTest : StringSpec() {
             .use { rs -> while (rs.next()) rows += rs.getString(1) to rs.getBoolean(2) }
         }
       }
-      rows.map { it.first }.shouldContainExactly("001", "002", "003", "004", "005")
+      rows.map { it.first }.shouldContainExactly("001", "002", "003", "004", "005", "006")
       rows.all { it.second } shouldBe true
     }
 

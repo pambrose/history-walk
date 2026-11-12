@@ -10,12 +10,16 @@ enum class SignInError(
   NOT_ALLOWED("not-allowed"),
   ;
 
-  fun message(email: String?): String {
+  /** What the page says of this refusal for [email], if known, at the school whose accounts are at [domain]. */
+  fun message(
+    email: String?,
+    domain: String = School.DEFAULT_DOMAIN,
+  ): String {
     val account = email ?: "That account"
     return when (this) {
       FAILED -> "Sign-in didn't complete. Please try again."
       UNVERIFIED -> "Google hasn't verified the email address on this account. Please use your school account."
-      WRONG_DOMAIN -> "$account isn't an ${School.DEFAULT_DOMAIN} account. Please sign in with your school account."
+      WRONG_DOMAIN -> "$account isn't an $domain account. Please sign in with your school account."
       NOT_ALLOWED -> "$account isn't set up to use History Walk. Please ask your teacher if you need access."
     }
   }
@@ -36,4 +40,16 @@ enum class SignInError(
     fun refusalEmailOrNull(raw: String?): String? =
       raw?.takeIf { it.length <= MAX_EMAIL_LENGTH && emailPattern.matches(it) }
   }
+}
+
+/**
+ * A refused sign-in, as the `/?error=` redirect reports it: why, and the address involved, if known. The page keeps it
+ * rather than its message, which names the school's domain, so the sign-in dialog can word it once the server has said
+ * which domain that is (`SCHOOL_EMAIL_DOMAIN`, served at `/auth/domain`).
+ */
+data class SignInRefusal(
+  val error: SignInError,
+  val email: String?,
+) {
+  fun message(domain: String): String = error.message(email, domain)
 }

@@ -58,6 +58,7 @@ import io.kvision.state.bind
 import io.kvision.utils.px
 import kotlinx.browser.document
 import kotlinx.browser.window
+import org.w3c.dom.Storage
 
 object MainPanel : SimplePanel() {
   val buttonPadding = 5.px
@@ -226,14 +227,18 @@ private suspend fun <T> whileWritingReason(block: suspend () -> T): T {
 
 /**
  * Asks why the student made [slideChoice] and records it, returning the next slide, or null if the student cancels.
- * If saving fails, a toast says so and the dialog opens again with the reason in it, so nothing typed is lost.
+ * If saving fails, a toast says so and the dialog opens again with the reason in it, so nothing typed is lost. The
+ * reason is also kept in the tab ([ReasonDrafts]) from the moment it is sent until the server has it: if the session
+ * has run out, the call waits behind the sign-in dialog for good, and signing in leaves the page, so the dialog for the
+ * same move starts from it after the student is back.
  */
 private suspend fun promptUserForReason(
   fromPathName: String,
   fromTitle: String,
   slideChoice: SlideChoice,
 ): SlideData? {
-  var draft: String? = null
+  val toPathName = slideChoice.toPathName
+  var draft: String? = ReasonDrafts.get(fromPathName, toPathName)
   while (true) {
     // A new dialog each time: Bootstrap finishes hiding the last one ~0.5s later and its hidden event would close a
     // reopened one. Disposed once answered, or KVision's list of modals keeps every reason dialog for good.
@@ -244,10 +249,66 @@ private suspend fun promptUserForReason(
       } finally {
         reasonDialog.dispose()
       }
-    if (reason.isNullOrBlank()) return null
-    orErrorToast(REASON_NOT_SAVED) { provideReason(fromPathName, fromTitle, slideChoice, reason) }?.also { return it }
+    if (reason.isNullOrBlank()) {
+      ReasonDrafts.drop(fromPathName, toPathName)
+      return null
+    }
+    ReasonDrafts.keep(fromPathName, toPathName, reason)
+    val next =
+      try {
+        orErrorToast(REASON_NOT_SAVED) { provideReason(fromPathName, fromTitle, slideChoice, reason) }
+      } catch (e: ServiceException) {
+        // Refused, so the server will not take it however often it is sent
+        ReasonDrafts.drop(fromPathName, toPathName)
+        throw e
+      }
+    if (next != null) {
+      ReasonDrafts.drop(fromPathName, toPathName)
+      return next
+    }
     draft = reason
   }
+}
+
+/**
+ * The reason a student sent for a move, kept in the tab's `sessionStorage`, which outlives the trip to Google sign-in
+ * and back but not the tab, until the server has it. Where the browser refuses storage, nothing is kept.
+ */
+internal object ReasonDrafts {
+  private const val PREFIX = "history-walk.reason-draft:"
+
+  internal fun key(
+    fromPathName: String,
+    toPathName: String,
+  ) = "$PREFIX$fromPathName -> $toPathName"
+
+  fun get(
+    fromPathName: String,
+    toPathName: String,
+  ): String? = storage { getItem(key(fromPathName, toPathName)) }
+
+  fun keep(
+    fromPathName: String,
+    toPathName: String,
+    reason: String,
+  ) {
+    storage { setItem(key(fromPathName, toPathName), reason) }
+  }
+
+  fun drop(
+    fromPathName: String,
+    toPathName: String,
+  ) {
+    storage { removeItem(key(fromPathName, toPathName)) }
+  }
+
+  private fun <T> storage(use: Storage.() -> T): T? =
+    try {
+      window.sessionStorage.use()
+    } catch (e: Throwable) {
+      console.log("Could not keep the reason in sessionStorage: $e")
+      null
+    }
 }
 
 internal fun reasonDialog(

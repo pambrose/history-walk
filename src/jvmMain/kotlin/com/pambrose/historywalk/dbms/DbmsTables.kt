@@ -70,4 +70,7 @@ object UserReasonsView : Table("history.user_reasons") {
   val toPathName = text("to_path_name")
   val toTitle = text("to_title")
   val reason = text("reason")
+
+  // The choice the reason explains, as its button read when the student made it (V006)
+  val choiceText = text("choice_text")
 }

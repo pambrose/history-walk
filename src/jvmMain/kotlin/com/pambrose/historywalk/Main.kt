@@ -70,6 +70,11 @@ fun Application.main() {
 
   dbmsInit(environment.config)
 
+  // The class pages count by the stored role; bring it into line with TEACHER_EMAILS as this process reads it
+  User.syncStoredRoles().also { changed ->
+    if (changed > 0) logger.info { "Brought $changed stored role(s) into line with TEACHER_EMAILS" }
+  }
+
   // The client is served by Routes.staticContent, with caching headers Kilua's own static handling does not send
   initRpc(initStaticResources = false) {
     registerService<IContentService> { call -> ContentService(call) }

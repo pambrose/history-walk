@@ -166,6 +166,13 @@ class AuthRoutesTest : StringSpec() {
         r.bodyAsText() shouldBe loginGreeting()
       }
     }
+    "the school's domain, which the sign-in dialog names, is served without a session" {
+      signInTest { client ->
+        val r = client.get("/auth/domain")
+        r.status shouldBe OK
+        r.bodyAsText() shouldBe SchoolConfig.emailDomain
+      }
+    }
     "the sign-in greeting is LOGIN_GREETING trimmed, or History Walk when unset or blank" {
       loginGreeting(null) shouldBe "History Walk"
       loginGreeting("   ") shouldBe "History Walk"

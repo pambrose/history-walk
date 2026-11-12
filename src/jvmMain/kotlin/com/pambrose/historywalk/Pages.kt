@@ -124,6 +124,12 @@ object Pages {
                       style = "text-align:left;"
                       +"From/To"
                     }
+                    // The slide a choice leads to does not always say which it was: every wrong Moses answer leads to
+                    // an Incorrect slide
+                    th {
+                      style = "text-align:left;"
+                      +"Choice"
+                    }
                     th {
                       style = "text-align:left;"
                       +"Reason"
@@ -133,6 +139,9 @@ object Pages {
                     tr {
                       td {
                         +"${userReason.fromTitle} -> ${userReason.toTitle}"
+                      }
+                      td {
+                        +userReason.choiceText
                       }
                       td {
                         +userReason.reason

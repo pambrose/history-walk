@@ -1,6 +1,7 @@
 package com.pambrose.historywalk
 
 import com.pambrose.common.util.simpleClassName
+import com.pambrose.historywalk.auth.SessionConfig
 import com.pambrose.historywalk.auth.configureGoogleAuth
 import com.pambrose.historywalk.auth.installUserSessions
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -42,11 +43,34 @@ object Installs {
     install(AutoHeadResponse)
   }
 
+  /**
+   * Headers every response carries, errors and redirects included. The session cookie is `SameSite=Strict`, which
+   * already keeps another site from posting to the app or framing a signed-in page; these are a second line, for a
+   * browser or extension that does not honor it, and for any escaping slip on the teacher pages:
+   * - `X-Content-Type-Options: nosniff`, so a browser never runs a response as a type other than the one it is sent as;
+   * - `Content-Security-Policy: frame-ancestors 'none'`, so no other site can frame a page to trick a click;
+   * - `Referrer-Policy: same-origin`, so a link off the app does not send the page's address, which after a refused
+   *   sign-in holds the address that was refused;
+   * - `Strict-Transport-Security` where the app is reached over HTTPS ([production]), so a browser that has been there
+   *   once does not use plain HTTP again.
+   */
+  internal fun Application.installSecurityHeaders(production: Boolean = SessionConfig.isProduction) {
+    install(DefaultHeaders) {
+      header("X-Content-Type-Options", "nosniff")
+      header("Content-Security-Policy", "frame-ancestors 'none'")
+      header("Referrer-Policy", "same-origin")
+      if (production) header("Strict-Transport-Security", "max-age=$HSTS_MAX_AGE_SECS")
+    }
+  }
+
+  // A year, the usual HSTS lifetime
+  private const val HSTS_MAX_AGE_SECS = 31_536_000
+
   fun Application.installs() {
     install(Compression)
     installConditionalHeaders()
     installAutoHeadResponse()
-    install(DefaultHeaders)
+    installSecurityHeaders()
     install(CallLogging) {
       level = Level.INFO
       // Log status, method, and path only: the default format appends a redirect's Location, which for /auth/login is

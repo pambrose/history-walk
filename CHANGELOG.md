@@ -21,6 +21,15 @@ All notable changes to History Walk are recorded here. The format follows
   now refuses a second choice with the same text, so a deck with one fails to load.
 - Migration `V004`, data only: the stored Jermain decisions that led to a *Continue* on to a dead end are marked as
   dead ends (see Fixed).
+- The reasons page has a *Choice* column, the choice each reason explains, as its button read: the slide a choice
+  leads to does not always say (every wrong Moses answer leads to an *Incorrect* slide). Migration `V006` adds
+  `choice_text` to the `user_reasons` view.
+- `/auth/domain`, open to all: `SCHOOL_EMAIL_DOMAIN`, which the sign-in dialog now names, in its instruction and in
+  the message for an account from another domain (they said Athenian and athenian.org whatever the setting).
+- Every response carries `X-Content-Type-Options: nosniff`, `Content-Security-Policy: frame-ancestors 'none'`, and
+  `Referrer-Policy: same-origin`, and in production `Strict-Transport-Security`; `make docker-smoke` checks the first.
+- A reason is kept in the tab while it is sent, so one typed as the 12-hour sign-in ran out is offered again, already
+  typed, once the student has signed in and makes the same choice.
 - Migration `V005`, data only: moves the stored places and moves of the slides renamed and rerouted below, so each
   student keeps their place. `DbmsMigrateTest` puts a student at every place either deck had before it and checks that
   each still finds its slide afterwards.
@@ -69,6 +78,13 @@ All notable changes to History Walk are recorded here. The format follows
   they have none.
 - Leaving in the summer on Old Ben's advice via Ross, and in the spring on Old Ben's own advice, now go through the
   Summer and Spring Departure slides, as on every other path.
+
+- A failure of the server's own in an RPC call (a database error, a missing user) no longer sends its message and
+  class name to the browser, where the SQL or the user's id could be read in the console; the browser is told only
+  that something went wrong, and the server logs it with the user.
+- The stored role, which the class pages count by, is brought into line with `TEACHER_EMAILS` at every startup, so an
+  address on the teacher list that also starts with two digits is counted by the role the app uses, not the one it had
+  at its last sign-in. An address the rule no longer admits keeps its stored role.
 
 ### Removed
 

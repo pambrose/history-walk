@@ -99,7 +99,7 @@ class AdminTest : StringSpec() {
         listOf("27walker@athenian.org" to "1", "mstrial@athenian.org" to "2")
 
       val reasons = Pages.displayUserReasons().reasonsByUser()
-      reasons.associate { (email, rows) -> email to rows.drop(1).map { it[1] } } shouldBe
+      reasons.associate { (email, rows) -> email to rows.drop(1).map { it.last() } } shouldBe
         mapOf(
           "27walker@athenian.org" to listOf("a student's reason"),
           "mstrial@athenian.org" to listOf("a counted reason", "a counted win"),

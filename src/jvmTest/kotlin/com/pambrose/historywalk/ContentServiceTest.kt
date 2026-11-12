@@ -5,6 +5,7 @@ import com.pambrose.historywalk.ContentService.Companion.NOT_A_CHOICE
 import com.pambrose.historywalk.ContentService.Companion.NOT_BEHIND_YOU
 import com.pambrose.historywalk.ContentService.Companion.NOT_ON_SLIDE
 import com.pambrose.historywalk.ContentService.Companion.NO_REASON_NEEDED
+import com.pambrose.historywalk.ContentService.Companion.SOMETHING_WENT_WRONG
 import com.pambrose.historywalk.ReasonRule.MAX_LENGTH
 import com.pambrose.historywalk.ReasonRule.MIN_WORDS
 import com.pambrose.historywalk.auth.userUuid
@@ -325,6 +326,22 @@ class ContentServiceTest : StringSpec() {
         service.makeChoice("/Plan/Departure", "Departure", carryOn, advance = true).reason shouldBe ADVANCE
         service.getCurrentSlide().pathName shouldBe "/Plan/Departure/Caught"
         decisionCount(id) shouldBe 1
+      }
+    }
+
+    "a failure of the server's own reaches the browser as a plain failure, without its message" {
+      // A session whose user is gone: the server's own error names the user, and the SQL error would quote the query
+      val gone = UUID.randomUUID().toString()
+      val service = serviceFor(gone)
+      listOf<suspend () -> Unit>(
+        { service.getCurrentSlide() },
+        { service.makeChoice(START, "Start", goOn, advance = false) },
+        { service.provideReason(START, "Start", goOn, reason) },
+        { service.goBackInTime(ParentTitle(ROOT, "Start")) },
+      ).forEach { call ->
+        val failure = shouldThrow<IllegalStateException> { call() }
+        failure.message shouldBe SOMETHING_WENT_WRONG
+        failure.cause shouldBe null
       }
     }
 

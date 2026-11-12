@@ -4,7 +4,9 @@ import io.kvision.modal.Modal
 import io.kvision.remote.SecurityMgr
 import io.kvision.state.ObservableValue
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.time.Duration.Companion.seconds
@@ -35,17 +37,28 @@ internal class LoginPrompt(
 
 object Security : SecurityMgr() {
   /** Why the last sign-in was refused (from the `?error=` redirect), or null. */
-  val signInError = ObservableValue<String?>(null)
+  val signInError = ObservableValue<SignInRefusal?>(null)
 
-  private val signInDialog = SignInDialog(signInError)
+  /** The domain whose accounts may sign in, as the server has it (`SCHOOL_EMAIL_DOMAIN`), which the dialog names. */
+  val schoolDomain = ObservableValue(School.DEFAULT_DOMAIN)
+
+  private val signInDialog = SignInDialog(signInError, schoolDomain)
   private val loginPrompt =
     LoginPrompt {
       Modal.getAllModals().filter { it.visible && it !== signInDialog }.forEach { it.hide() }
       SignInBackground.show()
       // NonCancellable, so cancelling the call that triggered sign-in cannot stop the dialog from opening; the timeout
-      // keeps a slow server from holding it back, in which case the default title stays.
-      withContext(NonCancellable) { withTimeoutOrNull(3.seconds) { fetchLoginGreeting() } }
-        ?.let { signInDialog.caption = it }
+      // keeps a slow server from holding it back, in which case the default title and domain stay.
+      withContext(NonCancellable) {
+        withTimeoutOrNull(3.seconds) {
+          coroutineScope {
+            val greeting = async { fetchLoginGreeting() }
+            val domain = async { fetchSchoolDomain() }
+            greeting.await()?.let { signInDialog.caption = it }
+            domain.await()?.let { schoolDomain.value = it }
+          }
+        }
+      }
       signInDialog.getResult()
     }
 
