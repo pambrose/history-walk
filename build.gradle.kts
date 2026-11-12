@@ -247,6 +247,16 @@ plugins.withType<YarnPlugin> {
         // 7.0.3. mocha uses it only in its Node parallel mode, which the client specs, run in the browser by Karma, never
         // use. Without this the Security workflow's lock-scan, a release check, would fail. Drop it once mocha asks for 7.
         resolution("serialize-javascript", "^7.0.3")
+        // Three Dependabot alerts on the test runner's dependencies, each fixed only in a newer major than its parent asks
+        // for: diff 7 (GHSA-73rr-hh4g-fpgx, low) and glob 10 (GHSA-3g3m-2fjr-6pw4, medium) under mocha, and minimatch 9
+        // (GHSA-g3hv-75wg-m249, medium) under mocha and karma-webpack. The paths keep Karma's own glob 7 and minimatch 3,
+        // which no advisory covers, as they are; they start with **/ because Kotlin installs through Yarn workspaces, so
+        // mocha sits under a workspace package, not at the root. glob 14 brings minimatch 11 itself. Drop each once its
+        // parent asks for it.
+        resolution("**/mocha/diff", "^8.0.3")
+        resolution("**/mocha/glob", "^14.0.2")
+        resolution("**/mocha/minimatch", "^11.0.1")
+        resolution("**/karma-webpack/minimatch", "^11.0.1")
     }
 }
 

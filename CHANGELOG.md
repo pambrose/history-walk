@@ -119,6 +119,11 @@ tooling. Three data migrations run at the first start; back up both databases fi
   it, all in build and test tools, and `serialize-javascript` is pinned to 7 for mocha (`build.gradle.kts`), which
   cleared the last. The Security workflow's new `lock-scan` job fails on a fixable HIGH or CRITICAL vulnerability in
   the lock, and `make release-check` requires it.
+- Dependabot's three alerts on the lock are fixed: `diff` 8 (GHSA-73rr-hh4g-fpgx, low) and `glob` 14
+  (GHSA-3g3m-2fjr-6pw4, medium) under mocha, and `minimatch` 11 (GHSA-g3hv-75wg-m249, medium) under mocha and
+  karma-webpack, each by a path-specific Yarn resolution in `build.gradle.kts`, since each fix is a newer major than
+  its parent asks for. Karma's own `glob` 7 and `minimatch` 3, which no advisory covers, are unchanged. Trivy finds
+  nothing in the lock at any severity.
 - The image's user owns neither `/app` nor the jar, so code running in the server could not rewrite it.
 - The Gradle wrapper checks the distribution's SHA-256 (`distributionSha256Sum`); `make upgrade-wrapper` records the
   new one.
