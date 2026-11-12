@@ -60,6 +60,21 @@ class ContentServiceTest : StringSpec() {
     }
   private val openDoor = SlideChoice("open the door", "/Hall/Door", "Door", false, offset = 0, alreadyVisited = false)
 
+  // /Plan -> /Plan/Departure, whose one way on, "Continue", ends at /Plan/Departure/Caught, as Jermain's Autumn
+  // Departure ends at the Paddy Rollers; or /Plan/Freedom, the success slide
+  private val departureDeck =
+    slideDeck {
+      val freedom = slide(id = 3, title = "Freedom", content = "Free", success = true)
+      val caught = slide(id = 4, title = "Caught", content = "THE END")
+      val departure = slide(id = 2, title = "Departure", content = "A rustling...") { choice("Continue", caught) }
+      slide(id = 1, title = "Plan", content = "When will you go?", root = true) {
+        choice("leave in the autumn", departure)
+        choice("leave in the winter", freedom)
+      }
+    }
+  private val leaveInAutumn =
+    SlideChoice("leave in the autumn", "/Plan/Departure", "Departure", false, offset = 0, alreadyVisited = false)
+
   private fun serviceFor(
     uuid: String,
     teachers: Set<String> = emptySet(),
@@ -286,6 +301,31 @@ class ContentServiceTest : StringSpec() {
       }
       allSuccessUsers("Win").map { it.id } shouldNotContain id
       correctDecisionStreak(id) shouldBe 0
+    }
+
+    "a decision whose one way on is a Continue to a dead end is offered and recorded as a dead end" {
+      withDeck(departureDeck) {
+        val id = student("27departure")
+        val service = serviceFor(id)
+
+        service.getCurrentSlide().choices.associate { it.choiceText to it.deadEnd } shouldBe
+          mapOf("leave in the autumn" to true, "leave in the winter" to false)
+
+        service.provideReason("/Plan", "Plan", leaveInAutumn, reason).pathName shouldBe "/Plan/Departure"
+        transaction {
+          UserChoiceTable
+            .selectAll()
+            .where { UserChoiceTable.userUuidRef eq UUID.fromString(id) }
+            .single()[UserChoiceTable.deadEnd]
+        } shouldBe true
+        correctDecisionStreak(id) shouldBe 0
+
+        // The Continue that follows is an advance, recorded nowhere, and ends at the dead end
+        val carryOn = leaveInAutumn.copy(choiceText = "Continue", toPathName = "/Plan/Departure/Caught")
+        service.makeChoice("/Plan/Departure", "Departure", carryOn, advance = true).reason shouldBe ADVANCE
+        service.getCurrentSlide().pathName shouldBe "/Plan/Departure/Caught"
+        decisionCount(id) shouldBe 1
+      }
     }
 
     "makeChoice answers with the deck's version of the choice" {

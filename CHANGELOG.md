@@ -16,6 +16,11 @@ All notable changes to History Walk are recorded here. The format follows
 - `docs/code-review-2026-11-11.md`, a review of the whole repository: 28 numbered issues and the order to fix them in.
 - The client's npm lock, `.kotlin-js-store/yarn.lock`, is committed, and the Security workflow's new `lock-scan` job
   reports its HIGH and CRITICAL vulnerabilities to code scanning, without failing yet (issue 28 of the review).
+- Moses's 14th decision has the third choice it was written with ("Try to break your irons with a rock right there,
+  beside the sleeping guards"); its two wrong choices had the same text, so one silently replaced the other. A slide
+  now refuses a second choice with the same text, so a deck with one fails to load.
+- Migration `V004`, data only: the stored Jermain decisions that led to a *Continue* on to a dead end are marked as
+  dead ends (see Fixed).
 
 ### Changed
 
@@ -34,9 +39,28 @@ All notable changes to History Walk are recorded here. The format follows
   CI builds and tests the bundle a release ships. After an npm dependency change, run `make yarn-unlock` and commit the
   lock.
 
+### Fixed
+
+- A decision whose next slide has only a *Continue* on to a dead end is stored as leading to a dead end
+  (`Slide.leadsToDeadEnd`), so *Consecutive Correct Decisions* resets for it. Jermain's "Leave in the autumn" and
+  "Leave in the spring", and entering a ramshackle hut, were counted as correct decisions.
+- The walks' text, with no slide title changed, so no student's place is lost:
+  - The Jermain title slide, the README, and the docs spell Loguen's name right (it said "Longuen").
+  - Moses's opening no longer says he was sold with his mother, which the later slides contradict: he was sold away
+    from her.
+  - Two correct Moses choices led to slides that described the wrong answer (upstream for downstream, a place to wade
+    for a bridge or boat).
+  - About 50 typos and grammar errors in both decks, and "SS Fox", a steamship's prefix, for the sailing ship Fox.
+  - Jermain slides shared by several paths no longer mention a companion or two fought patrols that a student on
+    some of those paths never had; the winter-clothes advice is no longer given twice; "Approach the cottage?" leads
+    to a log cabin and now says so.
+  - Every Jermain image has alt text describing it, for screen readers, in place of "Pic"; a test refuses an empty or
+    "Pic" alt.
+
 ### Removed
 
 - The stale `kotlin-js-store` line in `.gitignore`.
+- Two unused Jermain text constants and a commented-out choice.
 
 ## [1.2.1] - 2026-11-10
 
@@ -144,7 +168,7 @@ the original classroom app; [History](#history) at the end tells the story in or
 
 - Two choose-your-own-path walks through the history of slavery and escape, one per deployment, chosen with
   `SLIDES_VARIABLE_NAME`: **Jermain** (the default; the Underground Railroad scenario of Jarm Logue, later the
-  Reverend Jermain W. Longuen) and **Moses**.
+  Reverend Jermain W. Loguen) and **Moses**.
 - A reason for every decision, in a dialog that needs at least five words (at most 2,000 characters), counts words as
   they are typed, pasted, or dictated, and keeps the draft if saving fails.
 - The path so far, as buttons above each slide that go back to any earlier slide; go-back choices (`goBack(-n)`), such

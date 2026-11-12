@@ -31,10 +31,14 @@ slideDeck {
   `root = true` (the first slide; a deck has exactly one), `success = true` (the success slide; exactly one), and
   `displayTitle = false` (no title bar).
 - **`choice(text, slide)`** adds a button leading to a child slide. A slide may have only one parent: to reach the
-  same text from two places, use `copyOf("another title")`, which makes a copy with its own title and path.
+  same text from two places, use `copyOf("another title")`, which makes a copy with its own title and path. Two
+  choices on one slide can't have the same text; the deck refuses to load if they do.
 - **Content** is HTML and Markdown in raw strings; the text constants are `SCREAMING_SNAKE_CASE`.
 - **A slide with no choices** is a dead end, shown in red, unless it is the success slide, shown in green. The class
-  summary's *Success* column counts students who reached a slide with the success slide's title.
+  summary's *Success* column counts students who reached a slide with the success slide's title. A decision is
+  stored as leading to a dead end when its slide is one, or when that slide's only choice, a *Continue*, leads to one.
+- **Images** need an `alt` that describes the picture, which a screen reader reads aloud in its place; a test refuses
+  an empty one or `Pic`.
 - **A go-back choice**, `choice(text, goBack(-n))`, returns the student to the slide's n-th ancestor (-1 is its
   parent) without asking for a reason. The Jermain deck uses these to try another building in the same town.
 - **Images** go in `src/jvmMain/resources/static/images` and are referenced as `/static/images/<name>`.

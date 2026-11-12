@@ -43,7 +43,7 @@ object DbmsTxs {
           choiceText = choice,
           toPathName = slide.pathName,
           toTitle = slide.title,
-          deadEnd = slide.isDeadEnd,
+          deadEnd = slide.leadsToDeadEnd,
           offset = slide.offset,
           alreadyVisited = slide.title in alreadyVisited,
         )

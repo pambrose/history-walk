@@ -150,6 +150,31 @@ class DbmsMigrateTest : StringSpec() {
       }
     }
 
+    "V004 marks a stored decision that led to a Continue on to a dead end as a dead end, and nothing else" {
+      withDatabase { ds ->
+        flyway(ds).target("3").load().migrate()
+        val user = UUID.randomUUID()
+        val toWhenToGo = "/UGRR Scenario/START: Major Decision/Decision: When to Go"
+        ds.exec(
+          "insert into history.users (id, email, full_name, role, last_path_name) " +
+            "values ('$user', '27autumn@athenian.org', 'Autumn', 'student', '$toWhenToGo/Autumn Departure')",
+        )
+        listOf("Autumn Departure", "Summer Departure").forEach { to ->
+          ds.exec(
+            "insert into history.user_choices " +
+              "(user_uuid_ref, from_path_name, from_title, to_path_name, to_title, dead_end, choice_text, reason) " +
+              "values ('$user', '$toWhenToGo', 'Decision: When to Go', '$toWhenToGo/$to', '$to', false, 'leave', " +
+              "'because it is the best time')",
+          )
+        }
+
+        Dbms.migrate(ds)
+        ds.query("select to_title, dead_end from history.user_choices order by to_title") {
+          it.getString(1) to it.getBoolean(2)
+        } shouldBe listOf("Autumn Departure" to true, "Summer Departure" to false)
+      }
+    }
+
     "a deliberate baseline at the latest migration lets a refused database start again" {
       withDatabase { ds ->
         Dbms.migrate(ds)

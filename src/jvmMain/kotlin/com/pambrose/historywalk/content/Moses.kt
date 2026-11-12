@@ -11,14 +11,15 @@ const val INTRODUCTION_PAGE = """
     </div>
     <div style="text-align:left;padding-top:30px;padding-bottom:10px;">
     <font size="+1">
-    Your name is Moses. Your mother, Nancy was an Enslaved African, but your
+    Your name is Moses. Your mother, Nancy, was an Enslaved African, but your
     father was named Henry, a white slave owner. A few years after you were
     born Henry’s wife grew very suspicious that her husband was your father.
-    After some investigative work, it was revealed to be true. In a short
-    amount of time you and your mother were sold to a cruel slave owner name
-    Mr. Gooch. He seemed to revel in punishing those he owned. Your days
-    were filled with hard toil in the fields and the fear of physical
-    punishment. You began to contemplate whether it was time to runaway.
+    After some investigative work, it was revealed to be true. In time you
+    were sold away from your mother, and after passing through the hands of
+    several owners you came to a cruel slave owner named Mr. Gooch. He seemed
+    to revel in punishing those he owned. Your days were filled with hard toil
+    in the fields and the fear of physical punishment. You began to contemplate
+    whether it was time to run away.
     If you are caught the punishment will be severe, but there is a chance of freedom.
     </font>
     </div>
@@ -28,7 +29,7 @@ const val INTRODUCTION_PAGE = """
 const val ERROR_TEXT = "Incorrect. Try again."
 
 const val DECISION1_TEXT = """
-  You are on the way home from a exhausting day of harvesting rice, when a
+  You are on the way home from an exhausting day of harvesting rice, when a
   friend motions for you to come over and chat. He has heard that you are
   in line to be punished for not taking proper care of tools. You cannot
   stand the thought of suffering another lashing. But maybe the rumor isn’t
@@ -46,7 +47,7 @@ const val DECISION2_TEXT = """
 """
 
 const val DECISION3_TEXT = """
-  You travel close the road by night. After a week of travel you are awoken abruptly
+  You travel close to the road by night. After a week of travel you are awoken abruptly
   during the day as you sleep by a very surly man. He accuses you of being a fugitive
   and marches you off to the local jail. Eventually you are collected by Mr. Gooch.
   Upon returning to the plantation, you are put in leg irons and then sent into the
@@ -58,13 +59,13 @@ const val DECISION3_TEXT = """
 const val DECISION4_TEXT = """
   It takes a few hours and is very painful, but you manage to slip the irons off.
   You head into the woods fearful of what might follow you and after a few hours
-  you come to river that is 50 yards across.
+  you come to a river that is 50 yards across.
 
   Options:
 """
 
 const val DECISION5_TEXT = """
-  You travel upriver looking for a shallow or narrow place to cross.
+  You travel upriver looking for a bridge or a boat.
   Luck is with you today and you find a canoe of Native American origin.
   You set the canoe out into the river and paddle across to the other side.
   You feel really good putting some distance between you and your former owner.
@@ -105,7 +106,7 @@ const val DECISION8_TEXT = """
 
 const val DECISION9_TEXT = """
   You make your way to the plantation where you spent the first ten years
-  of your live. Along the way you encounter a young African American girl.
+  of your life. Along the way you encounter a young African American girl.
 
   Options:
 """
@@ -116,7 +117,7 @@ const val DECISION10_TEXT = """
   ambushed by a patrol out looking for fugitives.
   All white southerners regardless of whether they are slave owners or not
   must do patrol duty.
-  You are hit over the head with a club and marched off to the gaols.
+  You are hit over the head with a club and marched off to the gaol.
   After a few days you are placed shackled, on a horse and you start to travel.
   As you rest one day you see a strangely dressed man.
   He walks close to you and appears to hand you an object.
@@ -142,7 +143,7 @@ const val DECISION12_TEXT = """
 """
 
 const val DECISION13_TEXT = """
-  You grab a switch a whack your horse in the hindquarters.
+  You grab a switch and whack your horse in the hindquarters.
   And like that your horse is sprinting down the street and heading out of town.
   You hang on for dear life, never having travelled this fast in your life.
   All of a sudden you hear a shot ring out.
@@ -153,7 +154,7 @@ const val DECISION13_TEXT = """
 const val DECISION14_TEXT = """
   You pull on the reins and bring your horse to a halt.
   You are quickly surrounded by your pursuers.
-  You are hit in the side of the head by a rifle but and knocked unconscious.
+  You are hit in the side of the head by a rifle butt and knocked unconscious.
   When you come to you are chained to a female enslaved African, Eliza, and
   you have 20 pound bars of iron shackled to each leg.
   You can sense with each day you are getting closer and closer to the plantation
@@ -182,13 +183,13 @@ const val DECISION16_TEXT = """
 """
 
 const val DECISION17_TEXT = """
-  You move upstream looking for a safe crossing.
+  You move downstream looking for a safe crossing.
   Amazingly you find another canoe and jump in.
   There is no paddle so the two of you use your hands to navigate across the
   fast-moving river. The rain has the river swollen to capacity and you careen
   into a rock and miraculously scamper on top as the canoe is smashed into splinters.
   The two of you cling to the rock as the water level rises, hoping that the rain ceases.
-  And just as you are about to swept away the water recedes.
+  And just as you are about to be swept away the water recedes.
   You eventually are able to wade through the shallows to shore and fall fast asleep.
   You awake and meet an Enslaved African who offers to provide you with food if you
   return with him to his plantation.
@@ -198,7 +199,7 @@ const val DECISION17_TEXT = """
 
 const val DECISION18_TEXT = """
   You make it to his plantation and he leads you inside his quarters and offers you
-  some food. All of a sudden he is startled by the noise of some approaching.
+  some food. All of a sudden he is startled by the noise of someone approaching.
 
   Options:
 """
@@ -214,13 +215,13 @@ const val DECISION19_TEXT = """
 """
 
 const val DECISION20_TEXT = """
-  You enter the plantation as the sun goes down and attempt to find you friend.
+  You enter the plantation as the sun goes down and attempt to find your friend.
   However, a pair of dogs sniffs you out and alerts others to your presence.
-  You are apprehended and marched off to the local gaols to await your repatriation
+  You are apprehended and marched off to the local gaol to await your repatriation
   to the wicked Mr. Gooch. The first night you are imprisoned next to a man condemned
   to die for his crimes.
   All night long you are kept awake by his moaning and wailing. You will remember
-  for the rest of your life is his tearful prayers begging for mercy.
+  for the rest of your life his tearful prayers begging for mercy.
   After a few weeks a representative from your owner arrives to pick you up.
   You are made to jog at a brisk pace to keep up and upon your arrival are subjected
   to the worst torture yet, the dreaded cotton screw.
@@ -242,17 +243,17 @@ const val DECISION21_TEXT = """
   You quickly bid farewell to some of your friends and you are off on the road
   marching to your future.
   You are eventually brought to a person named Mr. Cowpens.
-  He is a very kind owner and live is tolerable.
+  He is a very kind owner and life is tolerable.
 
   Options:
 """
 
 const val DECISION22_TEXT = """
   You stay with Mr. Cowpens and work as a domestic servant.
-  This life is much more bearable from life with Mr. Gooch.
+  This life is much more bearable than life with Mr. Gooch.
   You put on some weight and you have moments of joy.
   Unfortunately your new owner becomes progressively ill.
-  A few months after you arrive at your new owners house he succumbs to consumption.
+  A few months after you arrive at your new owner’s house he succumbs to consumption.
   After his death, his estate is divvied up and you are sold to pay off his debts.
   After you are sold you are put on a wagon and you head to an auction in Florida.
   As you travel south, you have an opportunity to steal the keys to your shackles.
@@ -264,7 +265,7 @@ const val DECISION23_TEXT = """
   You are successful in your attempt to steal the keys.
   That night you quietly unlock your bonds and slip into the night.
   After your stay with Mr. Cowpens you look much more respectable and
-  you feel your chances of deceiving people about your slave status is good.
+  you feel your chances of deceiving people about your slave status are good.
   You see a sign on the road, and although you cannot read, you can make out
   enough that one way is to Savannah, a busy Georgia port and one continues
   on to the north.
@@ -282,7 +283,7 @@ const val DECISION24_TEXT = """
 
 const val DECISION25_TEXT = """
   The minister offers to walk with you to Savannah and help you find your master.
-  You are now with in five miles of the city.
+  You are now within five miles of the city.
 
   Options:
 """
@@ -290,7 +291,7 @@ const val DECISION25_TEXT = """
 const val DECISION26_TEXT = """
   You ditch the minister and after a few hours you encounter some African American
   men driving cattle.
-  The greet you and ask you where you are headed.
+  They greet you and ask you where you are headed.
   The men are all enslaved from a plantation out of town.
   They are bringing the cattle into Savannah to sell.
   You notice there is a little boy who is writing in a note-book as he walks
@@ -312,8 +313,8 @@ const val DECISION28_TEXT = """
   Being a port city, they are always on the lookout for runaways.
   He takes your pass which has been smudged by water.
   He asks you what happened and you inform him that you fell into a stream
-  while your were taking care of some horses.
-  He seems to buy your alibi and let’s you move on.
+  while you were taking care of some horses.
+  He seems to buy your alibi and lets you move on.
   As you walk through the bustling city you make it to the waterfront and
   see many tall ships.
 
@@ -322,7 +323,7 @@ const val DECISION28_TEXT = """
 
 const val DECISION29_TEXT = """
   You ask around for a ship captain.
-  Eventually you are directed to a man who is the captain of the SS Fox.
+  Eventually you are directed to a man who is the captain of the Fox, a sailing ship.
   You approach him and ask if he is in need of your services.
   He asks if you have any sailing experience.
   You respond, that you do not, but you could serve some other task.
@@ -335,7 +336,7 @@ const val DECISION29_TEXT = """
 """
 
 const val SUCCESS_TEXT = """
-  You decide to stay with the SS Fox.
+  You decide to stay with the Fox.
   Each day you nervously attempt to keep busy and hope you will not be
   discovered by authorities.
   You are pretty sure the captain knows you are a fugitive, but he seems not to mind.
@@ -343,7 +344,7 @@ const val SUCCESS_TEXT = """
   The trip takes ten days and during the voyage the rest of the crew is
   verbally and physically abusive towards you.
   However, you finally make it to Staten Island in the free state of New York.
-  As you disembark from the ship a man approaches you offers you assistance.
+  As you disembark from the ship a man approaches you and offers you assistance.
   He is a member of a committee that helps runaway Enslaved Africans.
   For the first time in your life you are free of fear and the oppression of a master.
 
@@ -375,7 +376,7 @@ val mosesSlides =
         content = DECISION29_TEXT,
       ) {
         choice(
-          text = "Stay with the SS Fox",
+          text = "Stay with the Fox",
           slide = slideSuccess,
         )
         choice(
@@ -460,7 +461,7 @@ val mosesSlides =
         )
         choice(
           text = "After spending time with the minister, you tell him your true predicament, " +
-            "that you are fugitive and ask him for help",
+            "that you are a fugitive and ask him for help",
           slide = errorSlide.copyOf("Incorrect2"),
         )
         choice(
@@ -641,7 +642,7 @@ val mosesSlides =
           slide = errorSlide.copyOf("Incorrect2"),
         )
         choice(
-          text = "Look for downstream for a bridge or watercraft",
+          text = "Look downstream for a bridge or watercraft",
           slide = slide17,
         )
       }
@@ -678,7 +679,7 @@ val mosesSlides =
           slide = slide15,
         )
         choice(
-          text = "There is no way you can escape right now, you wait for a better opportunity",
+          text = "Try to break your irons with a rock right there, beside the sleeping guards",
           slide = errorSlide.copyOf("Incorrect1"),
         )
         choice(
@@ -698,7 +699,7 @@ val mosesSlides =
           slide = errorSlide.copyOf("Incorrect1"),
         )
         choice(
-          text = "Head the warning and stop",
+          text = "Heed the warning and stop",
           slide = slide14,
         )
         choice(
@@ -746,7 +747,7 @@ val mosesSlides =
           slide = slide12,
         )
         choice(
-          text = "You wait for an opportunity to stab on of your captors with it",
+          text = "You wait for an opportunity to stab one of your captors with it",
           slide = errorSlide.copyOf("Incorrect2"),
         )
         choice(
@@ -814,7 +815,7 @@ val mosesSlides =
         content = DECISION7_TEXT,
       ) {
         choice(
-          text = "You run into the woods, trying to hide from the passers by",
+          text = "You run into the woods, trying to hide from the passers-by",
           slide = errorSlide.copyOf("Incorrect1"),
         )
         choice(
@@ -883,7 +884,7 @@ val mosesSlides =
           slide = errorSlide.copyOf("Incorrect2"),
         )
         choice(
-          text = "Investigate along the shoreline and look for a place to wade across\n",
+          text = "Investigate along the shoreline and look for a place to wade across",
           slide = errorSlide.copyOf("Incorrect3"),
         )
         choice(

@@ -22,8 +22,17 @@ class Slide(
   val isSubTree: Boolean get() = parentSlide?.isSubTree ?: !root
   val pathName: String get() = "${parentSlide?.pathName ?: ""}/$title"
 
-  /** A choice that leads here is a wrong turn: this slide offers no way on and is not the success slide. */
+  /** This slide offers no way on and is not the success slide. */
   val isDeadEnd: Boolean get() = !hasChoices && !success
+
+  /**
+   * A choice that leads here is a wrong turn: this slide is a dead end, or its one way on is a forward choice (a
+   * "Continue") that leads to one. Jermain's Autumn and Spring Departures and the Ramshackle Hut (cont.) slides each
+   * stand between a fatal decision and the Paddy Rollers ending, and a "Continue" is never recorded, so without this
+   * the decision itself was stored as a correct one, and the consecutive-correct count never reset for it.
+   */
+  val leadsToDeadEnd: Boolean
+    get() = isDeadEnd || choices.values.singleOrNull()?.let { it.offset == 0 && it.leadsToDeadEnd } == true
 
   /** The slides above this one, the root first. */
   val ancestors: List<Slide> get() = generateSequence(parentSlide) { it.parentSlide }.toList().asReversed()
@@ -54,11 +63,16 @@ class Slide(
     verticalChoices = false
   }
 
+  /**
+   * Adds a choice. Choices are kept by their text, so a second choice with the same text would silently replace the
+   * first (Moses's 14th decision lost one that way), and is refused instead.
+   */
   fun choice(
     text: String,
     slide: Slide,
   ) {
     require(text.isNotEmpty()) { "Choice text cannot be empty for ${slide.title}" }
+    require(text !in choices) { "Slide \"$title\" has two choices with the text \"$text\"" }
     choices[text] = slide
     slide.parentSlide = this
   }
@@ -66,13 +80,7 @@ class Slide(
   fun validateSlide() {
     fun <T> Collection<T>.dups() = groupingBy { it }.eachCount().filter { it.value > 1 }.map { it.key }
 
-    choices
-      .map { it.key }
-      .dups()
-      .also { dups ->
-        if (dups.isNotEmpty())
-          error("""Slide "$title" has duplicate choice titles: $dups""")
-      }
+    // Two choices with the same text are refused as they are added (choice), since the second would replace the first
 
     // Ignore children that are dead ends, e.g., "Incorrect Choice" slide
     choices

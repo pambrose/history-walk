@@ -59,7 +59,9 @@ the signed-in user from the `ApplicationCall` (`call.userUuid`), never from a cl
 **Moves are checked on the server.** `ContentService` takes the deck (`masterSlides`) and the user's stored slide as the
 truth, not what the client sends:
 - `makeChoice` and `provideReason` must start from the user's current slide and name one of its forward choices. The
-  stored title, choice text, and `deadEnd` come from the deck, and `advance` is derived as the client does
+  stored title, choice text, and `deadEnd` come from the deck (`Slide.leadsToDeadEnd`: a dead end, or a slide whose
+  one forward choice, a "Continue", leads to one, so a decision like Jermain's "Leave in the autumn" is stored as the
+  wrong turn it is), and `advance` is derived as the client does
   (`choices.size == 1`, go-backs counted).
 - `goBackInTime` must name an ancestor, the current slide, or `/` (the client's "back to the start").
 - A reason must pass `ReasonRule` (`commonMain`, at least 5 words, at most 2000 characters); the reason dialog uses the
@@ -134,7 +136,8 @@ is given to it. It starts at the teacher view.
 
 **Slides.** Decks are Kotlin DSL values in `jvmMain/content/` (`jermainLonguenSlides`, `mosesSlides`) built with
 `slides/SlideDeck.slideDeck { slide(...) { choice(...) } }`; content is HTML/markdown in raw strings, rendered through
-`MarkdownParser`. `Main.kt` picks the deck with `slideDeckFor` (`content/SlideDecks.kt`): `SLIDES_VARIABLE_NAME` is
+`MarkdownParser`. A slide keeps its choices by their text, so `choice` refuses a second one with the same text, which
+would silently replace the first (Moses's 14th decision lost a choice that way). `Main.kt` picks the deck with `slideDeckFor` (`content/SlideDecks.kt`): `SLIDES_VARIABLE_NAME` is
 `jermain` (the default when unset or blank) or `moses`, trimmed and in any case; any other value stops the server at
 startup, naming the value. The decks are compiled into the jar: nothing fetches or evaluates slide code at runtime, so
 a content change ships with a release. Slide images are jar resources under `src/jvmMain/resources/static/images`,
@@ -156,7 +159,8 @@ restart, together with the snapshot rewritten and committed with the deck change
 **Database.** `Dbms.migrate` runs Flyway (`src/jvmMain/resources/db/migration`) before `Database.connect` on every
 startup, so each deploy migrates. Never edit an applied migration (Flyway checksums them); add the next `V00N__...sql`
 (`V002` added `users.session_version`, `V003` the `history.settings` row and `user_choices.counted_as_student`, and
-rebuilt the progress views). Tables are Exposed objects in `dbms/DbmsTables.kt`; queries are in `dbms/DbmsTxs.kt`,
+rebuilt the progress views; `V004` is data only, marking as dead ends the stored decisions `Slide.leadsToDeadEnd` now
+catches, by path name). Tables are Exposed objects in `dbms/DbmsTables.kt`; queries are in `dbms/DbmsTxs.kt`,
 `dbms/AdminTxs.kt`, and `User.kt`.
 
 The connection (`Dbms.hikari`) comes from a platform's `DATABASE_URL` when it is set (Railway's
@@ -286,8 +290,8 @@ Kotest `StringSpec` on both targets. A spec in `src/commonTest` (`ReasonRuleTest
   checks the probe behind it: its timeout, one probe at a time however many calls wait, and an answer reused for its
   maximum age (a `TestTimeSource`). `EnvVarTest` checks the strict reading of the boolean and number settings.
 - `SlideContentTest` walks both real decks from the root and fails on a path name that does not find its slide, a
-  slide shared between two parents, a go-back past the root, a missing image, or a success slide whose title differs
-  from the deck's (the summary page counts successes by that title).
+  slide shared between two parents, a go-back past the root, a missing image, an image whose `alt` is empty or `Pic`,
+  or a success slide whose title differs from the deck's (the summary page counts successes by that title).
 
 **Client** (`src/jsTest`, run by `jsBrowserTest`, which `jsTest` runs): Kotest under Karma in headless Chrome. The
 Kotest Gradle plugin writes the JS entry point with KSP (`kspTestKotlinJs`), beside Kilua RPC's processor. MockK does
