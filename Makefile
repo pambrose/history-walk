@@ -198,9 +198,9 @@ docker-run: docker-build ## Run the image on DOCKER_PORT with ENV_FILE (.env), a
 			$(DOCKER_IMAGE):$(VERSION)
 
 # Starts the image against a throwaway Postgres on a Docker network of its own and checks that it migrates the empty
-# database and answers: /ping, /version, /health (the database reached), the page shell's Cache-Control, the bundle, and
-# a 401 for an RPC call without a session. Sign-in needs real Google credentials only when someone signs in, so placeholders let the server start, and
-# a loopback callback URL means no SESSION_SECRET is required. Everything it starts is removed, pass or fail; on a
+# database and answers: /ping, /version, /health (the database reached), the page shell's Cache-Control and security
+# headers, the bundle, and a 401 for an RPC call without a session. Sign-in needs real Google credentials only when
+# someone signs in, so placeholders let the server start, and a loopback callback URL means no SESSION_SECRET is required. Everything it starts is removed, pass or fail; on a
 # failure it prints the end of the server's log. The Docker Image workflow runs it too.
 SMOKE_NAME ?= history-walk-smoke
 SMOKE_PORT ?= 18080
@@ -233,6 +233,8 @@ docker-smoke: ## Start the image (make docker-build first) against a throwaway P
 	[ "$$(curl -fsS $$url/health || true)" = ok ] || fail "/health does not report the database answering"; \
 	curl -fsS -D - -o /dev/null $$url/ | grep -qi '^cache-control: no-cache, private' \
 		|| fail "the page shell is not sent with Cache-Control: no-cache, private"; \
+	curl -fsS -D - -o /dev/null $$url/ | grep -qi '^x-content-type-options: nosniff' \
+		|| fail "the page shell is not sent with X-Content-Type-Options: nosniff"; \
 	curl -fsS -o /dev/null $$url/main.bundle.js || fail "main.bundle.js is not served"; \
 	status=$$(curl -s -o /dev/null -w '%{http_code}' -X POST $$url/rpc/routeContentServiceManager0); \
 	[ "$$status" = 401 ] || fail "an RPC call without a session got $$status, not 401"; \

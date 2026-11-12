@@ -2,6 +2,7 @@ package com.pambrose.historywalk.auth
 
 import com.pambrose.historywalk.Auth.DEFAULT_LOGIN_GREETING
 import com.pambrose.historywalk.EndPoints.AUTH_CALLBACK
+import com.pambrose.historywalk.EndPoints.AUTH_DOMAIN
 import com.pambrose.historywalk.EndPoints.AUTH_GREETING
 import com.pambrose.historywalk.EndPoints.AUTH_LOGIN
 import com.pambrose.historywalk.EndPoints.LOGOUT
@@ -88,9 +89,14 @@ internal fun loginGreeting(value: String? = EnvVar.LOGIN_GREETING.getEnvOrNull()
  * which it can follow; they stay outside the RPC guard ([signedInApi]). [userInfoClient] asks Google for the account's
  * details once the code is redeemed ([fetchGoogleUserInfo]); a test passes one with a `MockEngine` in place of Google.
  */
-fun Route.signInRoutes(userInfoClient: HttpClient = HttpClient(CIO)) {
-  // The sign-in dialog's title. Open to all: the dialog is shown before anyone is signed in.
+fun Route.signInRoutes(
+  userInfoClient: HttpClient = HttpClient(CIO),
+  schoolDomain: () -> String = { SchoolConfig.emailDomain },
+) {
+  // The sign-in dialog's title, and the domain whose accounts may sign in, which the dialog names. Open to all: the
+  // dialog is shown before anyone is signed in.
   get(AUTH_GREETING) { call.respondText(loginGreeting(), ContentType.Text.Plain) }
+  get(AUTH_DOMAIN) { call.respondText(schoolDomain(), ContentType.Text.Plain) }
 
   authenticate(GOOGLE_AUTH) {
     // The provider sends a browser without a session to Google; one that gets here is signed in already

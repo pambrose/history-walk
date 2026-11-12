@@ -7,6 +7,7 @@ import com.pambrose.historywalk.User.Companion.userInfoFor
 import com.pambrose.historywalk.Utils.toUuid
 import com.pambrose.historywalk.auth.Roles.roleFor
 import com.pambrose.historywalk.auth.SchoolConfig
+import com.pambrose.historywalk.auth.signedInUserUuid
 import com.pambrose.historywalk.auth.userUuid
 import com.pambrose.historywalk.dbms.AdminTxs.teachersSeeStudentView
 import com.pambrose.historywalk.dbms.DbmsTxs.slideData
@@ -17,6 +18,7 @@ import com.pambrose.historywalk.slides.SlideDeck.Companion.ROOT
 import dev.kilua.rpc.ServiceException
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.server.application.*
+import kotlinx.coroutines.CancellationException
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.insertIgnore
@@ -38,17 +40,17 @@ class ContentService(
   private val call: ApplicationCall,
   private val teacherEmails: () -> Set<String> = { SchoolConfig.teacherEmails },
 ) : IContentService {
-  override suspend fun getUserInfo(): UserInfo {
-    val info = userInfoFor(call.userUuid.toUuid(), teacherEmails()) ?: return UserInfo("Unknown", "Unknown")
-    return if (info.role == Role.TEACHER && teachersSeeStudentView()) info.copy(role = Role.STUDENT) else info
-  }
+  override suspend fun getUserInfo(): UserInfo =
+    answering("getUserInfo") {
+      val info = userInfoFor(call.userUuid.toUuid(), teacherEmails()) ?: return@answering UserInfo("Unknown", "Unknown")
+      if (info.role == Role.TEACHER && teachersSeeStudentView()) info.copy(role = Role.STUDENT) else info
+    }
 
-  override suspend fun getCurrentSlide(): SlideData {
-    logger.debug { "userUuid=${call.userUuid}" }
-    val uuid = call.userUuid
-    val slide = findCurrentSlideForUser(uuid, masterSlides)
-    return slideData(uuid, slide)
-  }
+  override suspend fun getCurrentSlide(): SlideData =
+    answering("getCurrentSlide") {
+      val uuid = call.userUuid
+      slideData(uuid, findCurrentSlideForUser(uuid, masterSlides))
+    }
 
   // fromTitleStr, slideChoice's fields other than toPathName, and advance are ignored: the deck supplies them.
   override suspend fun makeChoice(
@@ -57,7 +59,8 @@ class ContentService(
     slideChoice: SlideChoice,
     advance: Boolean,
   ): UserChoice =
-    transaction {
+    answering("makeChoice") {
+      transaction {
       val uuid = call.userUuid
       val move = moveFor(uuid, fromPathNameStr, slideChoice.toPathName)
       val recorded = recordedReason(uuid, move)
@@ -68,7 +71,8 @@ class ContentService(
         // Already on the target, yet the move was neither recorded nor an advance: they got there some other way
         refuse(uuid, NOT_ON_SLIDE, "makeChoice ${move.describe()} unrecorded")
       }
-      UserChoice(move.from.pathName, move.from.title, move.slideChoice(alreadyVisited = recorded != null), reason)
+        UserChoice(move.from.pathName, move.from.title, move.slideChoice(alreadyVisited = recorded != null), reason)
+      }
     }
 
   // fromTitleStr and slideChoice's fields other than toPathName are ignored: the deck supplies them.
@@ -78,7 +82,8 @@ class ContentService(
     slideChoice: SlideChoice,
     reasonStr: String,
   ): SlideData =
-    transaction {
+    answering("provideReason") {
+      transaction {
       val uuid = call.userUuid
       val reasonText = reasonStr.trim()
       ReasonRule.problemWith(reasonText)?.also { problem ->
@@ -119,12 +124,14 @@ class ContentService(
         }
       }
 
-      updateLastSlide(uuid, move.to.pathName)
-      slideData(uuid, findCurrentSlideForUser(uuid, masterSlides))
+        updateLastSlide(uuid, move.to.pathName)
+        slideData(uuid, findCurrentSlideForUser(uuid, masterSlides))
+      }
     }
 
-  override suspend fun goBackInTime(parentTitle: ParentTitle) =
-    transaction {
+  override suspend fun goBackInTime(parentTitle: ParentTitle): SlideData =
+    answering("goBackInTime") {
+      transaction {
       val uuid = call.userUuid
       val current = findCurrentSlideForUser(uuid, masterSlides)
       val target = parentTitle.pathName
@@ -132,12 +139,35 @@ class ContentService(
       val allowed = target == ROOT || target == current.pathName || current.ancestors.any { it.pathName == target }
       if (!allowed)
         refuse(uuid, NOT_BEHIND_YOU, "goBackInTime from ${current.pathName} to $target")
-      updateLastSlide(uuid, target)
-      slideData(uuid, findCurrentSlideForUser(uuid, masterSlides))
+        updateLastSlide(uuid, target)
+        slideData(uuid, findCurrentSlideForUser(uuid, masterSlides))
+      }
     }
 
   override suspend fun versionCheck(versionCheckInfo: VersionCheckInfo): VersionCheckResponse =
-    ServerVersionCheck.checkServerVersion(versionCheckInfo)
+    answering("versionCheck") { ServerVersionCheck.checkServerVersion(versionCheckInfo) }
+
+  /**
+   * Runs the RPC call [name]. A refusal ([ServiceException]) goes to the browser as it is, with the message that says
+   * why. Anything else is a failure of the server's own, such as an `ExposedSQLException` whose message holds the SQL,
+   * or an `error("Missing uuid: ...")`; Kilua would send its message and class name to the browser, where any student
+   * can read them in the console. So it is logged here, with the user, and the browser gets [SOMETHING_WENT_WRONG]
+   * instead, as an exception the client treats as a failure (a toast and the page left as it was), not a refusal.
+   */
+  private suspend fun <T> answering(
+    name: String,
+    block: suspend () -> T,
+  ): T =
+    try {
+      block()
+    } catch (e: ServiceException) {
+      throw e
+    } catch (e: CancellationException) {
+      throw e
+    } catch (e: Exception) {
+      logger.error(e) { "$name failed for ${call.signedInUserUuid()}" }
+      throw IllegalStateException(SOMETHING_WENT_WRONG)
+    }
 
   /** A forward move in the deck: [choiceText] on [from] leads to [to]. [repeat]: the user already stands on [to]. */
   private class Move(
@@ -221,5 +251,8 @@ class ContentService(
     const val NOT_A_CHOICE = "That slide has no such choice"
     const val NO_REASON_NEEDED = "That choice takes no reason"
     const val NOT_BEHIND_YOU = "You can only go back to a slide on your path"
+
+    /** What the browser is told of a failure of the server's own, in place of its message (see [answering]). */
+    const val SOMETHING_WENT_WRONG = "Something went wrong on the server"
   }
 }

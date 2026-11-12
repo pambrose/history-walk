@@ -69,6 +69,10 @@ truth, not what the client sends:
 - A repeat of a move just made (a double-click, a second dialog, a retried transaction) is accepted and changes nothing:
   `provideReason` inserts with `ON CONFLICT DO NOTHING`, so the first reason wins.
 - Anything else is refused with a Kilua `ServiceException`, whose message reaches the browser.
+- Every method runs inside `ContentService.answering`: a failure of the server's own (an `ExposedSQLException`, an
+  `error("Missing uuid: ...")`) is logged there, with the user, and reaches the browser as an `IllegalStateException`
+  saying only `SOMETHING_WENT_WRONG`, which the client treats as a failure, not a refusal. Kilua would otherwise send
+  the exception's message and class name, which any student can read in the console.
 
 The RPC signatures still carry the fields the server now ignores, so changing them needs an `apiVersion` bump.
 
@@ -81,10 +85,17 @@ no longer cancels every later click. Clicks on choices and go-backs go through `
   KVision's `SecurityMgr.withAuth` takes any exception for "sign in needed", so `ClientUtils.withAuth` carries every
   other failure past it in a `Result` and rethrows it to the caller: a network error at start-up shows the
   `PAGE_NOT_LOADED` toast, not the sign-in dialog.
+- A reason is kept in the tab's `sessionStorage` (`ReasonDrafts`, `MainPanel.kt`) from the moment it is sent until
+  the server has it, and the reason dialog for the same move starts from it. A 401 parks the call behind the sign-in
+  dialog for good and signing in leaves the page, so without it a reason typed as the 12-hour session ran out was lost.
 
 **Sign-in (Google OAuth, `jvmMain/auth/`).** Only `athenian.org` accounts (`SCHOOL_EMAIL_DOMAIN`) are admitted. The role
 rule (`Roles.kt`): an address in `TEACHER_EMAILS` is a teacher, else a local part starting with two digits is a student,
 else refused. The role is recomputed from the live `TEACHER_EMAILS` on every request, not taken from the stored row.
+The progress views filter on the stored role, so `Main.kt` brings it into line at every startup (`User.syncStoredRoles`,
+which leaves alone an address the rule no longer admits, so a teacher taken off the list stays out of the class pages).
+The sign-in dialog names the domain the server serves at `/auth/domain` (`SCHOOL_EMAIL_DOMAIN`), in its instruction and
+in a refusal (`SignInRefusal`, kept rather than its message so the dialog can word it once the domain arrives).
 - `AuthRoutes.kt` runs `/auth/login` and `/auth/callback` with a signed stateless `state` and PKCE, storing nothing on
   the server. The `oauth_state` cookie (`OAuthState.kt`) holds a random secret plus an HMAC binding it to the state, and
   the PKCE verifier is derived from that secret (`Pkce.kt`), so a stolen callback URL is useless without the browser's
@@ -101,6 +112,9 @@ else refused. The role is recomputed from the live `TEACHER_EMAILS` on every req
 - `Routes.appRoutes` is the access map: RPC inside `signedInApi` (no session → 401), teacher pages (`/summary`, `/reasons`,
   `/admin` and its POSTs `/admin/view` and `/admin/clear`, `/slides`, `/threaddump`) inside `teachersOnly` (→ 403 for
   students), `/ping`, `/health`, `/version`, and `/static/*` open to all.
+- Every response carries `X-Content-Type-Options: nosniff`, `Content-Security-Policy: frame-ancestors 'none'`, and
+  `Referrer-Policy: same-origin`, and in production `Strict-Transport-Security` (`Installs.installSecurityHeaders`), a
+  second line behind the `SameSite=Strict` session cookie.
 - `/userreset` deletes the caller's own choices and is a POST, as `/logout` is (the client posts with
   `ClientUtils.postTo`); a GET or HEAD of either only redirects to `/`, since any link, image, or prefetch can send one.
 - Sign-in, sign-out, `/userreset`, and the teacher pages sit inside `noStore` (`RouteGuards.kt`), which sends
@@ -166,7 +180,8 @@ a place fails it too, so it needs a migration of its own or, if the students are
 startup, so each deploy migrates. Never edit an applied migration (Flyway checksums them); add the next `V00N__...sql`
 (`V002` added `users.session_version`, `V003` the `history.settings` row and `user_choices.counted_as_student`, and
 rebuilt the progress views; `V004` is data only, marking as dead ends the stored decisions `Slide.leadsToDeadEnd` now
-catches, by path name; `V005` is data only too, moving the stored places and moves of renamed and rerouted slides, as
+catches, by path name; `V006` adds `choice_text` to the `user_reasons` view, at its end, for the reasons page; `V005` is data only too,
+moving the stored places and moves of renamed and rerouted slides, as
 described under Slides). Tables are Exposed objects in `dbms/DbmsTables.kt`; queries are in `dbms/DbmsTxs.kt`,
 `dbms/AdminTxs.kt`, and `User.kt`.
 
@@ -295,7 +310,8 @@ Kotest `StringSpec` on both targets. A spec in `src/commonTest` (`ReasonRuleTest
   every request of a signed-in browser is a 503 while a signed-out one still gets `/ping`, that a bug is a 500, a bad
   request a 400, and a missing path still a 404, and that `/health` reports a database that fails. `HealthCheckTest`
   checks the probe behind it: its timeout, one probe at a time however many calls wait, and an answer reused for its
-  maximum age (a `TestTimeSource`). `EnvVarTest` checks the strict reading of the boolean and number settings.
+  maximum age (a `TestTimeSource`). `EnvVarTest` checks the strict reading of the boolean and number settings. `SecurityHeadersTest` checks the
+  security headers on a page, a 404, and a 500, and HSTS in production only.
 - `SlideContentTest` walks both real decks from the root and fails on a path name that does not find its slide, a
   slide shared between two parents, a go-back past the root, a missing image, an image whose `alt` is empty or `Pic`,
   or a success slide whose title differs from the deck's (the summary page counts successes by that title).

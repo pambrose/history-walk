@@ -154,6 +154,7 @@ object DbmsTxs {
               toPathName = row[toPathName],
               fromTitle = row[fromTitle],
               toTitle = row[toTitle],
+              choiceText = row[choiceText],
               reason = row[reason],
             )
           }
@@ -215,6 +216,7 @@ object DbmsTxs {
     val toPathName: String,
     val fromTitle: String,
     val toTitle: String,
+    val choiceText: String,
     val reason: String,
   )
 }

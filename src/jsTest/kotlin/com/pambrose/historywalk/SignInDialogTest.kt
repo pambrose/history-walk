@@ -17,10 +17,11 @@ class SignInDialogTest : StringSpec() {
 
   // Each spec's dialog, shown on the page; a test passes its own navigate, so nothing leaves the page
   private suspend fun signInDialog(
-    signInError: ObservableValue<String?> = ObservableValue(null),
+    signInError: ObservableValue<SignInRefusal?> = ObservableValue(null),
+    schoolDomain: ObservableValue<String> = ObservableValue(School.DEFAULT_DOMAIN),
     navigate: (String) -> Unit = {},
   ): SignInDialog =
-    SignInDialog(signInError, navigate).also {
+    SignInDialog(signInError, schoolDomain, navigate).also {
       opened += it
       showModal(it)
     }
@@ -36,7 +37,7 @@ class SignInDialogTest : StringSpec() {
 
     "Sign in with Google goes to the sign-in route" {
       val visited = mutableListOf<String>()
-      val dialog = signInDialog { visited += it }
+      val dialog = signInDialog(navigate = { visited += it })
 
       dialog.element.button("Sign in with Google").click()
 
@@ -47,18 +48,32 @@ class SignInDialogTest : StringSpec() {
       val dialog = signInDialog()
 
       dialog.caption shouldBe DEFAULT_LOGIN_GREETING
-      dialog.element.textContent.orEmpty() shouldContain "Sign in with your Athenian Google account"
+      dialog.element.textContent.orEmpty() shouldContain "Sign in with your athenian.org Google account"
     }
 
     "after a refused sign-in the dialog says why, and says nothing once the reason is cleared" {
-      val why = "That account is not a student or teacher account at athenian.org"
-      val signInError = ObservableValue<String?>(why)
+      val why = "jsmith@gmail.com isn't an athenian.org account. Please sign in with your school account."
+      val signInError = ObservableValue<SignInRefusal?>(SignInRefusal(SignInError.WRONG_DOMAIN, "jsmith@gmail.com"))
       val dialog = signInDialog(signInError)
 
       dialog.element.textContent.orEmpty() shouldContain why
 
       signInError.value = null
       dialog.element.textContent.orEmpty() shouldNotContain why
+    }
+
+    "the dialog names the school's domain as the server has it, in its instruction and in a refusal" {
+      val schoolDomain = ObservableValue(School.DEFAULT_DOMAIN)
+      val signInError = ObservableValue<SignInRefusal?>(SignInRefusal(SignInError.WRONG_DOMAIN, "jsmith@gmail.com"))
+      val dialog = signInDialog(signInError, schoolDomain)
+
+      schoolDomain.value = "example.edu"
+
+      dialog.element.textContent.orEmpty().run {
+        this shouldContain "Sign in with your example.edu Google account"
+        this shouldContain "jsmith@gmail.com isn't an example.edu account."
+        this shouldNotContain "athenian.org"
+      }
     }
 
     "the dialog cannot be dismissed: it has no close button, and Escape leaves it open" {

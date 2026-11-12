@@ -138,12 +138,15 @@ class PagesTest : StringSpec() {
       displayUserReasons().reasonsByUser() shouldBe
         listOf(
           "27alice@athenian.org" to
-            listOf(listOf("From/To", "Reason"), listOf("Town -> Hut again", "alice's only")),
+            listOf(
+              listOf("From/To", "Choice", "Reason"),
+              listOf("Town -> Hut again", "choose Hut again", "alice's only"),
+            ),
           "27bob@athenian.org" to
             listOf(
-              listOf("From/To", "Reason"),
-              listOf("Town -> Hut", "bob's first"),
-              listOf("Hut -> Win", "bob's second"),
+              listOf("From/To", "Choice", "Reason"),
+              listOf("Town -> Hut", "choose Hut", "bob's first"),
+              listOf("Hut -> Win", "choose Win", "bob's second"),
             ),
         )
     }
@@ -163,7 +166,7 @@ class PagesTest : StringSpec() {
       displayUserReasons().run {
         this shouldNotContain "<img"
         this shouldNotContain "<script"
-        reasonsByUser().single().second[1][1] shouldBe reason
+        reasonsByUser().single().second[1][2] shouldBe reason
       }
     }
 

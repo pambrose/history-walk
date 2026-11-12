@@ -26,11 +26,12 @@ its database. The migrations are SQL files in `src/jvmMain/resources/db/migratio
 | `V003__teachers_see_student_view.sql` | `history.settings` (the student-view switch) and `user_choices.counted_as_student`, and rebuilds the progress views to count teachers' moves made in the student view. |
 | `V004__dead_end_through_continue.sql` | Data only: marks as dead ends the stored Jermain decisions that led to a slide whose only choice, a *Continue*, ends the walk (the Autumn and Spring Departures, the Ramshackle Hut (cont.) slides), which were stored as correct. Changes nothing on the Moses database. |
 | `V005__renamed_and_rerouted_slides.sql` | Data only: moves the stored places and moves of the slides whose titles were corrected (Moses's "Decison" titles, four Jermain titles) and of the choices that were rerouted (refusing Ross's deal leads to Old Ben's own advice; two season choices go through their departure slide). A student on the via-Ross winter of the refused-deal branch, which is gone, goes back to that branch's first slide. |
+| `V006__choice_text_in_user_reasons.sql` | Adds each move's `choice_text` to the `user_reasons` view, for the reasons page's *Choice* column. |
 
 The log shows what happened at each start: *Flyway applied N migration(s); schema version … -> …*.
 
 Never edit a migration that has been applied anywhere: Flyway checksums them and refuses to start on a mismatch. A
-schema change is a new file, `V006__what_it_does.sql`.
+schema change is a new file, `V007__what_it_does.sql`.
 
 ### The startup guard
 

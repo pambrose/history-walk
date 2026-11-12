@@ -42,12 +42,12 @@ and in the step that fixes it under [Suggested order of work](#suggested-order-o
 | [12](#issue-12) | ✅ | Low      | Content           | Typos and grammar errors in both decks' text                                                    |
 | [13](#issue-13) | ⬜ | Low      | Content (Jermain) | Companions, horses, patrols, and seasons that do not match the student's path                   |
 | [14](#issue-14) | ✅ | Low      | Content (a11y)    | Every image's alt text is "Pic", and a few markup slips                                         |
-| [15](#issue-15) | ⬜ | Low      | Teacher pages     | The reasons page cannot show which wrong answer a Moses student chose                           |
-| [16](#issue-16) | ⬜ | Low      | Server            | A failed RPC call sends the exception's message and class name to the browser                   |
-| [17](#issue-17) | ⬜ | Low      | Server, data      | The class pages go by the role stored at sign-in, not the role the app uses                     |
-| [18](#issue-18) | ⬜ | Low      | Auth, client      | Sign-in messages name athenian.org whatever `SCHOOL_EMAIL_DOMAIN` says                          |
-| [19](#issue-19) | ⬜ | Low      | Client            | A reason typed as the session runs out is lost at sign-in                                       |
-| [20](#issue-20) | ⬜ | Low      | Server            | No security headers: `nosniff`, `frame-ancestors`, HSTS, `Referrer-Policy`                      |
+| [15](#issue-15) | ✅ | Low      | Teacher pages     | The reasons page cannot show which wrong answer a Moses student chose                           |
+| [16](#issue-16) | ✅ | Low      | Server            | A failed RPC call sends the exception's message and class name to the browser                   |
+| [17](#issue-17) | ✅ | Low      | Server, data      | The class pages go by the role stored at sign-in, not the role the app uses                     |
+| [18](#issue-18) | ✅ | Low      | Auth, client      | Sign-in messages name athenian.org whatever `SCHOOL_EMAIL_DOMAIN` says                          |
+| [19](#issue-19) | ✅ | Low      | Client            | A reason typed as the session runs out is lost at sign-in                                       |
+| [20](#issue-20) | ✅ | Low      | Server            | No security headers: `nosniff`, `frame-ancestors`, HSTS, `Referrer-Policy`                      |
 | [21](#issue-21) | ⬜ | Low      | Release           | `make release` pushes a rebuilt image, and cannot resume after a failed GitHub release          |
 | [22](#issue-22) | ⬜ | Low      | CI (docs site)    | The docs site ignores its lock file, and its workflow misses Makefile changes                   |
 | [23](#issue-23) | ⬜ | Low      | Makefile          | `docker-smoke` can stop without cleanup or diagnostics, and `make db` can wait forever          |
@@ -471,8 +471,10 @@ Things checked and found sound:
   `SlideContentTest` could refuse an `alt` that is empty or "Pic".
 
 <a id="issue-15"></a>
-### ⬜ 15. The reasons page cannot show which wrong answer a Moses student chose
+### ✅ 15. The reasons page cannot show which wrong answer a Moses student chose
 
+- **Status:** done in Wave 4: `V006` adds `choice_text` to the view, and the page has a *Choice* column between
+  *From/To* and *Reason*. Covered by `PagesTest`; `student-reasons.md` describes it.
 - **Severity:** Low
 - **Where:** `Pages.kt:135`; the `history.user_reasons` view (`V003__...sql:43-57`); `DbmsTables.kt:64-73`;
   `website/history-walk/docs/teachers/student-reasons.md:12`
@@ -487,8 +489,13 @@ Things checked and found sound:
   - Extend `PagesTest`, and update `student-reasons.md`.
 
 <a id="issue-16"></a>
-### ⬜ 16. A failed RPC call sends the exception's message and class name to the browser
+### ✅ 16. A failed RPC call sends the exception's message and class name to the browser
 
+- **Status:** done in Wave 4.
+  - Every RPC method runs inside `ContentService.answering`.
+  - A failure other than a refusal is logged with the user and reaches the browser as an `IllegalStateException`
+    saying only "Something went wrong on the server". The client treats it as a failure, with a toast, not a refusal.
+  - `ContentServiceTest` covers each method.
 - **Severity:** Low
 - **Where:** `ServiceImpl.kt` (every method); Kilua's `RpcServiceManager`, which answers any exception with
   `error = e.message` and `exceptionType = e.javaClass.canonicalName`
@@ -501,8 +508,14 @@ Things checked and found sound:
   message and reloads the student's slide. Add a test with a failing database call.
 
 <a id="issue-17"></a>
-### ⬜ 17. The class pages go by the role stored at sign-in, not the role the app uses
+### ✅ 17. The class pages go by the role stored at sign-in, not the role the app uses
 
+- **Status:** done in Wave 4.
+  - `User.syncStoredRoles` runs at every startup, after the migrations, and brings each stored role into line with
+    the role rule.
+  - An address the rule no longer admits keeps its stored role, so a teacher taken off the list stays out of the class
+    pages.
+  - Covered by `UserRepositoryTest`; `AGENTS.md` says which role the views use.
 - **Severity:** Low
 - **Where:** the views in `V003__teachers_see_student_view.sql:22-57` (`users.role = 'student'`); `User.kt:120`, `:132`;
   `AGENTS.md` ("The role is recomputed from the live `TEACHER_EMAILS` on every request, not taken from the stored row")
@@ -521,8 +534,14 @@ Things checked and found sound:
   - Make `AGENTS.md` say which.
 
 <a id="issue-18"></a>
-### ⬜ 18. Sign-in messages name athenian.org whatever `SCHOOL_EMAIL_DOMAIN` says
+### ✅ 18. Sign-in messages name athenian.org whatever `SCHOOL_EMAIL_DOMAIN` says
 
+- **Status:** done in Wave 4.
+  - `/auth/domain` serves `SCHOOL_EMAIL_DOMAIN`. The dialog fetches it with the greeting and names it in its
+    instruction and in the wrong-domain message.
+  - The page keeps the refusal (`SignInRefusal`) rather than its message, so the message can be worded once the domain
+    arrives.
+  - Covered by `SignInDialogTest` and `AuthRoutesTest`.
 - **Severity:** Low
 - **Where:** `commonMain/.../SignInError.kt:18` (`School.DEFAULT_DOMAIN`); `jsMain/.../SignInDialog.kt:51` ("your
   Athenian Google account"); `admins/configuration.md:30`
@@ -535,8 +554,12 @@ Things checked and found sound:
   - Cover it in `SignInDialogTest`.
 
 <a id="issue-19"></a>
-### ⬜ 19. A reason typed as the session runs out is lost at sign-in
+### ✅ 19. A reason typed as the session runs out is lost at sign-in
 
+- **Status:** done in Wave 4.
+  - A 401 parks the call for good, so the reason cannot be caught after the fact. Instead it is kept (`ReasonDrafts`)
+    from the moment it is sent until the server has it, and dropped on a save, a cancel, or a refusal.
+  - Covered by `ChoiceFlowTest`; `the-walk.md` tells teachers.
 - **Severity:** Low
 - **Where:** `MainPanel.kt:231-251` (`promptUserForReason`); `Security.kt:52`; `ClientUtils.kt:47-59`
 - **Problem:**
@@ -550,8 +573,13 @@ Things checked and found sound:
   - Add a `ReasonDialogTest` case.
 
 <a id="issue-20"></a>
-### ⬜ 20. No security headers: `nosniff`, `frame-ancestors`, HSTS, `Referrer-Policy`
+### ✅ 20. No security headers: `nosniff`, `frame-ancestors`, HSTS, `Referrer-Policy`
 
+- **Status:** done in Wave 4.
+  - `Installs.installSecurityHeaders` sends `nosniff`, `frame-ancestors 'none'`, and `Referrer-Policy: same-origin` on
+    every response, and HSTS in production.
+  - `SecurityHeadersTest` and `docker-smoke` check them.
+  - A full CSP for the teacher pages is left out, since the admin form's inline `confirm` would need moving first.
 - **Severity:** Low
 - **Where:** `Installs.kt:46` (`DefaultHeaders` with no headers added); `Pages.kt:78` (an inline `onsubmit`)
 - **Problem:**
@@ -769,12 +797,12 @@ The four steps share no files. Step 1 is a check in two dashboards, not code.
 
 | Step | Status | Issues | Work | Files |
 |------|:------:|--------|------|-------|
-| 10 | ⬜ | [16](#issue-16) | Generic `ServiceException` for unexpected RPC failures; a test | `ServiceImpl.kt`, `ContentServiceTest.kt` |
-| 11 | ⬜ | [17](#issue-17) | Sync `users.role` from `TEACHER_EMAILS` at startup; fix the `AGENTS.md` wording; a test | `User.kt` or `Dbms.kt`, `Main.kt`, `AdminTest.kt`, `AGENTS.md` |
-| 12 | ⬜ | [18](#issue-18) | The configured domain in the sign-in dialog and refusal message; tests | `SignInError.kt`, `SignInDialog.kt`, `AuthRoutes.kt`, `SignInDialogTest.kt` |
-| 13 | ⬜ | [19](#issue-19) | Keep a draft reason across a sign-in; a test | `MainPanel.kt`, `ReasonDialogTest.kt` |
-| 14 | ⬜ | [20](#issue-20) | Security headers; check one in `docker-smoke` and a route test | `Installs.kt`, `Makefile`, tests |
-| 15 | ⬜ | [15](#issue-15) | `choice_text` in the reasons view and page; tests; docs | a migration, `DbmsTables.kt`, `DbmsTxs.kt`, `Pages.kt`, `PagesTest.kt`, `student-reasons.md` |
+| 10 | ✅ | [16](#issue-16) | Generic `ServiceException` for unexpected RPC failures; a test | `ServiceImpl.kt`, `ContentServiceTest.kt` |
+| 11 | ✅ | [17](#issue-17) | Sync `users.role` from `TEACHER_EMAILS` at startup; fix the `AGENTS.md` wording; a test | `User.kt` or `Dbms.kt`, `Main.kt`, `AdminTest.kt`, `AGENTS.md` |
+| 12 | ✅ | [18](#issue-18) | The configured domain in the sign-in dialog and refusal message; tests | `SignInError.kt`, `SignInDialog.kt`, `AuthRoutes.kt`, `SignInDialogTest.kt` |
+| 13 | ✅ | [19](#issue-19) | Keep a draft reason across a sign-in; a test | `MainPanel.kt`, `ReasonDialogTest.kt` |
+| 14 | ✅ | [20](#issue-20) | Security headers; check one in `docker-smoke` and a route test | `Installs.kt`, `Makefile`, tests |
+| 15 | ✅ | [15](#issue-15) | `choice_text` in the reasons view and page; tests; docs | a migration, `DbmsTables.kt`, `DbmsTxs.kt`, `Pages.kt`, `PagesTest.kt`, `student-reasons.md` |
 
 - Step 10 follows Step 7, since both edit `provideReason`.
 - Step 14 follows Step 2 (`Installs.kt`), and coordinates its `docker-smoke` change with Step 18.
@@ -813,12 +841,12 @@ The four steps share no files. Step 1 is a check in two dashboards, not code.
 | Track | Steps | Can start |
 |-------|-------|-----------|
 | Ops | 1 | done |
-| Server errors and headers | 2 → 14 | now (Step 2 is done) |
+| Server errors and headers | 2 → 14 | done |
 | Settings | 3 | done |
 | Supply chain | 4 → 16, 19, and 23 | now (Step 4 is done) |
 | Moses content | 5 → 9 | done |
 | Jermain content | 6 → 8 → 9 | done (the horses in issue 13 wait on the content author) |
-| Walk data | 7 → 10 | Step 10 (Step 7 is done) |
-| Hardening | 11, 12, 13, 15 | now |
+| Walk data | 7 → 10 | done |
+| Hardening | 11, 12, 13, 15 | done |
 | Build and CI | 17, 18 | now (one person, the Makefile) |
 | Docs and cleanup | 20, 21 → 22 | after the steps above |

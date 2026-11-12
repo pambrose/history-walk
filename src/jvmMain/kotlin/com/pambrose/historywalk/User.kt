@@ -173,6 +173,28 @@ class User {
       }
     }
 
+    /**
+     * Brings each user's stored role into line with the role rule ([roleFor]) under [teacherEmails], and returns how
+     * many it changed. The progress views filter on the stored role, which sign-in writes, while everything else
+     * derives the role from `TEACHER_EMAILS`. Without this, an address on both sides of the rule (on the teacher list
+     * and starting with two digits) would be counted by the role it had at its last sign-in: a student given teacher
+     * access for a trial would have their test walk counted as a student's, until their next sign-in dropped their
+     * earlier moves from the class pages. The list is read once a process, so syncing at startup keeps the two in step.
+     * An address the rule no longer admits keeps its stored role: a teacher taken off the list stays out of the class
+     * pages, as before.
+     */
+    fun syncStoredRoles(teacherEmails: Set<String> = SchoolConfig.teacherEmails): Int =
+      transaction {
+        with(UsersTable) {
+          selectAll()
+            .mapNotNull { row ->
+              val now = roleFor(row[email], teacherEmails)?.name?.lowercase()
+              if (now != null && now != row[role]) row[id].value to now else null
+            }.onEach { (userId, now) -> update({ id eq userId }) { row -> row[role] = now } }
+            .size
+        }
+      }
+
     /** The role is derived from [teacherEmails] now, as the route guards do, not the one stored at last sign-in. */
     fun userInfoFor(
       uuid: UUID,

@@ -7,6 +7,7 @@ import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kvision.modal.Modal
+import kotlinx.browser.window
 
 /**
  * A click on a choice, through the real MainPanel and Rpc against [FakeServer]: makeChoice, then the reason dialog,
@@ -22,6 +23,10 @@ class ChoiceFlowTest : StringSpec() {
     FakeServer.on(IContentService::makeChoice) { call ->
       returns(UserChoice(start.pathName, start.title, call.param(2), earlierReason))
     }
+
+  // Where the reason for "Go north" is kept while it is sent
+  private val goNorthDraft: String
+    get() = ReasonDrafts.key(start.pathName, start.choices.first { it.choiceText == "Go north" }.toPathName)
 
   private suspend fun reasonDialogShowing(): Modal {
     awaitUntil { visibleModals().singleOrNull()?.getElement() != null }
@@ -44,6 +49,7 @@ class ChoiceFlowTest : StringSpec() {
     afterTest {
       closeModals()
       busy.value = false
+      window.sessionStorage.removeItem(goNorthDraft)
     }
 
     "a choice asks why, saves the reason, and shows the next slide" {
@@ -86,6 +92,33 @@ class ChoiceFlowTest : StringSpec() {
       awaitUntil { "North" in MainPanel.panel.texts() }
 
       FakeServer.callsTo(IContentService::provideReason).map { it.param<String>(3) } shouldBe listOf(reason, reason)
+    }
+
+    "the reason is kept in the tab while it is sent, so an interrupting sign-in loses nothing, and dropped once saved" {
+      answerChoiceWith("")
+      var keptWhileSent: String? = null
+      FakeServer.on(IContentService::provideReason) {
+        keptWhileSent = window.sessionStorage.getItem(goNorthDraft)
+        returns(north)
+      }
+
+      MainPanel.element.button("Go north").click()
+      val dialog = reasonDialogShowing()
+      dialog.element.textArea.enter(reason)
+      dialog.element.button("OK").click()
+      awaitUntil { "North" in MainPanel.panel.texts() }
+
+      keptWhileSent shouldBe reason
+      window.sessionStorage.getItem(goNorthDraft) shouldBe null
+    }
+
+    "a reason kept from before a sign-in is offered again when the student makes the same choice" {
+      answerChoiceWith("")
+      window.sessionStorage.setItem(goNorthDraft, reason)
+
+      MainPanel.element.button("Go north").click()
+
+      reasonDialogShowing().element.textArea.value shouldBe reason
     }
 
     "cancelling the reason leaves the student on the slide, with the choices enabled" {

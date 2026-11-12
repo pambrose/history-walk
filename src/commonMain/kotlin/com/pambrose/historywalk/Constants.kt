@@ -22,6 +22,7 @@ object EndPoints {
   const val AUTH_LOGIN = "auth/login"
   const val AUTH_CALLBACK = "auth/callback"
   const val AUTH_GREETING = "auth/greeting"
+  const val AUTH_DOMAIN = "auth/domain"
   const val USER_RESET = "userreset"
   const val SUMMARY = "summary"
   const val REASONS = "reasons"

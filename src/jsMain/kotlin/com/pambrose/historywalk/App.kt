@@ -77,7 +77,7 @@ private fun showRefusalFromUrl() {
   val params = URLSearchParams(window.location.search)
   val code = params.get(SignInError.ERROR_PARAM) ?: return
   val email = SignInError.refusalEmailOrNull(params.get(SignInError.EMAIL_PARAM))
-  Security.signInError.value = SignInError.fromCode(code)?.message(email)
+  Security.signInError.value = SignInError.fromCode(code)?.let { SignInRefusal(it, email) }
   window.history.replaceState(null, "", "/")
 }
 
