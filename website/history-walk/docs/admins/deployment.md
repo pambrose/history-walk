@@ -44,9 +44,9 @@ A Railway service runs the same jar or image with the same variables:
 - Keep a copy of the service's variables outside the repository. `secrets/` is gitignored for this, such as
   `secrets/railway.env`.
 - `make railway-restart` restarts the **Jermain** and **Moses** services with the
-  [Railway CLI](https://docs.railway.com/guides/cli) (`railway login` once), then waits for each walk to answer `/ping`
-  and shows its `/version`. It restarts the deployment as it is, rebuilding and pulling nothing, and each walk is down
-  for the few seconds it takes to start. `RAILWAY_PROJECT`, `RAILWAY_SERVICES`, and `RAILWAY_URLS` override the
+  [Railway CLI](https://docs.railway.com/guides/cli) (`railway login` once), then waits for each walk's `/version` to
+  show a new start time, and shows it. It restarts the deployment as it is, rebuilding and pulling nothing, and each
+  walk is down for the few seconds it takes to start. `RAILWAY_PROJECT`, `RAILWAY_SERVICES`, and `RAILWAY_URLS` override the
   project and services.
 - `make railway-redeploy` deploys both services again from their source, pulling the newest `pambrose/history-walk`
   image from Docker Hub (`railway redeploy --from-source`; a plain `railway redeploy`, like a restart, reuses the image
@@ -81,6 +81,7 @@ The image holds a Java 25 JRE (Alpine) and the fat jar, nothing else, and runs i
 The image:
 
 - listens on **8080** and has a health check that fetches `/ping` every 30 seconds;
+- runs as an unprivileged user, which owns neither the app's directory nor its jar;
 - sizes its heap to 75% of the container's memory limit, and exits on running out of memory, so the host restarts it;
 - takes its settings from the environment, like any other deployment: `docker run -e …` or the host's settings.
 

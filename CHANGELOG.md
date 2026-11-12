@@ -86,6 +86,20 @@ All notable changes to History Walk are recorded here. The format follows
   address on the teacher list that also starts with two digits is counted by the role the app uses, not the one it had
   at its last sign-in. An address the rule no longer admits keeps its stored role.
 
+- `make release` pushes the jar `make ci` built and smoke-tested, not a rebuild, and labels the image with its commit.
+  A release whose GitHub release failed after the push can be finished with the new `make release-github`, which
+  first checks that the image on Docker Hub was built from the current commit.
+- The client's npm lock is resolved afresh, which clears 47 of the Security workflow's 48 findings in it, and
+  `serialize-javascript` is pinned to 7 for mocha (`build.gradle.kts`), which clears the last. `lock-scan` now fails on
+  a fixable HIGH or CRITICAL vulnerability and is a release check.
+- The image's user owns neither `/app` nor the jar, so code running in the server could not rewrite it.
+- The Gradle wrapper checks the distribution's SHA-256; `make upgrade-wrapper` records the new one.
+- The docs site is built with `uv sync --locked`, and its workflow also runs when the Makefile changes.
+- `make docker-smoke` removes what it started however it ends, and says which step failed; `make db` gives up after a
+  minute, with the container's log, rather than waiting for ever.
+- `/version` ends with when the server started, and `make railway-restart` waits for it to change, rather than taking
+  the answer of the process being replaced for the restarted one.
+
 ### Removed
 
 - The stale `kotlin-js-store` line in `.gitignore`.

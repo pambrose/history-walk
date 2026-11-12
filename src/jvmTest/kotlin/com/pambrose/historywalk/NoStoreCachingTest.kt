@@ -221,6 +221,22 @@ class NoStoreCachingTest : StringSpec() {
       }
     }
 
+    "version names the release and when this server started, so a restart can be told from no restart" {
+      cachingTest { client ->
+        client.get("/version").bodyAsText().run {
+          this shouldStartWith "Version: "
+          substringAfter(" Started: ") shouldBe Routes.STARTED
+        }
+        // The JVM's start, to the second, as an ISO-8601 instant
+        java.time.Instant
+          .parse(Routes.STARTED)
+          .epochSecond shouldBe
+          java.lang.management.ManagementFactory
+            .getRuntimeMXBean()
+            .startTime / 1000
+      }
+    }
+
     "health and version are left alone" {
       cachingTest { client ->
         listOf("/ping", "/version").forEach { path ->

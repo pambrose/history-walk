@@ -242,6 +242,10 @@ plugins.withType<YarnPlugin> {
         yarnLockMismatchReportProperty.set(YarnLockMismatchReport.FAIL)
         reportNewYarnLockProperty.set(true)
         yarnLockAutoReplaceProperty.set(false)
+        // mocha 11 asks for serialize-javascript ^6.0.2, whose 6.x has a HIGH advisory (GHSA-5c6j-r48x-rmvq) fixed only in
+        // 7.0.3. mocha uses it only in its Node parallel mode, which the client specs, run in the browser by Karma, never
+        // use. Without this the Security workflow's lock-scan, a release check, would fail. Drop it once mocha asks for 7.
+        resolution("serialize-javascript", "^7.0.3")
     }
 }
 

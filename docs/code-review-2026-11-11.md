@@ -48,14 +48,14 @@ and in the step that fixes it under [Suggested order of work](#suggested-order-o
 | [18](#issue-18) | ✅ | Low      | Auth, client      | Sign-in messages name athenian.org whatever `SCHOOL_EMAIL_DOMAIN` says                          |
 | [19](#issue-19) | ✅ | Low      | Client            | A reason typed as the session runs out is lost at sign-in                                       |
 | [20](#issue-20) | ✅ | Low      | Server            | No security headers: `nosniff`, `frame-ancestors`, HSTS, `Referrer-Policy`                      |
-| [21](#issue-21) | ⬜ | Low      | Release           | `make release` pushes a rebuilt image, and cannot resume after a failed GitHub release          |
-| [22](#issue-22) | ⬜ | Low      | CI (docs site)    | The docs site ignores its lock file, and its workflow misses Makefile changes                   |
-| [23](#issue-23) | ⬜ | Low      | Makefile          | `docker-smoke` can stop without cleanup or diagnostics, and `make db` can wait forever          |
-| [24](#issue-24) | ⬜ | Low      | Supply chain      | The app's user owns the jar it runs, and the Gradle wrapper has no checksum                     |
+| [21](#issue-21) | ✅ | Low      | Release           | `make release` pushes a rebuilt image, and cannot resume after a failed GitHub release          |
+| [22](#issue-22) | ✅ | Low      | CI (docs site)    | The docs site ignores its lock file, and its workflow misses Makefile changes                   |
+| [23](#issue-23) | ✅ | Low      | Makefile          | `docker-smoke` can stop without cleanup or diagnostics, and `make db` can wait forever          |
+| [24](#issue-24) | ✅ | Low      | Supply chain      | The app's user owns the jar it runs, and the Gradle wrapper has no checksum                     |
 | [25](#issue-25) | ⬜ | Low      | Docs (developer)  | `AGENTS.md`, comments, and the Makefile have drifted from the code                              |
 | [26](#issue-26) | ⬜ | Low      | Docs (site)       | The admin pages and `llms.txt` have drifted from the code                                       |
 | [27](#issue-27) | ⬜ | Low      | Code hygiene      | Dead code and stale comments                                                                    |
-| [28](#issue-28) | ⬜ | Low      | Supply chain      | The npm lock has 48 fixable HIGH or CRITICAL findings, all in build and test tools (found in Step 4) |
+| [28](#issue-28) | ✅ | Low      | Supply chain      | The npm lock has 48 fixable HIGH or CRITICAL findings, all in build and test tools (found in Step 4) |
 
 Things checked and found sound:
 
@@ -593,8 +593,15 @@ Things checked and found sound:
   - Check one header in `docker-smoke` and in a route test.
 
 <a id="issue-21"></a>
-### ⬜ 21. `make release` pushes a rebuilt image, and cannot resume after a failed GitHub release
+### ✅ 21. `make release` pushes a rebuilt image, and cannot resume after a failed GitHub release
 
+- **Status:** done in Wave 5.
+  - `_docker-push` builds nothing: `make release` pushes the jar `make ci` built and smoke-tested, and labels the image
+    with its commit (`org.opencontainers.image.revision`).
+  - The new `make release-github` creates the GitHub release, after checking that the image on Docker Hub was built
+    from that commit. `make release` runs it last, and run alone it finishes a release that stopped after the push;
+    `release-check`'s Docker Hub refusal says so.
+  - Not done: smoke-testing the arm64 variant before the push.
 - **Severity:** Low
 - **Where:** `Makefile:182` (`_docker-push`), `:283`, and the `release` recipe (`:306-316`); `build.gradle.kts:56-62`
 - **Problem:**
@@ -613,8 +620,10 @@ Things checked and found sound:
     finishes an interrupted release.
 
 <a id="issue-22"></a>
-### ⬜ 22. The docs site ignores its lock file, and its workflow misses Makefile changes
+### ✅ 22. The docs site ignores its lock file, and its workflow misses Makefile changes
 
+- **Status:** done in Wave 5: `website-env` runs `uv sync --locked`, and both of `website.yml`'s path lists include
+  the Makefile.
 - **Severity:** Low
 - **Where:** `Makefile:327` and `:344` (`uv sync` without `--locked`); `.github/workflows/website.yml:10-21`
 - **Problem:**
@@ -625,8 +634,14 @@ Things checked and found sound:
 - **Fix:** `uv sync --locked` in `website-env` (and the line at `:344`), and add `Makefile` to both path lists.
 
 <a id="issue-23"></a>
-### ⬜ 23. `docker-smoke` can stop without cleanup or diagnostics, and `make db` can wait forever
+### ✅ 23. `docker-smoke` can stop without cleanup or diagnostics, and `make db` can wait forever
 
+- **Status:** done in Wave 5.
+  - `docker-smoke` sets `trap cleanup EXIT` and gives each command that can fail its own message. A missing image was
+    checked to fail with one and leave no container or network behind.
+  - `make db` gives up after a minute with the container's log.
+  - For `railway-restart`, `/version` now ends with the server's start time. The target reads each walk's `/version`
+    before restarting and waits until it changes, which a fake `railway` and `curl` were checked against.
 - **Severity:** Low
 - **Where:** `Makefile:207-236` (`docker-smoke`); `Makefile:87` (`make db`'s `until ... pg_isready` loop);
   `Makefile:374-387` (`railway-restart`)
@@ -645,8 +660,12 @@ Things checked and found sound:
     answer.
 
 <a id="issue-24"></a>
-### ⬜ 24. The app's user owns the jar it runs, and the Gradle wrapper has no checksum
+### ✅ 24. The app's user owns the jar it runs, and the Gradle wrapper has no checksum
 
+- **Status:** done in Wave 5.
+  - The jar and `/app` stay root's; the container's user, `historywalk`, was checked to be unable to write the jar.
+  - `gradle-wrapper.properties` has the `distributionSha256Sum` for 9.9.1, checked against a fresh download, and
+    `make upgrade-wrapper` fetches the new one from Gradle.
 - **Severity:** Low
 - **Where:** `Dockerfile:14` (`chown -R historywalk /app`) and `:23` (`COPY --chown=...`);
   `gradle/wrapper/gradle-wrapper.properties`; `Makefile:365` (`upgrade-wrapper`)
@@ -661,6 +680,7 @@ Things checked and found sound:
 <a id="issue-25"></a>
 ### ⬜ 25. `AGENTS.md`, comments, and the Makefile have drifted from the code
 
+- **Status:** partly done in Wave 5: the stray tab in `Makefile`'s "nothing published" is gone.
 - **Severity:** Low
 - **Where and what:**
   - **Start command and port:**
@@ -718,8 +738,18 @@ Things checked and found sound:
   and names.
 
 <a id="issue-28"></a>
-### ⬜ 28. The npm lock has 48 fixable HIGH or CRITICAL findings, all in build and test tools
+### ✅ 28. The npm lock has 48 fixable HIGH or CRITICAL findings, all in build and test tools
 
+- **Status:** done in Wave 5.
+  - Resolving the lock afresh (the lock moved aside, then `kotlinUpgradeYarnLock`) took every package to the newest
+    version in its range and cleared 47 of the 48 findings.
+  - The last, `serialize-javascript` 6.0.2, is fixed only in 7, beyond mocha's `^6.0.2`. A Yarn resolution in
+    `build.gradle.kts` pins it to 7 (7.1.4); mocha uses it only in its Node parallel mode, which the browser specs
+    never use.
+  - Trivy finds nothing. The 90 client specs pass and the bundle builds.
+  - `lock-scan` now fails on a finding, and `RELEASE_CHECKS` includes it.
+  - Note: `rootPackageJson` does not notice a changed resolution, so `build/js` must be deleted before re-locking
+    (`AGENTS.md`).
 - **Severity:** Low
 - **Found:** in Wave 1, while doing Step 4, by `trivy fs --scanners vuln --severity HIGH,CRITICAL --ignore-unfixed` over
   `.kotlin-js-store/`
@@ -813,11 +843,11 @@ The four steps share no files. Step 1 is a check in two dashboards, not code.
 
 | Step | Status | Issues | Work | Files |
 |------|:------:|--------|------|-------|
-| 16 | ⬜ | [21](#issue-21) | Push the jar `make ci` tested; a release that can be finished after a failure | `Makefile` |
-| 17 | ⬜ | [22](#issue-22) | `uv sync --locked`; `Makefile` in the website workflow's paths | `Makefile`, `website.yml` |
-| 18 | ⬜ | [23](#issue-23) | `trap cleanup EXIT` in `docker-smoke`; a bounded wait in `make db`; a surer `railway-restart` | `Makefile` |
-| 19 | ⬜ | [24](#issue-24) | A root-owned jar in the image; a checksum for the Gradle wrapper | `Dockerfile`, `gradle-wrapper.properties`, `Makefile` |
-| 23 | ⬜ | [28](#issue-28) | Upgrade or pin the flagged npm packages; then make `lock-scan` a gate and a release check | `build.gradle.kts`, `.kotlin-js-store/yarn.lock`, `security.yml`, `Makefile` |
+| 16 | ✅ | [21](#issue-21) | Push the jar `make ci` tested; a release that can be finished after a failure | `Makefile` |
+| 17 | ✅ | [22](#issue-22) | `uv sync --locked`; `Makefile` in the website workflow's paths | `Makefile`, `website.yml` |
+| 18 | ✅ | [23](#issue-23) | `trap cleanup EXIT` in `docker-smoke`; a bounded wait in `make db`; a surer `railway-restart` | `Makefile` |
+| 19 | ✅ | [24](#issue-24) | A root-owned jar in the image; a checksum for the Gradle wrapper | `Dockerfile`, `gradle-wrapper.properties`, `Makefile` |
+| 23 | ✅ | [28](#issue-28) | Upgrade or pin the flagged npm packages; then make `lock-scan` a gate and a release check | `build.gradle.kts`, `.kotlin-js-store/yarn.lock`, `security.yml`, `Makefile` |
 
 - Steps 16, 17, 18, and 19 all edit the Makefile, in different targets, so one person can take the wave, or the steps
   can merge one after another.
@@ -843,10 +873,10 @@ The four steps share no files. Step 1 is a check in two dashboards, not code.
 | Ops | 1 | done |
 | Server errors and headers | 2 → 14 | done |
 | Settings | 3 | done |
-| Supply chain | 4 → 16, 19, and 23 | now (Step 4 is done) |
+| Supply chain | 4 → 16, 19, and 23 | done |
 | Moses content | 5 → 9 | done |
 | Jermain content | 6 → 8 → 9 | done (the horses in issue 13 wait on the content author) |
 | Walk data | 7 → 10 | done |
 | Hardening | 11, 12, 13, 15 | done |
-| Build and CI | 17, 18 | now (one person, the Makefile) |
+| Build and CI | 17, 18 | done |
 | Docs and cleanup | 20, 21 → 22 | after the steps above |

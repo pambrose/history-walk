@@ -9,18 +9,24 @@ LABEL maintainer="Paul Ambrose <pambrose@mac.com>"
 # rather than ship an older one. Drop this once a new base digest carries the fix.
 RUN apk add --no-cache --upgrade 'libexpat>=2.10.0-r0'
 
-# Run as an unprivileged user rather than root, even inside the container.
+# Run as an unprivileged user rather than root, even inside the container. The user owns nothing it runs: /app and the
+# jar stay root's, readable by all, so code that got to run in the server could not rewrite the jar and outlive a restart.
+# The server writes nothing to disk; its log goes to stdout.
 ENV APPLICATION_USER=historywalk
-RUN adduser --disabled-password --gecos '' $APPLICATION_USER && mkdir /app && chown -R $APPLICATION_USER /app
-USER $APPLICATION_USER
+RUN adduser --disabled-password --gecos '' $APPLICATION_USER && mkdir /app
 
-# The version comes from gradle.properties (make docker-build passes it) and only labels the image: the jar's file name
+# The version comes from gradle.properties and the revision is the commit (make docker-build and make release pass both);
+# they only label the image, and make release-github checks the revision before it tags a release. The jar's file name
 # leaves the version out (build.gradle.kts), so this COPY and a deployment's start command name the same file in every
 # release.
 ARG APP_VERSION
+ARG APP_REVISION
 LABEL org.opencontainers.image.version=$APP_VERSION
+LABEL org.opencontainers.image.revision=$APP_REVISION
 # The jar carries the compiled JS client, logback.xml, the Flyway migrations, and the slide images, so nothing else is copied.
-COPY --chown=$APPLICATION_USER ./build/libs/history-walk.jar /app/history-walk.jar
+COPY ./build/libs/history-walk.jar /app/history-walk.jar
+
+USER $APPLICATION_USER
 
 WORKDIR /app
 
