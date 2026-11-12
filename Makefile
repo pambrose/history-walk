@@ -263,6 +263,9 @@ docker-smoke: ## Start the image (make docker-build first) against a throwaway P
 # at the first, so one run shows all that is left to do: the local checks first, then those that ask GitHub and Docker
 # Hub. RELEASE_NOTES.md's "## History Walk VERSION" section becomes the GitHub release's notes, so it must be there and
 # end with the **Full Changelog** link. A tag on Docker Hub can be pushed over, so a VERSION already there is refused.
+# The check runs named Dependabot are left out: they are Dependabot's own update jobs, which attach to master's commits
+# but are not CI, and fail for reasons the commit does not cause (it cannot update .kotlin-js-store/yarn.lock, which has
+# no package.json beside it; Kotlin writes that at build time).
 release-check: ## Fail, listing every reason, unless this checkout is fit to release VERSION
 	@problems=0; problem() { echo "  - $$1" >&2; problems=$$((problems + 1)); }; \
 	echo "Checking whether $(VERSION) can be released from $$(git rev-parse --short HEAD)"; \
@@ -289,7 +292,7 @@ release-check: ## Fail, listing every reason, unless this checkout is fit to rel
 	! gh release view "$(VERSION)" >/dev/null 2>&1 || problem "GitHub already has a release $(VERSION)"; \
 	docker info >/dev/null 2>&1 || problem "Docker is not running: make ci and the push need it"; \
 	if runs=$$(gh api "repos/{owner}/{repo}/commits/$$(git rev-parse HEAD)/check-runs" --paginate \
-			--jq '.check_runs[] | "\(.status) \(.conclusion) \(.name)"' 2>/dev/null); then \
+			--jq '.check_runs[] | select(.name != "Dependabot") | "\(.status) \(.conclusion) \(.name)"' 2>/dev/null); then \
 		failing=$$(echo "$$runs" | grep -Ev '^completed (success|skipped|neutral) ' | grep . | tr '\n' ';'); \
 		[ -z "$$failing" ] || problem "CI checks have not passed for HEAD: $$failing"; \
 		! echo "$$runs" | grep -q '^completed neutral GitGuardian' \

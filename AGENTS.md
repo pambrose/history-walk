@@ -374,7 +374,10 @@ master's newest (about 1 GB each, one per day scanned); `website.yml` builds the
 (`https://pambrose.github.io/history-walk/`, which needs Settings → Pages → Source set to GitHub Actions).
 `dependabot.yml` proposes action updates and new digests for the Dockerfile's base image (pinned by digest, tag kept)
 weekly, 7 days after each release, but for the JVM libraries only security updates (`open-pull-requests-limit: 0`; `make
-versions` lists the rest). `.gitignore` ignores dot-directories, so `.github/` is re-included explicitly, and so is
+versions` lists the rest). Dependabot's security updates also find the committed npm lock but cannot update it (no
+`package.json` beside it; Kotlin writes that at build time), so their jobs for it fail; `make release-check` leaves
+out check runs named Dependabot for that reason. The lock is kept current by hand (a fresh `make yarn-unlock`) and gated
+by `lock-scan`, and Dependabot's alerts on it still show under Security. `.gitignore` ignores dot-directories, so `.github/` is re-included explicitly, and so is
 `.kotlin-js-store/yarn.lock`, the client's npm lock: `build.gradle.kts` sets the Yarn plugin to fail a build whose
 resolved packages differ from it, or that finds none, so CI builds the bundle a release ships. After changing a Kotlin/JS
 or npm dependency, run `make yarn-unlock` and commit the rewritten lock with the change. `make ci` runs

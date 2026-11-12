@@ -6,115 +6,124 @@ All notable changes to History Walk are recorded here. The format follows
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-11-11
+
+The fixes from a review of the whole repository, `docs/code-review-2026-11-11.md` (#34–#39): the walks' text and
+paths, the class pages, failures and settings, sign-in, the security of the image and its dependencies, and the release
+tooling. Three data migrations run at the first start; back up both databases first.
+
 ### Added
 
-- `make railway-versions`, which runs `make served-version` for each walk on Railway, showing the client bundle version
-  each serves beside this checkout's version.
+- **The reasons page has a *Choice* column**: the choice each reason explains, as its button read. Every wrong Moses
+  answer leads to an *Incorrect* slide, so the From/To titles alone could not say which one a student chose. Migration
+  `V006` adds `choice_text` to the `user_reasons` view.
+- **A reason survives an expired sign-in.** The reason is kept in the tab (`sessionStorage`) while it is sent, so one
+  typed as the 12-hour sign-in ran out is offered again, already typed, once the student has signed in and makes the
+  same choice.
 - `/health`, open to all: `ok` while the database answers a trivial query within 3 seconds, else a 503, for an uptime
-  monitor. One query runs at a time and its answer is reused for 5 seconds, so no number of calls can load the database.
-  `make docker-smoke` checks it. `/ping` is unchanged and stays the image's health check.
-- `docs/code-review-2026-11-11.md`, a review of the whole repository: 28 numbered issues and the order to fix them in.
-- The client's npm lock, `.kotlin-js-store/yarn.lock`, is committed, and the Security workflow's new `lock-scan` job
-  reports its HIGH and CRITICAL vulnerabilities to code scanning, without failing yet (issue 28 of the review).
-- Moses's 14th decision has the third choice it was written with ("Try to break your irons with a rock right there,
-  beside the sleeping guards"); its two wrong choices had the same text, so one silently replaced the other. A slide
-  now refuses a second choice with the same text, so a deck with one fails to load.
-- Migration `V004`, data only: the stored Jermain decisions that led to a *Continue* on to a dead end are marked as
-  dead ends (see Fixed).
-- The reasons page has a *Choice* column, the choice each reason explains, as its button read: the slide a choice
-  leads to does not always say (every wrong Moses answer leads to an *Incorrect* slide). Migration `V006` adds
-  `choice_text` to the `user_reasons` view.
+  monitor. One query runs at a time and its answer is reused for 5 seconds. `/ping` is unchanged and stays the image's
+  health check.
 - `/auth/domain`, open to all: `SCHOOL_EMAIL_DOMAIN`, which the sign-in dialog now names, in its instruction and in
   the message for an account from another domain (they said Athenian and athenian.org whatever the setting).
-- Every response carries `X-Content-Type-Options: nosniff`, `Content-Security-Policy: frame-ancestors 'none'`, and
-  `Referrer-Policy: same-origin`, and in production `Strict-Transport-Security`; `make docker-smoke` checks the first.
-- A reason is kept in the tab while it is sent, so one typed as the 12-hour sign-in ran out is offered again, already
-  typed, once the student has signed in and makes the same choice.
-- Migration `V005`, data only: moves the stored places and moves of the slides renamed and rerouted below, so each
-  student keeps their place. `DbmsMigrateTest` puts a student at every place either deck had before it and checks that
-  each still finds its slide afterwards.
+- `/version` ends with when the server started (`Started: <instant>`).
+- `make release-github` creates a version's GitHub release after checking that Docker Hub's image was built from the
+  current commit; `make release` runs it last, and run alone it finishes a release that stopped after the image push.
+- `make railway-versions`, which runs `make served-version` for each walk on Railway, showing the client bundle version
+  each serves beside this checkout's version.
+- Migrations `V004` and `V005`, data only (see Changed and Fixed), and `V006` (above).
+- `DbmsMigrateTest` stores a student at every place either deck had before `V005` and requires each to find its slide
+  after every migration, so a later rename that strands a place fails CI.
+- `docs/code-review-2026-11-11.md`, the review: 28 numbered issues and the order they were fixed in.
 
 ### Changed
 
-- `make served-version` without `ORIGIN_URL` shows only the bundle `PUBLIC_URL` serves, as "The served bundle", and
-  says nothing of Cloudflare; with `ORIGIN_URL` it compares Cloudflare's bundle with the origin's as before.
-- A request that fails is answered by what went wrong: 400 for a bad parameter, 404 where there is nothing, 503 when
-  the database is not answering, 500 for anything else. Each 5xx is logged at ERROR with the method and path. Every
+- **Settings are read strictly.** The boolean settings (`SHOW_RESET_BUTTON`, `ALLOW_SLIDE_ACCESS`,
+  `DISPLAY_CONSECUTIVE_CORRECT_DECISIONS`) take only `true` or `false`, in any case. `CLIENT_VERSION_CHECK_INTERVAL_SECS`
+  takes a whole number from 10 to 3600, and `CLIENT_RELOAD_WARNING_INTERVAL_SECS` one from 0 to 3600. Any other value
+  stops the server at startup, naming the setting. Before, `1` or `yes` silently meant false, a typo in an interval
+  failed every version check, and a 0 had every open page poll the server nonstop. A page also never waits less than 5
+  seconds between checks.
+- **A failed request is answered by what went wrong**: 400 for a bad parameter, 404 where there is nothing, 503 when
+  the database is not answering, 500 for anything else, each 5xx logged at ERROR with the method and path. Every
   failure used to be a 404 logged at INFO, so with the database down a signed-in student's page was a bare
   "404 Not Found". `/slide/<id>` with an id that is not a number is a 400.
-- The boolean settings (`SHOW_RESET_BUTTON`, `ALLOW_SLIDE_ACCESS`, `DISPLAY_CONSECUTIVE_CORRECT_DECISIONS`) take only
-  `true` or `false`, in any case. `CLIENT_VERSION_CHECK_INTERVAL_SECS` takes a whole number from 10 to 3600 and
-  `CLIENT_RELOAD_WARNING_INTERVAL_SECS` one from 0 to 3600. Any other value stops the server at startup, naming the
-  setting. Before, `1` or `yes` silently meant false, a typo in an interval failed every version check, and a 0 had
-  every open page poll the server nonstop. The page also never waits less than 5 seconds between checks.
-- The build fails when the client's resolved npm packages differ from the committed lock, or when there is no lock, so
-  CI builds and tests the bundle a release ships. After an npm dependency change, run `make yarn-unlock` and commit the
-  lock.
+- **The server listens on the platform's `PORT`** when it sets one, else 8080 (`application.yaml`); a `-port=` argument
+  still wins.
+- **The stored role follows `TEACHER_EMAILS`.** It is brought into line at every startup, so the class pages, which
+  count by it, count an address on the teacher list that also starts with two digits by the role the app uses. An
+  address the rule no longer admits keeps its stored role.
+- **Slide titles:** Moses's say "Decision", not "Decison", and four Jermain titles capitalize their verb ("Bluff",
+  "Fight"). Migration `V005` moves the stored places and moves with them, so each student keeps their place.
+- **The Jermain walk's paths:**
+  - Refusing Ross's deal led to the slides that assume Ross's papers and pistols; it now leads to Old Ben's own advice.
+    A student who was on that branch's via-Ross winter, which is gone, goes back to the branch's first slide (`V005`).
+  - Leaving in the summer on Old Ben's advice via Ross, and in the spring on Old Ben's own advice, now go through the
+    Summer and Spring Departure slides, as on every other path (`V005`).
+  - The patrol that the town exits and the walk without Ross share says nothing of papers or pistols.
+- `make release` pushes the jar `make ci` built and smoke-tested rather than a rebuild, and labels the image with its
+  commit (`org.opencontainers.image.revision`).
+- `make ci` also builds the docs site strictly, as the Website workflow does.
+- `make docker-smoke` removes what it started however it ends and names the step that failed, and also checks
+  `/health` and `nosniff`; `make db` gives up after a minute, with the container's log; `make railway-restart` waits
+  for each walk's `/version` to show a new start time rather than taking the replaced process's answer.
+- The docs site is built with `uv sync --locked`, and its workflow also runs when the Makefile changes.
+- `make served-version` without `ORIGIN_URL` shows only the bundle `PUBLIC_URL` serves, as "The served bundle", and
+  says nothing of Cloudflare; with `ORIGIN_URL` it compares Cloudflare's bundle with the origin's as before.
+- The build fails when the client's resolved npm packages differ from the committed lock, or when there is no lock;
+  after an npm dependency change, run `make yarn-unlock` and commit the lock.
+- `make release-check` leaves out the check runs named Dependabot. Since the npm lock is committed, Dependabot's
+  security updates try to update it and fail (it has no `package.json` beside it), and those runs, which are not CI,
+  attach to master's commits and would have stopped every release.
 
 ### Fixed
 
-- A decision whose next slide has only a *Continue* on to a dead end is stored as leading to a dead end
-  (`Slide.leadsToDeadEnd`), so *Consecutive Correct Decisions* resets for it. Jermain's "Leave in the autumn" and
-  "Leave in the spring", and entering a ramshackle hut, were counted as correct decisions.
-- The walks' text, with no slide title changed, so no student's place is lost:
-  - The Jermain title slide, the README, and the docs spell Loguen's name right (it said "Longuen").
-  - Moses's opening no longer says he was sold with his mother, which the later slides contradict: he was sold away
-    from her.
-  - Two correct Moses choices led to slides that described the wrong answer (upstream for downstream, a place to wade
+- **Dead ends behind a *Continue*.** A decision whose next slide has only a *Continue* on to a dead end is stored as
+  leading to a dead end (`Slide.leadsToDeadEnd`), so *Consecutive Correct Decisions* resets for it. Jermain's "Leave in
+  the autumn" and "Leave in the spring", and entering a ramshackle hut, were counted as correct; migration `V004` marks
+  the ones already stored.
+- **Moses's 14th decision** has the third choice it was written with ("Try to break your irons with a rock right
+  there, beside the sleeping guards"): its two wrong choices had the same text, so one silently replaced the other. A
+  slide now refuses a second choice with the same text, so such a deck fails to load.
+- **The walks' text**, with no saved place moved by it:
+  - The Jermain title slide, the README, and the docs spell Loguen's name right (they said "Longuen").
+  - Moses's opening no longer says he was sold with his mother, which the later slides contradict.
+  - Two correct Moses choices led to slides that described the wrong answer (upstream for downstream; a place to wade
     for a bridge or boat).
   - About 50 typos and grammar errors in both decks, and "SS Fox", a steamship's prefix, for the sailing ship Fox.
-  - Jermain slides shared by several paths no longer mention a companion or two fought patrols that a student on
-    some of those paths never had; the winter-clothes advice is no longer given twice; "Approach the cottage?" leads
-    to a log cabin and now says so.
-  - Every Jermain image has alt text describing it, for screen readers, in place of "Pic"; a test refuses an empty or
-    "Pic" alt.
+  - Jermain slides shared by several paths no longer mention a companion or two fought patrols that a student on some
+    of those paths never had; the winter-clothes advice is given once; "Approach the cottage?" now says "log cabin",
+    as the slide does.
+  - Every Jermain image has alt text that describes it, for screen readers, in place of "Pic"; a test refuses an empty
+    or "Pic" alt.
+- `AGENTS.md`, `llms.txt`, and the admin docs no longer describe a start command the Railway services don't use, a
+  Website workflow narrower than it is, or a deck that needs exactly one success slide; build and workflow comments
+  name the real sources of the Gradle deprecation warning and the real cancellation rule.
 
-- Moses's slide titles say "Decision", not "Decison", and four Jermain titles capitalize their verb ("Bluff",
-  "Fight"); stored places and moves move with them (`V005`).
-- In the Jermain walk, refusing Ross's deal led to the slides that assume Ross's papers and pistols. It now leads to
-  Old Ben's own advice. A student who was on that branch's via-Ross winter, which is gone, goes back to the branch's
-  first slide and chooses when to go again.
-- The patrol that the town exits and the walk without Ross share no longer tells a student with Ross's papers that
-  they have none.
-- Leaving in the summer on Old Ben's advice via Ross, and in the spring on Old Ben's own advice, now go through the
-  Summer and Spring Departure slides, as on every other path.
+### Removed
+
+- Dead code: `Dbms.dbQuery`, the never-read `historywalk.site.googleAnalyticsId` property, `User`'s instance API (its
+  database-reading constructor, `toUser`, `deleteUser`, which logged the user's address, and `userExists`, with the two
+  tests that tested only them), `DbmsTxs.MaxDeadEndDate`, the `PipelineCall` typealias, an unused `EntityID.toUuid`,
+  `SlideData.hasParents` and `hasOneParent`, two unused Jermain text constants, and commented-out code.
+- The stale `kotlin-js-store` line in `.gitignore`.
+
+### Security
 
 - A failure of the server's own in an RPC call (a database error, a missing user) no longer sends its message and
   class name to the browser, where the SQL or the user's id could be read in the console; the browser is told only
   that something went wrong, and the server logs it with the user.
-- The stored role, which the class pages count by, is brought into line with `TEACHER_EMAILS` at every startup, so an
-  address on the teacher list that also starts with two digits is counted by the role the app uses, not the one it had
-  at its last sign-in. An address the rule no longer admits keeps its stored role.
-
-- `make release` pushes the jar `make ci` built and smoke-tested, not a rebuild, and labels the image with its commit.
-  A release whose GitHub release failed after the push can be finished with the new `make release-github`, which
-  first checks that the image on Docker Hub was built from the current commit.
-- The client's npm lock is resolved afresh, which clears 47 of the Security workflow's 48 findings in it, and
-  `serialize-javascript` is pinned to 7 for mocha (`build.gradle.kts`), which clears the last. `lock-scan` now fails on
-  a fixable HIGH or CRITICAL vulnerability and is a release check.
+- Every response carries `X-Content-Type-Options: nosniff`, `Content-Security-Policy: frame-ancestors 'none'`, and
+  `Referrer-Policy: same-origin`, and in production `Strict-Transport-Security`.
+- The client's npm dependencies are locked: `.kotlin-js-store/yarn.lock` is committed, so CI builds, tests, and scans
+  the bundle a release ships. Resolving it afresh cleared 47 of the 48 HIGH and CRITICAL vulnerabilities Trivy found in
+  it, all in build and test tools, and `serialize-javascript` is pinned to 7 for mocha (`build.gradle.kts`), which
+  cleared the last. The Security workflow's new `lock-scan` job fails on a fixable HIGH or CRITICAL vulnerability in
+  the lock, and `make release-check` requires it.
 - The image's user owns neither `/app` nor the jar, so code running in the server could not rewrite it.
-- The Gradle wrapper checks the distribution's SHA-256; `make upgrade-wrapper` records the new one.
-- The docs site is built with `uv sync --locked`, and its workflow also runs when the Makefile changes.
-- `make docker-smoke` removes what it started however it ends, and says which step failed; `make db` gives up after a
-  minute, with the container's log, rather than waiting for ever.
-- `/version` ends with when the server started, and `make railway-restart` waits for it to change, rather than taking
-  the answer of the process being replaced for the restarted one.
-
-- The server listens on the platform's `PORT` when it sets one, else 8080 (`application.yaml`), so the image no longer
-  depends on the platform targeting 8080. A `-port=` argument still wins.
-- `make ci` also builds the docs site strictly, as the Website workflow does.
-- `AGENTS.md`, `llms.txt`, and the admin docs no longer describe a start command the Railway services don't use, a
-  Website workflow narrower than it is, or a deck that needs exactly one success slide; build and workflow comments name
-  the real sources of the Gradle deprecation warning and the real cancellation rule, and why Kotlin and KSP are held.
-
-### Removed
-
-- The stale `kotlin-js-store` line in `.gitignore`.
-- Two unused Jermain text constants and a commented-out choice.
-- Dead code: `Dbms.dbQuery`, the never-read `historywalk.site.googleAnalyticsId` property, `User`'s instance API (its
-  database-reading constructor, `toUser`, `deleteUser`, which logged the user's address, and `userExists`, with the two
-  tests that tested only them), `DbmsTxs.MaxDeadEndDate`, the `PipelineCall` typealias, an unused `EntityID.toUuid`,
-  `SlideData.hasParents` and `hasOneParent`, and commented-out code.
+- The Gradle wrapper checks the distribution's SHA-256 (`distributionSha256Sum`); `make upgrade-wrapper` records the
+  new one.
+- `/health`, open to anyone, runs one query at a time and reuses its answer, so no number of calls can pile up threads
+  or take the walk's connections.
 
 ## [1.2.1] - 2026-11-10
 
@@ -375,7 +384,8 @@ the original classroom app; [History](#history) at the end tells the story in or
   CI (#5, #7); five waves of fixes from a code review of 24 issues (#9–#12, #14); the admin page's student view
   (#13); `make docker-push` and version 1.1.0 (#16); and the documentation site (#17).
 
-[Unreleased]: https://github.com/pambrose/history-walk/compare/1.2.1...HEAD
+[Unreleased]: https://github.com/pambrose/history-walk/compare/1.3.0...HEAD
+[1.3.0]: https://github.com/pambrose/history-walk/compare/1.2.1...1.3.0
 [1.2.1]: https://github.com/pambrose/history-walk/compare/1.2.0...1.2.1
 [1.2.0]: https://github.com/pambrose/history-walk/compare/1.1.3...1.2.0
 [1.1.3]: https://github.com/pambrose/history-walk/compare/1.1.2...1.1.3

@@ -1,5 +1,95 @@
 # Release notes
 
+## History Walk 1.3.0 — 2026-11-11
+
+The fixes from a review of the whole app: corrected walks, a clearer reasons page, steadier sign-in, and safer
+releases. Administrators: back up both databases and check the settings before deploying (below).
+
+### For teachers
+
+- **The reasons page shows the choice.** A new *Choice* column shows the choice each reason explains, as its button
+  read. Every wrong Moses answer leads to an *Incorrect* slide, so before this you couldn't tell which one a student
+  picked.
+- **Corrected walks.**
+    - The Jermain walk spells Loguen's name right, and its images describe themselves to screen readers.
+    - The Moses opening matches the rest of the story: Moses was sold away from his mother.
+    - Two correct Moses river choices led to text describing the wrong answer.
+    - Moses's 14th decision had lost one of its three choices.
+    - About 50 typos are fixed across both walks.
+- **The Jermain walk's paths make sense.**
+    - Refusing Ross's deal used to lead to slides about the papers and pistols Ross would have given; it now leads to
+      Old Ben's own advice.
+    - Leaving in the summer or spring now goes through the departure slide on every path.
+    - The patrol slides no longer contradict what the student is carrying.
+- **Students keep their place.** Slide titles were corrected ("Decision", not "Decison") and some Jermain choices
+  rerouted; the update moves each student's saved place with them. The one exception: a student who refused Ross and
+  was partway through the winter that followed goes back to choosing when to leave.
+- ***Consecutive Correct Decisions* counts honestly.** Leaving in the autumn or spring, or entering a ramshackle hut,
+  ends the attempt a slide later, after a *Continue*; these were counted as correct decisions, and now count as the
+  wrong turns they are, including those already made. Some students' counts will drop.
+- **A reason isn't lost to an expired sign-in.** If a student's sign-in (12 hours) runs out as they press **OK**, they
+  sign in again, make the same choice, and find their reason already typed.
+- **The sign-in dialog names your school's domain**, as the administrator set it.
+- **When the server can't reach its database**, a page says so (*503 Service Unavailable: the database is not
+  answering*) rather than *404 Not Found*.
+
+### For administrators
+
+- **Before you deploy:**
+    - **Back up both walks' databases.** Three migrations run at the first start: `V004` marks the dead ends described
+      above, `V005` moves saved places and moves to the corrected slide names, and `V006` adds the reasons page's
+      *Choice* column.
+    - **Check both services' settings.** `SHOW_RESET_BUTTON`, `ALLOW_SLIDE_ACCESS`, and
+      `DISPLAY_CONSECUTIVE_CORRECT_DECISIONS` now take only `true` or `false`.
+      `CLIENT_VERSION_CHECK_INTERVAL_SECS` takes a whole number from 10 to 3600, and
+      `CLIENT_RELOAD_WARNING_INTERVAL_SECS` one from 0 to 3600. Any other value, such as `1` for a switch, stops the
+      walk at startup with an error naming the setting; before, it was silently misread.
+    - **Deploy outside class time.** A page left open across the deploy keeps the old slide names until it reloads:
+      its first choice gets *That choice is not on your current slide* and shows the student's slide again, after
+      which it works. The page's interface with the server is unchanged, so open pages aren't asked to reload.
+- Then `make railway-redeploy` deploys both walks from the new image and waits until each reports 1.3.0.
+- **New addresses:**
+    - `/health` answers `ok` while the database answers, else a 503, for an uptime monitor.
+    - `/auth/domain` serves `SCHOOL_EMAIL_DOMAIN` to the sign-in dialog.
+    - `/version` ends with when the server started.
+- **The server listens on the platform's `PORT`** when it sets one, else 8080.
+- **Errors:** a failed request is a 400, 404, 500, or 503 by its cause, and each 5xx is logged at *ERROR* with the
+  method and path. They were all 404s at *INFO*.
+- **Teachers' stored roles follow `TEACHER_EMAILS`** at every start, so the class pages count each person by the role
+  the app gives them now.
+- **Security:**
+    - Every response carries `nosniff`, `frame-ancestors 'none'`, and `Referrer-Policy: same-origin`, and HSTS in
+      production.
+    - A server error no longer shows its details in the browser.
+    - The image's user can't rewrite the app's jar.
+    - The page's npm packages are locked and scanned for vulnerabilities, like the image's libraries.
+- **Releases:**
+    - `make release` pushes the image it just tested.
+    - `make release-github` finishes a release that stopped after pushing its image.
+    - `make railway-restart` waits until each walk has really restarted.
+    - `make railway-versions` shows the version each walk serves.
+
+### For contributors
+
+- `docs/code-review-2026-11-11.md` records the review: 28 issues, and the waves that fixed them (#34–#39).
+- **npm dependencies:** the lock (`.kotlin-js-store/yarn.lock`) is committed, and the build fails if it drifts. After
+  an npm dependency change, run `make yarn-unlock` and commit the lock. The Security workflow's `lock-scan` fails on a
+  fixable HIGH or CRITICAL vulnerability, and is a release check.
+- **Renaming a slide:** `DbmsMigrateTest` puts a student at every place the decks had before `V005` and fails if one
+  is stranded, so a rename needs a migration like `V005` (or a deliberate fixture edit).
+- **New checks:**
+    - A slide refuses two choices with the same text.
+    - `SlideContentTest` refuses an image without real alt text.
+    - `make ci` builds the docs site.
+    - `make docker-smoke` checks `/health` and the security headers.
+- **Gotcha:** adding a defaulted parameter to a function the JVM specs call can leave stale test classes in Gradle's
+  build cache. `./gradlew compileTestKotlinJvm --rerun` fixes it (`AGENTS.md`).
+- Dead code is gone, and the Gradle wrapper checks its distribution's checksum.
+- `make release-check` ignores Dependabot's own update jobs. Dependabot can't update the npm lock, which has no
+  `package.json` beside it, so those jobs fail on every master commit; they aren't CI.
+
+**Full Changelog**: <https://github.com/pambrose/history-walk/compare/1.2.1...1.3.0>
+
 ## History Walk 1.2.1 — 2026-11-10
 
 A release of the guide, not the app: nothing changes in the walk for teachers or students, or in how it is run.
