@@ -6,7 +6,7 @@
 |---|---|---|
 | `/ping` | `pong` | The server is up. It touches neither the database nor a session; the Docker health check uses it. |
 | `/health` | `ok`, or a 503 | The server can reach the database: a trivial query answered within 3 seconds. For an uptime monitor; a 503 means the database is down or unreachable. An answer is reused for 5 seconds, so it can lag that much. |
-| `/version` | `Version: 1.2.1 Release Date: … Build Date: … Started: …` | Which release a deployment runs, and when its server process started. |
+| `/version` | `Version: 1.3.0 Release Date: … Build Date: … Started: …` | Which release a deployment runs, and when its server process started. |
 | `/threaddump` | Every JVM thread's stack (teachers only) | A hung or slow server. Taking it briefly pauses the JVM. |
 
 ```bash
