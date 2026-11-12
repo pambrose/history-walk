@@ -154,13 +154,14 @@ zizmor: ## Audit the GitHub Actions workflows and dependabot.yml with zizmor, as
 	if [ -n "$$GH_TOKEN" ]; then export GH_TOKEN; else unset GH_TOKEN; fi; \
 	zizmor .
 
-# Every gate CI runs but the Trivy image scan (security.yml, which needs Trivy), in one command, so this is the check
-# before merging: lint, the zizmor audit, the JVM tests with coverage (checked against the floor in build.gradle.kts)
-# and the client tests (their results not taken from the build cache), the Docker image build, and the image started
-# against Postgres. Needs Docker, Chrome, and zizmor.
-ci: ## Run every CI gate locally but the image scan: lint, zizmor, the JVM and client tests, the image build, the smoke test
+# Every gate CI runs but the Trivy scans (security.yml's image-scan and lock-scan, which need Trivy), in one command, so
+# this is the check before merging: lint, the zizmor audit, the docs site's strict build, the JVM tests with coverage
+# (checked against the floor in build.gradle.kts) and the client tests (their results not taken from the build cache),
+# the Docker image build, and the image started against Postgres. Needs Docker, Chrome, zizmor, and uv.
+ci: ## Run every CI gate locally but the Trivy scans: lint, zizmor, the docs site, the tests, the image and its smoke test
 	$(MAKE) lint
 	$(MAKE) zizmor
+	$(MAKE) website-build
 	$(GRADLE) --no-build-cache cleanJvmTest cleanJsBrowserTest jvmTest jsBrowserTest koverXmlReport koverHtmlReport koverLog \
 		koverVerify
 	$(MAKE) docker-build
@@ -560,6 +561,6 @@ served-version: ## Show the bundle version PUBLIC_URL serves; with ORIGIN_URL, c
 	[ -z "$$origin" ] || [ -z "$$public" ] || [ "$$origin" = "$$public" ] \
 		|| problem "Cloudflare serves another bundle than the origin: purge $(PUBLIC_URL)/main.bundle.js in Cloudflare"; \
 	case "$$cached" in ""|BYPASS|DYNAMIC) ;; \
-		*) problem "Cloudflare caches the bundle ($$cached), so a deploy does not replace its copy: see AGENTS.md";; \
+		*) problem "Cloudflare caches the bundle ($$cached), so a deploy keeps its copy: see Caching in the docs' Releases";; \
 	esac; \
 	[ $$problems -eq 0 ] || exit 1

@@ -347,13 +347,6 @@ internal fun reasonDialog(
       },
     )
     addButton(submit.apply { onClick { setResult(input.value) } })
-//    onEvent {
-//      keydown = {
-//        if (it.keyCode == ENTER_KEY && input.value?.isNotEmpty() ?: false) {
-//          setResult(input.value)
-//        }
-//      }
-//    }
   }
 }
 

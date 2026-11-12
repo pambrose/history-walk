@@ -24,8 +24,8 @@ Two numbers in `gradle.properties` describe a release:
    section, a tag or GitHub release that already exists, CI that hasn't passed for the commit (the Tests, Lint, Docker
    Image, and Security workflows must all have run, the Security workflow's scans of the image and of the client's npm
    lock included), Docker not running, or the version already on Docker Hub.
-3. Run `make release`. It runs `release-check` again, a clean build and the CI gates (`make ci`, all but the image
-   scan, which CI runs), then asks once.
+3. Run `make release`. It runs `release-check` again, a clean build and the CI gates (`make ci`, all but the Trivy
+   scans, which CI runs), then asks once.
    Then it pushes the image to Docker Hub (`pambrose/history-walk:<version>` and `:latest`, amd64 and arm64), built
    from the jar `make ci` just tested, and creates the GitHub release: tag `1.2.1`, title `v1.2.1`, and the version's
    section of `RELEASE_NOTES.md` as its notes. If the checkout changes while `make ci` runs, it publishes nothing.

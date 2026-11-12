@@ -39,7 +39,7 @@ class App : Application() {
 
   override fun start() {
     // Also the bundle's version marker: make served-version finds this string in main.bundle.js to tell which
-    // release Heroku and Cloudflare each serve
+    // release a deployment serves, and, behind Cloudflare, whether Cloudflare serves the same one
     console.log("History Walk version ${BuildConfig.VERSION} - ${BuildConfig.RELEASE_DATE}")
     reloadWhenRestoredFromCache()
     showRefusalFromUrl()

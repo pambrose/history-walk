@@ -632,7 +632,7 @@ val jermainLonguenSlides =
         )
       }
 
-    val slide10AutumDeparture =
+    val slide10AutumnDeparture =
       slide(
         id = 10,
         title = "Autumn Departure",
@@ -1268,7 +1268,7 @@ val jermainLonguenSlides =
         )
         choice(
           text = "Leave in the autumn, hoping to slip away in the busyness and hubbub of harvest time",
-          slide = slide10AutumDeparture.copyOf(),
+          slide = slide10AutumnDeparture.copyOf(),
         )
         choice(
           text = "Leave in the spring, when love is in the air",
@@ -1326,7 +1326,7 @@ val jermainLonguenSlides =
         )
         choice(
           text = "Autumn Departure",
-          slide = slide10AutumDeparture.copyOf(),
+          slide = slide10AutumnDeparture.copyOf(),
         )
         choice(
           text = "Spring Departure",
@@ -1350,7 +1350,7 @@ val jermainLonguenSlides =
         )
         choice(
           text = "Leave in the autumn, hoping to slip away in the busyness and hubbub of harvest time",
-          slide = slide10AutumDeparture.copyOf(),
+          slide = slide10AutumnDeparture.copyOf(),
         )
         choice(
           text = "Leave in the spring, when love is in the air",
@@ -1377,7 +1377,7 @@ val jermainLonguenSlides =
           ) {
             choice(
               text = "Yes, leave now",
-              slide = slide10AutumDeparture.copyOf(),
+              slide = slide10AutumnDeparture.copyOf(),
             )
             choice(
               text = "No, risk the delay",

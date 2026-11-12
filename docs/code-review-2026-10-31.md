@@ -475,6 +475,8 @@ Things checked and found sound:
   (removal in Gradle 11; Gradle's summary always names the next major). KSP 2.3.13 stopped calling it; Kover 0.9.11
   still does, until a release carries Kotlin/kotlinx-kover#838, so the warning remains. Kotlin is 2.4.21 and KSP
   2.3.13; `jsTest` now takes `kotlin("test")` so the client specs compile when Kotlin is ahead of KVision's testutils.
+  Later: 1.2.0 took Kotlin back to 2.4.20, deliberately, and KSP back to 2.3.12, whose `setVisible` call is back too,
+  for google/ksp#3286 (`gradle/libs.versions.toml` says why; noted in issue 25 of `docs/code-review-2026-11-11.md`).
 - **Severity:** Low
 - **Where:** the build (each run warns "Deprecated Gradle features were used in this build, making it incompatible with
   Gradle 10"), and `gradle/libs.versions.toml`

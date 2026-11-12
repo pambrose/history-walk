@@ -53,7 +53,7 @@ The dev server forwards `/auth`, the API, `/static`, and the teacher pages to th
 | `./gradlew jvmTest --tests 'com.pambrose.historywalk.AdminTest'` | One server spec. The page's tests always run whole. |
 | `make coverage` | The tests, then Kover's coverage reports (`build/reports/kover/html/index.html`), and the coverage floor. |
 | `make lint` / `make format` | Checks, or fixes, the Kotlin style. |
-| `make ci` | Every CI gate but the image scan: lint, the workflow audit, all tests, the Docker build, and the image's smoke test. |
+| `make ci` | Every CI gate but the Trivy scans of the image and the npm lock: lint, the workflow audit, the docs site's strict build, all tests, the Docker build, and the image's smoke test. Needs Docker, Chrome, zizmor, and uv. |
 
 The JVM line coverage must stay at or above the floor in `build.gradle.kts` (90%); CI fails under it. Raise the floor
 as coverage grows; never lower it to let a change through.
@@ -67,9 +67,9 @@ GitHub Actions runs these on every push to `master` and every pull request:
 | Tests | The server's tests with coverage and the floor, and the page's tests in Chrome. |
 | Lint | `make lint`. |
 | Docker Image | Builds the jar and the image, and runs the smoke test. |
-| Security | Builds the image and scans it with Trivy (Alpine, the Java runtime, and every library in the jar), failing on a HIGH or CRITICAL vulnerability that has a fix. It also runs every Monday, since a newly published vulnerability changes nothing in the repository. The findings from `master` and the weekly run, including those with no fix yet, appear under **Security → Code scanning**. |
+| Security | Builds the image and scans it with Trivy (Alpine, the Java runtime, and every library in the jar), and scans the client's npm lock (the packages webpacked into the page), each failing on a HIGH or CRITICAL vulnerability that has a fix. It also runs every Monday, since a newly published vulnerability changes nothing in the repository. The findings from `master` and the weekly run, including those with no fix yet, appear under **Security → Code scanning**. |
 | zizmor | Audits the workflow files, when they change. |
-| Website | Builds the docs site when `website/` or `llms.txt` changes; on `master`, publishes it to GitHub Pages. |
+| Website | Builds the docs site when `website/`, `llms.txt`, `RELEASE_NOTES.md`, or the `Makefile` changes; on `master`, publishes it to GitHub Pages. |
 
 And these on their own:
 

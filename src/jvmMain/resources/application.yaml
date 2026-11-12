@@ -1,6 +1,7 @@
 ktor:
   deployment:
-    port: 8080
+    # The platform's PORT when it sets one (Railway does), else 8080. A -port=... argument wins over both.
+    port: "$PORT:8080"
     watch:
       - build/classes/kotlin/jvm/main
   application:

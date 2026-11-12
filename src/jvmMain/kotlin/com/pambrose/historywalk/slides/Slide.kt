@@ -82,7 +82,8 @@ class Slide(
 
     // Two choices with the same text are refused as they are added (choice), since the second would replace the first
 
-    // Ignore children that are dead ends, e.g., "Incorrect Choice" slide
+    // Two children with the same title would have the same path name; a deck gives each copy of a dead end its own
+    // title instead (Moses's Incorrect1, Incorrect2, ...)
     choices
       .map { it.value.title }
       .dups()

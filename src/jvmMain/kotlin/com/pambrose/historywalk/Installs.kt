@@ -80,14 +80,6 @@ object Installs {
 
     installUserSessions()
 
-//  install(KHealth) {
-//    readyCheckEnabled = false
-//
-//    healthChecks {
-//      check("Server ready") { true }
-//    }
-//  }
-
     install(Authentication) { configureGoogleAuth() }
 
     installStatusPages()

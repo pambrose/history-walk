@@ -30,9 +30,10 @@ Each target first installs Zensical, at the version `website/uv.lock` pins, into
 The site is published to GitHub Pages, at <https://pambrose.github.io/history-walk/>, by the **Website** workflow
 (`.github/workflows/website.yml`):
 
-- A push to `master` that changes anything under `website/` (or the workflow) builds the site with
+- A push to `master` that changes anything under `website/`, `llms.txt`, `RELEASE_NOTES.md` (the site's Release notes
+  page is a link to it), the `Makefile` (which holds the build's commands), or the workflow builds the site with
   `make website-build` and deploys it. **Run workflow** on the workflow's Actions page publishes it by hand.
-- A pull request that changes `website/` gets the same build as a check, so a broken link fails the pull request; it
+- A pull request that changes any of those gets the same build as a check, so a broken link fails the pull request; it
   publishes nothing.
 - Deploys run one at a time and are never cancelled halfway.
 

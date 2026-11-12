@@ -46,8 +46,6 @@ fun Application.main() {
       )
     }
     info { HistoryWalkServer::class.versionDesc() }
-//    callerVersion = callerVersion(args)
-//    info { "Caller Version: $callerVersion" }
   }
 
   assignProperties()

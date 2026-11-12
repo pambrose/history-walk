@@ -52,9 +52,9 @@ and in the step that fixes it under [Suggested order of work](#suggested-order-o
 | [22](#issue-22) | ✅ | Low      | CI (docs site)    | The docs site ignores its lock file, and its workflow misses Makefile changes                   |
 | [23](#issue-23) | ✅ | Low      | Makefile          | `docker-smoke` can stop without cleanup or diagnostics, and `make db` can wait forever          |
 | [24](#issue-24) | ✅ | Low      | Supply chain      | The app's user owns the jar it runs, and the Gradle wrapper has no checksum                     |
-| [25](#issue-25) | ⬜ | Low      | Docs (developer)  | `AGENTS.md`, comments, and the Makefile have drifted from the code                              |
-| [26](#issue-26) | ⬜ | Low      | Docs (site)       | The admin pages and `llms.txt` have drifted from the code                                       |
-| [27](#issue-27) | ⬜ | Low      | Code hygiene      | Dead code and stale comments                                                                    |
+| [25](#issue-25) | ✅ | Low      | Docs (developer)  | `AGENTS.md`, comments, and the Makefile have drifted from the code                              |
+| [26](#issue-26) | ✅ | Low      | Docs (site)       | The admin pages and `llms.txt` have drifted from the code                                       |
+| [27](#issue-27) | ✅ | Low      | Code hygiene      | Dead code and stale comments                                                                    |
 | [28](#issue-28) | ✅ | Low      | Supply chain      | The npm lock has 48 fixable HIGH or CRITICAL findings, all in build and test tools (found in Step 4) |
 
 Things checked and found sound:
@@ -678,9 +678,19 @@ Things checked and found sound:
   - Pass `--gradle-distribution-sha256-sum` in `upgrade-wrapper`, and add the sum for the current version.
 
 <a id="issue-25"></a>
-### ⬜ 25. `AGENTS.md`, comments, and the Makefile have drifted from the code
+### ✅ 25. `AGENTS.md`, comments, and the Makefile have drifted from the code
 
-- **Status:** partly done in Wave 5: the stray tab in `Makefile`'s "nothing published" is gone.
+- **Status:** done in Waves 5 and 6.
+  - **Start command and port:** `AGENTS.md`, `llms.txt`, and the README describe the image the Railway services run.
+    `application.yaml` takes `"$PORT:8080"`.
+  - **`make ci`:** it runs `make website-build` too, and its comments, help, and docs say so.
+  - **Heroku:** the mentions are gone from `build.gradle.kts` and `App.kt`.
+  - **Gradle deprecations:** a deprecation trace showed both Kover 0.9.11 and KSP 2.3.12 calling `setVisible`, and the
+    build comment now names both. The catalog says Kotlin is held at 2.4.20 deliberately; its reason is recorded
+    nowhere. The 2026-10-31 review's issue 24 has a note on the rollback.
+  - **Cloudflare:** the `served-version` message points to Caching in the docs' Releases page.
+  - **Security workflow:** its comment states the real cancellation rule.
+  - **Stray tab:** removed in Wave 5.
 - **Severity:** Low
 - **Where and what:**
   - **Start command and port:**
@@ -705,8 +715,14 @@ Things checked and found sound:
 - **Fix:** correct each one; add the `PORT` fallback to `application.yaml`.
 
 <a id="issue-26"></a>
-### ⬜ 26. The admin pages and `llms.txt` have drifted from the code
+### ✅ 26. The admin pages and `llms.txt` have drifted from the code
 
+- **Status:** done in Wave 6.
+  - `slide-decks.md` says a deck needs at least one success slide (a second only warns), and lists the duplicate-text
+    refusal.
+  - `docs-site.md` and `development.md` list every Website workflow trigger, the Makefile included since Wave 5;
+    `development.md`'s Security row mentions the lock scan.
+  - `llms.txt` lists the docs-site page and the release notes, and its start command and release lines match.
 - **Severity:** Low
 - **Where and what:**
   - `admins/slide-decks.md:31` and `:42-43` say a deck needs exactly one success slide, or it refuses to load.
@@ -717,8 +733,15 @@ Things checked and found sound:
 - **Fix:** correct the pages and the list.
 
 <a id="issue-27"></a>
-### ⬜ 27. Dead code and stale comments
+### ✅ 27. Dead code and stale comments
 
+- **Status:** done in Wave 6.
+  - Deleted, each confirmed unused first: everything listed above, and an unused `EntityID.toUuid` and
+    `PropertyNames` constants.
+  - `User` keeps only its companion's queries: `deleteUser` and `userExists` went with the two `DbmsTxsTest` specs that
+    tested only them, rather than moving into the tests.
+  - The `@Suppress` went in Wave 1.
+  - `Slide.kt`'s comment says what the check does, and the two misspelled names are corrected.
 - **Severity:** Low
 - **Where:**
   - **Unused code:**
@@ -859,9 +882,9 @@ The four steps share no files. Step 1 is a check in two dashboards, not code.
 
 | Step | Status | Issues | Work | Files |
 |------|:------:|--------|------|-------|
-| 20 | ⬜ | [25](#issue-25) | Correct `AGENTS.md`, the comments, and the Makefile messages; the `PORT` fallback | `AGENTS.md`, `Makefile`, `build.gradle.kts`, `App.kt`, `security.yml`, `application.yaml` |
-| 21 | ⬜ | [26](#issue-26) | Correct the admin pages and `llms.txt` | `website/history-walk/docs/admins/*.md`, `llms.txt` |
-| 22 | ⬜ | [27](#issue-27) | Delete the dead code; fix the comments and names | `User.kt`, `DbmsTxs.kt`, `Dbms.kt`, `Property.kt`, `Utils.kt`, `Dao.kt`, `EnvVar.kt`, and others |
+| 20 | ✅ | [25](#issue-25) | Correct `AGENTS.md`, the comments, and the Makefile messages; the `PORT` fallback | `AGENTS.md`, `Makefile`, `build.gradle.kts`, `App.kt`, `security.yml`, `application.yaml` |
+| 21 | ✅ | [26](#issue-26) | Correct the admin pages and `llms.txt` | `website/history-walk/docs/admins/*.md`, `llms.txt` |
+| 22 | ✅ | [27](#issue-27) | Delete the dead code; fix the comments and names | `User.kt`, `DbmsTxs.kt`, `Dbms.kt`, `Property.kt`, `Utils.kt`, `Dao.kt`, `EnvVar.kt`, and others |
 
 - Steps 20 and 21 can run in parallel.
 - Step 22 goes last, since it touches files that most earlier steps edit.
@@ -879,4 +902,4 @@ The four steps share no files. Step 1 is a check in two dashboards, not code.
 | Walk data | 7 → 10 | done |
 | Hardening | 11, 12, 13, 15 | done |
 | Build and CI | 17, 18 | done |
-| Docs and cleanup | 20, 21 → 22 | after the steps above |
+| Docs and cleanup | 20, 21 → 22 | done |

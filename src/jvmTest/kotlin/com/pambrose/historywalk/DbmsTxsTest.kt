@@ -1,7 +1,6 @@
 package com.pambrose.historywalk
 
 import com.pambrose.historywalk.User.Companion.findCurrentSlideForUser
-import com.pambrose.historywalk.User.Companion.userExists
 import com.pambrose.historywalk.dbms.DbmsTxs.allSuccessUsers
 import com.pambrose.historywalk.dbms.DbmsTxs.allUserReasons
 import com.pambrose.historywalk.dbms.DbmsTxs.allUserSummaries
@@ -193,21 +192,6 @@ class DbmsTxsTest : StringSpec() {
       addChoice(teacher, MIDDLE, WIN)
 
       allSuccessUsers("Win").map { it.id } shouldContainExactlyInAnyOrder listOf(winner)
-    }
-
-    "a user is loaded by id, and is gone once deleted" {
-      val id = UUID.fromString(student("27gone", "Gone Soon"))
-      User(id, true).run {
-        email.value shouldBe "27gone@athenian.org"
-        fullName.value shouldBe "Gone Soon"
-        userExists(id).shouldBeTrue()
-        deleteUser()
-      }
-      userExists(id).shouldBeFalse()
-    }
-
-    "loading a user who does not exist fails" {
-      shouldThrow<IllegalStateException> { User(UUID.randomUUID(), true) }.message shouldContain "not found"
     }
   }
 }

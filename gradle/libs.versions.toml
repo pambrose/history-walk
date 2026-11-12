@@ -1,5 +1,6 @@
 [versions]
-# Kotlin and JVM
+# Kotlin and JVM. Kotlin went back to 2.4.20 from 2.4.21 deliberately in 1.2.0 (CHANGELOG), so make versions offers
+# 2.4.21; ask before taking it.
 kotlin = "2.4.20"
 jvm = "25"
 

@@ -105,7 +105,7 @@ object DbmsTxs {
 
   fun correctDecisionStreak(uuid: String) =
     transaction {
-      val wrongDecsions =
+      val wrongDecisions =
         with(UserChoiceTable) {
           selectAll()
             .where { userUuidRef eq uuid.toUuid() and (deadEnd eq true) }
@@ -113,7 +113,7 @@ object DbmsTxs {
             .toInt()
         }
 
-      if (wrongDecsions == 0) {
+      if (wrongDecisions == 0) {
         with(UserChoiceTable) {
           selectAll()
             .where { userUuidRef eq uuid.toUuid() and (deadEnd eq false) }
@@ -190,10 +190,6 @@ object DbmsTxs {
           }
       }
     }
-
-  data class MaxDeadEndDate(
-    val maxDeadEndDate: LocalDateTime,
-  )
 
   data class UserVisits(
     val id: String,

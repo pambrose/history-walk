@@ -22,9 +22,10 @@ plugins {
     alias(libs.plugins.versions)
     alias(libs.plugins.config)
     alias(libs.plugins.kotlinter)
-    // Kover 0.9.11 is the source of every build's "Deprecated Gradle features ... incompatible with Gradle 10" line:
-    // it calls Configuration.setVisible, which Gradle 9.8 deprecates for removal in Gradle 11 (Gradle's summary always
-    // names the next major). Kover's fix (Kotlin/kotlinx-kover#838) is merged but not yet released.
+    // Kover 0.9.11 and KSP 2.3.12 (held there; see gradle/libs.versions.toml) are the source of every build's
+    // "Deprecated Gradle features ... incompatible with Gradle 10" line: both call Configuration.setVisible, which Gradle
+    // 9.8 deprecates for removal in Gradle 11 (Gradle's summary always names the next major). KSP 2.3.13 no longer does;
+    // Kover's fix (Kotlin/kotlinx-kover#838) is merged but not yet released.
     alias(libs.plugins.kover)
 //    alias(libs.plugins.diktat)
 //    alias(libs.plugins.detekt)
@@ -50,7 +51,7 @@ abstract class BuildTimeMillisValueSource : ValueSource<Long, ValueSourceParamet
     override fun obtain(): Long = System.currentTimeMillis()
 }
 
-// Only a build that packages the fat jar (one asked for `jar`, as make build, make docker-build, and Heroku do, or given
+// Only a build that packages the fat jar (one asked for `jar`, as make build and make docker-build do, or given
 // -PstampBuildTime=true) is stamped with its build date and time. Every compile reads BuildConfig, so a stamp that
 // changed on every run would make every build recompile from scratch and leave the build cache nothing to reuse.
 // Unstamped builds report a release date of "unreleased" and a build time of 0.
