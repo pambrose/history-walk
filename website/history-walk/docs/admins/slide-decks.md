@@ -19,7 +19,7 @@ slideDeck {
   val slideSuccess = slide(id = 30, title = "Success!", content = SUCCESS_TEXT, success = true)
 
   val slide29 =
-    slide(id = 29, title = "29th Decison", content = DECISION29_TEXT) {
+    slide(id = 29, title = "29th Decision", content = DECISION29_TEXT) {
       choice(text = "Stay with the SS Fox", slide = slideSuccess)
       choice(text = "Look for a new ship", slide = errorSlide.copyOf("Incorrect2"))
     }
@@ -66,7 +66,10 @@ For a deliberate rename, either:
 
 - accept that the students on the affected slides restart, or
 - add a [migration](database.md#migrations) that rewrites the stored path names (`users.last_path_name`,
-  `user_choices.from_path_name` and `to_path_name`) from the old names to the new ones,
+  `user_choices.from_path_name` and `to_path_name`) from the old names to the new ones, and the stored titles
+  (`from_title`, `to_title`) where a slide's own title changed. `V005` is the example: it renamed titles and rerouted
+  choices in both decks, and `DbmsMigrateTest` stores a student at every place the decks had before it
+  (`src/jvmTest/resources/slide-paths/before-v005/`), migrates, and checks that each still finds its slide,
 
 and in either case rewrite the snapshot and commit it with the change:
 

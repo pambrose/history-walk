@@ -372,7 +372,7 @@ val mosesSlides =
     val slide29 =
       slide(
         id = 29,
-        title = "29th Decison",
+        title = "29th Decision",
         content = DECISION29_TEXT,
       ) {
         choice(
@@ -392,7 +392,7 @@ val mosesSlides =
     val slide28 =
       slide(
         id = 28,
-        title = "28th Decison",
+        title = "28th Decision",
         content = DECISION28_TEXT,
       ) {
         choice(
@@ -408,7 +408,7 @@ val mosesSlides =
     val slide27 =
       slide(
         id = 27,
-        title = "27th Decison",
+        title = "27th Decision",
         content = DECISION27_TEXT,
       ) {
         choice(
@@ -432,7 +432,7 @@ val mosesSlides =
     val slide26 =
       slide(
         id = 26,
-        title = "26th Decison",
+        title = "26th Decision",
         content = DECISION26_TEXT,
       ) {
         choice(
@@ -452,7 +452,7 @@ val mosesSlides =
     val slide25 =
       slide(
         id = 25,
-        title = "25th Decison",
+        title = "25th Decision",
         content = DECISION25_TEXT,
       ) {
         choice(
@@ -473,7 +473,7 @@ val mosesSlides =
     val slide24 =
       slide(
         id = 24,
-        title = "24th Decison",
+        title = "24th Decision",
         content = DECISION24_TEXT,
       ) {
         choice(
@@ -498,7 +498,7 @@ val mosesSlides =
     val slide23 =
       slide(
         id = 23,
-        title = "23rd Decison",
+        title = "23rd Decision",
         content = DECISION23_TEXT,
       ) {
         choice(
@@ -518,7 +518,7 @@ val mosesSlides =
     val slide22 =
       slide(
         id = 22,
-        title = "22nd Decison",
+        title = "22nd Decision",
         content = DECISION22_TEXT,
       ) {
         choice(
@@ -534,7 +534,7 @@ val mosesSlides =
     val slide21 =
       slide(
         id = 21,
-        title = "21st Decison",
+        title = "21st Decision",
         content = DECISION21_TEXT,
       ) {
         choice(
@@ -554,7 +554,7 @@ val mosesSlides =
     val slide20 =
       slide(
         id = 20,
-        title = "20th Decison",
+        title = "20th Decision",
         content = DECISION20_TEXT,
       ) {
         choice(
@@ -570,7 +570,7 @@ val mosesSlides =
     val slide19 =
       slide(
         id = 19,
-        title = "19th Decison",
+        title = "19th Decision",
         content = DECISION19_TEXT,
       ) {
         choice(
@@ -590,7 +590,7 @@ val mosesSlides =
     val slide18 =
       slide(
         id = 18,
-        title = "18th Decison",
+        title = "18th Decision",
         content = DECISION18_TEXT,
       ) {
         choice(
@@ -610,7 +610,7 @@ val mosesSlides =
     val slide17 =
       slide(
         id = 17,
-        title = "17th Decison",
+        title = "17th Decision",
         content = DECISION17_TEXT,
       ) {
         choice(
@@ -630,7 +630,7 @@ val mosesSlides =
     val slide16 =
       slide(
         id = 16,
-        title = "16th Decison",
+        title = "16th Decision",
         content = DECISION16_TEXT,
       ) {
         choice(
@@ -650,7 +650,7 @@ val mosesSlides =
     val slide15 =
       slide(
         id = 15,
-        title = "15th Decison",
+        title = "15th Decision",
         content = DECISION15_TEXT,
       ) {
         choice(
@@ -670,7 +670,7 @@ val mosesSlides =
     val slide14 =
       slide(
         id = 14,
-        title = "14th Decison",
+        title = "14th Decision",
         content = DECISION14_TEXT,
       ) {
         choice(
@@ -691,7 +691,7 @@ val mosesSlides =
     val slide13 =
       slide(
         id = 13,
-        title = "13th Decison",
+        title = "13th Decision",
         content = DECISION13_TEXT,
       ) {
         choice(
@@ -711,7 +711,7 @@ val mosesSlides =
     val slide12 =
       slide(
         id = 12,
-        title = "12th Decison",
+        title = "12th Decision",
         content = DECISION12_TEXT,
       ) {
         choice(
@@ -735,7 +735,7 @@ val mosesSlides =
     val slide11 =
       slide(
         id = 11,
-        title = "11th Decison",
+        title = "11th Decision",
         content = DECISION11_TEXT,
       ) {
         choice(
@@ -759,7 +759,7 @@ val mosesSlides =
     val slide10 =
       slide(
         id = 10,
-        title = "10th Decison",
+        title = "10th Decision",
         content = DECISION10_TEXT,
       ) {
         choice(
@@ -779,7 +779,7 @@ val mosesSlides =
     val slide9 =
       slide(
         id = 9,
-        title = "9th Decison",
+        title = "9th Decision",
         content = DECISION9_TEXT,
       ) {
         choice(
@@ -795,7 +795,7 @@ val mosesSlides =
     val slide8 =
       slide(
         id = 8,
-        title = "8th Decison",
+        title = "8th Decision",
         content = DECISION8_TEXT,
       ) {
         choice(
@@ -811,7 +811,7 @@ val mosesSlides =
     val slide7 =
       slide(
         id = 7,
-        title = "7th Decison",
+        title = "7th Decision",
         content = DECISION7_TEXT,
       ) {
         choice(
@@ -832,7 +832,7 @@ val mosesSlides =
     val slide6 =
       slide(
         id = 6,
-        title = "6th Decison",
+        title = "6th Decision",
         content = DECISION6_TEXT,
       ) {
         choice(
@@ -852,7 +852,7 @@ val mosesSlides =
     val slide5 =
       slide(
         id = 5,
-        title = "5th Decison",
+        title = "5th Decision",
         content = DECISION5_TEXT,
       ) {
         choice(
@@ -872,7 +872,7 @@ val mosesSlides =
     val slide4 =
       slide(
         id = 4,
-        title = "4th Decison",
+        title = "4th Decision",
         content = DECISION4_TEXT,
       ) {
         choice(

@@ -305,7 +305,7 @@ const val MAJOR_ENCOUNTER_FLEE_PATROL_END = """
 """
 
 const val MAJOR_ENCOUNTER_FIGHT1ST_PATROL_END = """
-    You boldly respond by trying to throw the men from their horses.
+    You boldly fight back, trying to throw the men from their horses.
 
     Melee ensues, and you find yourself beaten to a pulp, shortly to be bound, strapped
     to the back of horse, and taken back to the plantation.
@@ -326,8 +326,8 @@ const val MAJOR_ENCOUNTER_VIA_ROSS_FIGHT1ST_PATROL = """
 
 const val MAJOR_ENCOUNTER_BLUFF_PATROL = """
     You try to explain that you have been sent on a mission by your master, which was
-    not an uncommon occurrence. However, the man with a rifle demands to see your
-    travel papers. You have none.
+    not an uncommon occurrence. However, the man with the rifle is not convinced: whatever
+    you say or show him, he is sure that you are a runaway.
 
     Having failed at bluffing, will you...
 """
@@ -675,7 +675,7 @@ val jermainLonguenSlides =
     val slide25MajorEncounterBluffPatrol =
       slide(
         id = 25,
-        title = "Major Encounter: bluff Patrol",
+        title = "Major Encounter: Bluff Patrol",
         content = MAJOR_ENCOUNTER_BLUFF_PATROL,
       ) {
         choice(
@@ -732,7 +732,7 @@ val jermainLonguenSlides =
     val slide54MajorEncounterFight2ndPatrol =
       slide(
         id = 54,
-        title = "Major Encounter: fight 2nd Patrol",
+        title = "Major Encounter: Fight 2nd Patrol",
         content = MAJOR_ENCOUNTER_FIGHT2ND_PATROL,
       ) {
         choice(
@@ -1180,7 +1180,7 @@ val jermainLonguenSlides =
               text = "Fight",
               slide = slide(
                 id = 24,
-                title = "Major Encounter (via Ross): fight 1st Patrol",
+                title = "Major Encounter (via Ross): Fight 1st Patrol",
                 content = MAJOR_ENCOUNTER_VIA_ROSS_FIGHT1ST_PATROL,
               ) {
                 choice(
@@ -1197,7 +1197,7 @@ val jermainLonguenSlides =
               text = "Try to bluff (talk your way out of the situation)",
               slide = slide(
                 id = 26,
-                title = "Major Encounter (via Ross): bluff 1st Patrol",
+                title = "Major Encounter (via Ross): Bluff 1st Patrol",
                 content = MAJOR_ENCOUNTER_VIA_ROSS_BLUFF1ST_PATROL,
               ) {
                 choice(
@@ -1240,32 +1240,6 @@ val jermainLonguenSlides =
         )
       }
 
-    val slide5OldBenViaRoss =
-      slide(
-        id = 5,
-        title = "Old Ben (via Ross): When to Go",
-        content = OLD_BEN_VIA_ROSS,
-      ) {
-        choice(
-          text = "Leave in the summer, when the weather is warmest, and you can easily sleep outdoors",
-          slide = slide8SummerCrossCountry.copyOf(),
-        )
-        choice(
-          text = "Leave in the autumn, hoping to slip away in the busyness and hubbub of harvest time",
-          slide = slide10AutumDeparture.copyOf(),
-        )
-        // TODO This is straight to Paddy Rollers (slide 12) in slides, which I think is a mistake
-        choice(
-          text = "Leave in the spring, when love is in the air",
-          slide = slide11SpringDeparture.copyOf(),
-        )
-        choice(
-          text = "Follow Old Ben’s advice, take the risk of stealing a coat and leave in the winter, " +
-            "right at Christmas, when it is coldest and darkest",
-          slide = slide19StealOvercoatViaRoss,
-        )
-      }
-
     val slide7SummerDeparture =
       slide(
         id = 7,
@@ -1279,6 +1253,31 @@ val jermainLonguenSlides =
         choice(
           text = "Go off-track, cross-country, with the risk of getting lost",
           slide = slide8SummerCrossCountry.copyOf(),
+        )
+      }
+
+    val slide5OldBenViaRoss =
+      slide(
+        id = 5,
+        title = "Old Ben (via Ross): When to Go",
+        content = OLD_BEN_VIA_ROSS,
+      ) {
+        choice(
+          text = "Leave in the summer, when the weather is warmest, and you can easily sleep outdoors",
+          slide = slide7SummerDeparture.copyOf(),
+        )
+        choice(
+          text = "Leave in the autumn, hoping to slip away in the busyness and hubbub of harvest time",
+          slide = slide10AutumDeparture.copyOf(),
+        )
+        choice(
+          text = "Leave in the spring, when love is in the air",
+          slide = slide11SpringDeparture.copyOf(),
+        )
+        choice(
+          text = "Follow Old Ben’s advice, take the risk of stealing a coat and leave in the winter, " +
+            "right at Christmas, when it is coldest and darkest",
+          slide = slide19StealOvercoatViaRoss,
         )
       }
 
@@ -1339,6 +1338,30 @@ val jermainLonguenSlides =
         )
       }
 
+    val slide6OldBenWhenToGo =
+      slide(
+        id = 6,
+        title = "Go To Old Ben",
+        content = OLD_BEN_WHEN_TO_GO,
+      ) {
+        choice(
+          text = "Leave in the summer, when the weather is warmest and you can easily sleep outdoors",
+          slide = slide7SummerDeparture.copyOf(),
+        )
+        choice(
+          text = "Leave in the autumn, hoping to slip away in the busyness and hubbub of harvest time",
+          slide = slide10AutumDeparture.copyOf(),
+        )
+        choice(
+          text = "Leave in the spring, when love is in the air",
+          slide = slide11SpringDeparture.copyOf(),
+        )
+        choice(
+          text = "Follow Old Ben’s advice and leave in the winter, right at Christmas, when it is coldest and darkest",
+          slide = slide13WinterDepartureAlone.copyOf(),
+        )
+      }
+
     val slide16RossEncounter =
       slide(
         id = 16,
@@ -1364,31 +1387,7 @@ val jermainLonguenSlides =
         )
         choice(
           text = "No",
-          slide = slide5OldBenViaRoss.copyOf(),
-        )
-      }
-
-    val slide6OldBenWhenToGo =
-      slide(
-        id = 6,
-        title = "Go To Old Ben",
-        content = OLD_BEN_WHEN_TO_GO,
-      ) {
-        choice(
-          text = "Leave in the summer, when the weather is warmest and you can easily sleep outdoors",
-          slide = slide7SummerDeparture.copyOf(),
-        )
-        choice(
-          text = "Leave in the autumn, hoping to slip away in the busyness and hubbub of harvest time",
-          slide = slide10AutumDeparture.copyOf(),
-        )
-        choice(
-          text = "Leave in the spring, when love is in the air",
-          slide = slide12PaddyRollersEnd.copyOf(),
-        )
-        choice(
-          text = "Follow Old Ben’s advice and leave in the winter, right at Christmas, when it is coldest and darkest",
-          slide = slide13WinterDepartureAlone.copyOf(),
+          slide = slide6OldBenWhenToGo.copyOf(),
         )
       }
 

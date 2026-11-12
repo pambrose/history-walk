@@ -33,12 +33,12 @@ and in the step that fixes it under [Suggested order of work](#suggested-order-o
 | [3](#issue-3)   | ✅ | Medium   | Server, client    | The version-check settings are not validated: a typo kills the check, a 0 floods the server     |
 | [4](#issue-4)   | ✅ | Medium   | Supply chain      | The client's npm dependencies are not locked, so CI builds and scans a different bundle         |
 | [5](#issue-5)   | ✅ | Medium   | Content (Moses)   | Slide 14 silently loses one of its three choices                                                |
-| [6](#issue-6)   | ⬜ | Medium   | Content (Jermain) | Refusing Ross's deal still puts the student on the Ross path, and the patrol slide contradicts it |
+| [6](#issue-6)   | ✅ | Medium   | Content (Jermain) | Refusing Ross's deal still puts the student on the Ross path, and the patrol slide contradicts it |
 | [7](#issue-7)   | ✅ | Medium   | Content, data     | Five fatal Jermain decisions are recorded as correct ones                                       |
 | [8](#issue-8)   | ✅ | Medium   | Content (Moses)   | Two correct choices say one thing and the next slide says the opposite                          |
 | [9](#issue-9)   | ✅ | Medium   | Content (Moses)   | The opening contradicts the later story of Moses's mother                                       |
 | [10](#issue-10) | ✅ | Medium   | Content (Jermain) | The title slide and the docs misspell Loguen as "Longuen"                                       |
-| [11](#issue-11) | ⬜ | Low      | Content           | "Decison" in 26 Moses slide titles, and lowercase verbs in four Jermain titles                  |
+| [11](#issue-11) | ✅ | Low      | Content           | "Decison" in 26 Moses slide titles, and lowercase verbs in four Jermain titles                  |
 | [12](#issue-12) | ✅ | Low      | Content           | Typos and grammar errors in both decks' text                                                    |
 | [13](#issue-13) | ⬜ | Low      | Content (Jermain) | Companions, horses, patrols, and seasons that do not match the student's path                   |
 | [14](#issue-14) | ✅ | Low      | Content (a11y)    | Every image's alt text is "Pic", and a few markup slips                                         |
@@ -244,8 +244,16 @@ Things checked and found sound:
   - The fix only adds a path (`Incorrect1`), so rewrite the snapshot; no student's progress is orphaned.
 
 <a id="issue-6"></a>
-### ⬜ 6. Refusing Ross's deal still puts the student on the Ross path, and the patrol slide contradicts it
+### ✅ 6. Refusing Ross's deal still puts the student on the Ross path, and the patrol slide contradicts it
 
+- **Status:** done in Wave 3.
+  - "No" leads to `Go To Old Ben`, Old Ben's own advice. Its summer, autumn, and spring have the same slides as the
+    via-Ross ones had.
+  - The via-Ross winter is gone from this branch. Migration `V005` sends a student who was there back to the
+    branch's first slide, and leaves their moves there as history.
+  - Slides 20, 23, and 25 were made neutral rather than rerouted, which moves no path: the bluff no longer says
+    "You have none", and the fight no longer says how it is fought.
+  - `DbmsMigrateTest` checks every place the deck had before.
 - **Severity:** Medium
 - **Where:** `content/JermainLonguen.kt:1382-1384`; the patrol slides 20, 23, and 25 (`:316-319`, `:338`); the town
   exits at `:774`, `:822`, `:846`, `:862`, `:891`, `:943`, `:1023`, `:1054`, `:1102`, `:1156`, `:1173`
@@ -340,8 +348,10 @@ Things checked and found sound:
   - Renaming the Kotlin identifiers and the file (`jermainLonguenSlides`, `JermainLonguen.kt`) is optional.
 
 <a id="issue-11"></a>
-### ⬜ 11. "Decison" in 26 Moses slide titles, and lowercase verbs in four Jermain titles
+### ✅ 11. "Decison" in 26 Moses slide titles, and lowercase verbs in four Jermain titles
 
+- **Status:** done in Wave 3. The 26 Moses titles and the four Jermain titles are corrected. Migration `V005` rewrites
+  the stored path names and titles, and `slide-decks.md` shows the corrected title.
 - **Severity:** Low
 - **Where:**
   - `content/Moses.kt:374-874`: the 4th through 29th "Decison" titles
@@ -426,8 +436,9 @@ Things checked and found sound:
   - **The horses.** Loguen's escape is generally told as made on horseback, with John Farney (the companion the
     deck names), so the likely fix is to give the student the horse where the walk begins rather than remove the
     rides. That is the content author's call.
-  - **The season reroutes and the TODO at the Ross path's spring choice.** These change path names, so they belong to
-    Step 8.
+
+  Done in Wave 3: the Ross path's summer goes through Summer Departure and Old Ben's spring through Spring Departure,
+  as on every other path, with their stored places and moves moved by `V005`. The TODO is gone.
 - **Severity:** Low
 - **Where:** `content/JermainLonguen.kt`
 - **Problem:**
@@ -746,8 +757,8 @@ The four steps share no files. Step 1 is a check in two dashboards, not code.
 
 | Step | Status | Issues | Work | Files |
 |------|:------:|--------|------|-------|
-| 8  | ⬜ | [6](#issue-6), [13](#issue-13) (rerouted seasons) | Send "No" off the Ross path; a patrol that suits each path; a migration for the moved paths | `JermainLonguen.kt`, a migration, `slide-paths/jermain.txt` |
-| 9  | ⬜ | [11](#issue-11) | Fix the titles; a migration that rewrites stored path names and titles | `Moses.kt`, `JermainLonguen.kt`, a migration, both snapshots, `slide-decks.md` |
+| 8  | ✅ | [6](#issue-6), [13](#issue-13) (rerouted seasons) | Send "No" off the Ross path; a patrol that suits each path; a migration for the moved paths | `JermainLonguen.kt`, a migration, `slide-paths/jermain.txt` |
+| 9  | ✅ | [11](#issue-11) | Fix the titles; a migration that rewrites stored path names and titles | `Moses.kt`, `JermainLonguen.kt`, a migration, both snapshots, `slide-decks.md` |
 
 - Step 8 follows Step 6, which edits the same file. Step 9 follows Steps 5 and 8, since all three edit the same titles
   and snapshots. Having one person do 8 and 9 avoids two rounds of snapshot rewrites.
@@ -805,8 +816,8 @@ The four steps share no files. Step 1 is a check in two dashboards, not code.
 | Server errors and headers | 2 → 14 | now (Step 2 is done) |
 | Settings | 3 | done |
 | Supply chain | 4 → 16, 19, and 23 | now (Step 4 is done) |
-| Moses content | 5 → 9 | Step 9 (Step 5 is done) |
-| Jermain content | 6 → 8 → 9 | Step 8 (Step 6 is done) |
+| Moses content | 5 → 9 | done |
+| Jermain content | 6 → 8 → 9 | done (the horses in issue 13 wait on the content author) |
 | Walk data | 7 → 10 | Step 10 (Step 7 is done) |
 | Hardening | 11, 12, 13, 15 | now |
 | Build and CI | 17, 18 | now (one person, the Makefile) |
