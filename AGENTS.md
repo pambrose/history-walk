@@ -61,6 +61,7 @@ the signed-in user from the `ApplicationCall` (`call.userUuid`), never from a cl
 
 **Moves are checked on the server.** `ContentService` takes the deck (`masterSlides`) and the user's stored slide as the
 truth, not what the client sends:
+
 - `makeChoice` and `provideReason` must start from the user's current slide and name one of its forward choices. The
   stored title, choice text, and `deadEnd` come from the deck (`Slide.leadsToDeadEnd`: a dead end, or a slide whose
   one forward choice, a "Continue", leads to one, so a decision like Jermain's "Leave in the autumn" is stored as the
@@ -81,6 +82,7 @@ The RPC signatures still carry the fields the server now ignores, so changing th
 
 **Client errors.** `AppScope` has a `SupervisorJob`, and the version check runs in a scope of its own, so a failed call
 no longer cancels every later click. Clicks on choices and go-backs go through `onClickWhenIdle` (`MainPanel.kt`):
+
 - A `busy` flag disables those buttons until the request finishes.
 - A failure shows a toast (`ClientUtils.orErrorToast`), and a server refusal shows its own message and reloads the
   student's real slide.
@@ -99,6 +101,7 @@ The progress views filter on the stored role, so `Main.kt` brings it into line a
 which leaves alone an address the rule no longer admits, so a teacher taken off the list stays out of the class pages).
 The sign-in dialog names the domain the server serves at `/auth/domain` (`SCHOOL_EMAIL_DOMAIN`), in its instruction and
 in a refusal (`SignInRefusal`, kept rather than its message so the dialog can word it once the domain arrives).
+
 - `AuthRoutes.kt` runs `/auth/login` and `/auth/callback` with a signed stateless `state` and PKCE, storing nothing on
   the server. The `oauth_state` cookie (`OAuthState.kt`) holds a random secret plus an HMAC binding it to the state, and
   the PKCE verifier is derived from that secret (`Pkce.kt`), so a stolen callback URL is useless without the browser's
@@ -135,6 +138,7 @@ in the student view (below).
 **Teachers see the student view.** The admin page (`/admin`, `Pages.displayAdmin`) has one app-wide switch, the single
 row of `history.settings` (`AdminTxs.teachersSeeStudentView`), so teachers can walk as their class will before the app
 is given to it. It starts at the teacher view.
+
 - The button names what pressing it does ("Teachers see student view" while teachers see the teacher view), so the page
   also says which view is on. It posts the view it names (`view=student` or `view=teacher`), not a toggle, so a second
   press of a page left open sets the same view again.
@@ -208,6 +212,7 @@ pgjdbc's own URL parsing.
 
 `V001` begins with `drop schema if exists history cascade`, and Flyway records what it has applied in
 `public.flyway_schema_history` (the connection's default schema, outside `history`):
+
 - Flyway runs `V001` whenever that table is missing or empty: its own refusal to migrate a non-empty schema without
   one looks only at `public`. So a database whose `history` schema survived without it (a restore or copy that left it
   out, the table dropped or emptied) would lose every user and choice at startup.
@@ -225,6 +230,7 @@ The files in `webpack.config.d/` are concatenated into the generated webpack con
 
 **Page caching.** `main.bundle.js` has the same name in every release, so a release reaches a browser at its next page
 load only because of these; do not drop any of them:
+
 - `Routes.staticContent` serves the page shell (`/`, the jar's `assets/index.html`), the bundle, and the `/static`
   images with `Cache-Control: no-cache, private` and a SHA-256 ETag (`revalidatedEachTime`). Kilua's own static
   handling is off (`initRpc(initStaticResources = false)`): it sent no Cache-Control, so a cache could keep the bundle
@@ -291,6 +297,7 @@ Kotest `StringSpec` on both targets. A spec in `src/commonTest` (`ReasonRuleTest
 
 **JVM** (`src/jvmTest`, run by `jvmTest`): Kotest on JUnit Platform + MockK + Ktor test host. Route tests call
 `appRoutes(...)` with injected `findEmail`/`teacherEmails` lambdas instead of a database.
+
 - The database specs (`UserRepositoryTest`, `DbmsTxsTest`, `ContentServiceTest`, `PagesTest`, `AdminTest`,
   `UserResetTest`, `SignOutTest`) each start their own `TestPostgres`, a Testcontainers `postgres:18` with the real Flyway migrations
   applied, and share the small deck and helpers in `TestWalk.kt`.
@@ -332,6 +339,7 @@ Kotest Gradle plugin writes the JS entry point with KSP (`kspTestKotlinJs`), bes
 not run on Kotlin/JS, so the specs use fakes and the units' injected functions (`LoginPrompt`'s `show`, `SignInDialog`'s
 `navigate`); the `MainPanel.kt` units they drive (`busy`, `onClickWhenIdle`, `reasonDialog`) are `internal`, not
 private.
+
 - `TestPage.kt`: `TestPage.root`, the one KVision `Root` for the run (KVision draws every modal and toast through the
   page's first Root and forgets them when it is disposed), rendering synchronously; and the DOM helpers (`awaitUntil`,
   `click`, `enter` for text that arrives by input event alone, `toastsShownBy`, `showModal`, `closeModals`, `texts`).

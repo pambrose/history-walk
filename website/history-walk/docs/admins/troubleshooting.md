@@ -30,7 +30,7 @@ Worth knowing in the log:
 | *Serving the jermain slide deck (SLIDES_VARIABLE_NAME is …)* | Which walk this deployment serves. |
 | *Container database: host:port/db as user* | The database it connected to through `DATABASE_URL` (never the password). |
 | *Flyway applied N migration(s); schema version … -> …* | The migrations this start ran. |
-| *Created user … * | Someone signed in for the first time. |
+| *Created user …* | Someone signed in for the first time. |
 | *Signing out the session for user …: …* | A session was ended, with why: expired, signed out elsewhere, or no longer admitted. |
 | *Teachers see the student view* / *teacher view* | Someone pressed the admin page's switch. |
 | *Cleared N moves of M teachers* | Someone pressed **Clear teachers' trial walks**. |
