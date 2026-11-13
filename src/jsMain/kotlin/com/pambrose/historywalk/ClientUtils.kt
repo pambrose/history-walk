@@ -11,6 +11,7 @@ import io.kvision.html.Button
 import io.kvision.toast.ToastContainer
 import io.kvision.toast.ToastContainerPosition.BOTTOMRIGHT
 import kotlinx.browser.document
+import kotlinx.browser.window
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -106,5 +107,13 @@ object ClientUtils {
     form.action = path
     document.body?.appendChild(form)
     form.submit()
+  }
+
+  /**
+   * Opens [url] in a new tab, so the walk stays open beside it. `noopener` keeps the new page from reaching this one
+   * through `window.opener`.
+   */
+  fun openInNewTab(url: String) {
+    window.open(url, "_blank", "noopener")
   }
 }

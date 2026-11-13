@@ -5,6 +5,7 @@ import com.pambrose.historywalk.ClientUtils.PAGE_NOT_LOADED
 import com.pambrose.historywalk.ClientUtils.REASON_NOT_SAVED
 import com.pambrose.historywalk.ClientUtils.launchOrErrorToast
 import com.pambrose.historywalk.ClientUtils.lowercase
+import com.pambrose.historywalk.ClientUtils.openInNewTab
 import com.pambrose.historywalk.ClientUtils.orErrorToast
 import com.pambrose.historywalk.ClientUtils.postTo
 import com.pambrose.historywalk.ClientUtils.showErrorToast
@@ -390,14 +391,14 @@ private fun Container.header(
 
   hPanel(alignItems = AlignItems.CENTER) {
     if (isTeacher) {
-      // The class pages open in new tabs, so the walk stays open beside them; noopener, as for help
-      navLink("class summary", "fas fa-chart-bar") { window.open("/$SUMMARY", "_blank", "noopener") }
-      navLink("student reasons", "fas fa-comments") { window.open("/$REASONS", "_blank", "noopener") }
+      // The class pages open in new tabs, so the walk stays open beside them
+      navLink("class summary", "fas fa-chart-bar") { openInNewTab("/$SUMMARY") }
+      navLink("student reasons", "fas fa-comments") { openInNewTab("/$REASONS") }
       // The switch to the student view, and back. In the student view the server reports a teacher as a student, so
       // this link is not shown and the admin page says to come back to /admin
       navLink("admin", "fas fa-cog") { document.location?.href = "/$ADMIN" }
-      // The teacher guide, in a new tab so the walk stays open; noopener keeps the guide's page from reaching this one
-      navLink("help", "fas fa-question-circle") { window.open(TEACHER_GUIDE, "_blank", "noopener") }
+      // The teacher guide, in a new tab so the walk stays open
+      navLink("help", "fas fa-question-circle") { openInNewTab(TEACHER_GUIDE) }
     }
     // Clears the teacher's own test walk and starts it again from the first slide, once the browser's confirmation is
     // answered OK, as the admin page's clear asks. A POST, as logout is: the server resets nothing on a GET, which any

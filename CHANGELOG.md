@@ -15,6 +15,10 @@ All notable changes to History Walk are recorded here. The format follows
   - A setting missing from `application.yaml` is found with `propertyOrNull`, not by catching every `Throwable`.
   - The webpack and Karma config fragments declare the `config` global that Kotlin/JS defines for them, which ESLint
     took for an undefined variable.
+  - The troubleshooting guide's table of log lines shows *Created user …* in italics, not between stray asterisks,
+    and the teacher guide's sign-in steps are headed "How to sign in" rather than repeating the page's title.
+  - The header's three new-tab links share `ClientUtils.openInNewTab`, and every list in AGENTS.md has a blank line
+    before it.
 
 ## [1.3.1] - 2026-11-13
 

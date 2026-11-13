@@ -2,7 +2,7 @@
 
 History Walk uses your school Google account; there is no separate password.
 
-## Signing in
+## How to sign in
 
 1. Open the walk's address in your browser.
 2. A dialog titled **History Walk** (or a greeting your administrator chose) asks you to *Sign in with your Athenian
