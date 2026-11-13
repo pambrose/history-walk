@@ -411,6 +411,16 @@ so raise it as coverage grows and never lower it to let a change through. The li
 `build/generated` by path (see `build.gradle.kts`); the slide decks' text constants are SCREAMING_SNAKE_CASE, as
 ktlint's property-naming rule requires.
 
+**Codacy** (a GitHub app, set up at app.codacy.com rather than in the repository) checks each pull request and fails
+one that adds an issue of any severity. Its detekt rules ask for a KDoc comment on each public class and function, and
+every one has one, so a new public declaration needs one too, in tests as well. It also flags a Markdown list with no
+blank line before it, emphasis with a space inside its markers, and a catch of `Exception` or `Throwable`. Its findings
+are on the pull request's page there, or from the command line: `codacy pull-request <number>` (add `--diff`), and
+`codacy issues -O` for `master`. A pull request's count of fixed issues runs low (#44 showed 1 and fixed 179), so
+compare `master`'s counts before and after a merge. The issues left on `master` are deliberate or noise: Markdown in
+`docs/` and the release notes, repeated strings in tests and slide text, the generic catches that are boundaries
+(`ContentService.answering`, for one), and SQL Server rules applied to the Postgres migrations.
+
 ## Gotchas
 
 - IntelliJ has twice auto-imported JDK-internal classes (`sun.jvmstat...`, `sun.jvm.hotspot.HelloWorld.e`) into Kotlin

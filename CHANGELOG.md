@@ -6,9 +6,14 @@ All notable changes to History Walk are recorded here. The format follows
 
 ## [Unreleased]
 
+## [1.3.2] - 2026-11-13
+
+Fixes from Codacy's analysis (#44, #45): two corrections to the guide and code-level cleanups, with Flyway and Kotest
+updated. No new settings and no database changes; `apiVersion` is unchanged.
+
 ### Changed
 
-- **Fixes from Codacy's analysis**, none of which a teacher or a student would notice:
+- **Fixes from Codacy's analysis**, none of which changes the walk:
   - Every public class and function has a KDoc comment; 164 had none.
   - The sign-in dialog's fetch of its title and domain lets a coroutine's cancellation through rather than taking it
     for a failed fetch.
@@ -19,6 +24,9 @@ All notable changes to History Walk are recorded here. The format follows
     and the teacher guide's sign-in steps are headed "How to sign in" rather than repeating the page's title.
   - The header's three new-tab links share `ClientUtils.openInNewTab`, and every list in AGENTS.md has a blank line
     before it.
+- **The guide and AGENTS.md describe Codacy's check of each pull request**, which fails one that adds any issue,
+  and how to read its findings (`codacy pull-request <number>`).
+- Flyway 13.12.2 (was 13.12.1) and Kotest 6.2.7 (was 6.2.6).
 
 ## [1.3.1] - 2026-11-13
 
@@ -423,7 +431,8 @@ the original classroom app; [History](#history) at the end tells the story in or
   CI (#5, #7); five waves of fixes from a code review of 24 issues (#9–#12, #14); the admin page's student view
   (#13); `make docker-push` and version 1.1.0 (#16); and the documentation site (#17).
 
-[Unreleased]: https://github.com/pambrose/history-walk/compare/1.3.1...HEAD
+[Unreleased]: https://github.com/pambrose/history-walk/compare/1.3.2...HEAD
+[1.3.2]: https://github.com/pambrose/history-walk/compare/1.3.1...1.3.2
 [1.3.1]: https://github.com/pambrose/history-walk/compare/1.3.0...1.3.1
 [1.3.0]: https://github.com/pambrose/history-walk/compare/1.2.1...1.3.0
 [1.2.1]: https://github.com/pambrose/history-walk/compare/1.2.0...1.2.1

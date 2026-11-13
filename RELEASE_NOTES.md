@@ -1,5 +1,40 @@
 # Release notes
 
+## History Walk 1.3.2 — 2026-11-13
+
+A maintenance release: two corrections to the guide, fixes from a code-quality scan, and two library updates. Nothing
+changes in the walk itself.
+
+### For teachers
+
+- **Nothing changes for you or your students.** The walk, the class pages, and the admin page work as in 1.3.1. The
+  guide's *Signing in* page now heads its steps *How to sign in*.
+
+### For administrators
+
+- **No new settings and no database changes**, and the page's interface with the server is unchanged, so open pages
+  aren't asked to reload: each picks up 1.3.2 at its next load. `make railway-redeploy` deploys both walks from the new
+  image and waits until each reports 1.3.2.
+- **Coming from 1.2.1 or earlier?** The *Before you deploy* steps in 1.3.0's notes still apply: back up both walks'
+  databases, check the settings, and deploy outside class time.
+- **The troubleshooting page's table of log lines** shows *Created user …* in italics; it used to show stray
+  asterisks.
+
+### For contributors
+
+- **Codacy checks every pull request**, and fails one that adds any issue. Every public class and function now has a
+  KDoc comment (164 were added), so a new one needs one too, in tests as well. The development page and AGENTS.md
+  describe the check and how to read its findings (`codacy pull-request <number>`).
+- `ClientUtils.openInNewTab` opens the header's class pages and help in a new tab, with `noopener`.
+- The sign-in dialog's fetches let a coroutine's cancellation through, `Property` reads a missing setting with
+  `propertyOrNull`, and the webpack and Karma config fragments declare their `config` global for ESLint.
+- Codacy's count of issues on `master` fell from 545 to 355. The rest are deliberate or noise: Markdown in `docs/` and
+  the release notes, repeated strings in tests and slide text, generic catches that are boundaries, and SQL Server
+  rules applied to the Postgres migrations.
+- Flyway 13.12.2 and Kotest 6.2.7.
+
+**Full Changelog**: <https://github.com/pambrose/history-walk/compare/1.3.1...1.3.2>
+
 ## History Walk 1.3.1 — 2026-11-13
 
 A small release: a page left open stops checking for updates while nobody is using it. Nothing changes in the walk

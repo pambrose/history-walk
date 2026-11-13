@@ -83,6 +83,12 @@ download from the run's page for 30 days; then they expire by themselves.
 
 All actions are pinned to commit hashes, and Dependabot proposes their updates.
 
+Two GitHub apps, set up on their own sites rather than in the repository, also check every pull request. GitGuardian
+looks for committed secrets. Codacy Static Code Analysis fails a pull request that adds any issue, such as a public
+class or function with no KDoc comment, or a Markdown list with no blank line before it. Its findings are on the pull
+request's page at [app.codacy.com](https://app.codacy.com/gh/pambrose/history-walk); with the Codacy Cloud CLI,
+`codacy pull-request <number>` lists them.
+
 ## Where things are
 
 | Path | Holds |
