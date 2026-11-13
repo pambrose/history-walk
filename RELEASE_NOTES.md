@@ -1,5 +1,40 @@
 # Release notes
 
+## History Walk 1.3.1 — 2026-11-13
+
+A small release: a page left open stops checking for updates while nobody is using it. Nothing changes in the walk
+itself.
+
+### For teachers
+
+- **A page left open goes quiet.** A page nobody has used for 5 minutes, or one in a background tab, stops asking the
+  server whether a new version is out. As soon as someone uses it again (a click, a key, a scroll, the mouse, or
+  switching back to its tab), it asks at once. So if an update comes out while a page sits unused, its *Application
+  Update* dialog appears when a student comes back to it, not while nobody is looking, and the page reloads about a
+  minute later, as before. Nothing is lost: every move is already saved.
+
+### For administrators
+
+- **Fewer requests, quieter logs.** Every open page used to ask the server every minute for as long as it stayed open,
+  and a signed-out one logged `401 Unauthorized: POST /rpc/routeContentServiceManager5` each time. Now only pages in
+  use ask.
+- **No new settings and no database changes**, and the page's interface with the server is unchanged, so open pages
+  aren't asked to reload: each picks up 1.3.1 at its next load, and checks every minute until then.
+  `make railway-redeploy` deploys both walks from the new image and waits until each reports 1.3.1.
+- **Coming from 1.2.1 or earlier?** The *Before you deploy* steps in 1.3.0's notes still apply: back up both walks'
+  databases, check the settings, and deploy outside class time.
+- **The guide's port notes are corrected.** The server listens on the host's `PORT` when it sets one, else on 8080,
+  and a `-port=` argument wins over both. The configuration and deployment pages said `-port=$PORT` was needed.
+
+### For contributors
+
+- `PageActivity` (`jsMain`) says whether someone is using the page: it is visible, and someone did something in it
+  within `IDLE_AFTER` (5 minutes). `listenForActivity` feeds it the window's events. `VersionCheckLoop` waits on it
+  before each check, after the interval, so checks stay at least an interval apart.
+- `PageActivityTest` and four new `VersionCheckLoopTest` cases cover it, and `settle()` is shared in `TestPage.kt`.
+
+**Full Changelog**: <https://github.com/pambrose/history-walk/compare/1.3.0...1.3.1>
+
 ## History Walk 1.3.0 — 2026-11-11
 
 The fixes from a review of the whole app: corrected walks, a clearer reasons page, steadier sign-in, and safer
