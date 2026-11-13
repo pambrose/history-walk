@@ -79,6 +79,6 @@ See [Google sign-in](google-sign-in.md#other-sign-in-problems). The most common:
 
 | Error | Fix |
 |---|---|
-| *The 'expect' declaration 'getService' has no 'actual' declaration* in `compileKotlinJvm` | KSP lost the RPC service while generating code. KSP is held at 2.3.12 for this ([Releases](releases.md#dependencies)); if it still happens, run `./gradlew clean` and build again. |
+| *The 'expect' declaration 'getService' has no 'actual' declaration* in `compileKotlinJvm` | KSP lost the RPC service while generating code. KSP 2.3.13 did this ([google/ksp#3286](https://github.com/google/ksp/issues/3286)), and 2.3.14 fixes it, so check that `gradle/libs.versions.toml` doesn't name 2.3.13; if it still happens, run `./gradlew clean` and build again. |
 | An import of `sun.…` classes in a Kotlin file | IntelliJ sometimes auto-imports JDK-internal classes. Delete the import. |
 | `jsBrowserTest` fails with nothing run | The Kotest entry point wasn't generated; run `./gradlew clean` and the tests again. |

@@ -8,10 +8,10 @@ config = "6.1.2"
 kiluaRpc = "0.0.46"
 kotlinter = "5.7.0"
 kover = "0.9.11"
-# Required by kilua. Held at 2.3.12: KSP 2.3.13 sometimes loses library symbols when two KSP tasks run at once in one
-# Gradle daemon (google/ksp#3286), and kspKotlinJs and kspKotlinJvm do. Kilua RPC's processor then finds no
-# @RpcService interface, so the JVM build fails with "expect getService has no actual". Take the release that fixes it.
-ksp = "2.3.12"
+# Required by kilua. Not 2.3.13, which sometimes lost library symbols when two KSP tasks ran at once in one Gradle
+# daemon (google/ksp#3286), as kspKotlinJs and kspKotlinJvm do: Kilua RPC's processor then found no @RpcService
+# interface, and the JVM build failed with "expect getService has no actual". 2.3.14 fixes it.
+ksp = "2.3.14"
 kvision = "9.7.0"
 versions = "0.67.0"
 exposed = "1.6.1"

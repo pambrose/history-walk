@@ -2,8 +2,8 @@
 
 ## History Walk 1.3.2 — 2026-11-13
 
-A maintenance release: two corrections to the guide, fixes from a code-quality scan, and two library updates. Nothing
-changes in the walk itself.
+A maintenance release: two corrections to the guide, fixes from a code-quality scan, and three library updates.
+Nothing changes in the walk itself.
 
 ### For teachers
 
@@ -31,7 +31,9 @@ changes in the walk itself.
 - Codacy's count of issues on `master` fell from 545 to 355. The rest are deliberate or noise: Markdown in `docs/` and
   the release notes, repeated strings in tests and slide text, generic catches that are boundaries, and SQL Server
   rules applied to the Postgres migrations.
-- Flyway 13.12.2 and Kotest 6.2.7.
+- Flyway 13.12.2, Kotest 6.2.7, and KSP 2.3.14. KSP is no longer held at 2.3.12: 2.3.14 fixes
+  [google/ksp#3286](https://github.com/google/ksp/issues/3286), which could make the build fail with *The 'expect'
+  declaration 'getService' has no 'actual' declaration*.
 
 **Full Changelog**: <https://github.com/pambrose/history-walk/compare/1.3.1...1.3.2>
 
