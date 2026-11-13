@@ -2,16 +2,17 @@ package com.pambrose.historywalk
 
 import kotlinx.browser.document
 import kotlinx.browser.window
-import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.first
 import org.w3c.dom.AddEventListenerOptions
 import org.w3c.dom.events.EventTarget
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.TimeSource
 
 /**
- * Whether someone is using the page: it is [visible], and someone did something in it ([active]) less than [idleAfter]
- * ago. The version check waits on it ([awaitInUse]), so a page left open with nobody at it, such as a signed-out one
+ * Whether someone is using the page: it is [visible], and someone did something in it ([active]) less than
+ * [IDLE_AFTER] ago. The version check waits on it ([awaitInUse]), so a page left open with nobody at it, such as a signed-out one
  * behind the sign-in dialog, stops calling the server, and the first thing anyone does in it brings a check. The page
  * counts as in use from its load. It touches no DOM: [listenForActivity] feeds it the page's events.
  *
@@ -19,25 +20,21 @@ import kotlin.time.TimeSource
  */
 internal class PageActivity(
   private val visible: () -> Boolean = ::pageVisible,
-  private val idleAfter: Duration = IDLE_AFTER,
   private val timeSource: TimeSource = TimeSource.Monotonic,
 ) {
   private var lastActive = timeSource.markNow()
 
-  // Awaited while the page is not in use; the next activity completes it and drops it
-  private var nextActivity: CompletableDeferred<Unit>? = null
+  // Each activity, for whoever is waiting in awaitInUse; with nobody waiting, an emit is dropped at once
+  private val activity = MutableSharedFlow<Unit>(extraBufferCapacity = 1, onBufferOverflow = DROP_OLDEST)
 
-  /** Whether the page is [visible] and someone did something in it less than [idleAfter] ago. */
+  /** Whether the page is [visible] and someone did something in it less than [IDLE_AFTER] ago. */
   val inUse: Boolean
-    get() = visible() && lastActive.elapsedNow() < idleAfter
+    get() = visible() && lastActive.elapsedNow() < IDLE_AFTER
 
   /** Someone did something in the page, or it came back into view. */
   fun active() {
     lastActive = timeSource.markNow()
-    nextActivity?.also {
-      nextActivity = null
-      it.complete(Unit)
-    }
+    activity.tryEmit(Unit)
   }
 
   /**
@@ -45,7 +42,7 @@ internal class PageActivity(
    * is visible, the tab coming back into view included.
    */
   suspend fun awaitInUse() {
-    while (!inUse) (nextActivity ?: CompletableDeferred<Unit>().also { nextActivity = it }).await()
+    while (!inUse) activity.first()
   }
 
   companion object {

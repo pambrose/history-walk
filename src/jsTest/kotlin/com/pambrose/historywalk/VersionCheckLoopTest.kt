@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.hours
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
@@ -108,9 +107,6 @@ class VersionCheckLoopTest : StringSpec() {
         job.cancel()
       }
     }
-
-  // Long enough for whatever is due now, such as the first check, to run; short of any wait in the loop
-  private suspend fun settle() = delay(1.milliseconds)
 
   init {
     timeout = CLIENT_TEST_TIMEOUT_MS

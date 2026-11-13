@@ -5,11 +5,9 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.browser.document
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.w3c.dom.EventInit
 import org.w3c.dom.events.Event
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.TestTimeSource
 
@@ -27,8 +25,8 @@ class PageActivityTest : StringSpec() {
   // A page that has gone unused for as long as it takes to be idle
   private fun idlePage() = pageActivity().also { time += PageActivity.IDLE_AFTER }
 
-  // Long enough for a waiter that can return to do so
-  private suspend fun settle() = delay(1.milliseconds)
+  // An element of the test's own that feeds [activity] its events as the window feeds the page's
+  private fun listening(activity: PageActivity) = document.createElement("div").also { listenForActivity(activity, it) }
 
   init {
     timeout = CLIENT_TEST_TIMEOUT_MS
@@ -75,43 +73,30 @@ class PageActivityTest : StringSpec() {
     }
 
     "waiting for the page to be in use returns at once while it is" {
-      val activity = pageActivity()
-      var returned = false
-
       coroutineScope {
-        launch {
-          activity.awaitInUse()
-          returned = true
-        }
+        val waiter = launch { pageActivity().awaitInUse() }
         settle()
+        waiter.isCompleted shouldBe true
       }
-
-      returned shouldBe true
     }
 
     "waiting on an idle page returns only once someone does something in it while it is visible" {
       val activity = idlePage()
-      var returned = false
 
       coroutineScope {
-        val waiter =
-          launch {
-            activity.awaitInUse()
-            returned = true
-          }
+        val waiter = launch { activity.awaitInUse() }
         settle()
-        returned shouldBe false
+        waiter.isCompleted shouldBe false
 
         // Something that reaches a hidden page, such as its going out of view, is not someone using it
         visible = false
         activity.active()
         settle()
-        returned shouldBe false
+        waiter.isCompleted shouldBe false
 
         visible = true
         activity.active()
         settle()
-        returned shouldBe true
         waiter.isCompleted shouldBe true
       }
     }
@@ -119,10 +104,8 @@ class PageActivityTest : StringSpec() {
     "each of the page's signs of use makes it in use again" {
       PageActivity.ACTIVITY_EVENTS.forEach { type ->
         val activity = idlePage()
-        val target = document.createElement("div")
-        listenForActivity(activity, target)
 
-        target.dispatchEvent(Event(type))
+        listening(activity).dispatchEvent(Event(type))
 
         withClue(type) { activity.inUse shouldBe true }
       }
@@ -130,8 +113,7 @@ class PageActivityTest : StringSpec() {
 
     "other events do not count as someone using the page" {
       val activity = idlePage()
-      val target = document.createElement("div")
-      listenForActivity(activity, target)
+      val target = listening(activity)
 
       listOf("load", "message", "resize", "pointerup").forEach { target.dispatchEvent(Event(it)) }
 
@@ -140,9 +122,7 @@ class PageActivityTest : StringSpec() {
 
     "an event inside the page counts even when it does not bubble or a component stops it" {
       val activity = idlePage()
-      val target = document.createElement("div")
-      val field = document.createElement("input").also { target.appendChild(it) }
-      listenForActivity(activity, target)
+      val field = document.createElement("input").also { listening(activity).appendChild(it) }
 
       field.dispatchEvent(Event("focus"))
       activity.inUse shouldBe true
