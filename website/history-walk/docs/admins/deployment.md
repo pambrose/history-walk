@@ -24,7 +24,8 @@ Custom Start Command**):
 java -jar build/libs/history-walk.jar -port=$PORT
 ```
 
-`-port=$PORT` makes the server listen on the port the host assigns; without it, the server listens on 8080. The
+The server listens on the port the host assigns in `PORT`, or on 8080 when there is none; `-port=$PORT` says the same
+thing explicitly, and a `-port=` wins over `PORT`. The
 repository has no Procfile, so the start command must be set on the host. `build/libs` also holds two smaller jars, so
 name `history-walk.jar` exactly rather than letting the host pick one. Its name has no version in it, so a release
 never leaves the start command pointing at a file the build no longer writes.

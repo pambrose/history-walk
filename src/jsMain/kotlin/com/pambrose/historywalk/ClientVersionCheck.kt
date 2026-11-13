@@ -17,22 +17,27 @@ import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.seconds
 
 /**
- * Asks the server, every so often, whether this page's bundle is still current (ServerVersionCheck), so a page left
- * open across a release that changes `apiVersion` is asked to reload, then reloads itself. The check goes around
- * `withAuth`: a signed-out page is left to the sign-in dialog, and its failed checks are retried quietly. The decisions
- * are [VersionCheckState]'s, and [VersionCheckLoop] runs them.
+ * Asks the server, every so often while someone is using the page ([PageActivity]), whether this page's bundle is still
+ * current (ServerVersionCheck), so a page left open across a release that changes `apiVersion` is asked to reload, then
+ * reloads itself. The check goes around `withAuth`: a signed-out page is left to the sign-in dialog, and its failed
+ * checks are retried quietly until nobody is using the page. The decisions are [VersionCheckState]'s, and
+ * [VersionCheckLoop] runs them.
  */
 object ClientVersionCheck {
   private val contentService = getService<IContentService>()
 
-  suspend fun checkClientVersion() =
+  suspend fun checkClientVersion() {
+    val activity = PageActivity()
+    listenForActivity(activity)
     VersionCheckLoop(
       state = VersionCheckState(BuildConfig.VERSION, BuildConfig.API_VERSION, SessionStorageReloadMemory()),
       versionCheck = { contentService.versionCheck(it) },
+      awaitInUse = activity::awaitInUse,
       modalOpen = { Modal.getAllModals().any { it.visible } },
       writingReason = { writingReason },
       ui = KVisionVersionCheckUi,
     ).run()
+  }
 }
 
 /** What the version check shows and does in the page: [KVisionVersionCheckUi] in the app, a fake in a test. */
@@ -56,21 +61,28 @@ internal interface VersionCheckUi {
 /**
  * Runs the version check: asks the server ([versionCheck]) what it makes of [state]'s request, acts on the answer as
  * [VersionCheckState.decide] says through [ui], waits [VersionCheckState.checkInterval], and goes again until the page
- * reloads. Everything it touches is passed in, so a test can drive it with fakes and virtual time.
+ * reloads. A check that comes due while nobody is using the page waits for someone to ([awaitInUse]), then runs at
+ * once. Everything it touches is passed in, so a test can drive it with fakes and virtual time.
  *
+ * @param awaitInUse returns once someone is using the page ([PageActivity.awaitInUse])
  * @param modalOpen whether any modal is open (see [VersionCheckState.decide])
  * @param writingReason whether the student is giving a reason (MainPanel's `writingReason`)
  */
 internal class VersionCheckLoop(
   private val state: VersionCheckState,
   private val versionCheck: suspend (VersionCheckInfo) -> VersionCheckResponse,
+  private val awaitInUse: suspend () -> Unit,
   private val modalOpen: () -> Boolean,
   private val writingReason: () -> Boolean,
   private val ui: VersionCheckUi,
 ) {
-  /** Checks, and waits between checks, until the page reloads itself. */
+  /**
+   * Checks, and waits between checks, until the page reloads itself. The wait for someone to use the page comes after
+   * the interval, so checks stay at least an interval apart however often someone leaves and comes back.
+   */
   suspend fun run() {
     while (true) {
+      awaitInUse()
       try {
         if (checkOnce()) return
       } catch (e: CancellationException) {

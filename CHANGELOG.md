@@ -6,6 +6,21 @@ All notable changes to History Walk are recorded here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- **An open page checks for a new version only while someone is using it.** A page nobody has clicked, typed,
+  scrolled, or moved the mouse in for 5 minutes, or one in a background tab or a minimized window, stops asking the
+  server; the first thing anyone does in it, or bringing it back into view, has it ask at once, then every
+  `CLIENT_VERSION_CHECK_INTERVAL_SECS` again. A forgotten tab used to ask every minute for good, and a signed-out one
+  logged a `401 Unauthorized: POST /rpc/routeContentServiceManager5` each time. An out-of-date page nobody is using now
+  shows its update dialog, and reloads, once someone comes back to it. The page alone changed: its interface with the
+  server is the same, so open pages aren't asked to reload.
+
+### Fixed
+
+- The configuration and deployment guides said the server needs `-port=$PORT` and the image listens on 8080; since
+  1.3.0 both listen on the host's `PORT` when it sets one, else 8080, and `-port=` wins over both.
+
 ## [1.3.0] - 2026-11-11
 
 The fixes from a review of the whole repository, `docs/code-review-2026-11-11.md` (#34–#39): the walks' text and

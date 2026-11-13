@@ -262,12 +262,18 @@ floor of its own (`VersionCheckState.MIN_CHECK_INTERVAL`, 5 seconds), whatever t
 
 **Version check.** A page left open across a release keeps its old bundle, so `ClientVersionCheck` (started from
 `App.start()`) sends its `BuildConfig` versions to `IContentService.versionCheck` every
-`CLIENT_VERSION_CHECK_INTERVAL_SECS` (60). `ServerVersionCheck` compares only `apiVersion` (gradle.properties): on a
-mismatch the page shows a dialog with a reload link, then, `CLIENT_RELOAD_WARNING_INTERVAL_SECS` (60) after the first
-warning, a countdown toast before it reloads itself. Increment `apiVersion` only when the RPC interfaces change, or when
+`CLIENT_VERSION_CHECK_INTERVAL_SECS` (60) while someone is using the page. `ServerVersionCheck` compares only
+`apiVersion` (gradle.properties): on a mismatch the page shows a dialog with a reload link, then,
+`CLIENT_RELOAD_WARNING_INTERVAL_SECS` (60) after the first warning, a countdown toast before it reloads itself. Increment `apiVersion` only when the RPC interfaces change, or when
 a release must replace pages already open; a release that leaves it alone reaches each page at its next load. The check
 goes around `withAuth`, so a signed-out page is left to the sign-in dialog. The page's decisions are
 `VersionCheckState`'s (no DOM; `VersionCheckLoop` runs them with the RPC, the UI, and the flags passed in):
+- A check due while nobody is using the page waits until someone does, then runs at once (`PageActivity`, which
+  `listenForActivity` feeds from the window). The page is in use while it is visible and someone has clicked, tapped,
+  typed, scrolled, or moved the mouse in it, or brought it back into view, within `PageActivity.IDLE_AFTER` (5
+  minutes); a hidden tab is idle at once. So a forgotten tab stops calling the server: a signed-out one used to log a
+  401 every minute for good. The wait comes after the interval, so checks stay at least an interval apart, and an
+  out-of-date page nobody is using shows its dialog, and reloads, only once someone comes back to it.
 - The warning time starts only when the dialog is really shown: the page sends back the server's warning stamp only
   from the answer whose dialog it showed. The dialog is held back while another modal is open or the student is writing
   a reason (`writingReason`, `MainPanel.kt`), and a due reload, its countdown included, is put off while a reason is
@@ -342,7 +348,10 @@ private.
   none of them).
 - The version check: `VersionCheckStateTest` (the pure decisions: when the dialog is held back, when the server's
   warning stamp is kept, the reload put off while a reason is written, the reload remembered in `sessionStorage`),
-  `VersionCheckLoopTest` (the loop with a fake server and UI, on Kotest's virtual clock, `coroutineTestScope`), and
+  `VersionCheckLoopTest` (the loop with a fake server and UI, on Kotest's virtual clock, `coroutineTestScope`: the
+  checks stop while the page is not in use and come back at once when it is, never closer than the interval),
+  `PageActivityTest` (in use until `IDLE_AFTER` without activity, a hidden page idle, the wait for use, and the events
+  that count, on an element of its own rather than the window, with a `TestTimeSource`), and
   `KVisionVersionCheckUiTest` (the real dialog, gone from the DOM and KVision's modal list once closed).
 - `WithAuthTest` (only a 401 reaches the sign-in dialog; a 503 or a refusal reaches the caller as itself, even while
   the page counts as signed out) and `PageShowReloadTest` (a page restored from the back/forward cache reloads).
