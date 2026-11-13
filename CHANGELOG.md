@@ -8,8 +8,8 @@ All notable changes to History Walk are recorded here. The format follows
 
 ## [1.3.2] - 2026-11-13
 
-Fixes from Codacy's analysis (#44, #45): two corrections to the guide and code-level cleanups, with Flyway and Kotest
-updated. No new settings and no database changes; `apiVersion` is unchanged.
+Fixes from Codacy's analysis (#44, #45): two corrections to the guide and code-level cleanups, with Flyway, Kotest, and
+KSP updated. No new settings and no database changes; `apiVersion` is unchanged.
 
 ### Changed
 
@@ -27,6 +27,8 @@ updated. No new settings and no database changes; `apiVersion` is unchanged.
 - **The guide and AGENTS.md describe Codacy's check of each pull request**, which fails one that adds any issue,
   and how to read its findings (`codacy pull-request <number>`).
 - Flyway 13.12.2 (was 13.12.1) and Kotest 6.2.7 (was 6.2.6).
+- KSP 2.3.14 (was 2.3.12). It had been held at 2.3.12 because 2.3.13 could lose the RPC service when two KSP
+  tasks ran at once (google/ksp#3286); 2.3.14 fixes that.
 
 ## [1.3.1] - 2026-11-13
 

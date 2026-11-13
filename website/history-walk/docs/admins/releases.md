@@ -80,10 +80,3 @@ after a release, and could cache per-user pages.
 
 Dependabot proposes updates to GitHub Actions and to the Docker base image, and security fixes for the Java
 libraries. Other library updates are made by hand from `make versions`.
-
-!!! warning "KSP is held at 2.3.12"
-
-    KSP 2.3.13 sometimes drops library symbols when two KSP tasks run at once in one Gradle process
-    ([google/ksp#3286](https://github.com/google/ksp/issues/3286)). The build then fails with *The 'expect'
-    declaration 'getService' has no 'actual' declaration*. `gradle/libs.versions.toml` holds KSP at 2.3.12 until a
-    release fixes it.
