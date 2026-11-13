@@ -38,8 +38,13 @@ Two numbers in `gradle.properties` describe a release:
 
 ## What open pages do
 
-An open page asks the server every minute (`CLIENT_VERSION_CHECK_INTERVAL_SECS`) whether it is current. The server
-compares only the page's `apiVersion` with its own.
+An open page asks the server every minute (`CLIENT_VERSION_CHECK_INTERVAL_SECS`) whether it is current, as long as
+someone is using it. The server compares only the page's `apiVersion` with its own.
+
+A page nobody has clicked, typed, scrolled, or moved the mouse in for 5 minutes, or one in a background tab or a
+minimized window, stops asking. The first thing anyone does in it, or bringing it back into view, has it ask at once,
+then every minute again. So a page forgotten on a computer, even one signed out behind the sign-in dialog, stops calling
+the server, and an out-of-date page nobody is using shows its dialog when someone comes back to it.
 
 - **Same `apiVersion`**: nothing happens. The page keeps working, and runs the new release's page the next time it is
   loaded.

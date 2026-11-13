@@ -74,6 +74,12 @@ suspend fun awaitUntil(
   }
 }
 
+/**
+ * In a spec on Kotest's virtual clock (`coroutineTestScope`), lets whatever is due now run, such as a coroutine just
+ * launched or woken: it moves the clock 1ms, short of any wait under test.
+ */
+suspend fun settle() = delay(1.milliseconds)
+
 /** Every component under this one, at any depth. */
 fun Component.descendants(): List<Component> =
   if (this is Container) getChildren().flatMap { listOf(it) + it.descendants() } else emptyList()

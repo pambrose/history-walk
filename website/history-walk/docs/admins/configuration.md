@@ -60,8 +60,9 @@ The server logs a description of the database it connects to, never the password
 
 ## Update checks
 
-An open page asks the server every minute whether a newer version has been released (see
-[Releases and updates](releases.md)).
+An open page asks the server every minute, while someone is using it, whether a newer version has been released (see
+[Releases and updates](releases.md)). A page left alone for 5 minutes, or out of view, stops asking until someone uses it
+again.
 
 | Variable | Default | Value |
 |---|---|---|
@@ -74,8 +75,9 @@ often than every 5 seconds, whatever the server says.
 
 ## The port
 
-The server listens on the port given with `-port=` on its command line, so a deployment's start command passes the
-host's `$PORT`: `java -jar build/libs/history-walk.jar -port=$PORT`. The Docker image listens on 8080.
+The server listens on the host's `PORT` when it sets one (Railway does), else on 8080. A `-port=` on its command line
+wins over both, so a start command of `java -jar build/libs/history-walk.jar -port=$PORT` does the same as one without
+it. The Docker image follows the same rule: 8080 unless the host sets `PORT`.
 
 ## A complete example
 

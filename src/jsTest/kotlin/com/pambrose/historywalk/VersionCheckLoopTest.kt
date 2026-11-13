@@ -9,8 +9,10 @@ import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
@@ -61,6 +63,9 @@ class VersionCheckLoopTest : StringSpec() {
   private var modalOpen = false
   private var writingReason = false
 
+  // Whether someone is using the page, as PageActivity would say; the loop waits on it before each check
+  private val inUse = MutableStateFlow(true)
+
   // What the page sent with each check, oldest first
   private val requests = mutableListOf<VersionCheckInfo>()
 
@@ -83,6 +88,7 @@ class VersionCheckLoopTest : StringSpec() {
         requests += request
         answer(request)
       },
+      awaitInUse = { inUse.first { it } },
       modalOpen = { modalOpen },
       writingReason = { writingReason },
       ui = ui,
@@ -102,9 +108,6 @@ class VersionCheckLoopTest : StringSpec() {
       }
     }
 
-  // Long enough for whatever is due now, such as the first check, to run; short of any wait in the loop
-  private suspend fun settle() = delay(1.milliseconds)
-
   init {
     timeout = CLIENT_TEST_TIMEOUT_MS
     coroutineTestScope = true
@@ -114,6 +117,7 @@ class VersionCheckLoopTest : StringSpec() {
       ui = FakeUi()
       modalOpen = false
       writingReason = false
+      inUse.value = true
       requests.clear()
       answer = { upToDateAnswer() }
     }
@@ -132,6 +136,79 @@ class VersionCheckLoopTest : StringSpec() {
 
       ui.dialogs.shouldBeEmpty()
       ui.countdown.shouldBeEmpty()
+    }
+
+    "a page nobody is using stops checking, and someone using it again brings a check at once, then the interval" {
+      answer = { upToDateAnswer(checkInterval = 60.seconds) }
+
+      runningLoop { job ->
+        settle()
+        requests shouldHaveSize 1
+
+        inUse.value = false
+        delay(60.seconds)
+        requests shouldHaveSize 1
+        delay(2.hours)
+        requests shouldHaveSize 1
+        job.isActive shouldBe true
+
+        inUse.value = true
+        settle()
+        requests shouldHaveSize 2
+        delay(59.seconds)
+        requests shouldHaveSize 2
+        delay(1.seconds)
+        requests shouldHaveSize 3
+      }
+    }
+
+    "a page left and come back to between checks is checked at the interval, no sooner" {
+      answer = { upToDateAnswer(checkInterval = 60.seconds) }
+
+      runningLoop {
+        settle()
+        inUse.value = false
+        delay(20.seconds)
+        inUse.value = true
+        delay(20.seconds)
+        requests shouldHaveSize 1
+
+        delay(20.seconds)
+        requests shouldHaveSize 2
+      }
+    }
+
+    "a signed-out page nobody is using stops checking too" {
+      answer = { throw SecurityException("Unauthorized") }
+
+      runningLoop {
+        settle()
+        delay(VersionCheckState.DEFAULT_CHECK_INTERVAL)
+        requests shouldHaveSize 2
+
+        inUse.value = false
+        delay(1.hours)
+        requests shouldHaveSize 2
+
+        inUse.value = true
+        settle()
+        requests shouldHaveSize 3
+      }
+    }
+
+    "an out-of-date page nobody is using shows the update dialog when someone comes back to it" {
+      answer = warnsWithDialog
+      inUse.value = false
+
+      runningLoop {
+        delay(10.minutes)
+        requests.shouldBeEmpty()
+        ui.dialogs.shouldBeEmpty()
+
+        inUse.value = true
+        settle()
+        ui.dialogs shouldHaveSize 1
+      }
     }
 
     "a mismatch shows the update dialog once, and the stamp goes back only from the answer whose dialog was shown" {

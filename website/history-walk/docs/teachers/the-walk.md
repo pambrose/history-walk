@@ -68,4 +68,5 @@ continues on the slide where they stopped, with their counts and bookmarks as th
     *A new version of History Walk is available. Please click here to reload this page and continue.* Clicking the
     link reloads the page; nothing is lost, since every move is already saved. If nobody clicks, the page counts down
     and reloads itself about a minute later. It waits while a student is writing a reason, so a half-written reason
-    is never thrown away.
+    is never thrown away. A page nobody has used for a few minutes, or one in a background tab, shows the dialog as
+    soon as someone comes back to it.
