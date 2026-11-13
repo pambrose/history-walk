@@ -240,6 +240,7 @@ class ContentService(
     throw ServiceException(message)
   }
 
+  /** The texts the service sends the browser: [ADVANCE], the refusals' messages, and [SOMETHING_WENT_WRONG]. */
   companion object {
     private val logger = KotlinLogging.logger {}
 

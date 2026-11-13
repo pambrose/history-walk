@@ -4,6 +4,10 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 
+/**
+ * `goBackTarget` finds the ancestor a go-back of -n returns to, as far as the root; a go-back past the root, or a
+ * choice that does not go back, is refused.
+ */
 class SlideDataTest : StringSpec() {
   private val town = ParentTitle("/Start/Town", "Town")
   private val mansion = ParentTitle("/Start/Town/Mansion", "Mansion")

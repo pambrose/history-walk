@@ -5,6 +5,7 @@ import com.pambrose.common.util.Version.Companion.versionDesc
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.string.shouldContain
 
+/** The server's version description carries the version and release date from BuildConfig. */
 class VersionTest : StringSpec() {
   init {
     "the server's version description comes from BuildConfig" {

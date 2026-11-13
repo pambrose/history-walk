@@ -29,9 +29,14 @@ val AppScope = CoroutineScope(window.asCoroutineDispatcher() + SupervisorJob() +
 // The version check's own scope, so nothing that goes wrong in the walk can stop it
 private val versionCheckScope = CoroutineScope(window.asCoroutineDispatcher() + SupervisorJob() + logUncaught)
 
+/** The page's own stylesheet (kvapp.css), as a module that [App] loads. */
 @JsModule("/kotlin/modules/css/kvapp.css")
 external object KvappCss
 
+/**
+ * The KVision application. Its start reloads a page restored from the back/forward cache, shows a refused sign-in from
+ * the URL, draws [MainPanel] with the user's current slide, and starts the version check.
+ */
 class App : Application() {
   init {
     useModule(KvappCss)
@@ -81,6 +86,7 @@ private fun showRefusalFromUrl() {
   window.history.replaceState(null, "", "/")
 }
 
+/** The client's entry point: registers the RPC types and starts [App] with hot reload and KVision's modules. */
 fun main() {
   registerRemoteTypes()
   startApplication(

@@ -3,6 +3,10 @@ package com.pambrose.historywalk
 import com.pambrose.common.util.isNotNull
 import com.pambrose.common.util.obfuscate
 
+/**
+ * The settings the server reads from the environment, each from the variable of its own name. [maskFunc] gives the
+ * value as a log line may show it, obfuscated for a secret.
+ */
 enum class EnvVar(
   val maskFunc: EnvVar.() -> String = { getEnv(UNASSIGNED) },
 ) {
@@ -27,10 +31,13 @@ enum class EnvVar(
   CLIENT_RELOAD_WARNING_INTERVAL_SECS,
   ;
 
+  /** Whether the variable is set, even to a blank value. */
   fun isDefined(): Boolean = getEnvOrNull().isNotNull()
 
+  /** The variable's value, or null when it is not set. */
   fun getEnvOrNull(): String? = System.getenv(name)
 
+  /** The variable's value, or [default] when it is not set. A blank value is returned as it is. */
   fun getEnv(default: String) = System.getenv(name) ?: default
 
   /** `true` or `false`, in any case; [default] when unset or blank. Anything else fails, naming the setting. */
@@ -42,8 +49,10 @@ enum class EnvVar(
     range: IntRange,
   ): Int = parseInt(name, getEnvOrNull(), default, range)
 
+  /** The variable's value; fails, naming the variable, when it is not set. */
   fun getRequiredEnv() = getEnvOrNull() ?: error("Missing $name value")
 
+  /** The strict readings of a boolean or number setting, kept apart from the environment so tests can drive them. */
   companion object {
     /**
      * The boolean setting [name] holds as [raw]. `toBoolean()` took anything but `true` for false, so `1` or `yes`

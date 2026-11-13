@@ -15,9 +15,14 @@ import javax.sql.DataSource
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
+/** The database: the connection pool, the Flyway migrations run at every startup, and the `/health` probe. */
 object Dbms {
   private val logger = KotlinLogging.logger {}
 
+  /**
+   * Connects the app to the database at startup (`Main.kt`): builds the Hikari pool from `DATABASE_URL`, else from
+   * `DBMS_URL` and its settings, runs any pending migrations ([migrate]), then hands the pool to Exposed.
+   */
   fun dbmsInit(config: ApplicationConfig) {
     val dataSource = hikari(config)
     migrate(dataSource)

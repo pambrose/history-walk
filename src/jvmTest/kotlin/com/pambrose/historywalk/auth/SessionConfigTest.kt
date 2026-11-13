@@ -8,6 +8,11 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 
+/**
+ * Which callback hosts count as local, the session secret production requires (trimmed, and not too short) where a
+ * local server falls back on a development one, the 32-byte keys derived by label, and the `__Host-` prefix on secure
+ * cookies.
+ */
 class SessionConfigTest : StringSpec() {
   init {
     "localhost, 127.0.0.1 and ::1 callbacks are local" {

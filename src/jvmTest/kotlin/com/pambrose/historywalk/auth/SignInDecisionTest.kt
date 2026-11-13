@@ -11,6 +11,11 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.serialization.json.Json
 
+/**
+ * Who Google's account details admit and as what: a school student or a listed teacher is admitted, address
+ * lowercased, while an unverified address, another domain (a missing or foreign `hd`, a look-alike suffix, a
+ * subdomain), or an unlisted staff account is refused with its reason; plus the refusal's redirect and message.
+ */
 class SignInDecisionTest : StringSpec() {
   private val lenientJson = Json { ignoreUnknownKeys = true }
   private val teachers = setOf("pambrose@athenian.org")

@@ -60,6 +60,7 @@ import kotlinx.browser.document
 import kotlinx.browser.window
 import org.w3c.dom.Storage
 
+/** The page's content: it loads the signed-in user into [userInfo], for the header, and draws each slide in [panel]. */
 object MainPanel : SimplePanel() {
   val buttonPadding = 5.px
   val panel = SimplePanel()
@@ -73,6 +74,7 @@ object MainPanel : SimplePanel() {
     }
   }
 
+  /** Draws [slide], with its header, in place of the slide shown. */
   fun refresh(slide: SlideData) = panel.displaySlide(slide)
 }
 

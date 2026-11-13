@@ -35,6 +35,10 @@ internal class LoginPrompt(
   }
 }
 
+/**
+ * The page's KVision security manager: a 401 calls [login], which shows the sign-in dialog once, with the server's
+ * greeting and domain, and parks for good (see [LoginPrompt]).
+ */
 object Security : SecurityMgr() {
   /** Why the last sign-in was refused (from the `?error=` redirect), or null. */
   val signInError = ObservableValue<SignInRefusal?>(null)

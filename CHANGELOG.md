@@ -6,6 +6,16 @@ All notable changes to History Walk are recorded here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- **Fixes from Codacy's analysis**, none of which a teacher or a student would notice:
+  - Every public class and function has a KDoc comment; 164 had none.
+  - The sign-in dialog's fetch of its title and domain lets a coroutine's cancellation through rather than taking it
+    for a failed fetch.
+  - A setting missing from `application.yaml` is found with `propertyOrNull`, not by catching every `Throwable`.
+  - The webpack and Karma config fragments declare the `config` global that Kotlin/JS defines for them, which ESLint
+    took for an undefined variable.
+
 ## [1.3.1] - 2026-11-13
 
 One change to the page, which stops checking for a new version while nobody is using it (#42), and a correction to

@@ -7,6 +7,10 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseContextualSerialization
 import kotlin.math.abs
 
+/**
+ * The signed-in user as the page's header shows them: name, address, Google picture (if any), and [role], which is a
+ * student's for a teacher while teachers see the student view.
+ */
 @Serializable
 data class UserInfo(
   val fullName: String,
@@ -15,6 +19,10 @@ data class UserInfo(
   val role: Role = Role.STUDENT,
 )
 
+/**
+ * A slide as the page draws it: its content (HTML), its [choices], and its ancestors ([parentTitles], the root first),
+ * with the user's decision count and streak of correct decisions and the settings that shape the page.
+ */
 @Serializable
 data class SlideData(
   val pathName: String,
@@ -44,12 +52,17 @@ data class SlideData(
   }
 }
 
+/** A slide's path name and title, as a go-back button shows an ancestor and as the target of a go-back. */
 @Serializable
 data class ParentTitle(
   val pathName: String,
   val title: String,
 )
 
+/**
+ * A choice on a slide: its text and the slide it leads to, whether that is a wrong turn ([deadEnd]), the go-back
+ * [offset] (0 for a forward choice, -n for the n-th ancestor), and whether the user has already made it.
+ */
 @Serializable
 data class SlideChoice(
   val choiceText: String,
@@ -60,6 +73,10 @@ data class SlideChoice(
   val alreadyVisited: Boolean,
 )
 
+/**
+ * A move as makeChoice answers it, with its [reason]: the one recorded if the user already made the move, "Advance"
+ * for a choice that moves on without one, or empty when the page must ask for one.
+ */
 @Serializable
 data class UserChoice(
   val fromPathName: String,

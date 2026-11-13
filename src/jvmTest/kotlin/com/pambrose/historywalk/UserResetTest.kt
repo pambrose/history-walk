@@ -138,6 +138,7 @@ class UserResetTest : StringSpec() {
       )
     }
 
+  /** The local part of the one address the spec's routes count as a teacher's. */
   companion object {
     const val TEACHER = "mrreset"
   }

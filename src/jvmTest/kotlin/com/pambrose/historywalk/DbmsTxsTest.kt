@@ -23,6 +23,12 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.sql.SQLException
 import java.util.UUID
 
+/**
+ * The walk's queries against a real database (a [TestPostgres], so Docker): a user's current slide (the root for a new
+ * user or a path the deck no longer has), decision counts and the correct-decision streak, deleting one user's choices,
+ * a move recorded only once, the slide data the client gets, and the summaries, reasons, and success list, which leave
+ * teachers out.
+ */
 class DbmsTxsTest : StringSpec() {
   private lateinit var db: TestPostgres
 

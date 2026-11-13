@@ -14,6 +14,11 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
 
+/**
+ * The server's answer to a page's version check: no alert for a page on the server's `apiVersion`, else a dialog with a
+ * reload link that keeps the first warning's time, then, once the warning interval has passed, a countdown before the
+ * page reloads itself; and both the check and its answer survive the trip as JSON.
+ */
 class ServerVersionCheckTest : StringSpec() {
   private val now = Instant.parse("2026-11-01T10:00:00Z")
   private val warning = 60.seconds

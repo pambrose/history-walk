@@ -25,6 +25,12 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Instant
 
+/**
+ * Which sessions are trusted: a session is signed out once its user is deleted or taken off the teacher list, after 12
+ * hours, or when its version differs from the stored one. The cookie payload leaves out version 0, so one written
+ * before versions reads as 0; a tampered or password-era cookie is ignored, and a production cookie carries the
+ * `__Host-` prefix, its flags, and a 12-hour max age.
+ */
 class UserSessionTest : StringSpec() {
   private val student = UUID.randomUUID()
   private val teacher = UUID.randomUUID()

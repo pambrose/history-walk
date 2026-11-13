@@ -1,3 +1,4 @@
+/* global config -- the webpack configuration Kotlin/JS defines in the file it pastes this one into */
 if (config.devServer) {
   const target = 'http://localhost:8080';
   config.devServer.proxy = [

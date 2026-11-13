@@ -16,6 +16,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.w3c.dom.HTMLFormElement
 
+/** The client's shared helpers: the RPC wrapper [withAuth], the failure messages and toasts, and button styling. */
 object ClientUtils {
   // What a student is told when something fails; the page stays as it was, so trying again is safe
   const val PAGE_NOT_LOADED = "Something went wrong loading the page. Please reload it."
@@ -25,10 +26,12 @@ object ClientUtils {
   /** The page's one toast container, shared by the error toasts and the version check's countdown. */
   val toastContainer by lazy { ToastContainer(BOTTOMRIGHT) }
 
+  /** Shows the button's text as written, with no CSS text transform. */
   fun Button.lowercase() {
     textTransform = TextTransform.NONE
   }
 
+  /** Sets the top and bottom padding to [size]. */
   fun StyledComponent.verticalPadding(size: CssSize) {
     paddingTop = size
     paddingBottom = size
@@ -58,6 +61,7 @@ object ClientUtils {
         }
       }.getOrThrow()
 
+  /** Shows [message] in a red toast in [toastContainer]. */
   fun showErrorToast(message: String) =
     toastContainer.showToast(message, color = BsColor.DANGEREMPHASIS, bgColor = BsBgColor.DANGERSUBTLE)
 

@@ -6,6 +6,10 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.string.shouldMatch
 
+/**
+ * The PKCE challenge matches RFC 7636's example, and a verifier is 43 URL-safe characters that the same secret and key
+ * always give, another secret or key never does, and that is not the secret itself.
+ */
 class PkceTest : StringSpec() {
   private val key = ByteArray(32) { 3 }
 

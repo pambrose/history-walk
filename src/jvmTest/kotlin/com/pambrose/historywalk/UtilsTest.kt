@@ -9,6 +9,10 @@ import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
 import java.util.UUID
 
+/**
+ * Slide text renders from markdown to HTML with its common indent removed, passing HTML through and keeping quotes,
+ * and a UUID string is parsed, or refused when malformed.
+ */
 class UtilsTest : StringSpec() {
   init {
     "markdown is rendered to HTML" {

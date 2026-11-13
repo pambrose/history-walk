@@ -1,3 +1,4 @@
+/* global config -- the webpack configuration Kotlin/JS defines in the file it pastes this one into */
 config.resolve.modules.push("../../processedResources/js/main");
 
 if (config.devServer) {

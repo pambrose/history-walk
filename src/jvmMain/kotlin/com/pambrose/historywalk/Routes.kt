@@ -51,6 +51,7 @@ import java.time.temporal.ChronoUnit
 import java.util.UUID
 import kotlin.text.Charsets.UTF_8
 
+/** The server's routes ([appRoutes]) and the caching of its static content ([staticContent]). */
 object Routes {
   /**
    * The browser checks with the server each time it uses what carries this, and a shared cache such as Cloudflare keeps
@@ -81,6 +82,7 @@ object Routes {
     staticResources("/static", "static") { revalidatedEachTime() }
   }
 
+  /** Routes every request through [appRoutes], whose defaults read the database and the environment. */
   fun Application.assignRoutes() {
     routing { appRoutes() }
   }

@@ -115,11 +115,13 @@ private class FakeGoogle(
   suspend fun tokenForm(): Parameters = String(tokenRequests().single().body.toByteArray()).parseUrlEncodedParameters()
 }
 
-// The OAuth callback end to end: a real /auth/login, then Google's redirect back to /auth/callback, with a MockEngine
-// in place of Google's token and userinfo endpoints. The state, and the state cookie, come from the login's response
-// and go back as a browser sends them; only the replay specs, which play someone without the browser, build a cookie.
-// Provisioning (User.upsertFromGoogle) is mocked, so no database is needed; whether a browser is signed in is asked of
-// the app.
+/**
+ * The OAuth callback end to end: a real /auth/login, then Google's redirect back to /auth/callback, with a MockEngine
+ * in place of Google's token and userinfo endpoints. The state, and the state cookie, come from the login's response
+ * and go back as a browser sends them; only the replay specs, which play someone without the browser, build a cookie.
+ * Provisioning (User.upsertFromGoogle) is mocked, so no database is needed; whether a browser is signed in is asked of
+ * the app.
+ */
 class AuthCallbackTest : StringSpec() {
   private val student = UUID.randomUUID()
 

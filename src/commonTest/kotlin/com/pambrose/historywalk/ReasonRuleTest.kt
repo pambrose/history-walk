@@ -8,6 +8,7 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
 
+/** Checks [ReasonRule]: how words are counted, and the minimum word count and maximum length a reason must meet. */
 class ReasonRuleTest : StringSpec() {
   init {
     "nothing has no words" {

@@ -10,6 +10,11 @@ import io.kotest.matchers.string.shouldNotContain
 import io.kotest.matchers.string.shouldStartWith
 import org.postgresql.Driver
 
+/**
+ * Through pgjdbc's own URL parsing, a connection is unencrypted unless its URL sets an `sslmode`; and `DBMS_URL` must
+ * start with `jdbc:postgresql:`, so a pgjdbc-ng `jdbc:pgsql:` URL or any other is refused at startup, without the
+ * message repeating the URL.
+ */
 class DbmsConnectionTest : StringSpec() {
   // The settings pgjdbc connects with: Hikari hands the driver the URL and its data source properties, and the URL's
   // parameters win over the properties.

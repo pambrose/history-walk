@@ -40,13 +40,17 @@ repositories {
     mavenCentral()
 }
 
-// The build date and time come from ValueSources, which the configuration cache re-reads on every run: when a value
-// differs, the cache is invalidated and the tasks that read it re-run.
+/**
+ * Today's date (MM/dd/yyyy), a stamped build's RELEASE_DATE. The build date and time come from ValueSources, which the
+ * configuration cache re-reads on every run: when a value differs, the cache is invalidated and the tasks that read it
+ * re-run.
+ */
 abstract class CurrentDateValueSource : ValueSource<String, ValueSourceParameters.None> {
     override fun obtain(): String =
         LocalDate.now().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"))
 }
 
+/** The current time in epoch milliseconds, a stamped build's BUILD_TIME, re-read like [CurrentDateValueSource]. */
 abstract class BuildTimeMillisValueSource : ValueSource<Long, ValueSourceParameters.None> {
     override fun obtain(): Long = System.currentTimeMillis()
 }

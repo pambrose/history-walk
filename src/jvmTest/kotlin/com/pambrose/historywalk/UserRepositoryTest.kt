@@ -25,6 +25,12 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.sql.SQLException
 import java.util.*
 
+/**
+ * The users table against a real database (a [TestPostgres], so Docker): every migration applied, a sign-in creating
+ * a user or updating the same row whatever the address's case, a mixed-case address refused by the schema, the role
+ * taken from the live teacher list and the stored roles brought into line with it, the session version a sign-out
+ * moves on and a sign-in keeps, and progress views that leave teachers out.
+ */
 class UserRepositoryTest : StringSpec() {
   private lateinit var db: TestPostgres
 
