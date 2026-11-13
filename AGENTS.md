@@ -264,10 +264,12 @@ floor of its own (`VersionCheckState.MIN_CHECK_INTERVAL`, 5 seconds), whatever t
 `App.start()`) sends its `BuildConfig` versions to `IContentService.versionCheck` every
 `CLIENT_VERSION_CHECK_INTERVAL_SECS` (60) while someone is using the page. `ServerVersionCheck` compares only
 `apiVersion` (gradle.properties): on a mismatch the page shows a dialog with a reload link, then,
-`CLIENT_RELOAD_WARNING_INTERVAL_SECS` (60) after the first warning, a countdown toast before it reloads itself. Increment `apiVersion` only when the RPC interfaces change, or when
-a release must replace pages already open; a release that leaves it alone reaches each page at its next load. The check
-goes around `withAuth`, so a signed-out page is left to the sign-in dialog. The page's decisions are
-`VersionCheckState`'s (no DOM; `VersionCheckLoop` runs them with the RPC, the UI, and the flags passed in):
+`CLIENT_RELOAD_WARNING_INTERVAL_SECS` (60) after the first warning, a countdown toast before it reloads itself.
+Increment `apiVersion` only when the RPC interfaces change, or when a release must replace pages already open; a release
+that leaves it alone reaches each page at its next load. The check goes around `withAuth`, so a signed-out page is left
+to the sign-in dialog. The page's decisions are `VersionCheckState`'s (no DOM; `VersionCheckLoop` runs them with the
+RPC, the UI, and the flags passed in):
+
 - A check due while nobody is using the page waits until someone does, then runs at once (`PageActivity`, which
   `listenForActivity` feeds from the window). The page is in use while it is visible and someone has clicked, tapped,
   typed, scrolled, or moved the mouse in it, or brought it back into view, within `PageActivity.IDLE_AFTER` (5
@@ -349,7 +351,7 @@ private.
 - The version check: `VersionCheckStateTest` (the pure decisions: when the dialog is held back, when the server's
   warning stamp is kept, the reload put off while a reason is written, the reload remembered in `sessionStorage`),
   `VersionCheckLoopTest` (the loop with a fake server and UI, on Kotest's virtual clock, `coroutineTestScope`: the
-  checks stop while the page is not in use and come back at once when it is, never closer than the interval),
+  checks pause while the page is not in use and resume at once when it is, at least an interval apart),
   `PageActivityTest` (in use until `IDLE_AFTER` without activity, a hidden page idle, the wait for use, and the events
   that count, on an element of its own rather than the window, with a `TestTimeSource`), and
   `KVisionVersionCheckUiTest` (the real dialog, gone from the DOM and KVision's modal list once closed).

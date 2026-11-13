@@ -26,6 +26,11 @@ import kotlin.time.Duration.Companion.seconds
 object ClientVersionCheck {
   private val contentService = getService<IContentService>()
 
+  /**
+   * Starts listening for someone using the page, then runs the version check until the page reloads itself; it
+   * returns only then. `App.start()` launches it in a scope of its own, so nothing that goes wrong in the walk can
+   * stop it.
+   */
   suspend fun checkClientVersion() {
     val activity = PageActivity()
     listenForActivity(activity)
