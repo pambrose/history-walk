@@ -4,11 +4,13 @@ import io.kotest.assertions.fail
 import io.kotest.core.spec.style.StringSpec
 import java.io.File
 
-// A student's progress is stored by path name, the chain of slide titles from the root (users.last_path_name,
-// user_choices.from_path_name and to_path_name). A title edit or a moved slide changes the path names at and below it,
-// and a student saved there silently resumes at the root slide. This spec pins every path name a student can reach in
-// each deck to a snapshot, src/jvmTest/resources/slide-paths/<deck>.txt (one sorted path per line), so such a change
-// fails CI and has to be made deliberately. Run with -PupdateSlidePaths=true, the spec rewrites the snapshots instead.
+/**
+ * A student's progress is stored by path name, the chain of slide titles from the root (users.last_path_name,
+ * user_choices.from_path_name and to_path_name). A title edit or a moved slide changes the path names at and below it,
+ * and a student saved there silently resumes at the root slide. This spec pins every path name a student can reach in
+ * each deck to a snapshot, `src/jvmTest/resources/slide-paths/<deck>.txt` (one sorted path per line), so such a change
+ * fails CI and has to be made deliberately. Run with -PupdateSlidePaths=true, the spec rewrites the snapshots instead.
+ */
 class SlidePathsTest : StringSpec() {
   init {
     deckNames.forEach { name ->
@@ -19,6 +21,7 @@ class SlidePathsTest : StringSpec() {
     }
   }
 
+  /** The decks' snapshot files, and the checking and rewriting of them, with a failure that names what changed. */
   companion object {
     // The SLIDES_VARIABLE_NAME values, which also name the snapshot files
     private val deckNames = listOf("jermain", "moses")

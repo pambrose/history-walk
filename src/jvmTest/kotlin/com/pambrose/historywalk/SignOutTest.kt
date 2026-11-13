@@ -28,8 +28,11 @@ import io.ktor.server.routing.routing
 import io.ktor.server.testing.testApplication
 import java.util.UUID
 
-// Signing out against a real database: POST /logout moves the user's session version on, so the cookie it came with,
-// any copy of it, and the user's sessions in other browsers no longer sign anyone in
+/**
+ * Signing out against a real database (a [TestPostgres], so Docker): POST /logout moves the user's session version on,
+ * so the cookie it came with, any copy of it, and the user's sessions in other browsers no longer sign anyone in. Only
+ * a trusted session moves the version on, and other users stay signed in.
+ */
 class SignOutTest : StringSpec() {
   private lateinit var db: TestPostgres
 

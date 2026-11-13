@@ -7,6 +7,12 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldNotContain
 import io.kotest.matchers.string.shouldStartWith
 
+/**
+ * A platform's `DATABASE_URL` becomes a pgjdbc URL, a decoded user name, and a decoded password, with the URL's query
+ * string kept percent-encoded, and `DBMS_NAME` and `DBMS_QUERY_PATH`, when not blank, in place of the URL's database
+ * and query string. The description leaves out the password and the query string, and a URL that does not parse or
+ * names no database is refused without echoing the password.
+ */
 class ContainerDatabaseUrlTest : StringSpec() {
   init {
     "a container platform's DATABASE_URL becomes a pgjdbc URL, a user name, and a password" {

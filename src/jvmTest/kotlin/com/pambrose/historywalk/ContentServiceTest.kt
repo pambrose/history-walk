@@ -36,8 +36,14 @@ import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
-// The RPC service against a real database, with the signed-in user's id supplied by a mocked ApplicationCall. The
-// choices sent are the ones the client builds from SlideData, unless a test is replaying a forged call.
+/**
+ * The RPC service against a real database (a [TestPostgres], so Docker), with the signed-in user's id supplied by a
+ * mocked ApplicationCall. The choices sent are the ones the client builds from SlideData, unless a test is replaying a
+ * forged call. Moves are checked against the deck and the user's stored slide: a move from elsewhere, a choice not
+ * offered, a go-back to a slide not behind the user, or a reason too short or too long is refused, a repeated move
+ * changes nothing, and a failure of the server's own reaches the browser without its message. While teachers see the
+ * student view, a teacher is reported as a student and their moves are counted; a student's are never marked.
+ */
 class ContentServiceTest : StringSpec() {
   private lateinit var db: TestPostgres
   private lateinit var savedSlides: SlideDeck

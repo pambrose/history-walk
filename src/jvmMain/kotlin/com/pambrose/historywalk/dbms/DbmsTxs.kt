@@ -15,9 +15,17 @@ import org.jetbrains.exposed.v1.core.*
 import org.jetbrains.exposed.v1.jdbc.*
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
+/**
+ * The walk's queries: a user's slide as the page draws it, their place and moves, and the class pages' reads of the
+ * progress views.
+ */
 object DbmsTxs {
   private val logger = KotlinLogging.logger {}
 
+  /**
+   * [slide] as the user [uuid] sees it: its content rendered to HTML, each choice marked when the user has already
+   * taken it, their decision count and streak of correct decisions, and the display settings from the environment.
+   */
   fun slideData(
     uuid: String,
     slide: Slide,
@@ -71,6 +79,10 @@ object DbmsTxs {
       }
   }
 
+  /**
+   * Puts the user [uuid] on the slide at [pathName]. Runs in the caller's transaction, having none of its own, and
+   * fails when no user has [uuid].
+   */
   fun updateLastSlide(
     uuid: String,
     pathName: String,
@@ -84,6 +96,7 @@ object DbmsTxs {
       }
   }
 
+  /** Deletes every move of the user [uuid], for the reset. Runs in the caller's transaction, having none of its own. */
   fun deleteChoices(uuid: String) {
     UserChoiceTable
       .deleteWhere { UserChoiceTable.userUuidRef eq uuid.toUuid() }
@@ -92,6 +105,7 @@ object DbmsTxs {
       }
   }
 
+  /** The number of moves the user [uuid] has recorded, each with its reason; a "Continue" is never recorded. */
   fun decisionCount(uuid: String) =
     transaction {
       with(UserChoiceTable) {
@@ -103,6 +117,10 @@ object DbmsTxs {
       }
     }
 
+  /**
+   * The user [uuid]'s consecutive correct decisions: the moves recorded since their last wrong turn (a move marked
+   * dead end), or every move when they have made none.
+   */
   fun correctDecisionStreak(uuid: String) =
     transaction {
       val wrongDecisions =
@@ -141,6 +159,7 @@ object DbmsTxs {
       }
     }
 
+  /** Every row of [UserReasonsView], for the reasons page: each counted move, its reason, and who made it. */
   fun allUserReasons() =
     transaction {
       with(UserReasonsView) {
@@ -161,6 +180,7 @@ object DbmsTxs {
       }
     }
 
+  /** Every row of [UserDecisionCountsView], for the summary page: each user, their slide, and their counted moves. */
   fun allUserSummaries() =
     transaction {
       with(UserDecisionCountsView) {
@@ -177,6 +197,10 @@ object DbmsTxs {
       }
     }
 
+  /**
+   * The counted moves that reached a slide titled [successSlideTitle], one per move, so a user may appear more than
+   * once. The summary page's Success column takes their ids.
+   */
   fun allSuccessUsers(successSlideTitle: String) =
     transaction {
       with(UserVisitsView) {
@@ -191,11 +215,13 @@ object DbmsTxs {
       }
     }
 
+  /** A row of [UserVisitsView]: the mover's [id] and the title of the slide a counted move reached ([toSlide]). */
   data class UserVisits(
     val id: String,
     val toSlide: String,
   )
 
+  /** A row of [UserDecisionCountsView]: a user the summary page lists, the slide they stand on, their counted moves. */
   data class UserSummary(
     val id: String,
     val fullName: String,
@@ -204,6 +230,7 @@ object DbmsTxs {
     val decisionCount: Int,
   )
 
+  /** A row of [UserReasonsView]: a counted move, the reason given for it, and who made it. */
   data class UserReason(
     val id: String,
     val fullName: String,

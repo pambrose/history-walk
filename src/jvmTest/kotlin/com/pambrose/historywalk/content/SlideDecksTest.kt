@@ -6,8 +6,10 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.types.shouldBeSameInstanceAs
 
-// SLIDES_VARIABLE_NAME picks the walk a server serves; a value that names no deck must stop the server, not fall
-// through to the other walk
+/**
+ * SLIDES_VARIABLE_NAME picks the walk a server serves; a value that names no deck must stop the server, not fall
+ * through to the other walk. `jermain` and `moses` are read trimmed and in any case, and unset or blank is `jermain`.
+ */
 class SlideDecksTest : StringSpec() {
   init {
     "jermain selects the Jermain Loguen deck" {

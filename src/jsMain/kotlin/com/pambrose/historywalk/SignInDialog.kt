@@ -14,6 +14,7 @@ import io.kvision.modal.Dialog
 import io.kvision.state.ObservableValue
 import io.kvision.state.bind
 import kotlinx.browser.window
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.await
 
 /**
@@ -31,6 +32,8 @@ private suspend fun fetchText(path: String): String? =
       .takeIf { it.isNotEmpty() }
       else
       null
+  } catch (e: CancellationException) {
+    throw e
   } catch (e: Throwable) {
     console.log("Could not fetch /$path: $e")
     null

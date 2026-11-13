@@ -46,6 +46,11 @@ object ServerVersionCheck {
 
   internal const val TITLE = "Application Update"
 
+  /**
+   * The answer to a page's version check ([client]): nothing to do while its `apiVersion` matches [serverApiVersion];
+   * otherwise the reload dialog until [warningInterval] has passed since the page first showed it (the stamp it sends
+   * back, or [now] when it sends none), then the countdown toast before the page reloads itself.
+   */
   fun checkServerVersion(
     client: VersionCheckInfo,
     serverApiVersion: String = BuildConfig.API_VERSION,

@@ -33,6 +33,7 @@ data class UserSession(
   /** Whether this sign-in is older than [LIFETIME] at [now]. */
   fun isExpiredAt(now: Instant): Boolean = now - Instant.fromEpochMilliseconds(created) > LIFETIME
 
+  /** Holds [LIFETIME], which the cookie's max age and [SessionValidation] both use. */
   companion object {
     /**
      * How long a sign-in lasts: a school day, so a session left open on a shared lab computer is gone by the next

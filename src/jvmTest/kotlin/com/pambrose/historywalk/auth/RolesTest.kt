@@ -6,6 +6,10 @@ import com.pambrose.historywalk.auth.Roles.roleFor
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 
+/**
+ * The role rule: a listed address is a teacher (checked first, ignoring case), else a local part starting with two
+ * digits is a student, else refused; and `TEACHER_EMAILS` parses to a clean, lowercase set, empty when unset.
+ */
 class RolesTest : StringSpec() {
   init {
     "a listed teacher is a teacher" {

@@ -35,6 +35,13 @@ import io.mockk.mockk
 import io.mockk.verify
 import java.util.UUID
 
+/**
+ * The sign-in routes and the access map, with the user lookups passed in rather than a database: sign-in goes to
+ * Google with the school hint and PKCE, a failed or stray callback clears the state cookie and signs no one in, an RPC
+ * without a session is a 401, the greeting, the domain, and the images are open, a student is refused every teacher
+ * page, a POST logout ends the session where a GET does not, and a finished sign-in admits a student and refuses an
+ * account outside the school.
+ */
 class AuthRoutesTest : StringSpec() {
   private val student = UUID.randomUUID()
   private val teacher = UUID.randomUUID()

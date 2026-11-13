@@ -4,6 +4,10 @@ import com.pambrose.historywalk.SignInError.Companion.refusalEmailOrNull
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 
+/**
+ * The address a refusal shows comes through only when it looks like an address: text with spaces, no at sign, an
+ * over-long value, or a newline or other control character is dropped.
+ */
 class SignInErrorTest : StringSpec() {
   init {
     "normal addresses pass" {

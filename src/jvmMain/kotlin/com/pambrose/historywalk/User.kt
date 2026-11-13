@@ -22,9 +22,14 @@ import java.util.*
  * nothing holds a user in memory between requests.
  */
 class User private constructor() {
+  /** The queries themselves: [User] has no instances. */
   companion object {
     private val logger = KotlinLogging.logger {}
 
+    /**
+     * Records a Google sign-in for [email], stored lowercase, and returns the user's id. A known address has its name,
+     * picture, role, and sign-in time updated, its session version left alone; a new one starts at the first slide.
+     */
     fun upsertFromGoogle(
       email: String,
       fullName: String,
@@ -66,6 +71,7 @@ class User private constructor() {
       }
     }
 
+    /** The stored, lowercased address of [uuid], or null when there is no such user. The role rule reads it. */
     fun emailForUuid(uuid: UUID): String? =
       transaction {
         with(UsersTable) {
@@ -141,6 +147,10 @@ class User private constructor() {
         }
       }
 
+    /**
+     * The slide in [slideDeck] at [uuid]'s stored place, or the deck's root slide when that path name no longer finds
+     * one. Fails when there is no such user.
+     */
     fun findCurrentSlideForUser(
       uuid: String,
       slideDeck: SlideDeck,

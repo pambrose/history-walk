@@ -12,6 +12,12 @@ import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.types.shouldBeSameInstanceAs
 import io.kotest.matchers.types.shouldNotBeSameInstanceAs
 
+/**
+ * The slide-deck DSL: path names, finding a slide by path name (an unknown one falls back to the root) or by id and
+ * instance, copies with their own titles and choices, go-backs, and [Slide.leadsToDeadEnd]; and the decks it refuses,
+ * with no root or two, no success slide, a success slide with choices, an empty title or choice text, or two choices
+ * of a slide with the same text or leading to the same title.
+ */
 class SlideDeckTest : StringSpec() {
   // Start -> Win (success) or Lose (dead end); Orphan is never chosen
   private fun simpleDeck() =

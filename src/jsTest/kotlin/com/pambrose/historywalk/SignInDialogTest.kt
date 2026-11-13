@@ -12,6 +12,7 @@ import org.w3c.dom.events.KeyboardEvent
 import org.w3c.dom.events.KeyboardEventInit
 import kotlin.time.Duration.Companion.milliseconds
 
+/** Checks [SignInDialog]: its sign-in link, title, domain, and refusal message, and that it cannot be dismissed. */
 class SignInDialogTest : StringSpec() {
   private val opened = mutableListOf<SignInDialog>()
 

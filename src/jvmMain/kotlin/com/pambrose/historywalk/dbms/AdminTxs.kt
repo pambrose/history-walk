@@ -31,6 +31,10 @@ object AdminTxs {
       }
     }
 
+  /**
+   * Sets the switch [teachersSeeStudentView] reads: the student view when [studentView] is true, else the teacher view.
+   * The admin page's view button posts the view it names, which lands here.
+   */
   fun setTeachersSeeStudentView(studentView: Boolean) {
     transaction {
       with(SettingsTable) {

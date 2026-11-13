@@ -48,6 +48,7 @@ class SignedNonceManager(
   // URL-safe, as the state travels in URLs, and free of dots, which the state is split on
   private fun sign(unsigned: String): String = hmacSha256Base64Url(key, unsigned)
 
+  /** Holds [instance], the manager Google sign-in uses unless a test passes its own. */
   companion object {
     /** The server's instance, keyed from `SESSION_SECRET`. */
     val instance: SignedNonceManager by lazy { SignedNonceManager(SessionConfig.oauthStateKey) }

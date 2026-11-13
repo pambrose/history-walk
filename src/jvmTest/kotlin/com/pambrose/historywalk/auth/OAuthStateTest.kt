@@ -33,6 +33,13 @@ import kotlinx.coroutines.runBlocking
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Instant
 
+/**
+ * The signed `state` and the `oauth_state` cookie: a state verifies only unexpired, untampered, and under its own key,
+ * and a cookie gives back its sign-in's secret only when bound to that state under the server's key. Through the
+ * provider's hooks, the browser that started a sign-in passes `verifyState` with a PKCE verifier derived from the
+ * cookie's secret, while a stolen callback URL replayed with no cookie, the bare state, another sign-in's cookie, or a
+ * made-up one is refused before any verifier is made.
+ */
 class OAuthStateTest : StringSpec() {
   private val key = ByteArray(32) { 7 }
   private val pkceKey = ByteArray(32) { 3 }

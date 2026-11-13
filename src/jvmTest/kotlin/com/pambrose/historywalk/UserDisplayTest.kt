@@ -3,6 +3,7 @@ package com.pambrose.historywalk
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 
+/** Initials are uppercase, from a name's first and last words, or from the email when the name is blank. */
 class UserDisplayTest : StringSpec() {
   init {
     "two words give two initials" { initialsOf("Maya Smith", "27msmith@athenian.org") shouldBe "MS" }

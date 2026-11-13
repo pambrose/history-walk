@@ -14,6 +14,7 @@ import com.pambrose.historywalk.dbms.DbmsTxs.allUserSummaries
 import kotlinx.html.*
 import kotlinx.html.stream.createHTML
 
+/** The pages the server renders for teachers: the admin page, class summary, student reasons, and slide list. */
 object Pages {
   // The admin page's switch form: its one field names the view to set
   const val VIEW_FIELD = "view"
@@ -89,6 +90,10 @@ object Pages {
       }
   }
 
+  /**
+   * The student reasons page: every reason given, grouped by user, each with its move and choice. It reads the progress
+   * views, so it holds students' reasons and the teachers' ones counted in the student view.
+   */
   fun displayUserReasons() =
     createHTML()
       .html {
@@ -156,6 +161,11 @@ object Pages {
         }
       }
 
+  /**
+   * The class summary page: each user's name, address, decision count, whether they reached the success slide, and
+   * last slide, fewest decisions first. It reads the progress views, so a teacher appears only with moves counted in
+   * the student view, and only those count.
+   */
   fun displayUserSummary() =
     createHTML()
       .html {
@@ -220,6 +230,10 @@ object Pages {
         }
       }
 
+  /**
+   * The slide list (`/slides`, served only with `ALLOW_SLIDE_ACCESS`): each slide id with its title and a link to each
+   * place the slide appears in the deck, which moves the teacher's walk there.
+   */
   fun displayAllSlides() =
     createHTML()
       .html {

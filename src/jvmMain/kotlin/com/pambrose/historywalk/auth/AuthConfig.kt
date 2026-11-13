@@ -62,6 +62,7 @@ object SessionConfig {
   val stateCookieKey: ByteArray by lazy { deriveKey(secret, "state-cookie") }
   val pkceKey: ByteArray by lazy { deriveKey(secret, "pkce") }
 
+  /** Encrypts and signs the session cookie under [encryptionKey] and [signKey], with a fresh random IV each time. */
   fun encryptTransformer(): SessionTransportTransformerEncrypt =
     SessionTransportTransformerEncrypt(
       encryptionKey,

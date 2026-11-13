@@ -1,3 +1,4 @@
+/* global config -- the Karma configuration Kotlin/JS defines in the file it pastes this one into */
 // The Kotlin/JS plugin adds this file to the Karma config that jsBrowserTest runs (the client specs in headless Chrome).
 //
 // Kotest runs every spec inside one Mocha test and reports the results only once all of them have run, so Karma hears

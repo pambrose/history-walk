@@ -38,7 +38,11 @@ import io.ktor.server.testing.testApplication
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.util.UUID
 
-// The teacher pages, rendered from a real database, and the teacher routes that serve them
+/**
+ * The teacher pages, rendered from a real database (a [TestPostgres], so Docker), and the teacher routes that serve
+ * them. The summary and reasons pages list students only, in order, with a student's name or reason arriving as text,
+ * never markup, and carry their titles; the slides page links each slide instance, and a link moves the teacher there.
+ */
 class PagesTest : StringSpec() {
   private lateinit var db: TestPostgres
   private lateinit var savedSlides: SlideDeck
@@ -301,6 +305,7 @@ class PagesTest : StringSpec() {
     )
   }
 
+  /** The spec's deck and teacher, and the readers of the pages' HTML, which AdminTest uses too. */
   companion object {
     const val TEACHER = "mrpages"
     const val TOWN = "/Town"
@@ -333,7 +338,10 @@ class PagesTest : StringSpec() {
 
     private fun String.cellText() = replace(Regex("<[^>]+>"), "").replace(Regex("\\s+"), " ").trim().decoded()
 
-    // The text of each table row's cells, header rows included; rows without cells are dropped
+    /**
+     * The text of each table row's cells, header rows included; rows without cells are dropped. A cell's text has its
+     * tags removed, its whitespace collapsed, and its entities decoded.
+     */
     fun String.tableRows(): List<List<String>> =
       Regex("<tr[^>]*>(.*?)</tr>", dotAll)
         .findAll(this)
@@ -345,15 +353,16 @@ class PagesTest : StringSpec() {
         }.filter { it.isNotEmpty() }
         .toList()
 
-    // Each "User: <email>" heading on the reasons page, with the rows of the table that follows it
+    /** Each `User: <email>` heading on the reasons page, with the rows of the table that follows it. */
     fun String.reasonsByUser(): List<Pair<String, List<List<String>>>> =
       split(Regex("<p>\\s*<b>\\s*User:"))
         .drop(1)
         .map { section -> section.substringBefore("</p>").cellText() to section.tableRows() }
 
-    // The page's <title>, and the text of its first <h2>; null when it has none
+    /** The text of the page's `<title>`; null when it has none. */
     fun String.pageTitle(): String? = firstMatch("<title>(.*?)</title>")
 
+    /** The text of the page's first `<h2>`; null when it has none. */
     fun String.heading(): String? = firstMatch("<h2[^>]*>(.*?)</h2>")
 
     private fun String.firstMatch(pattern: String): String? {
@@ -361,7 +370,7 @@ class PagesTest : StringSpec() {
       return match.groupValues[1].cellText()
     }
 
-    // Each link's target and text, in page order
+    /** Each link's target and text, in page order. */
     fun String.links(): List<Pair<String, String>> =
       Regex("""<a href="([^"]+)">(.*?)</a>""", dotAll)
         .findAll(this)

@@ -24,10 +24,12 @@ enum class SignInError(
     }
   }
 
+  /** The refusal redirect's query parameters ([ERROR_PARAM], [EMAIL_PARAM]) and how the page reads them. */
   companion object {
     const val ERROR_PARAM = "error"
     const val EMAIL_PARAM = "email"
 
+    /** The error whose [SignInError.code] is [code], or null when [code] is missing or names none. */
     fun fromCode(code: String?): SignInError? = entries.firstOrNull { it.code == code }
 
     private const val MAX_EMAIL_LENGTH = 254
@@ -51,5 +53,6 @@ data class SignInRefusal(
   val error: SignInError,
   val email: String?,
 ) {
+  /** What the sign-in dialog says of this refusal, naming [domain], the school's domain as the server has it. */
   fun message(domain: String): String = error.message(email, domain)
 }

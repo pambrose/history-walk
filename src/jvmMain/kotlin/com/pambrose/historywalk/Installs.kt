@@ -22,6 +22,7 @@ import io.ktor.server.response.*
 import org.slf4j.event.Level
 import java.sql.SQLException
 
+/** The Ktor plugins the server runs with, installed at startup by [installs]. */
 object Installs {
   private val logger = KotlinLogging.logger {}
 
@@ -66,6 +67,10 @@ object Installs {
   // A year, the usual HSTS lifetime
   private const val HSTS_MAX_AGE_SECS = 31_536_000
 
+  /**
+   * Installs every plugin: compression, conditional and HEAD responses, the security headers, call logging of status,
+   * method, and path only, the user sessions, Google sign-in, and the status pages.
+   */
   fun Application.installs() {
     install(Compression)
     installConditionalHeaders()

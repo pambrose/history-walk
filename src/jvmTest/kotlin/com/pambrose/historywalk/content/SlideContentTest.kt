@@ -9,7 +9,12 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 
-// Checks the real decks the way a student walks them: from the root slide, through every choice (DeckWalk.kt)
+/**
+ * Checks the real decks the way a student walks them: from the root slide, through every choice (DeckWalk.kt). Each
+ * slide must be found again by its path name, be the parent of its choices, render, and show only images in the jar
+ * with alt text that describes them; each go-back must land on an ancestor (in Jermain's deck, the town the student is
+ * in), and every success slide must carry the deck's success title.
+ */
 class SlideContentTest : StringSpec() {
   private val decks = listOf("Jermain Loguen" to jermainLonguenSlides, "Moses" to mosesSlides)
 
@@ -88,6 +93,7 @@ class SlideContentTest : StringSpec() {
     }
   }
 
+  /** The patterns that find a slide's images and their alt text, and a slide's go-backs as the client gets them. */
   companion object {
     private val imagePattern = Regex("""/static/images/([^"'\s)]+)""")
 

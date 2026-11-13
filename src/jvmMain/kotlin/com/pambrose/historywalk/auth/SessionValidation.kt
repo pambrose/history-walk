@@ -28,6 +28,10 @@ data class SessionUser(
   val sessionVersion: Int = 0,
 )
 
+/**
+ * What [SessionValidation] reads: a user's address and session version ([findUser], the users table unless a test
+ * puts its own), and the teacher list the role rule takes ([teacherEmails]). [installUserSessions] sets both.
+ */
 class SessionValidationConfig {
   var findUser: (UUID) -> SessionUser? = { User.sessionUserFor(it) }
   var teacherEmails: () -> Set<String> = { SchoolConfig.teacherEmails }
