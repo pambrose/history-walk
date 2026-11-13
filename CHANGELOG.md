@@ -6,6 +6,11 @@ All notable changes to History Walk are recorded here. The format follows
 
 ## [Unreleased]
 
+## [1.3.1] - 2026-11-13
+
+One change to the page, which stops checking for a new version while nobody is using it (#42), and a correction to
+the guide. No new settings and no database changes; `apiVersion` is unchanged.
+
 ### Changed
 
 - **An open page checks for a new version only while someone is using it.** A page nobody has clicked, typed,
@@ -404,7 +409,8 @@ the original classroom app; [History](#history) at the end tells the story in or
   CI (#5, #7); five waves of fixes from a code review of 24 issues (#9–#12, #14); the admin page's student view
   (#13); `make docker-push` and version 1.1.0 (#16); and the documentation site (#17).
 
-[Unreleased]: https://github.com/pambrose/history-walk/compare/1.3.0...HEAD
+[Unreleased]: https://github.com/pambrose/history-walk/compare/1.3.1...HEAD
+[1.3.1]: https://github.com/pambrose/history-walk/compare/1.3.0...1.3.1
 [1.3.0]: https://github.com/pambrose/history-walk/compare/1.2.1...1.3.0
 [1.2.1]: https://github.com/pambrose/history-walk/compare/1.2.0...1.2.1
 [1.2.0]: https://github.com/pambrose/history-walk/compare/1.1.3...1.2.0
