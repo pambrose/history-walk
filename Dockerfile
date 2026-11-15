@@ -1,7 +1,7 @@
 # The fat jar is built outside Docker (make docker-build runs ./gradlew jar first), so the image holds only a JRE and that jar.
 # The base is pinned to its multi-arch (amd64 and arm64) index digest, so a commit always builds on the same JRE; the
 # tag is kept for readers. Dependabot (.github/dependabot.yml) opens a PR with the new digest when the tag moves.
-FROM eclipse-temurin:25-jre-alpine@sha256:56f273059de6b13a6b49fe0ded691ed2d0399bbee76156a8f2d385f7524a3d43
+FROM eclipse-temurin:25-jre-alpine@sha256:e1898fd6a11fc965a994d8ace186fd3585aeb636cf8f05f47a723fcfee0b0918
 LABEL maintainer="Paul Ambrose <pambrose@mac.com>"
 
 # The base image predates Alpine 3.24's libexpat 2.10.0-r0, which fixes four HIGH CVEs in the 2.9.0-r0 it ships
