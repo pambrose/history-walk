@@ -6,6 +6,11 @@ All notable changes to History Walk are recorded here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- **The Docker image no longer upgrades `libexpat` itself.** Its new base digest (#48) ships Alpine's libexpat
+  2.10.0-r0, which fixes the four HIGH CVEs the image's own upgrade was there for.
+
 ## [1.3.2] - 2026-11-13
 
 Fixes from Codacy's analysis (#44, #45): two corrections to the guide and code-level cleanups, with Flyway, Kotest, and

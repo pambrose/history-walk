@@ -4,11 +4,6 @@
 FROM eclipse-temurin:25-jre-alpine@sha256:e1898fd6a11fc965a994d8ace186fd3585aeb636cf8f05f47a723fcfee0b0918
 LABEL maintainer="Paul Ambrose <pambrose@mac.com>"
 
-# The base image predates Alpine 3.24's libexpat 2.10.0-r0, which fixes four HIGH CVEs in the 2.9.0-r0 it ships
-# (CVE-2026-113351, CVE-2026-115506, CVE-2026-117610 and CVE-2026-118370). Upgrade only that package, and fail the build
-# rather than ship an older one. Drop this once a new base digest carries the fix.
-RUN apk add --no-cache --upgrade 'libexpat>=2.10.0-r0'
-
 # Run as an unprivileged user rather than root, even inside the container. The user owns nothing it runs: /app and the
 # jar stay root's, readable by all, so code that got to run in the server could not rewrite the jar and outlive a restart.
 # The server writes nothing to disk; its log goes to stdout.
