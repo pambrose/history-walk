@@ -6,10 +6,21 @@ All notable changes to History Walk are recorded here. The format follows
 
 ## [Unreleased]
 
+## [1.3.3] - 2026-11-15
+
+A new Docker base image (#48), which carries the `libexpat` fix the image used to apply itself (#50), with Logback,
+the docs site's pymdown-extensions, and the CI actions updated (#49). No new settings and no database changes; `apiVersion` is unchanged.
+
 ### Changed
 
-- **The Docker image no longer upgrades `libexpat` itself.** Its new base digest (#48) ships Alpine's libexpat
-  2.10.0-r0, which fixes the four HIGH CVEs the image's own upgrade was there for.
+- **A new Docker base image.** The `eclipse-temurin:25-jre-alpine` digest moves from `56f2730` to `e1898fd` (#48):
+  Alpine 3.24.4 (was 3.24.3), with `libexpat` 2.10.0-r0, `apk-tools` 3.0.9, and `tzdata` 2026f. The Java runtime is
+  unchanged (Temurin 25.0.5+8).
+- **The Docker image no longer upgrades `libexpat` itself** (#50). The new base ships 2.10.0-r0, which fixes the four
+  HIGH CVEs the image's own upgrade was there for.
+- Logback 1.6.7 (was 1.6.6); the docs site builds with pymdown-extensions 13.1 (was 13.0), still on Zensical 0.1.1.
+- CI: `actions/setup-java` 6.2.0 (was 6.1.0), `github/codeql-action/upload-sarif` 4.39.3 (was 4.39.1), and
+  `zizmorcore/zizmor-action` 0.8.1 (was 0.8.0) (#49).
 
 ## [1.3.2] - 2026-11-13
 
@@ -438,7 +449,8 @@ the original classroom app; [History](#history) at the end tells the story in or
   CI (#5, #7); five waves of fixes from a code review of 24 issues (#9–#12, #14); the admin page's student view
   (#13); `make docker-push` and version 1.1.0 (#16); and the documentation site (#17).
 
-[Unreleased]: https://github.com/pambrose/history-walk/compare/1.3.2...HEAD
+[Unreleased]: https://github.com/pambrose/history-walk/compare/1.3.3...HEAD
+[1.3.3]: https://github.com/pambrose/history-walk/compare/1.3.2...1.3.3
 [1.3.2]: https://github.com/pambrose/history-walk/compare/1.3.1...1.3.2
 [1.3.1]: https://github.com/pambrose/history-walk/compare/1.3.0...1.3.1
 [1.3.0]: https://github.com/pambrose/history-walk/compare/1.2.1...1.3.0

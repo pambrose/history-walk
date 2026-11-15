@@ -1,5 +1,35 @@
 # Release notes
 
+## History Walk 1.3.3 — 2026-11-15
+
+A maintenance release: a new Docker base image and a logging library update. Nothing changes in the walk itself.
+
+### For teachers
+
+- **Nothing changes for you or your students.** The walk, the class pages, and the admin page work as in 1.3.2.
+
+### For administrators
+
+- **No new settings and no database changes**, and the page's interface with the server is unchanged, so open pages
+  aren't asked to reload: each picks up 1.3.3 at its next load. `make railway-redeploy` deploys both walks from the new
+  image and waits until each reports 1.3.3.
+- **A new Docker base image**: Alpine 3.24.4 on the same Java 25 runtime. It carries the `libexpat` fix for four HIGH
+  CVEs that the image applied itself since 1.3.0, so the image no longer needs that step. Trivy's scan of the image
+  passes without it.
+- **Coming from 1.2.1 or earlier?** The *Before you deploy* steps in 1.3.0's notes still apply: back up both walks'
+  databases, check the settings, and deploy outside class time.
+
+### For contributors
+
+- The Dockerfile's `apk add --upgrade 'libexpat>=2.10.0-r0'` step is gone. Trivy's image scan still fails on a
+  fixable HIGH or CRITICAL vulnerability in the image, so a new base digest that brought back an older `libexpat`
+  would fail its pull request.
+- Logback 1.6.7, and the CI actions `actions/setup-java` 6.2.0, `github/codeql-action/upload-sarif` 4.39.3, and
+  `zizmorcore/zizmor-action` 0.8.1.
+- The docs site builds with pymdown-extensions 13.1 (was 13.0), still on Zensical 0.1.1.
+
+**Full Changelog**: <https://github.com/pambrose/history-walk/compare/1.3.2...1.3.3>
+
 ## History Walk 1.3.2 — 2026-11-13
 
 A maintenance release: two corrections to the guide, fixes from a code-quality scan, and three library updates.
