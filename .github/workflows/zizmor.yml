@@ -34,7 +34,7 @@ jobs:
       # The findings fail the job and appear as annotations on the pull request, rather than going to the Security tab.
       # The online audits use the job's token. The action pins zizmor's image by digest, so its own SHA fixes which
       # zizmor runs, and Dependabot moves the two together.
-      - uses: zizmorcore/zizmor-action@53290badfa369cb0bf7ad16342cb62c2fa47ac7b # v0.8.0
+      - uses: zizmorcore/zizmor-action@45d7276c9ca790aabd705e31ca99c6185c3e76dd # v0.8.1
         with:
           advanced-security: false
           annotations: true
