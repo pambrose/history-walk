@@ -7,7 +7,7 @@ DB_CONTAINER ?= history-walk
 DB_IMAGE     ?= postgres:18
 DB_USER      ?= postgres
 DB_PASSWORD  ?= docker
-DB_PORT      ?= 5432
+DB_PORT      ?= 5452
 DB_DATA_DIR  ?= $(HOME)/docker/volumes/$(DB_CONTAINER)
 
 # Docker image of the server; `make docker-run` serves it on DOCKER_PORT against the DOCKER_DB database from `make db`.
@@ -59,7 +59,7 @@ ZENSICAL     := $(abspath website/.venv/bin/zensical)
 
 .DEFAULT_GOAL := help
 
-.PHONY: help db reset-jermain reset-moses stop-db server client build clean tests js-tests coverage lint \
+.PHONY: help db reset-jermain reset-moses stop-db server client build clean tests js-tests all-tests coverage lint \
 		format zizmor ci docker-build docker-push _docker-push docker-run docker-smoke release-check release \
 		_confirm-release release-github railway-restart railway-redeploy log log-jermain log-moses _follow-log website-env \
 		website-serve website-build website-clean upgrade-site versions versions-all depends yarn-unlock upgrade-wrapper \
@@ -75,6 +75,20 @@ help: ## Show this help
 ##@ Development
 
 db: ## Start the Postgres instance and create the jermain and moses databases if missing
+	@# Docker fixes a container's image, port and mounts when it creates it, and docker start keeps them, so a container
+	@# made with another DB_IMAGE, DB_PORT or DB_DATA_DIR is removed and created again. Its data is in the directory it
+	@# mounted, which is kept. The image is checked first, so an empty one never leaves the container removed.
+	@[ -n "$(DB_IMAGE)" ] || { echo "make db: DB_IMAGE is empty" >&2; exit 1; }
+	@want="$(DB_IMAGE) 127.0.0.1:$(DB_PORT) $(DB_DATA_DIR)"; \
+	if docker container inspect $(DB_CONTAINER) >/dev/null 2>&1; then \
+		made=$$(docker inspect --format \
+			'{{.Config.Image}} {{range .HostConfig.PortBindings}}{{range .}}{{.HostIp}}:{{.HostPort}}{{end}}{{end}} {{range .Mounts}}{{.Source}}{{end}}' \
+			$(DB_CONTAINER)) || exit 1; \
+		if [ "$$made" != "$$want" ]; then \
+			printf '%s was made with\n  %s\nso it is made again with\n  %s\n' "$(DB_CONTAINER)" "$$made" "$$want"; \
+			docker stop $(DB_CONTAINER) >/dev/null && docker rm $(DB_CONTAINER) >/dev/null || exit 1; \
+		fi; \
+	fi
 	@if docker container inspect $(DB_CONTAINER) >/dev/null 2>&1; then \
 		docker start $(DB_CONTAINER) >/dev/null; \
 	else \
@@ -136,6 +150,14 @@ tests: ## Run the JVM and client tests every time (the JVM tests need Docker for
 
 js-tests: ## Run only the client tests every time (Kotest in headless Chrome; no Docker needed)
 	$(GRADLE) jsBrowserTest --rerun
+
+# Every test there is: the two Gradle suites (allTests and the kotest task run the same specs), then the image's smoke
+# test, which needs the image built. Not the checks that test nothing (lint, zizmor, the docs build, the coverage floor:
+# make ci) or the Trivy scans, which only CI runs.
+all-tests: ## Run every test: the JVM and client tests, then build the image and smoke-test it (Docker and Chrome)
+	$(MAKE) tests
+	$(MAKE) docker-build
+	$(MAKE) docker-smoke
 
 # koverVerify comes last, so the reports are written even when the coverage is under the floor (build.gradle.kts).
 coverage: ## Run the JVM and client tests, write the JVM code's Kover reports, and check the coverage floor
@@ -253,7 +275,7 @@ docker-smoke: ## Start the image (make docker-build first) against a throwaway P
 	curl -fsS -D - -o /dev/null $$url/ | grep -qi '^x-content-type-options: nosniff' \
 		|| fail "the page shell is not sent with X-Content-Type-Options: nosniff"; \
 	curl -fsS -o /dev/null $$url/main.bundle.js || fail "main.bundle.js is not served"; \
-	status=$$(curl -s -o /dev/null -w '%{http_code}' -X POST $$url/rpc/routeContentServiceManager0 || true); \
+	status=$$(curl -s -o /dev/null -w '%{http_code}' -X POST $$url/rpc/routeIContentServiceManager0 || true); \
 	[ "$$status" = 401 ] || fail "an RPC call without a session got $$status, not 401"; \
 	echo "docker-smoke: $(DOCKER_IMAGE):$(VERSION) migrated an empty database and answered every check"
 

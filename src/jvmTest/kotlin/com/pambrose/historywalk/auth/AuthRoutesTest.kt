@@ -163,7 +163,7 @@ class AuthRoutesTest : StringSpec() {
     }
     "an RPC without a session is 401" {
       signInTest { client ->
-        client.post("/rpc/routeContentServiceManager0").status shouldBe Unauthorized
+        client.post("/rpc/routeIContentServiceManager0").status shouldBe Unauthorized
       }
     }
     "the sign-in greeting is served without a session" {
@@ -261,7 +261,7 @@ class AuthRoutesTest : StringSpec() {
     "a session naming a deleted user is 401 on RPC" {
       signInTest { client ->
         client.get("/test/sign-in/${UUID.randomUUID()}")
-        client.post("/rpc/routeContentServiceManager0").status shouldBe Unauthorized
+        client.post("/rpc/routeIContentServiceManager0").status shouldBe Unauthorized
       }
     }
     "GET logout keeps the session; POST logout ends it" {
@@ -270,7 +270,7 @@ class AuthRoutesTest : StringSpec() {
         client.get("/logout").headers[Location] shouldBe "/"
         client.get("/probe").bodyAsText() shouldBe "teacher ok"
         client.post("/logout").headers[Location] shouldBe "/"
-        client.post("/rpc/routeContentServiceManager0").status shouldBe Unauthorized
+        client.post("/rpc/routeIContentServiceManager0").status shouldBe Unauthorized
       }
     }
     "an admitted student gets a session and goes home" {

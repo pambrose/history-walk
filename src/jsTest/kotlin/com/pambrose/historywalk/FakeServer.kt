@@ -42,7 +42,7 @@ sealed interface Reply {
 inline fun <reified T> returns(value: T): Reply = Reply.Result(RpcSerialization.getJson().encodeToString(value))
 
 /** The route Kilua posts [function] (an `IContentService` member, e.g. `IContentService::getCurrentSlide`) to. */
-fun routeOf(function: Function<*>): String = ContentServiceManager.requireCall(function).first
+fun routeOf(function: Function<*>): String = IContentServiceManager.requireCall(function).first
 
 /**
  * Stands in for the server in the client specs, so a call takes the page's real path: Rpc's `withAuth`, Kilua's client

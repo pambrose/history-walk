@@ -192,7 +192,7 @@ kotlin {
             implementation(libs.exposed.kotlin.datetime)
             implementation(libs.flyway.core)
             runtimeOnly(libs.flyway.database.postgresql)
-            
+
             implementation(libs.flexmark)
 
             implementation(libs.logback.classic)

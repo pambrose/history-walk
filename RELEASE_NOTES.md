@@ -1,5 +1,48 @@
 # Release notes
 
+## History Walk 1.4.0 — 2026-11-18
+
+A platform release: the app is built on new versions of its libraries, KVision 10, Kotlin 2.5, and Kilua RPC, all
+release candidates. Nothing changes in the walk itself, but a page left open across the upgrade must be reloaded.
+
+### For teachers
+
+- **The walk, the class pages, and the admin page work as in 1.3.3.**
+- **Reload any History Walk page that was open when 1.4.0 went out.** Until it is reloaded, every click shows
+  *Something went wrong, so nothing changed. Please try again.*, and trying again doesn't help. A page opened after the
+  upgrade is fine. A reason a student wrote but could not save is kept in the tab: after the reload, making the same
+  choice again brings it back.
+
+### For administrators
+
+- **Deploy outside class time.** The paths the page calls the server at have changed, so a page loaded from 1.3.3
+  reaches none of them, not even its check for a new version: it can't show the *Application Update* dialog or reload
+  itself, and fails on every click until someone reloads it. `apiVersion` goes to 1.1.0 all the same. The releases
+  page explains this.
+- **No new settings and no database changes.** `make railway-redeploy` deploys both walks from the new image and waits
+  until each reports 1.4.0.
+- **Coming from 1.2.1 or earlier?** The *Before you deploy* steps in 1.3.0's notes still apply: back up both walks'
+  databases, check the settings, and deploy outside class time.
+
+### For contributors
+
+- **KVision 10.0.0-RC, Kotlin 2.5.0-RC, and Kilua RPC 0.0.47-RC** (were 9.7.0, 2.4.20, and 0.0.46). KVision 10
+  requires Kotlin 2.5. The page's Bootstrap is 5.3.9.
+- **Kilua RPC names its generated manager `IContentServiceManager`** (was `ContentServiceManager`), and each RPC path
+  after it: `/rpc/routeIContentServiceManager0` and on. `Routes.kt`, the client specs' `FakeServer`,
+  `AuthRoutesTest`, and `make docker-smoke` use the new names. A stale path in a test is a 404, not the 401 it checks.
+- **Kotlin/JS output is `per-module`** (`kotlin.js.ir.output.granularity` in `gradle.properties`, was `per-file`).
+  Under Kotlin 2.5.0-RC, `per-file` output gave the standard library's modules an import cycle, and the page died as
+  it loaded (`VOID` undefined in `coreRuntime.mjs`'s `boxApply`), as did the client specs. Try `per-file` again on a
+  later Kotlin.
+- **`make db` serves Postgres on `127.0.0.1:5452`** (was 5432), so a local `.env` that points at it needs
+  `DBMS_URL=jdbc:postgresql://localhost:5452/<db>` (or run `make db DB_PORT=5432`). A `history-walk` container made
+  with another image, port, or data directory is removed and made again; its data stays in the directory it mounted.
+- **`make all-tests` runs every test**: the JVM and client tests, then the Docker image built and smoke-tested.
+- The client's build and test tools: webpack 5.111.1, webpack-cli 7.2.3, mocha 11.8.0, and kotlin-web-helpers 3.5.4.
+
+**Full Changelog**: <https://github.com/pambrose/history-walk/compare/1.3.3...1.4.0>
+
 ## History Walk 1.3.3 — 2026-11-15
 
 A maintenance release: a new Docker base image and a logging library update. Nothing changes in the walk itself.

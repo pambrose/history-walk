@@ -1,7 +1,14 @@
 .*/
-# The dot-directories are ignored, except the GitHub workflows and Dependabot config, and the Kotlin/JS yarn lock
+# The dot-directories are ignored, except the GitHub workflows and Dependabot config, the Kotlin/JS yarn lock, and
+# impeccable's shared config (.impeccable/config.json, which keeps its design hook off the built docs site)
 !.github/
 !.kotlin-js-store/
+!.impeccable/
+# impeccable's per-machine state: one developer's hook consent, an editing session's journal, and the hook's scratch
+.impeccable/config.local.json
+.impeccable/live/sessions/
+.impeccable/hook.cache.json
+.impeccable/hook.pending.json
 build/
 out/
 *.imp

@@ -5,19 +5,20 @@
 Two numbers in `gradle.properties` describe a release:
 
 `version`
-:   The release, such as `1.3.3`. `/version` reports it, the page logs it in the browser's console, and it tags the
+:   The release, such as `1.4.0`. `/version` reports it, the page logs it in the browser's console, and it tags the
     Docker image. Bump it for every release.
 
 `apiVersion`
 :   The version of the interface between the page and the server. Increment it **only** when that interface
     (`IContentService` and the data it carries) changes, or when a release must replace pages already open. A
     change of `apiVersion` makes every open page reload (below); a release that leaves it alone reaches each page at
-    its next load.
+    its next load. The interface includes the paths the page calls the server at, which Kilua RPC names after the
+    manager class it generates, so a Kilua RPC upgrade that renames that class changes them, as 1.4.0's did.
 
 ## Shipping a release
 
 1. Bump `version` in `gradle.properties` (and `apiVersion`, if the interface changed), and add the version's sections
-   to `CHANGELOG.md` (`## [1.3.3] - <date>`) and `RELEASE_NOTES.md` (`## History Walk 1.3.3 — <date>`, ending with a
+   to `CHANGELOG.md` (`## [1.4.0] - <date>`) and `RELEASE_NOTES.md` (`## History Walk 1.4.0 — <date>`, ending with a
    `**Full Changelog**:` link). Merge it all to `master`, with CI green.
 2. On an up-to-date `master`, run `make release-check`. It publishes nothing; it lists every reason the checkout
    can't be released yet: a dirty tree, another branch, a commit not on GitHub, a missing changelog or release-notes
@@ -27,7 +28,7 @@ Two numbers in `gradle.properties` describe a release:
 3. Run `make release`. It runs `release-check` again, a clean build and the CI gates (`make ci`, all but the Trivy
    scans, which CI runs), then asks once.
    Then it pushes the image to Docker Hub (`pambrose/history-walk:<version>` and `:latest`, amd64 and arm64), built
-   from the jar `make ci` just tested, and creates the GitHub release: tag `1.3.3`, title `v1.3.3`, and the version's
+   from the jar `make ci` just tested, and creates the GitHub release: tag `1.4.0`, title `v1.4.0`, and the version's
    section of `RELEASE_NOTES.md` as its notes. If the checkout changes while `make ci` runs, it publishes nothing.
    If the GitHub release fails after the push (`gh` signed out, the network), run `make release-github` to finish it:
    it checks that the image on Docker Hub was built from the current commit, then creates the release.
@@ -56,6 +57,12 @@ the server, and an out-of-date page nobody is using shows its dialog when someon
 The dialog and the reload wait while another dialog is open or a student is writing a reason, so nothing typed is
 lost; every move before that is already saved. If a reload brings back the old page (a cache still serving the old
 bundle), the page doesn't loop: it shows the dialog once and stops reloading itself in that tab.
+
+A page can only learn it is out of date by reaching the server. When a release changes the paths the page calls
+the server at, as 1.4.0 did, a page loaded before it reaches nothing: its check fails quietly, and every click shows
+*Something went wrong, so nothing changed. Please try again.* (or, for a reason, *…your reason was not saved*) until
+someone reloads it. Deploy such a release outside class time, and have anyone with the walk open reload it. A reason
+that was not saved is kept in the tab: after the reload, making the same choice again brings it back.
 
 ## Caching
 

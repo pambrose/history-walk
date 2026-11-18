@@ -19,7 +19,7 @@ Put your settings in `.env` at the top of the repository. It is gitignored; the 
 GOOGLE_CLIENT_ID=….apps.googleusercontent.com
 GOOGLE_CLIENT_SECRET=…
 OAUTH_CALLBACK_URL=http://localhost:3000/auth/callback
-DBMS_URL=jdbc:postgresql://localhost:5432/jermain
+DBMS_URL=jdbc:postgresql://localhost:5452/jermain
 TEACHER_EMAILS=you@athenian.org
 SLIDES_VARIABLE_NAME=jermain
 ALLOW_SLIDE_ACCESS=true
@@ -41,6 +41,10 @@ make client    # the page on :3000, with hot reload, proxying the server's route
 
 Then open `http://localhost:3000` and sign in.
 
+`make db` serves Postgres on `127.0.0.1:5452` (`DB_PORT`), not the usual 5432, which another local Postgres may hold.
+Docker fixes a container's image, port, and data directory when it makes it, so `make db` removes a container made
+with another `DB_IMAGE`, `DB_PORT`, or `DB_DATA_DIR` and makes it again. The data stays in the directory it mounted.
+
 The dev server forwards `/auth`, the API, `/static`, and the teacher pages to the server
 (`webpack.config.d/proxy.js`). A new server route the browser loads directly must be added there.
 
@@ -50,6 +54,7 @@ The dev server forwards `/auth`, the API, `/static`, and the teacher pages to th
 |---|---|
 | `make tests` | The server's tests (Kotest, MockK, Testcontainers Postgres) and the page's tests (Kotest in headless Chrome). |
 | `make js-tests` | The page's tests alone; no Docker needed. |
+| `make all-tests` | Every test: `make tests`, then the Docker image built and smoke-tested (`make docker-smoke`). |
 | `./gradlew jvmTest --tests 'com.pambrose.historywalk.AdminTest'` | One server spec. The page's tests always run whole. |
 | `make coverage` | The tests, then Kover's coverage reports (`build/reports/kover/html/index.html`), and the coverage floor. |
 | `make lint` / `make format` | Checks, or fixes, the Kotlin style. |
