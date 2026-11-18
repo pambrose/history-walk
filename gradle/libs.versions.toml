@@ -1,18 +1,18 @@
 [versions]
-# Kotlin and JVM. Kotlin went back to 2.4.20 from 2.4.21 deliberately in 1.2.0 (CHANGELOG), so make versions offers
-# 2.4.21; ask before taking it.
-kotlin = "2.4.20"
+# Kotlin and JVM. Kotlin 2.5.0-RC since 1.4.0, as KVision 10.0.0-RC requires. Under it, Kotlin/JS's per-file output
+# crashes the page as the stdlib loads, so gradle.properties sets the granularity to per-module.
+kotlin = "2.5.0-RC"
 jvm = "25"
 
 config = "6.1.2"
-kiluaRpc = "0.0.46"
+kiluaRpc = "0.0.47-RC"
 kotlinter = "5.7.0"
 kover = "0.9.11"
 # Required by kilua. Not 2.3.13, which sometimes lost library symbols when two KSP tasks ran at once in one Gradle
 # daemon (google/ksp#3286), as kspKotlinJs and kspKotlinJvm do: Kilua RPC's processor then found no @RpcService
 # interface, and the JVM build failed with "expect getService has no actual". 2.3.14 fixes it.
 ksp = "2.3.14"
-kvision = "9.7.0"
+kvision = "10.0.0-RC"
 versions = "0.67.0"
 exposed = "1.6.1"
 flexmark = "0.64.8"

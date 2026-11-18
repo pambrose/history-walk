@@ -267,7 +267,7 @@ docker-smoke: ## Start the image (make docker-build first) against a throwaway P
 	curl -fsS -D - -o /dev/null $$url/ | grep -qi '^x-content-type-options: nosniff' \
 		|| fail "the page shell is not sent with X-Content-Type-Options: nosniff"; \
 	curl -fsS -o /dev/null $$url/main.bundle.js || fail "main.bundle.js is not served"; \
-	status=$$(curl -s -o /dev/null -w '%{http_code}' -X POST $$url/rpc/routeContentServiceManager0 || true); \
+	status=$$(curl -s -o /dev/null -w '%{http_code}' -X POST $$url/rpc/routeIContentServiceManager0 || true); \
 	[ "$$status" = 401 ] || fail "an RPC call without a session got $$status, not 401"; \
 	echo "docker-smoke: $(DOCKER_IMAGE):$(VERSION) migrated an empty database and answered every check"
 

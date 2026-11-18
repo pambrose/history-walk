@@ -201,7 +201,7 @@ object Routes {
 
     signedInApi {
       authenticate(GOOGLE_AUTH) {
-        applyRoutes(ContentServiceManager)
+        applyRoutes(IContentServiceManager)
       }
     }
 
