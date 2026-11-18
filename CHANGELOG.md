@@ -6,6 +6,35 @@ All notable changes to History Walk are recorded here. The format follows
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-11-18
+
+The app moves to release candidates of its libraries: KVision 10.0.0-RC, Kotlin 2.5.0-RC, and Kilua RPC 0.0.47-RC.
+Kilua's upgrade renames every RPC path, so `apiVersion` goes to 1.1.0, and a page left open across the upgrade must
+be reloaded. No new settings and no database changes.
+
+### Changed
+
+- **KVision 10.0.0-RC** (was 9.7.0), with **Kotlin 2.5.0-RC** (was 2.4.20), which it requires, and **Kilua RPC
+  0.0.47-RC** (was 0.0.46). The page's Bootstrap is 5.3.9 (was 5.3.8).
+- **The RPC paths change, and `apiVersion` goes to 1.1.0** (was 1.0.0). Kilua RPC names its generated manager
+  `IContentServiceManager` (was `ContentServiceManager`) and each path after it, so `/rpc/routeContentServiceManager0`
+  is now `/rpc/routeIContentServiceManager0`, and so on. A page loaded from 1.3.3 or earlier reaches none of them, its
+  version check included, so it can't be asked to reload: every click fails until someone reloads it. A reason it could
+  not save is kept in the tab and offered again after the reload. `make docker-smoke` and `AuthRoutesTest` post to the
+  new path.
+- **Kotlin/JS writes one module per library** (`kotlin.js.ir.output.granularity=per-module`, was `per-file`). Under
+  Kotlin 2.5.0-RC, `per-file` output gave the standard library's modules an import cycle, and the page died as it
+  loaded (`VOID` undefined in `coreRuntime.mjs`'s `boxApply`), as did the client specs.
+- **`make db` serves Postgres on `127.0.0.1:5452`** (`DB_PORT`, was 5432), and removes and makes again a
+  `history-walk` container made with another image, port, or data directory; the data stays in the directory it
+  mounted. The `DBMS_URL` examples in the README, the development page, and AGENTS.md use 5452.
+- The releases page says that the RPC paths are part of the interface `apiVersion` versions, and what a page that can't
+  reach them does.
+- **`make all-tests` runs every test**: the JVM and client tests (`make tests`), then builds the Docker image and
+  smoke-tests it (`make docker-smoke`). `make ci` still runs those and the other gates.
+- The client's build and test tools, in the committed npm lock: webpack 5.111.1 (was 5.108.1), webpack-cli 7.2.3 (was
+  7.2.1), mocha 11.8.0 (was 11.7.6), and kotlin-web-helpers 3.5.4 (was 3.3.0).
+
 ## [1.3.3] - 2026-11-15
 
 A new Docker base image (#48), which carries the `libexpat` fix the image used to apply itself (#50), with Logback,
@@ -449,7 +478,8 @@ the original classroom app; [History](#history) at the end tells the story in or
   CI (#5, #7); five waves of fixes from a code review of 24 issues (#9–#12, #14); the admin page's student view
   (#13); `make docker-push` and version 1.1.0 (#16); and the documentation site (#17).
 
-[Unreleased]: https://github.com/pambrose/history-walk/compare/1.3.3...HEAD
+[Unreleased]: https://github.com/pambrose/history-walk/compare/1.4.0...HEAD
+[1.4.0]: https://github.com/pambrose/history-walk/compare/1.3.3...1.4.0
 [1.3.3]: https://github.com/pambrose/history-walk/compare/1.3.2...1.3.3
 [1.3.2]: https://github.com/pambrose/history-walk/compare/1.3.1...1.3.2
 [1.3.1]: https://github.com/pambrose/history-walk/compare/1.3.0...1.3.1

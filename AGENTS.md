@@ -14,12 +14,14 @@ The build needs JDK 25 (`gradle/gradle-daemon-jvm.properties` pins the daemon to
 `make` with no target prints the help. The project `group` and `version` live in `gradle.properties`.
 
 ```bash
-make db                 # Postgres 18 in Docker (container history-walk) with the jermain and moses databases
+make db                 # Postgres 18 in Docker (container history-walk, 127.0.0.1:5452) with the jermain and moses
+                        # databases; a container made with another image, port, or data dir is made again, data kept
 make reset-jermain      # drop and recreate one database (reset-moses for the other); Flyway rebuilds the schema on next start
 make server             # Ktor on :8080, continuous rebuild (./gradlew jvmRun -t)
 make client             # webpack dev server on :3000 with hot reload, proxying server routes to :8080
 make tests              # JVM and client specs: ./gradlew jvmTest --rerun jsBrowserTest --rerun (Docker and Chrome)
 make js-tests           # the client specs alone, Kotest in headless Chrome (./gradlew jsBrowserTest --rerun); no Docker
+make all-tests          # every test: make tests, then make docker-build and make docker-smoke (Docker and Chrome)
 make coverage           # the tests plus Kover reports of the JVM code (build/reports/kover/html/index.html), then koverVerify
 ./gradlew jvmTest --tests 'com.pambrose.historywalk.auth.AuthRoutesTest'   # one JVM spec (a client run is always whole)
 make lint               # kotlinter (./gradlew lintKotlin); make format fixes what it can
@@ -49,13 +51,13 @@ make upgrade-site       # upgrade Zensical and its dependencies in website/uv.lo
 Local settings and secrets live in `.env` (gitignored, loaded by the IntelliJ run configs and `make docker-run`). The
 server refuses to start without `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, and `OAUTH_CALLBACK_URL`. The DB defaults in
 `Property.kt` point at a database named `historywalk`, so set `DBMS_URL` (e.g.
-`jdbc:postgresql://localhost:5432/jermain`). The app and the tests use the standard PostgreSQL JDBC driver
+`jdbc:postgresql://localhost:5452/jermain`). The app and the tests use the standard PostgreSQL JDBC driver
 (`org.postgresql`, pgjdbc); a `jdbc:pgsql:` URL, written for the pgjdbc-ng driver used through 1.1.3, is refused.
 
 ## Architecture
 
 **RPC boundary.** `IContentService` (`commonMain/Services.kt`, `@RpcService`) is the whole client/server API. KSP
-generates `ContentServiceManager`; `Main.kt` registers `ContentService(call)` per request, so the implementation reads
+generates `IContentServiceManager`; `Main.kt` registers `ContentService(call)` per request, so the implementation reads
 the signed-in user from the `ApplicationCall` (`call.userUuid`), never from a client-supplied id. DTOs are in
 `commonMain/Dao.kt`. The client calls go through `jsMain/Rpc.kt`, which wraps each in `withAuth`.
 
@@ -272,9 +274,12 @@ floor of its own (`VersionCheckState.MIN_CHECK_INTERVAL`, 5 seconds), whatever t
 `apiVersion` (gradle.properties): on a mismatch the page shows a dialog with a reload link, then,
 `CLIENT_RELOAD_WARNING_INTERVAL_SECS` (60) after the first warning, a countdown toast before it reloads itself.
 Increment `apiVersion` only when the RPC interfaces change, or when a release must replace pages already open; a release
-that leaves it alone reaches each page at its next load. The check goes around `withAuth`, so a signed-out page is left
-to the sign-in dialog. The page's decisions are `VersionCheckState`'s (no DOM; `VersionCheckLoop` runs them with the
-RPC, the UI, and the flags passed in):
+that leaves it alone reaches each page at its next load. The interfaces include their paths, which Kilua names after its
+generated manager (`/rpc/route<Manager><n>`): 1.4.0's Kilua RPC upgrade renamed `ContentServiceManager` to
+`IContentServiceManager`, so a page loaded before it gets a 404 on every call, its check included, and is never told
+to reload (1.4.0 raised `apiVersion` to 1.1.0 all the same). The check goes around `withAuth`, so a signed-out page
+is left to the sign-in dialog. The page's decisions are `VersionCheckState`'s (no DOM; `VersionCheckLoop` runs them
+with the RPC, the UI, and the flags passed in):
 
 - A check due while nobody is using the page waits until someone does, then runs at once (`PageActivity`, which
   `listenForActivity` feeds from the window). The page is in use while it is visible and someone has clicked, tapped,
@@ -423,6 +428,13 @@ compare `master`'s counts before and after a merge. The issues left on `master` 
 
 ## Gotchas
 
+- `gradle.properties` sets `kotlin.js.ir.output.granularity=per-module`. Under Kotlin 2.5.0-RC, `per-file` (used
+  through 1.3.3) writes the stdlib as modules that import one another in a cycle, and the page dies as it loads them
+  (`VOID` undefined in `coreRuntime.mjs`'s `boxApply`), as do the client specs, before any spec runs. A later Kotlin
+  may fix it; re-test before going back.
+- An upgrade of Kilua RPC can rename its generated manager, and with it every RPC path (see Version check).
+  `AuthRoutesTest` and `make docker-smoke` post to `/rpc/routeIContentServiceManager0`. A stale path there is a 404,
+  not the 401 they check for, since `signedInApi` is a child route with no path of its own.
 - IntelliJ has twice auto-imported JDK-internal classes (`sun.jvmstat...`, `sun.jvm.hotspot.HelloWorld.e`) into Kotlin
   files, which breaks the build; delete such imports.
 - Adding a defaulted parameter to a function the JVM specs call (`Routes.appRoutes`, in the 2026-11-11 Wave 1) once

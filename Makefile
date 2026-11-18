@@ -59,7 +59,7 @@ ZENSICAL     := $(abspath website/.venv/bin/zensical)
 
 .DEFAULT_GOAL := help
 
-.PHONY: help db reset-jermain reset-moses stop-db server client build clean tests js-tests coverage lint \
+.PHONY: help db reset-jermain reset-moses stop-db server client build clean tests js-tests all-tests coverage lint \
 		format zizmor ci docker-build docker-push _docker-push docker-run docker-smoke release-check release \
 		_confirm-release release-github railway-restart railway-redeploy log log-jermain log-moses _follow-log website-env \
 		website-serve website-build website-clean upgrade-site versions versions-all depends yarn-unlock upgrade-wrapper \
@@ -150,6 +150,14 @@ tests: ## Run the JVM and client tests every time (the JVM tests need Docker for
 
 js-tests: ## Run only the client tests every time (Kotest in headless Chrome; no Docker needed)
 	$(GRADLE) jsBrowserTest --rerun
+
+# Every test there is: the two Gradle suites (allTests and the kotest task run the same specs), then the image's smoke
+# test, which needs the image built. Not the checks that test nothing (lint, zizmor, the docs build, the coverage floor:
+# make ci) or the Trivy scans, which only CI runs.
+all-tests: ## Run every test: the JVM and client tests, then build the image and smoke-test it (Docker and Chrome)
+	$(MAKE) tests
+	$(MAKE) docker-build
+	$(MAKE) docker-smoke
 
 # koverVerify comes last, so the reports are written even when the coverage is under the floor (build.gradle.kts).
 coverage: ## Run the JVM and client tests, write the JVM code's Kover reports, and check the coverage floor

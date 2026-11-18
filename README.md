@@ -9,7 +9,7 @@
 [![Release](https://img.shields.io/github/v/release/pambrose/history-walk)](https://github.com/pambrose/history-walk/releases)
 [![Docs](https://img.shields.io/badge/docs-pambrose.github.io-blue)](https://pambrose.github.io/history-walk/)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
-[![Kotlin](https://img.shields.io/badge/Kotlin-2.4.20-7F52FF?logo=kotlin&logoColor=white)](https://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.5.0--RC-7F52FF?logo=kotlin&logoColor=white)](https://kotlinlang.org)
 [![Java](https://img.shields.io/badge/Java-25-ED8B00?logo=openjdk&logoColor=white)](https://openjdk.org/projects/jdk/25/)
 
 A choose-your-own-path history scenario for Athenian students: a student makes the decisions of a person escaping
@@ -34,17 +34,18 @@ Put your settings in `.env` at the top of the repository (it is gitignored; see 
 GOOGLE_CLIENT_ID=….apps.googleusercontent.com
 GOOGLE_CLIENT_SECRET=…
 OAUTH_CALLBACK_URL=http://localhost:3000/auth/callback
-DBMS_URL=jdbc:postgresql://localhost:5432/jermain
+DBMS_URL=jdbc:postgresql://localhost:5452/jermain
 TEACHER_EMAILS=you@athenian.org
 ```
 
 Then:
 
 ```bash
-make db        # Postgres 18 in Docker, with the jermain and moses databases
+make db        # Postgres 18 in Docker on 127.0.0.1:5452, with the jermain and moses databases
 make server    # the server on :8080, rebuilt as you edit
 make client    # the page on :3000, with hot reload, proxying the server's routes; open http://localhost:3000
 make tests     # the JVM tests (Docker) and the client tests (Chrome)
+make all-tests # every test: make tests, then the Docker image built and smoke-tested
 make ci        # every CI gate but the Trivy scans: lint, zizmor, the docs site, all tests, the Docker build and smoke test
 ```
 
