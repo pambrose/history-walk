@@ -7,7 +7,7 @@ DB_CONTAINER ?= history-walk
 DB_IMAGE     ?= postgres:18
 DB_USER      ?= postgres
 DB_PASSWORD  ?= docker
-DB_PORT      ?= 5432
+DB_PORT      ?= 5452
 DB_DATA_DIR  ?= $(HOME)/docker/volumes/$(DB_CONTAINER)
 
 # Docker image of the server; `make docker-run` serves it on DOCKER_PORT against the DOCKER_DB database from `make db`.
@@ -75,6 +75,20 @@ help: ## Show this help
 ##@ Development
 
 db: ## Start the Postgres instance and create the jermain and moses databases if missing
+	@# Docker fixes a container's image, port and mounts when it creates it, and docker start keeps them, so a container
+	@# made with another DB_IMAGE, DB_PORT or DB_DATA_DIR is removed and created again. Its data is in the directory it
+	@# mounted, which is kept. The image is checked first, so an empty one never leaves the container removed.
+	@[ -n "$(DB_IMAGE)" ] || { echo "make db: DB_IMAGE is empty" >&2; exit 1; }
+	@want="$(DB_IMAGE) 127.0.0.1:$(DB_PORT) $(DB_DATA_DIR)"; \
+	if docker container inspect $(DB_CONTAINER) >/dev/null 2>&1; then \
+		made=$$(docker inspect --format \
+			'{{.Config.Image}} {{range .HostConfig.PortBindings}}{{range .}}{{.HostIp}}:{{.HostPort}}{{end}}{{end}} {{range .Mounts}}{{.Source}}{{end}}' \
+			$(DB_CONTAINER)) || exit 1; \
+		if [ "$$made" != "$$want" ]; then \
+			printf '%s was made with\n  %s\nso it is made again with\n  %s\n' "$(DB_CONTAINER)" "$$made" "$$want"; \
+			docker stop $(DB_CONTAINER) >/dev/null && docker rm $(DB_CONTAINER) >/dev/null || exit 1; \
+		fi; \
+	fi
 	@if docker container inspect $(DB_CONTAINER) >/dev/null 2>&1; then \
 		docker start $(DB_CONTAINER) >/dev/null; \
 	else \
