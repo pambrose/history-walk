@@ -77,6 +77,7 @@ The image holds a Java 25 JRE (Alpine) and the fat jar, nothing else, and runs i
 | `make docker-build` | Builds the jar, then the image `history-walk:<version>` and `:latest`. |
 | `make docker-run` | Runs the image on port 8080 with `.env`, against the local `jermain` database from `make db` (`DOCKER_DB=moses` for the other; `DOCKER_PORT=8090` for another port). |
 | `make docker-smoke` | Starts the image against a throwaway Postgres and checks that it migrates an empty database and answers `/ping`, `/version`, `/health`, the page, and a refused API call. CI runs it on every pull request. |
+| `make docker-scan` | Builds the image, then lists its known vulnerabilities with Docker Scout: the Alpine and Java layers and the libraries in the jar, of every severity, fixed or not. It gates nothing: CI's gate is the Security workflow's Trivy scan, whose database is not Scout's, so the two lists can differ. Scout can also name a fix from Alpine's development branch for a vulnerability the image's Alpine release has already fixed in an earlier version; [Alpine's security database](https://secdb.alpinelinux.org/) says which. |
 | `make docker-push` | Builds the jar, then builds the image for `linux/amd64` and `linux/arm64` and pushes `pambrose/history-walk:<version>` and `:latest` to Docker Hub. It asks before pushing; `docker login` once first. `DOCKER_REPO` and `DOCKER_PLATFORMS` override the repository and the platforms. |
 
 The image:
