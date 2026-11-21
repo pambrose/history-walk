@@ -1,5 +1,5 @@
 GRADLE         := ./gradlew
-GRADLE_VERSION ?= 9.9.1
+GRADLE_VERSION ?= 9.9.2
 
 # One local Postgres instance holding both databases; override any of these, e.g. `make db DB_PORT=5433`.
 DATABASES    := jermain moses
