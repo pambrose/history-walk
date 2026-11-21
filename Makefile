@@ -1,5 +1,5 @@
 GRADLE         := ./gradlew
-GRADLE_VERSION ?= 9.9.1
+GRADLE_VERSION ?= 9.9.2
 
 # One local Postgres instance holding both databases; override any of these, e.g. `make db DB_PORT=5433`.
 DATABASES    := jermain moses
@@ -60,7 +60,7 @@ ZENSICAL     := $(abspath website/.venv/bin/zensical)
 .DEFAULT_GOAL := help
 
 .PHONY: help db reset-jermain reset-moses stop-db server client build clean tests js-tests all-tests coverage lint \
-		format zizmor ci docker-build docker-push _docker-push docker-run docker-smoke release-check release \
+		format zizmor ci docker-build docker-scan docker-push _docker-push docker-run docker-smoke release-check release \
 		_confirm-release release-github railway-restart railway-redeploy log log-jermain log-moses _follow-log website-env \
 		website-serve website-build website-clean upgrade-site versions versions-all depends yarn-unlock upgrade-wrapper \
 		railway-versions served-version
@@ -198,6 +198,15 @@ docker-build: ## Build the fat jar, then an image holding it (history-walk:VERSI
 	$(GRADLE) jar
 	docker build --build-arg APP_VERSION=$(VERSION) --build-arg APP_REVISION=$(APP_REVISION) \
 		-t $(DOCKER_IMAGE):$(VERSION) -t $(DOCKER_IMAGE):latest .
+
+# Lists the image's known vulnerabilities with Docker Scout: the Alpine and JRE layers and the libraries inside the jar,
+# of every severity, fixed or not. It gates nothing. CI's gate is Trivy (security.yml's image-scan, which a fixable HIGH
+# or CRITICAL fails), whose database is not Scout's, so the two lists can differ: Scout can name a fix that only Alpine's
+# edge branch has for a CVE the image's Alpine release fixed in an earlier version (musl's CVE-2026-107891, fixed in
+# 3.24's 1.2.6-r3), so check secdb.alpinelinux.org before acting on one. local:// scans the image just built, never one
+# of the same name from a registry.
+docker-scan: docker-build ## Build the image, then list its known vulnerabilities with Docker Scout
+	docker scout cves local://$(DOCKER_IMAGE):$(VERSION)
 
 # One jar serves every platform, and the base image is pinned to its multi-arch index, so buildx builds the image for
 # each of DOCKER_PLATFORMS from the same jar and pushes them under one tag. The image holds no secrets (they come from

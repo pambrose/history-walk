@@ -1,5 +1,39 @@
 # Release notes
 
+## History Walk 1.4.1 — 2026-11-21
+
+A maintenance release: a new Docker base image that fixes vulnerabilities found in 1.4.0's, and library updates.
+Nothing changes in the walk itself.
+
+### For teachers
+
+- **Nothing changes for you or your students.** The walk, the class pages, and the admin page work as in 1.4.0.
+
+### For administrators
+
+- **No new settings and no database changes**, and the page's interface with the server is unchanged, so open pages
+  aren't asked to reload: each picks up 1.4.1 at its next load. `make railway-redeploy` deploys both walks from the new
+  image and waits until each reports 1.4.1.
+- **A new Docker base image**, on Java 25.0.5.1, with fixes for OpenSSL (four HIGH CVEs) and `libfontenc` (a HIGH
+  CVE), and the image upgrades `zlib` itself for a CVE the new base still carries. Trivy's scan of 1.4.0's image now
+  fails on the `libfontenc` CVE; 1.4.1's passes.
+- **Coming from 1.3.3 or earlier?** Read 1.4.0's notes first: a page left open from 1.3.3 can't reach the new server
+  and must be reloaded by hand, so deploy outside class time. From 1.2.1 or earlier, the *Before you deploy* steps in
+  1.3.0's notes apply too.
+
+### For contributors
+
+- **`make docker-scan`** builds the image and lists its known vulnerabilities with Docker Scout, of every severity,
+  fixed or not. It gates nothing: the Security workflow's Trivy scan is still the gate, and the two use different
+  databases. Scout reports a HIGH in musl (CVE-2026-107891) with a fix from Alpine's development branch; Alpine 3.24
+  fixed it in the 1.2.6-r3 the image has.
+- The Dockerfile upgrades `zlib` (`apk add --upgrade 'zlib>=1.4-r0'`), as it did `libexpat` until 1.3.3. Drop the
+  step once a base digest ships zlib 1.4.
+- Flyway 13.13.0, Logback 1.6.8, and Gradle 9.9.2.
+- The docs site builds with Zensical 0.1.3 (was 0.1.1) and pymdown-extensions 13.1.2 (was 13.1).
+
+**Full Changelog**: <https://github.com/pambrose/history-walk/compare/1.4.0...1.4.1>
+
 ## History Walk 1.4.0 — 2026-11-18
 
 A platform release: the app is built on new versions of its libraries, KVision 10, Kotlin 2.5, and Kilua RPC, all

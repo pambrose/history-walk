@@ -6,6 +6,28 @@ All notable changes to History Walk are recorded here. The format follows
 
 ## [Unreleased]
 
+## [1.4.1] - 2026-11-21
+
+A maintenance release that fixes the vulnerabilities now found in 1.4.0's Docker image, one of which Trivy fails it
+on: a new base image, and `zlib` upgraded in the image. `make docker-scan` lists an image's vulnerabilities locally,
+and Flyway, Logback, Gradle, and the docs site's tools are updated. No new settings and no database changes;
+`apiVersion` is unchanged (1.1.0).
+
+### Added
+
+- `make docker-scan` builds the image and lists its known vulnerabilities with Docker Scout, of every severity,
+  fixed or not. It gates nothing: the Security workflow's Trivy scan is still CI's gate.
+
+### Changed
+
+- **A new Docker base image.** The `eclipse-temurin:25-jre-alpine` digest moves from `e1898fd` to `69c2a26`: Temurin
+  25.0.5.1+2 (was 25.0.5+8), with OpenSSL 3.5.9-r1 (four HIGH CVEs) and `libfontenc` 1.1.10-r0 (a HIGH CVE, on which
+  Trivy now fails the 1.4.0 image), still on Alpine 3.24.4.
+- **The Docker image upgrades `zlib` to 1.4-r0** itself, for CVE-2026-4738, which the new base still carries. Drop the
+  upgrade once a base digest ships it.
+- Flyway 13.13.0 (was 13.12.2), Logback 1.6.8 (was 1.6.7), and Gradle 9.9.2 (was 9.9.1).
+- The docs site builds with Zensical 0.1.3 (was 0.1.1) and pymdown-extensions 13.1.2 (was 13.1).
+
 ## [1.4.0] - 2026-11-18
 
 The app moves to release candidates of its libraries: KVision 10.0.0-RC, Kotlin 2.5.0-RC, and Kilua RPC 0.0.47-RC.
@@ -478,7 +500,8 @@ the original classroom app; [History](#history) at the end tells the story in or
   CI (#5, #7); five waves of fixes from a code review of 24 issues (#9–#12, #14); the admin page's student view
   (#13); `make docker-push` and version 1.1.0 (#16); and the documentation site (#17).
 
-[Unreleased]: https://github.com/pambrose/history-walk/compare/1.4.0...HEAD
+[Unreleased]: https://github.com/pambrose/history-walk/compare/1.4.1...HEAD
+[1.4.1]: https://github.com/pambrose/history-walk/compare/1.4.0...1.4.1
 [1.4.0]: https://github.com/pambrose/history-walk/compare/1.3.3...1.4.0
 [1.3.3]: https://github.com/pambrose/history-walk/compare/1.3.2...1.3.3
 [1.3.2]: https://github.com/pambrose/history-walk/compare/1.3.1...1.3.2

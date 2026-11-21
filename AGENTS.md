@@ -30,6 +30,7 @@ make ci                 # every CI gate but the Trivy scans: lint, zizmor, websi
                         # docker-smoke
 make build              # clean + fat jar at build/libs/history-walk.jar (server + bundled JS client; no version)
 make docker-build       # fat jar, then image history-walk:<version>; make docker-run runs it with .env against make db
+make docker-scan        # docker-build, then Docker Scout lists the image's CVEs, every severity (gates nothing; CI's is Trivy)
 make docker-push        # fat jar, then buildx pushes pambrose/history-walk:<version> and :latest (amd64, arm64) to Docker Hub
 make docker-smoke       # start the image against a throwaway Postgres and check /ping, /version, /health, headers, the 401
 make yarn-unlock        # rewrite the committed Kotlin/JS yarn lock after an npm dependency change (commit the result)
