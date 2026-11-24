@@ -59,11 +59,14 @@ ZENSICAL     := $(abspath website/.venv/bin/zensical)
 
 .DEFAULT_GOAL := help
 
-.PHONY: help db reset-jermain reset-moses stop-db server client build clean tests js-tests all-tests coverage lint \
-		format zizmor ci docker-build docker-scan docker-push _docker-push docker-run docker-smoke docker-clean release-check \
-		release _confirm-release release-github railway-restart railway-redeploy log log-jermain log-moses _follow-log \
-		website-env website-serve website-build website-clean upgrade-site versions versions-all depends yarn-unlock \
-		upgrade-wrapper railway-versions served-version
+.PHONY: help db reset-jermain reset-moses stop-db server client build clean \
+		tests js-tests all-tests coverage lint format zizmor ci depends yarn-unlock \
+		docker-build docker-scan docker-push _docker-push docker-run docker-smoke docker-clean \
+		release-check release _confirm-release release-github  \
+		log log-jermain log-moses _follow-log \
+		website-env website-serve website-build website-clean \
+		upgrade-site versions versions-all \
+		upgrade-wrapper railway-restart railway-redeploy railway-versions served-version
 
 ##@ General
 
