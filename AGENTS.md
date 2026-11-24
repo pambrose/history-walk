@@ -33,6 +33,8 @@ make docker-build       # fat jar, then image history-walk:<version>; make docke
 make docker-scan        # docker-build, then Docker Scout lists the image's CVEs, every severity (gates nothing; CI's is Trivy)
 make docker-push        # fat jar, then buildx pushes pambrose/history-walk:<version> and :latest (amd64, arm64) to Docker Hub
 make docker-smoke       # start the image against a throwaway Postgres and check /ping, /version, /health, headers, the 401
+make docker-clean       # remove every history-walk image but VERSION's and latest, and Postgres volumes docker-smoke left
+                        # behind (DRY_RUN=true lists them); make db's container and data, and other projects', stay
 make yarn-unlock        # rewrite the committed Kotlin/JS yarn lock after an npm dependency change (commit the result)
 make railway-restart    # restart the Jermain and Moses services on Railway (railway CLI), then wait for /version to change
 make railway-redeploy   # redeploy both from the newest Docker Hub image (after a release), then wait for its version

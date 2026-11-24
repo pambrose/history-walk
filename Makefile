@@ -59,11 +59,14 @@ ZENSICAL     := $(abspath website/.venv/bin/zensical)
 
 .DEFAULT_GOAL := help
 
-.PHONY: help db reset-jermain reset-moses stop-db server client build clean tests js-tests all-tests coverage lint \
-		format zizmor ci docker-build docker-scan docker-push _docker-push docker-run docker-smoke release-check release \
-		_confirm-release release-github railway-restart railway-redeploy log log-jermain log-moses _follow-log website-env \
-		website-serve website-build website-clean upgrade-site versions versions-all depends yarn-unlock upgrade-wrapper \
-		railway-versions served-version
+.PHONY: help db reset-jermain reset-moses stop-db server client build clean \
+		tests js-tests all-tests coverage lint format zizmor ci depends yarn-unlock \
+		docker-build docker-scan docker-push _docker-push docker-run docker-smoke docker-clean \
+		release-check release _confirm-release release-github  \
+		log log-jermain log-moses _follow-log \
+		website-env website-serve website-build website-clean \
+		upgrade-site versions versions-all \
+		upgrade-wrapper railway-restart railway-redeploy railway-versions served-version
 
 ##@ General
 
@@ -247,12 +250,13 @@ docker-run: docker-build ## Run the image on DOCKER_PORT with ENV_FILE (.env), a
 # headers, the bundle, and a 401 for an RPC call without a session. Sign-in needs real Google credentials only when
 # someone signs in, so placeholders let the server start, and a loopback callback URL means no SESSION_SECRET is
 # required. Everything it starts is removed however it ends (a trap on exit), and a failure says which check failed and
-# prints the end of the server's log. The Docker Image workflow runs it too.
+# prints the end of the server's log. The Docker Image workflow runs it too. Postgres's image declares a volume, which
+# docker rm keeps unless given -v: without it, each run used to leave an unnamed volume of about 50 MB (docker-clean).
 SMOKE_NAME ?= history-walk-smoke
 SMOKE_PORT ?= 18080
 docker-smoke: ## Start the image (make docker-build first) against a throwaway Postgres and check that it answers
 	@set -e; \
-	cleanup() { docker rm -f $(SMOKE_NAME)-app $(SMOKE_NAME)-db >/dev/null 2>&1 || true; \
+	cleanup() { docker rm -f -v $(SMOKE_NAME)-app $(SMOKE_NAME)-db >/dev/null 2>&1 || true; \
 		docker network rm $(SMOKE_NAME) >/dev/null 2>&1 || true; }; \
 	fail() { echo "docker-smoke: $$1" >&2; docker logs $(SMOKE_NAME)-app 2>&1 | tail -40 >&2 || true; exit 1; }; \
 	cleanup; \
@@ -287,6 +291,48 @@ docker-smoke: ## Start the image (make docker-build first) against a throwaway P
 	status=$$(curl -s -o /dev/null -w '%{http_code}' -X POST $$url/rpc/routeIContentServiceManager0 || true); \
 	[ "$$status" = 401 ] || fail "an RPC call without a session got $$status, not 401"; \
 	echo "docker-smoke: $(DOCKER_IMAGE):$(VERSION) migrated an empty database and answered every check"
+
+# Removes what the Docker targets leave behind, and nothing else: make db's container and its data directory, the images
+# the build and the tests run on (DB_IMAGE, the JRE base), and other projects' images and volumes all stay.
+# - make docker-build tags the image with VERSION, so each release left its own tag (about 100 MB apiece, apart from the
+#   layers they share): every DOCKER_IMAGE tag but VERSION's and latest goes.
+# - A release's push can keep a copy of the multi-arch image under DOCKER_REPO, as 1.3.3's did (the docker builder
+#   stores what it builds in Docker Desktop's image store): those copies go, since Docker Hub has them.
+# - docker-smoke used to leave its Postgres volume behind (see above). Each unnamed volume that no container uses, even a
+#   stopped one, is mounted read-only in one DB_IMAGE container, and those holding a data directory with the smoke
+#   test's historywalk database go (SMOKE_VOLUME_PROBE). No other database here, the tests' included, has that name.
+# An image a container still uses is not removed, and the target fails, naming it. DRY_RUN=true lists what would go.
+DRY_RUN ?=
+# Prints each volume under /vols whose Postgres data directory, at its top (postgres:17 and before) or in
+# <major>/docker (postgres:18), lists the historywalk database in pg_database (global/1262).
+SMOKE_VOLUME_PROBE = for d in /vols/*; do for f in "$$d"/global/1262 "$$d"/*/docker/global/1262; do \
+	if [ -f "$$f" ] && grep -qs historywalk "$$f"; then basename "$$d"; break; fi; done; done
+docker-clean: ## Remove old history-walk images and docker-smoke's leftover volumes (DRY_RUN=true lists them)
+	@status=0; \
+	if [ "$(DRY_RUN)" = true ]; then act="Would remove"; else act="Removing"; fi; \
+	images=$$(docker images --format '{{.Repository}}:{{.Tag}}' | awk -F: '($$1 == "$(DOCKER_IMAGE)" || \
+		$$1 == "$(DOCKER_REPO)") && $$0 != "$(DOCKER_IMAGE):$(VERSION)" && $$0 != "$(DOCKER_IMAGE):latest"' | sort -u) \
+		|| exit 1; \
+	if [ -n "$$images" ]; then \
+		echo "$$act these images:"; echo "$$images" | sed 's/^/  /'; \
+		[ "$(DRY_RUN)" = true ] || docker rmi $$images >/dev/null || status=1; \
+	else \
+		echo "No old $(DOCKER_IMAGE) or $(DOCKER_REPO) images"; \
+	fi; \
+	vols=$$(docker volume ls -q --filter dangling=true --filter label=com.docker.volume.anonymous) || exit 1; \
+	smoke=; \
+	if [ -n "$$vols" ]; then \
+		smoke=$$(docker run --rm --network none --entrypoint sh \
+			$$(for v in $$vols; do printf -- '--mount type=volume,src=%s,dst=/vols/%s,readonly ' $$v $$v; done) \
+			$(DB_IMAGE) -c '$(SMOKE_VOLUME_PROBE)') || exit 1; \
+	fi; \
+	if [ -n "$$smoke" ]; then \
+		echo "$$act $$(echo "$$smoke" | wc -l | tr -d ' ') Postgres volumes docker-smoke left behind"; \
+		[ "$(DRY_RUN)" = true ] || docker volume rm $$smoke >/dev/null || status=1; \
+	else \
+		echo "No Postgres volumes left by docker-smoke"; \
+	fi; \
+	exit $$status
 
 ##@ Release
 
