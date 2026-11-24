@@ -280,7 +280,7 @@ class AuthRoutesTest : StringSpec() {
         val r = client.get("/test/complete-student")
         r.headers[Location] shouldBe "/"
         r.setCookie().map { it.name } shouldContain "HistoryWalkAuth"
-        verify(exactly = 1) { provision(match { it.role == Role.STUDENT }) }
+        verify(exactly = 1) { val _ = provision(match { it.role == Role.STUDENT }) }
       }
     }
     "a refused account gets no session and is told why" {
@@ -289,7 +289,7 @@ class AuthRoutesTest : StringSpec() {
         val r = client.get("/test/complete-gmail")
         r.headers[Location] shouldBe "/?error=domain&email=jsmith%40gmail.com"
         r.setCookie().none { it.name == "HistoryWalkAuth" && it.value.isNotEmpty() } shouldBe true
-        verify(exactly = 0) { provision(any()) }
+        verify(exactly = 0) { val _ = provision(any()) }
       }
     }
   }
