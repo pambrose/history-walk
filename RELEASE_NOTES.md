@@ -1,5 +1,42 @@
 # Release notes
 
+## History Walk 1.4.2 — 2026-11-24
+
+A maintenance release: a security update of the PostgreSQL driver, and Docker housekeeping for contributors. Nothing
+changes in the walk itself.
+
+### For teachers
+
+- **Nothing changes for you or your students.** The walk, the class pages, and the admin page work as in 1.4.1.
+
+### For administrators
+
+- **No new settings and no database changes**, and the page's interface with the server is unchanged, so open pages
+  aren't asked to reload: each picks up 1.4.2 at its next load. `make railway-redeploy` deploys both walks from the new
+  image and waits until each reports 1.4.2.
+- **The PostgreSQL JDBC driver 42.7.15**, a security release that fixes fourteen advisories against the 42.7.14 in
+  1.4.1, seven of them rated high. History Walk sends every value, a student's reason included, as a parameter of a
+  prepared statement in the driver's default query mode, and sets `sslmode` itself, which keeps it clear of the
+  injection and TLS advisories, but deploy 1.4.2 all the same. GitHub's advisory database, which Trivy reads, didn't
+  list them yet, so a scan of 1.4.1's image can still pass.
+- **Coming from 1.3.3 or earlier?** Read 1.4.0's notes first: a page left open from 1.3.3 can't reach the new server
+  and must be reloaded by hand, so deploy outside class time. From 1.2.1 or earlier, the *Before you deploy* steps in
+  1.3.0's notes apply too.
+
+### For contributors
+
+- **`make docker-clean`** removes what the Docker targets leave behind: every local `history-walk` image but this
+  version's and `latest` (each version's `make docker-build` leaves its own tag), local copies of
+  `pambrose/history-walk` (Docker Hub has them), and the Postgres volumes `make docker-smoke` left. `DRY_RUN=true`
+  lists them without removing anything. `make db`'s container and data, and other projects' images and volumes, stay.
+- **`make docker-smoke` no longer leaves a volume behind.** Postgres's image declares one, and the smoke test removed
+  its container without it, so each run left an unnamed volume of about 50 MB. `make docker-clean` removes those
+  already left.
+- common-utils 5.3.0 (was 5.2.0): none of its behavior changes reaches the server. CI sets up Java with
+  `actions/setup-java` 6.3.0.
+
+**Full Changelog**: <https://github.com/pambrose/history-walk/compare/1.4.1...1.4.2>
+
 ## History Walk 1.4.1 — 2026-11-21
 
 A maintenance release: a new Docker base image that fixes vulnerabilities found in 1.4.0's, and library updates.
