@@ -6,6 +6,11 @@ All notable changes to History Walk are recorded here. The format follows
 
 ## [Unreleased]
 
+## [1.4.2] - 2026-11-24
+
+A maintenance release: a security update of the PostgreSQL JDBC driver, `make docker-clean`, and a fix for the volumes
+`make docker-smoke` left behind. No new settings and no database changes; `apiVersion` is unchanged (1.1.0).
+
 ### Added
 
 - `make docker-clean` removes the Docker images earlier versions left behind, every local `history-walk` image but
@@ -18,6 +23,22 @@ All notable changes to History Walk are recorded here. The format follows
 
 - `make docker-smoke` removes its Postgres container's volume with the container. Postgres's image declares one, and
   `docker rm` without `-v` kept it, so each run left an unnamed volume of about 50 MB.
+
+### Changed
+
+- common-utils 5.3.0 (was 5.2.0). Its behavior changes are in modules the server doesn't use, and the server already
+  had the Ktor 3.6.1 and Exposed 1.6.1 it moves to.
+- CI sets up Java with `actions/setup-java` 6.3.0 (was 6.2.0), in the five workflows that use it.
+
+### Security
+
+- **The PostgreSQL JDBC driver 42.7.15** (was 42.7.14), a security release that fixes fourteen advisories against
+  42.7.14, seven of them rated high. Among them: quoted text the driver read as SQL (in JDBC escapes, dollar quotes,
+  `E''` strings, and simple query mode), catalog queries that could run another role's objects, `ssl` settings that
+  left a connection unencrypted, and crafted data from a server or the network path. History Walk sends every value,
+  a student's reason included, as a parameter of a prepared statement in the driver's default query mode, and sets
+  `sslmode` itself, which keeps it clear of the injection and TLS advisories; the update is taken all the same.
+  GitHub's advisory database, which Trivy reads, didn't list them yet, so the Security workflow passed 42.7.14.
 
 ## [1.4.1] - 2026-11-21
 
@@ -513,7 +534,8 @@ the original classroom app; [History](#history) at the end tells the story in or
   CI (#5, #7); five waves of fixes from a code review of 24 issues (#9–#12, #14); the admin page's student view
   (#13); `make docker-push` and version 1.1.0 (#16); and the documentation site (#17).
 
-[Unreleased]: https://github.com/pambrose/history-walk/compare/1.4.1...HEAD
+[Unreleased]: https://github.com/pambrose/history-walk/compare/1.4.2...HEAD
+[1.4.2]: https://github.com/pambrose/history-walk/compare/1.4.1...1.4.2
 [1.4.1]: https://github.com/pambrose/history-walk/compare/1.4.0...1.4.1
 [1.4.0]: https://github.com/pambrose/history-walk/compare/1.3.3...1.4.0
 [1.3.3]: https://github.com/pambrose/history-walk/compare/1.3.2...1.3.3

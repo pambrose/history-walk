@@ -149,6 +149,10 @@ Use `DOCKER_PORT=8090` to run beside `make server`, and `DOCKER_DB=moses` (with
 `linux/amd64` and `linux/arm64` with `docker buildx`. Run `docker login` once first. It asks before pushing, and
 `DOCKER_REPO` and `DOCKER_PLATFORMS` override the repository and the platforms.
 
+Each version's `make docker-build` leaves its own `history-walk:<version>` tag. `make docker-clean` removes every one
+but the current version's and `latest`, any local copy of `pambrose/history-walk` (Docker Hub has them), and the
+Postgres volumes that `make docker-smoke` left before 1.4.2; `DRY_RUN=true` lists them without removing anything.
+
 ## Deployment
 
 Each walk is its own deployment of the fat jar, on Java 25, with its own Postgres database and environment variables.
