@@ -6,6 +6,19 @@ All notable changes to History Walk are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- `make docker-clean` removes the Docker images earlier versions left behind, every local `history-walk` image but
+  VERSION's and `latest`, and local copies of `pambrose/history-walk` (Docker Hub has them), and the Postgres volumes
+  `make docker-smoke` left. It finds those by the smoke test's `historywalk` database, mounting each unused unnamed
+  volume read-only. `DRY_RUN=true` lists what it would remove. `make db`'s container and data stay, as do other
+  projects' images and volumes.
+
+### Fixed
+
+- `make docker-smoke` removes its Postgres container's volume with the container. Postgres's image declares one, and
+  `docker rm` without `-v` kept it, so each run left an unnamed volume of about 50 MB.
+
 ## [1.4.1] - 2026-11-21
 
 A maintenance release that fixes the vulnerabilities now found in 1.4.0's Docker image, one of which Trivy fails it
